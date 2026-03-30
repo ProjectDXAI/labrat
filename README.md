@@ -32,12 +32,34 @@ The common thread: you have a baseline, a metric, multiple axes of variation, an
 
 ## How it works
 
-Your agent harness (Claude Code, Codex, etc.) acts as the orchestrator -- the monolith that watches everything, allocates budget, and judges results. It dispatches labrats (subagents) to explore branches in parallel. Each experiment changes one thing. A formula scores results. Budget flows to what produces. The loop runs until convergence.
+You define a research tree. The orchestrator explores it.
 
 ```
-  orchestrator.md
+                            baseline
+                          TF-IDF + LR
+                               │
+            ┌──────────┬───────┼───────┬──────────┐
+            │          │       │       │          │
+        features    model   preproc  objectives  ensemble
+        budget:20  budget:20  b:15    b:15       b:10
+            │          │       │       │
+         bigrams     SVM    stopwords balanced    ← promoted
+         trigrams    catboost  min_df   C=0.5     ← tested
+         char_wb    lightgbm  max_df   C=5.0     ← rejected
+         50K feat   rand.for.          C=10
+            │          │       │       │
+            └──────────┴───────┴───────┘
+                               │
+                           capstone
+                     combine branch winners
+```
+
+Your agent harness (Claude Code, Codex, etc.) acts as the orchestrator. It dispatches labrats (subagents) to explore branches in parallel. Each experiment changes one thing. A formula scores results. Budget flows to what produces.
+
+```
+  orchestrator (the monolith)
   │
-  ├─ Select branches by priority (UCB1-inspired)
+  ├─ Select branches by priority
   ├─ Dispatch labrats in parallel ─────────────────┐
   │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
   │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
