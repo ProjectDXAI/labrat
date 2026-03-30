@@ -1,0 +1,100 @@
+# Research Lab: Branch Tree Template
+#
+# CUSTOMIZE THIS FILE for your domain.
+# Each branch explores one axis of variation.
+# The allocator picks the highest-priority branch each cycle.
+
+# One line: what is this lab trying to achieve? Shown in the dashboard header.
+# Examples:
+#   "Maximize macro F1 on SST-5 (5-class sentiment). Baseline: TF-IDF+LR F1=0.36. Target: F1 >= 0.42."
+#   "Minimize RMSE on housing prices. Baseline: linear regression RMSE=45K. Target: RMSE < 30K."
+#   "Maximize Sharpe ratio on BTC perps. Baseline: no-trade. Target: Sharpe > 0.15 after 1bps fees."
+mission: "Describe your goal, baseline metric, and target. This appears in the dashboard header."
+
+# Your current best configuration (the thing to beat)
+production_baseline:
+  experiment_id: "baseline_v1"
+  description: "Current best approach"
+  config:
+    # YOUR baseline config here
+    data:
+      dataset: "your_dataset"
+      train_split: "train"
+      test_split: "test"
+    model:
+      type: "your_model"
+      params: {}
+    training:
+      epochs: 10
+      batch_size: 32
+      learning_rate: 0.001
+    evaluation:
+      metric: "your_primary_metric"
+      cross_validation: true
+      n_folds: 5
+
+branches:
+  # Branch 1: Model architecture
+  architecture:
+    description: "Model architecture variations"
+    initial_budget: 25
+    search_space:
+      - delta_key: "model.type"
+        values: ["model_a", "model_b", "model_c"]
+      - delta_key: "model.params.hidden_size"
+        values: [128, 256, 512, 1024]
+
+  # Branch 2: Training recipe
+  training:
+    description: "Training hyperparameters and schedules"
+    initial_budget: 20
+    search_space:
+      - delta_key: "training.learning_rate"
+        values: [0.0001, 0.0005, 0.005, 0.01]
+      - delta_key: "training.batch_size"
+        values: [16, 64, 128]
+      - delta_key: "training.epochs"
+        values: [5, 20, 50]
+
+  # Branch 3: Data engineering
+  data:
+    description: "Data preprocessing, augmentation, and selection"
+    initial_budget: 20
+    search_space:
+      - delta_key: "data.augmentation"
+        values: ["none", "basic", "aggressive"]
+      - delta_key: "data.preprocessing"
+        values: ["standard", "normalized", "quantile"]
+
+  # Branch 4: Objective function
+  objectives:
+    description: "Loss function and optimization target"
+    initial_budget: 15
+    search_space:
+      - delta_key: "training.loss"
+        values: ["cross_entropy", "focal", "label_smoothing"]
+
+  # Branch 5: Generalization
+  generalization:
+    description: "Cross-domain and robustness tests"
+    initial_budget: 10
+    search_space:
+      - delta_key: "data.dataset"
+        values: ["dataset_b", "dataset_c"]
+
+  # Branch 6: Capstone (cross-branch combinations)
+  capstone:
+    description: "Combined configs from branch winners"
+    initial_budget: 20
+    search_space:
+      - delta_key: "combined"
+        values:
+          - name: "optimal_combined"
+            description: "All branch winners combined"
+            config_overrides: {}  # filled after branch exploration
+
+budget_rules:
+  replenish_every_n_cycles: 10
+  base_replenish: 5
+  improvement_bonus: 3
+  max_stale_cycles: 10

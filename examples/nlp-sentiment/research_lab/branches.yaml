@@ -1,0 +1,91 @@
+# SST-5 Sentiment Classification -- labrat branches
+# CPU-only, M4 MacBook Pro, ~2-3 min per experiment
+# Illustrative example pushing for real performance on a public benchmark
+
+mission: "SST-5 fine-grained sentiment (5-class, 8.5K train). Maximize macro F1 with TF-IDF + sklearn on CPU. Baseline F1=0.36. Composite score blends F1 (40%), robustness (25%), generalization (20%), calibration (10%), minus complexity (5%)."
+
+production_baseline:
+  experiment_id: "baseline_tfidf_logreg"
+  description: "TF-IDF (unigram, 10K features) + LogisticRegression"
+  config:
+    features:
+      ngram_min: 1
+      ngram_max: 1
+      max_features: 10000
+      sublinear_tf: true
+      analyzer: "word"
+      min_df: 2
+      max_df: 0.95
+    preprocessing:
+      lowercase: true
+      stop_words: false
+    model:
+      type: "logistic"
+      params:
+        C: 1.0
+        max_iter: 1000
+
+branches:
+  features:
+    description: "TF-IDF feature engineering: ngrams, vocabulary size, char vs word"
+    initial_budget: 20
+    search_space:
+      - delta_key: "features.ngram_max"
+        values: [2, 3]
+      - delta_key: "features.max_features"
+        values: [5000, 20000, 50000]
+      - delta_key: "features.analyzer"
+        values: ["char_wb"]
+      - delta_key: "features.sublinear_tf"
+        values: [false]
+
+  model:
+    description: "Classifier type: CatBoost, LightGBM, SVM, RandomForest, GBM"
+    initial_budget: 20
+    search_space:
+      - delta_key: "model.type"
+        values: ["catboost", "lightgbm", "svm", "random_forest", "gradient_boosting"]
+
+  preprocessing:
+    description: "Text preprocessing: stopwords, min_df, max_df"
+    initial_budget: 15
+    search_space:
+      - delta_key: "preprocessing.stop_words"
+        values: [true]
+      - delta_key: "features.min_df"
+        values: [1, 5, 10]
+      - delta_key: "features.max_df"
+        values: [0.80, 0.90]
+
+  objectives:
+    description: "Class weighting and regularization"
+    initial_budget: 15
+    search_space:
+      - delta_key: "model.params.class_weight"
+        values: ["balanced"]
+      - delta_key: "model.params.C"
+        values: [0.1, 0.5, 5.0, 10.0]
+
+  ensemble:
+    description: "Ensemble methods (after individual branch winners found)"
+    initial_budget: 10
+    search_space:
+      - delta_key: "model.type"
+        values: ["voting_soft", "stacking"]
+        note: "Requires branch winners to be identified first"
+
+  capstone:
+    description: "Combined configs from branch winners"
+    initial_budget: 15
+    search_space:
+      - delta_key: "combined"
+        values:
+          - name: "all_winners"
+            description: "Best features + best model + best preprocessing + best objectives"
+            config_overrides: {}
+
+budget_rules:
+  replenish_every_n_cycles: 10
+  base_replenish: 5
+  improvement_bonus: 3
+  max_stale_cycles: 8

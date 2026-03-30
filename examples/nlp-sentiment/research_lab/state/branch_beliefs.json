@@ -1,0 +1,77 @@
+{
+  "updated_at": "2026-03-30T19:30:27.397698+00:00",
+  "branches": {
+    "features": {
+      "n_experiments": 23,
+      "n_improvements": 5,
+      "current_ev": 0.0873,
+      "uncertainty": 0.2041,
+      "last_explored_cycle": 41,
+      "best_composite_score": 0.7854,
+      "status": "active",
+      "flat_axes": [
+        "max_features",
+        "char_wb",
+        "ngram_max_3",
+        "sublinear_tf"
+      ]
+    },
+    "model": {
+      "n_experiments": 23,
+      "n_improvements": 5,
+      "current_ev": 0.0426,
+      "uncertainty": 0.2041,
+      "last_explored_cycle": 42,
+      "best_composite_score": 0.778,
+      "status": "active",
+      "flat_axes": [
+        "lightgbm",
+        "random_forest",
+        "gradient_boosting"
+      ]
+    },
+    "preprocessing": {
+      "n_experiments": 16,
+      "n_improvements": 5,
+      "current_ev": 0.2191,
+      "uncertainty": 0.2425,
+      "last_explored_cycle": 42,
+      "best_composite_score": 0.7834,
+      "status": "active",
+      "flat_axes": [
+        "min_df",
+        "max_df"
+      ]
+    },
+    "objectives": {
+      "n_experiments": 24,
+      "n_improvements": 2,
+      "current_ev": 0.103,
+      "uncertainty": 0.2,
+      "last_explored_cycle": 43,
+      "best_composite_score": 0.8048,
+      "status": "active",
+      "flat_axes": [
+        "C"
+      ]
+    },
+    "ensemble": {
+      "n_experiments": 10,
+      "n_improvements": 3,
+      "current_ev": 0.0541,
+      "uncertainty": 0.3015,
+      "last_explored_cycle": 38,
+      "best_composite_score": 0.8096,
+      "status": "active"
+    },
+    "capstone": {
+      "n_experiments": 51,
+      "n_improvements": 9,
+      "current_ev": 0.0247,
+      "uncertainty": 0.1387,
+      "last_explored_cycle": 40,
+      "best_composite_score": 0.8128,
+      "status": "active"
+    }
+  }
+}

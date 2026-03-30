@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.eggs/
+
+# CatBoost artifacts
+catboost_info/
+
+# Experiment result directories (large, generated)
+**/research_lab/experiments/
+**/research_lab/logs/cycles/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

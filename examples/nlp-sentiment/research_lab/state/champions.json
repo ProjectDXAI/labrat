@@ -1,0 +1,89 @@
+{
+  "updated_at": "2026-03-30T19:29:38.849136+00:00",
+  "production_champion": {
+    "experiment_id": "capstone_champ_5k_c25",
+    "scores": {
+      "D": 0.7966,
+      "R": 1.0,
+      "G": 0.9959,
+      "C": 0.5,
+      "K": 0.1,
+      "composite_score": 0.8128
+    },
+    "result_path": "research_lab/experiments/capstone/capstone_champ_5k_c25/result.json"
+  },
+  "branches": {
+    "features": {
+      "experiment_id": "features_5k_c16",
+      "scores": {
+        "D": 0.7279,
+        "R": 1.0,
+        "G": 0.9964,
+        "C": 0.5,
+        "K": 0.1,
+        "composite_score": 0.7854
+      },
+      "result_path": "research_lab/experiments/features/features_5k_c16/result.json"
+    },
+    "model": {
+      "experiment_id": "model_svm_bigram_c14",
+      "scores": {
+        "D": 0.7223,
+        "R": 1.0,
+        "G": 0.9953,
+        "C": 0.5,
+        "K": 0.2,
+        "composite_score": 0.778
+      },
+      "result_path": "research_lab/experiments/model/model_svm_bigram_c14/result.json"
+    },
+    "preprocessing": {
+      "experiment_id": "preprocessing_stop_5k_c15",
+      "scores": {
+        "D": 0.7241,
+        "R": 1.0,
+        "G": 0.9937,
+        "C": 0.5,
+        "K": 0.1,
+        "composite_score": 0.7834
+      },
+      "result_path": "research_lab/experiments/preprocessing/preprocessing_stop_5k_c15/result.json"
+    },
+    "objectives": {
+      "experiment_id": "objectives_bal_bigram_mindf5_c18",
+      "scores": {
+        "D": 0.789,
+        "R": 1.0,
+        "G": 0.9959,
+        "C": 0.5,
+        "K": 0.2,
+        "composite_score": 0.8048
+      },
+      "result_path": "research_lab/experiments/objectives/objectives_bal_bigram_mindf5_c18/result.json"
+    },
+    "ensemble": {
+      "experiment_id": "ensemble_voting_bal_c25",
+      "scores": {
+        "D": 0.8028,
+        "R": 1.0,
+        "G": 0.9923,
+        "C": 0.5,
+        "K": 0.2,
+        "composite_score": 0.8096
+      },
+      "result_path": "research_lab/experiments/ensemble/ensemble_voting_bal_c25/result.json"
+    },
+    "capstone": {
+      "experiment_id": "capstone_champ_5k_c25",
+      "scores": {
+        "D": 0.7966,
+        "R": 1.0,
+        "G": 0.9959,
+        "C": 0.5,
+        "K": 0.1,
+        "composite_score": 0.8128
+      },
+      "result_path": "research_lab/experiments/capstone/capstone_champ_5k_c25/result.json"
+    }
+  }
+}
