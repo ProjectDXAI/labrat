@@ -175,20 +175,17 @@ The **[examples/nlp-sentiment/](examples/nlp-sentiment/)** directory is a fully 
 
 See the [full writeup](examples/nlp-sentiment/README.md) for dataset details, scoring formula, and published baseline comparisons.
 
-## Results from internal research
+## For agents reading this repo
 
-55 cycles across a crypto microstructure trading program at DXRG:
+This repo is designed so that a coding agent (Claude Code, Codex, OpenClaw) can set up and run a lab with minimal human input. The workflow:
 
-| What the market found | Evidence |
-|----------------------|---------|
-| 12 book features = 49 features | OFI, momentum, volatility add nothing |
-| Tree depth 4 = 6 = 8 | Signal is approximately linear |
-| 2-day dead zone optimal | Temporal autocorrelation decays in 1-2 days |
-| More training data always helps | train_frac 0.8 >> 0.6 |
-| Retrained model has live alpha | +0.10 Sharpe at instant fills |
-| Execution latency is the bottleneck | Edge dies at ~250ms |
+1. **Human provides**: the problem statement, baseline, constraints, and any relevant papers
+2. **Agent runs Phase 1**: uses a deep research model to design the branch tree, converts to YAML, creates `branches.yaml`, `constitution.md`, `dead_ends.md`, and `run_experiment.py`
+3. **Agent checks in with user**: "Here's the tree I designed with N branches and M total budget. The scoring formula weights F1 at 40%, robustness at 25%, generalization at 20%. Ready to start the lab?"
+4. **User approves** (or adjusts)
+5. **Agent runs Phase 2**: bootstraps, starts dashboard, enters the `/loop`. From here it's fully autonomous -- the orchestrator.md has all the instructions.
 
-9 axes proven flat. 6 axes that matter. 231/231 walk-forward windows positive. 3 deployment blockers found by the execution branch that backtest couldn't see.
+Everything the agent needs is in `templates/orchestrator.md`. That file IS the agent's brain. It tells the agent what to read, what to do, how to score, when to stop, and how to write the handoff. A fresh agent with no prior context can read it and execute a full cycle.
 
 ## Docs
 
