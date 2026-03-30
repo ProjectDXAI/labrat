@@ -4,22 +4,9 @@ Autoresearch explores one direction. This explores all of them and figures out w
 
 Branches compete for compute budget. Productive branches earn more. Dead branches get defunded. The system converges without you.
 
-```
-         ▓██████████▓
-         █          █
-         █ ░▒▓██▓▒░ █       ᘛ⁐ᕐᐷ~ features     ᘛ⁐ᕐᐷ~ model
-         █ █ ████ █ █       ᘛ⁐ᕐᐷ  preprocessing  ᘛ⁐ᕐᐷ? objectives (stuck)
-         █ █ ████ █ █       ᘛ⁐ᕐᐷ~ ensemble       ᘛ⁐ᕐᐷ  capstone
-         █ ░▒▓██▓▒░ █
-         █          █       The eye watches. The rats work.
-         █          █       Budget flows to productive branches.
-         █          █       Dead branches get defunded.
-         ▓██████████▓
-```
-
 ![dashboard](docs/exampledash.png)
 
-Open-sourced from the research infrastructure we use at [DXRG](https://dxrg.ai) for exploratory work across broad domains. Informed by our research into how economic incentives and market structures improve agent orchestration.
+A recent approach we've been using at [DXRG](https://dxrg.ai) to expand autoresearch into more exploratory domains. When you're trying to get a grounding across the full surface area of a problem -- not just optimize one metric on one axis -- you need something that can run many branches simultaneously and figure out which ones are worth funding. This is that.
 
 Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-branch market allocation across a full research tree.
 
