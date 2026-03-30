@@ -7,7 +7,7 @@
 
 Autonomous research lab that explores multi-branch research trees in parallel. An economic funding mechanism prioritizes across competing trajectories -- productive branches earn more compute, dead branches get defunded. The system converges on what works without manual steering.
 
-![dashboard](docs/exampledash.png)
+![dashboard](docs/dash-sample.png)
 
 Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-branch market allocation. Born out of work at [DXRG](https://dxrg.ai) to push autoresearch into broader, more exploratory domains where you need to map the full surface area of a problem before committing to a direction.
 
