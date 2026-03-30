@@ -34,6 +34,10 @@ The common thread: you have a baseline, a metric, multiple axes of variation, an
 
 You define a research tree. The orchestrator explores it.
 
+A tree can be anything -- different model architectures, feature engineering strategies, data preprocessing pipelines, hyperparameter regions, loss functions, training regimes. Branches are just dimensions of variation you want to explore. They can be narrow (testing 5 values of learning rate) or broad (comparing entirely different algorithmic families). We recommend experimenting with how you define them. The structure of your tree matters as much as what's in it.
+
+In the example below, branches converge into a capstone that combines winners. We've also experimented with spawning sub-trees off productive branches for deeper exploration, then running a separate pass to look across sub-trees for shared learnings and unexpected synergies. That pattern works well for deep domains but isn't formalized in the framework yet.
+
 ```
                             baseline
                           TF-IDF + LR
