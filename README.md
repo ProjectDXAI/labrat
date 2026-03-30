@@ -1,7 +1,6 @@
 # labrat
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ProjectDXAI/labrat?style=flat&color=black)](https://github.com/ProjectDXAI/labrat/stargazers)
 
 [**Quickstart**](#quickstart) · [**For Agents**](#for-agents) · [**Example**](#example) · [**Docs**](docs/) · [**DXRG**](https://dxrg.ai)
 
@@ -12,6 +11,24 @@ Autonomous research lab that explores multi-branch research trees in parallel. A
 Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-branch market allocation. Born out of work at [DXRG](https://dxrg.ai) to push autoresearch into broader, more exploratory domains where you need to map the full surface area of a problem before committing to a direction.
 
 Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works with Codex, OpenClaw, or any agent that reads markdown and runs shell commands.
+
+## When to use this
+
+Labrat is for problems where you have many plausible directions and need to figure out which ones are worth pursuing. Some examples:
+
+- **Transformer architecture search** -- you have a small validation set and want to compare attention patterns, layer depths, positional encodings, and activation functions. Each branch tests one axis. The market tells you which dimensions of the architecture actually move the needle vs which are flat.
+
+- **Kernel and systems optimization** -- testing compiler flags, memory layouts, tiling strategies, and fusion patterns for a GPU kernel. Experiments run in seconds. The market burns through hundreds of configs and finds the 3 that matter.
+
+- **Feature engineering for tabular models** -- you suspect some of your 200 features are noise. Branches test feature subsets, encoding strategies, interaction terms, and normalization methods. The market identifies the minimal feature set.
+
+- **Prompt and retrieval tuning** -- different chunking strategies, embedding models, reranking approaches, and prompt templates for a RAG system. Each branch is a different axis of the retrieval pipeline.
+
+- **Drug compound screening** -- molecular descriptors, fingerprint types, model architectures, and training strategies for QSAR models. Branches compete for compute based on which descriptor/model combos actually predict activity.
+
+- **Trading strategy research** -- signal features, execution methods, regime filters, and sizing rules tested across walk-forward windows. The market finds which components have real edge vs which are overfitting to history.
+
+The common thread: you have a baseline, a metric, multiple axes of variation, and more ideas than compute. The market figures out where to spend.
 
 ## How it works
 
