@@ -3,12 +3,11 @@
 # CUSTOMIZE THIS FILE for your domain.
 # Each branch explores one axis of variation.
 # The allocator picks the highest-priority branch each cycle.
+#
+# v2: Added meta-branches, external research hooks, multi-delta capstone,
+#     expansion triggers, and per-branch scoring overrides.
 
 # One line: what is this lab trying to achieve? Shown in the dashboard header.
-# Examples:
-#   "Maximize macro F1 on SST-5 (5-class sentiment). Baseline: TF-IDF+LR F1=0.36. Target: F1 >= 0.42."
-#   "Minimize RMSE on housing prices. Baseline: linear regression RMSE=45K. Target: RMSE < 30K."
-#   "Maximize Sharpe ratio on BTC perps. Baseline: no-trade. Target: Sharpe > 0.15 after 1bps fees."
 mission: "Describe your goal, baseline metric, and target. This appears in the dashboard header."
 
 # Your current best configuration (the thing to beat)
@@ -32,6 +31,9 @@ production_baseline:
       metric: "your_primary_metric"
       cross_validation: true
       n_folds: 5
+
+# --- STANDARD BRANCHES ---
+# Each branch explores one axis of variation with single-delta experiments.
 
 branches:
   # Branch 1: Model architecture
@@ -82,10 +84,14 @@ branches:
       - delta_key: "data.dataset"
         values: ["dataset_b", "dataset_c"]
 
-  # Branch 6: Capstone (cross-branch combinations)
+  # --- CAPSTONE BRANCH ---
+  # Multi-delta: combines winners from other branches.
+  # The orchestrator auto-generates 2^N factorial combinations of branch winners.
   capstone:
-    description: "Combined configs from branch winners"
+    description: "Combined configs from branch winners. Multi-delta allowed."
     initial_budget: 20
+    multi_delta: true  # allows changing multiple params at once
+    auto_generate: true  # orchestrator generates combinations from branch winners
     search_space:
       - delta_key: "combined"
         values:
@@ -93,8 +99,76 @@ branches:
             description: "All branch winners combined"
             config_overrides: {}  # filled after branch exploration
 
+  # --- META-BRANCHES ---
+  # These don't test configs. They test assumptions.
+
+  assumption_audit:
+    description: "Tests whether our methodology is sound"
+    initial_budget: 10
+    experiment_type: "diagnostic"  # no composite scoring
+    search_space:
+      - delta_key: "audit_type"
+        values:
+          - name: "data_leakage_check"
+            description: "Verify no future data leaks into features"
+          - name: "oos_split_validation"
+            description: "Compare close_time vs snapshot_time splits"
+          - name: "fill_probability_sensitivity"
+            description: "Test sensitivity to execution assumptions"
+          - name: "scoring_metric_correlation"
+            description: "Does our scoring metric predict live performance?"
+
+  frame_challenge:
+    description: "Challenges fundamental assumptions when lab converges"
+    initial_budget: 5
+    experiment_type: "meta"  # can retroactively change verdicts
+    trigger: "convergence"  # only activates when lab is about to converge
+    search_space:
+      - delta_key: "challenge_type"
+        values:
+          - name: "wrong_metric"
+            description: "Are we optimizing the wrong thing?"
+          - name: "dead_end_revival"
+            description: "What would make our dead ends work?"
+          - name: "assumption_test"
+            description: "List and test all unstated assumptions"
+
+# --- EXTERNAL RESEARCH CONFIGURATION ---
+# Controls how the research scout and expansion agent search for new ideas.
+
+external_research:
+  # When to deploy research scouts
+  scout_trigger:
+    consecutive_non_improvements: 4  # per branch (raised from 3)
+    all_branches_stuck: true  # scout all branches simultaneously
+    on_convergence: true  # before declaring convergence
+
+  # When to run expansion cycles (inject external knowledge)
+  expansion_trigger:
+    every_n_cycles: 20
+    on_diminishing_returns: true
+
+  # Search configuration for scouts
+  search_config:
+    # Domain-specific search terms (customize these)
+    domain_terms: ["your domain", "your technique"]
+    # Venues to prioritize
+    venues: ["arxiv", "github", "neurips", "icml"]
+    # Year range for papers
+    year_range: [2024, 2026]
+    # Max proposals per scout run
+    max_proposals: 5
+
+# --- BUDGET RULES ---
+
 budget_rules:
   replenish_every_n_cycles: 10
   base_replenish: 5
   improvement_bonus: 3
   max_stale_cycles: 10
+  # New: exhaustion threshold raised from 3 to match scout_trigger
+  exhaustion_threshold: 4
+  # New: max budget cap per branch after replenishment
+  max_budget_cap: 30
+  # New: meta-branches get separate budget pool
+  meta_budget_separate: true

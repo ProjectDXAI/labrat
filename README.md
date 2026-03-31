@@ -6,6 +6,8 @@
 
 Autonomous research lab that explores multi-branch research trees in parallel. An economic funding mechanism prioritizes across competing trajectories -- productive branches earn more compute, dead branches get defunded. The system converges on what works without manual steering.
 
+**v2**: Deep research agents that design their own trees via web search, periodic expansion scouts that inject external knowledge to prevent local optima, belief revision that catches when assumptions change, and graduated context management for long-running sessions.
+
 ![dashboard](docs/dash-sample.png)
 
 Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-branch market allocation. Born out of work at [DXRG](https://dxrg.ai) to push autoresearch into broader, more exploratory domains where you need to map the full surface area of a problem before committing to a direction.
@@ -73,11 +75,39 @@ Your agent harness (Claude Code, Codex, etc.) acts as the orchestrator. It dispa
   └─ Write handoff → next cycle
 ```
 
-Every 5th cycle: red team (shuffled labels). Every 10th: budget replenishment. Stuck branches trigger a research scout that searches for new approaches.
+Every 5th cycle: red team (shuffled labels). Every 10th: budget replenishment. Every 20th: expansion scout searches for external approaches. Stuck branches trigger a research scout that finds papers and proposes new experiments. At convergence: frame challenge tests assumptions before declaring the lab done.
+
+```
+  orchestrator (the monolith)
+  │
+  ├─ Graduated context reading (handoff-first)
+  ├─ Expansion check (every 20 cycles: inject external knowledge)
+  ├─ Research scout check (stuck branches: search papers/repos)
+  ├─ Select branches by priority (shared allocator.py)
+  ├─ Dispatch labrats in parallel ─────────────────┐
+  │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
+  │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
+  │     └── ᘛ⁐ᕐᐷ~ objectives: run + judge          │
+  ├─ Collect + score mechanically ◄────────────────┘
+  ├─ SYNTHESIS: "What did we learn?" (new)
+  ├─ Update beliefs, budget, champions
+  ├─ Belief revision check (new)
+  ├─ Log transition type (new)
+  └─ Write handoff → next cycle
+```
 
 ## Quickstart
 
-**1. Design your research tree** using a deep research model (GPT-5.4 Pro, Claude with extended thinking, or similar). Give it your problem, baseline, and constraints. Ask for branches, search spaces, scoring formula, and dead ends. Convert to YAML:
+**1. Design your research tree.** Option A: use the automated tree designer that surveys the landscape via web search:
+
+```
+# In Claude Code:
+Read labrat/templates/tree_designer.md and design a research tree for:
+Mission: Maximize macro F1 on 5-class sentiment. Baseline F1=0.36.
+Constraints: CPU only, <8K samples, no pretrained embeddings.
+```
+
+Option B: use a deep research model manually (GPT-5.4 Pro, Claude with extended thinking, or similar). Give it your problem, baseline, and constraints. Convert to YAML:
 
 ```yaml
 mission: "Maximize macro F1 on 5-class sentiment. Baseline F1=0.36."
@@ -148,7 +178,7 @@ The market found 3 axes that matter, 9 that are flat, and that branch winners do
 
 ## Docs
 
-[Getting Started](docs/getting-started.md) · [Architecture](docs/ARCHITECTURE.md) · [Economics](docs/economics.md) · [Domains](docs/domains.md) · [Runners](docs/runners.md) · [Visual Identity](docs/labrats-visual-guide.md)
+[Getting Started](docs/getting-started.md) · [Architecture](docs/ARCHITECTURE.md) · [Deep Research Guide](docs/DEEP_RESEARCH.md) · [Data Splitting](docs/data-splitting.md) · [Economics](docs/economics.md) · [Domains](docs/domains.md) · [Runners](docs/runners.md) · [Assessment](docs/ASSESSMENT.md) · [Visual Identity](docs/labrats-visual-guide.md)
 
 ## Credits
 
