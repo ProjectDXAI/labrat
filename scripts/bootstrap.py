@@ -195,7 +195,15 @@ def main():
     # Update lab registry
     _update_lab_registry(config)
 
-    print(f"\nBootstrap complete. {len(active)} active branches, {sum(budget.values())} total budget.")
+    # Print research tree
+    try:
+        from scripts.tree_render import render_tree, load_lab
+        _, state = load_lab(LAB_ROOT)
+        print("\n" + render_tree(config, state, compact=True))
+    except Exception:
+        pass
+
+    print(f"Bootstrap complete. {len(active)} active branches, {sum(budget.values())} total budget.")
     print(f"Meta-branches: {len(meta)}")
     print()
     print("To start:")

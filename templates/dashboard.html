@@ -409,6 +409,10 @@ tbody tr.row-new { animation: rowFlash 2s ease-out forwards; }
     </div>
   </div>
   <div class="section">
+    <div class="section-title">research tree</div>
+    <pre id="tree-content" style="font-size:11px;line-height:1.6;color:var(--fg);overflow-x:auto;white-space:pre"></pre>
+  </div>
+  <div class="section">
     <div class="section-title">progress</div>
     <div id="score-timeline" style="position:relative"></div>
     <div id="branch-leaderboard" style="margin-top:16px"></div>
@@ -958,9 +962,113 @@ function renderBranchLeaderboard(beliefs,champions){
   svg+='</svg>';el.innerHTML=svg;
 }
 
+function renderTree(beliefs,budget,champions,branchesYaml){
+  var el=document.getElementById('tree-content');
+  if(!el)return;
+  if(!beliefs||!beliefs.branches)return;
+
+  // Parse branches from YAML text (simple regex extraction)
+  var branchNames=Object.keys(beliefs.branches);
+  var baseline='baseline';
+  if(branchesYaml){
+    var m=branchesYaml.match(/experiment_id:\s*["']?([^"'\n]+)/);
+    if(m)baseline=m[1].trim();
+  }
+
+  var prodChamp=champions&&champions.production_champion;
+  var prodId=prodChamp?prodChamp.experiment_id||baseline:baseline;
+  var prodScore='';
+  if(prodChamp&&prodChamp.scores&&prodChamp.scores.composite_score!=null){
+    prodScore=' (score='+prodChamp.scores.composite_score.toFixed(3)+')';
+  }
+
+  function icon(b){
+    if(b.status==='converged')return'\u2550';
+    if(b.status==='exhausted')return'\u2716';
+    if(b.n_experiments===0)return'\u00b7';
+    if(b.n_improvements>0)return'+';
+    return'\u2013';
+  }
+  function verdictColor(b){
+    if(b.status==='converged')return'var(--muted)';
+    if(b.status==='exhausted')return'var(--faint)';
+    if(b.n_improvements>0)return'#2a7d2a';
+    if(b.n_experiments>0)return'#aa4400';
+    return'var(--muted)';
+  }
+
+  // Classify branches
+  var standard=[],meta=[],capstone=[];
+  for(var i=0;i<branchNames.length;i++){
+    var nm=branchNames[i];
+    var b=beliefs.branches[nm];
+    var et=b.experiment_type||'standard';
+    if(nm==='capstone')capstone.push(nm);
+    else if(et==='diagnostic'||et==='meta')meta.push(nm);
+    else standard.push(nm);
+  }
+  var ordered=standard.concat(meta);
+  var totalBudget=0;
+  for(var k in budget||{})totalBudget+=(budget[k]||0);
+
+  var L=[];
+  L.push('  champion: <span style="color:var(--fg);font-weight:600">'+esc(prodId)+'</span>'+esc(prodScore));
+  L.push('');
+  L.push('  '+esc(baseline));
+  L.push('  \u2502');
+
+  for(var j=0;j<ordered.length;j++){
+    var nm=ordered[j];
+    var b=beliefs.branches[nm];
+    var bgt=(budget&&budget[nm])||0;
+    var isLast=(j===ordered.length-1)&&capstone.length===0;
+    var conn=isLast?'\u2514':'\u251c';
+    var pipe=isLast?' ':'\u2502';
+    var ic=icon(b);
+    var col=verdictColor(b);
+    var tag='';
+    var et=b.experiment_type||'standard';
+    if(et==='diagnostic')tag=' <span style="color:var(--faint)">[diagnostic]</span>';
+    if(et==='meta')tag=' <span style="color:var(--faint)">[meta]</span>';
+
+    // Branch champion
+    var bc=(champions&&champions.branches&&champions.branches[nm])||{};
+    var bcId=bc.experiment_id||'';
+    var bcScore='';
+    if(bc.scores&&bc.scores.composite_score!=null)bcScore='='+bc.scores.composite_score.toFixed(3);
+
+    L.push('  '+conn+'\u2500\u2500 [<span style="color:'+col+';font-weight:700">'+ic+'</span>] <span style="font-weight:600">'+esc(nm)+'</span>'+tag);
+    var detail='     '+b.n_experiments+' exp, '+b.n_improvements+' promoted, budget='+bgt;
+    if(bcId&&bcId!==baseline)detail+=' \u2502 champ: '+esc(bcId)+esc(bcScore);
+    L.push('  '+pipe+detail);
+    L.push('  '+pipe);
+  }
+
+  // Capstone
+  if(capstone.length>0){
+    var nm=capstone[0];
+    var b=beliefs.branches[nm];
+    var bgt=(budget&&budget[nm])||0;
+    var ic=icon(b);
+    var col=verdictColor(b);
+    var bc=(champions&&champions.branches&&champions.branches[nm])||{};
+    var bcId=bc.experiment_id||'';
+    var bcScore='';
+    if(bc.scores&&bc.scores.composite_score!=null)bcScore='='+bc.scores.composite_score.toFixed(3);
+    L.push('  \u2514\u2500\u2500 \u252c <span style="font-weight:600">capstone</span> \u2500\u2500\u2500 combine branch winners');
+    var detail='       ['+ic+'] '+b.n_experiments+' exp, '+b.n_improvements+' promoted, budget='+bgt;
+    if(bcId&&bcId!==baseline)detail+=' \u2502 champ: '+esc(bcId)+esc(bcScore);
+    L.push(detail);
+  }
+
+  L.push('');
+  L.push('  <span style="color:var(--faint)">[+] promoted  [\u2013] no improvement  [\u00b7] unexplored  [\u2550] converged  [\u2716] exhausted</span>');
+  el.innerHTML=L.join('\n');
+}
+
 var refreshTimer=null;
 var _chartBeliefs=null;var _chartChampions=null;var _chartEntries=null;var _chartBudget=null;
-var _missionText=null;
+var _missionText=null;var _branchesYaml=null;
 
 function renderMissionSummary(beliefs,champions,budget,entries){
   var el=document.getElementById('mission-summary');
@@ -1036,7 +1144,7 @@ function refresh(){
         if(err2)budget=null;_chartBudget=budget;
         loadJSON(STATE+'champions.json',function(err3,champions){
           if(err3)champions=null;_chartChampions=champions;
-          renderBranches(beliefs,budget,champions);renderScaling(beliefs);tryRenderCharts();
+          renderBranches(beliefs,budget,champions);renderScaling(beliefs);renderTree(beliefs,budget,champions,_branchesYaml);tryRenderCharts();
         });
       });
     });
@@ -1048,6 +1156,7 @@ function refresh(){
   if(_missionText===null){
     loadText('./branches.yaml',function(err,text){
       if(!err&&text){
+        _branchesYaml=text;
         var match=text.match(/^mission:\s*["'](.+?)["']/m);
         _missionText=match?match[1]:'(no mission defined in branches.yaml)';
         tryRenderCharts();
