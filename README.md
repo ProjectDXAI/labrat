@@ -4,41 +4,44 @@
 
 [**Quickstart**](#quickstart) · [**For Agents**](#for-agents) · [**Example**](#example) · [**Docs**](docs/) · [**DXRG**](https://dxrg.ai)
 
-Autonomous research lab that explores multi-branch research trees in parallel. An economic funding mechanism prioritizes across competing trajectories -- productive branches earn more compute, dead branches get defunded. The system converges on what works without manual steering.
-
-**v2**: Deep research agents that design their own trees via web search, periodic expansion scouts that inject external knowledge to prevent local optima, belief revision that catches when assumptions change, and graduated context management for long-running sessions.
+Turn any AI agent into an autonomous researcher. Point it at a problem, give it a budget, walk away. It designs its own experiments, kills dead branches, finds papers when it gets stuck, and tells you what actually matters.
 
 ![dashboard](docs/dash-sample.png)
 
-Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-branch market allocation. Born out of work at [DXRG](https://dxrg.ai) to push autoresearch into broader, more exploratory domains where you need to map the full surface area of a problem before committing to a direction.
+147 experiments. Zero human intervention. One command.
+
+## What this is
+
+An autoresearch framework that goes beyond single-metric optimization. Where [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) runs one agent against one metric, labrat runs N agents across N branches simultaneously, with an economic system that routes compute to whatever is producing results.
+
+The agent doesn't just tune hyperparameters. It explores fundamentally different approaches in parallel, scores them mechanically, defunds the losers, and doubles down on the winners. When it runs out of ideas, it searches the internet for papers and proposes new directions it hasn't tried. When it's about to declare convergence, it challenges its own assumptions first.
 
 Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works with Codex, OpenClaw, or any agent that reads markdown and runs shell commands.
 
-## When to use this
+Born out of work at [DXRG](https://dxrg.ai) running autonomous research programs on BTC microstructure (55 cycles, 47 experiments), prediction markets (74 experiments, 18 branches), and NLP (147 experiments, 43 cycles). Every feature exists because something went wrong in a real deployment and we built the fix.
 
-Labrat is for problems where you have many plausible directions and need to figure out which ones are worth pursuing. Some examples:
+## The autoresearch loop
 
-- **Transformer architecture search** -- you have a small validation set and want to compare attention patterns, layer depths, positional encodings, and activation functions. Each branch tests one axis. The market tells you which dimensions of the architecture actually move the needle vs which are flat.
+```
+  orchestrator
+  │
+  ├─ Profile the data (Step 0: what subgroups have variance?)
+  ├─ Select branches by UCB1 priority
+  ├─ Dispatch labrats in parallel ─────────────────┐
+  │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
+  │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
+  │     └── ᘛ⁐ᕐᐷ~ objectives: run + judge          │
+  ├─ Score mechanically ◄──────────────────────────┘
+  ├─ Synthesize: "what did we learn?"
+  ├─ Update beliefs, budget, champions
+  ├─ Check: any gates blocking good experiments?
+  ├─ Check: any assumptions invalidated?
+  └─ Write handoff → next cycle
+```
 
-- **Kernel and systems optimization** -- testing compiler flags, memory layouts, tiling strategies, and fusion patterns for a GPU kernel. Experiments run in seconds. The market burns through hundreds of configs and finds the 3 that matter.
+Every 5th cycle: red team (shuffled labels, is the signal real?). Every 10th: budget replenishment. Every 20th: expansion scout searches arXiv and GitHub for approaches the lab hasn't tried. Stuck branches trigger a research scout that reads papers and proposes new experiments. At convergence: frame challenge tests assumptions before declaring done.
 
-- **Feature engineering for tabular models** -- you suspect some of your 200 features are noise. Branches test feature subsets, encoding strategies, interaction terms, and normalization methods. The market identifies the minimal feature set.
-
-- **Prompt and retrieval tuning** -- different chunking strategies, embedding models, reranking approaches, and prompt templates for a RAG system. Each branch is a different axis of the retrieval pipeline.
-
-- **Drug compound screening** -- molecular descriptors, fingerprint types, model architectures, and training strategies for QSAR models. Branches compete for compute based on which descriptor/model combos actually predict activity.
-
-- **Trading strategy research** -- signal features, execution methods, regime filters, and sizing rules tested across walk-forward windows. The market finds which components have real edge vs which are overfitting to history.
-
-The common thread: you have a baseline, a metric, multiple axes of variation, and more ideas than compute. The market figures out where to spend.
-
-## How it works
-
-You define a research tree. The orchestrator explores it.
-
-A tree can be anything -- different model architectures, feature engineering strategies, data preprocessing pipelines, hyperparameter regions, loss functions, training regimes. Branches are just dimensions of variation you want to explore. They can be narrow (testing 5 values of learning rate) or broad (comparing entirely different algorithmic families). We recommend experimenting with how you define them. The structure of your tree matters as much as what's in it.
-
-In the example below, branches converge into a capstone that combines winners. We've also experimented with spawning sub-trees off productive branches for deeper exploration, then running a separate pass to look across sub-trees for shared learnings and unexpected synergies. That pattern works well for deep domains but isn't formalized in the framework yet.
+The tree structure is whatever you want it to be:
 
 ```
                             baseline
@@ -60,45 +63,35 @@ In the example below, branches converge into a capstone that combines winners. W
                      combine branch winners
 ```
 
-Your agent harness (Claude Code, Codex, etc.) acts as the orchestrator. It dispatches labrats (subagents) to explore branches in parallel. Each experiment changes one thing. A formula scores results. Budget flows to what produces.
+Branches can be narrow (5 values of learning rate) or broad (entirely different algorithmic families). The allocator doesn't care. It just measures what produces and routes budget accordingly.
 
-```
-  orchestrator (the monolith)
-  │
-  ├─ Select branches by priority
-  ├─ Dispatch labrats in parallel ─────────────────┐
-  │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
-  │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
-  │     └── ᘛ⁐ᕐᐷ~ objectives: run + judge          │
-  ├─ Collect + score mechanically ◄────────────────┘
-  ├─ Update beliefs, budget, champions
-  └─ Write handoff → next cycle
-```
+## When to use this
 
-Every 5th cycle: red team (shuffled labels). Every 10th: budget replenishment. Every 20th: expansion scout searches for external approaches. Stuck branches trigger a research scout that finds papers and proposes new experiments. At convergence: frame challenge tests assumptions before declaring the lab done.
+You have a baseline, a metric, multiple axes of variation, and more ideas than time to test them.
 
-```
-  orchestrator (the monolith)
-  │
-  ├─ Graduated context reading (handoff-first)
-  ├─ Expansion check (every 20 cycles: inject external knowledge)
-  ├─ Research scout check (stuck branches: search papers/repos)
-  ├─ Select branches by priority (shared allocator.py)
-  ├─ Dispatch labrats in parallel ─────────────────┐
-  │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
-  │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
-  │     └── ᘛ⁐ᕐᐷ~ objectives: run + judge          │
-  ├─ Collect + score mechanically ◄────────────────┘
-  ├─ SYNTHESIS: "What did we learn?" (new)
-  ├─ Update beliefs, budget, champions
-  ├─ Belief revision check (new)
-  ├─ Log transition type (new)
-  └─ Write handoff → next cycle
-```
+- **Architecture search** -- attention patterns, layer depths, positional encodings, activation functions. Each branch tests one axis. The allocator finds which dimensions move the needle vs which are flat.
+- **Feature engineering** -- 200 features, most are noise. Branches test subsets, encodings, interactions. The allocator identifies the minimal set.
+- **Trading strategy research** -- signals, execution methods, regime filters, sizing rules across walk-forward windows. The allocator separates real edge from backtest overfitting.
+- **Kernel optimization** -- compiler flags, memory layouts, tiling strategies. Experiments run in seconds. The allocator burns through hundreds of configs.
+- **Prompt / RAG tuning** -- chunking strategies, embedding models, reranking, prompt templates. Each branch is a pipeline axis.
+- **Drug compound screening** -- molecular descriptors, fingerprint types, model architectures. Branches compete for compute based on predicted activity.
+
+## What the autoresearcher actually does
+
+It's not just a hyperparameter sweeper. The full v2 loop includes:
+
+- **Data profiling** before experiments start (what subgroups have variance? what correlates?)
+- **Research scouts** that search the web for papers when a branch gets stuck
+- **Expansion scouts** that inject external knowledge every 20 cycles to escape local optima
+- **Belief revision** that catches when a new finding invalidates previous results
+- **Gate evolution** that detects when your scoring gates are blocking good experiments
+- **Failure categorization** that tells you WHY experiments fail, not just that they did
+- **Efficiency tracking** that measures waste rate, budget ROI, and time-to-first-promote per branch
+- **Frame challenge** that questions "are we even measuring the right thing?" before convergence
 
 ## Quickstart
 
-**1. Design your research tree.** Option A: use the automated tree designer that surveys the landscape via web search:
+**1. Design your research tree.** Option A: let the agent do it. The tree designer surveys the landscape via web search before writing a single line of YAML:
 
 ```
 # In Claude Code:
@@ -107,7 +100,7 @@ Mission: Maximize macro F1 on 5-class sentiment. Baseline F1=0.36.
 Constraints: CPU only, <8K samples, no pretrained embeddings.
 ```
 
-Option B: use a deep research model manually (GPT-5.4 Pro, Claude with extended thinking, or similar). Give it your problem, baseline, and constraints. Convert to YAML:
+Option B: write the YAML yourself or use a deep research model:
 
 ```yaml
 mission: "Maximize macro F1 on 5-class sentiment. Baseline F1=0.36."
@@ -137,9 +130,9 @@ def run_experiment(config):
 **3. Bootstrap and loop:**
 
 ```bash
-cp templates/* research_lab/          # orchestrator, constitution, dead_ends
+cp templates/* research_lab/
 cd research_lab && python scripts/bootstrap.py
-python -m http.server 8787 &          # dashboard
+python -m http.server 8787 &
 ```
 
 Then tell your agent:
@@ -147,11 +140,11 @@ Then tell your agent:
 /loop 10m Read research_lab/orchestrator.md and execute one research cycle.
 ```
 
-Watch it live at `localhost:8787/dashboard.html`.
+Watch it run at `localhost:8787/dashboard.html`.
 
 ## For agents
 
-If a user pointed you here, your job is to set up and run a research lab for their problem.
+If a user pointed you here, your job is to set up and run an autonomous research lab for their problem.
 
 **If they haven't given you context yet**, ask:
 
@@ -162,7 +155,7 @@ If a user pointed you here, your job is to set up and run a research lab for the
 
 **Once you have the problem:**
 
-1. **Design the tree** -- use a deep research model to map the problem space, convert to `branches.yaml`
+1. **Design the tree** -- run the tree designer or use deep research to map the problem space, convert to `branches.yaml`
 2. **Build the lab** -- create `run_experiment.py`, customize `constitution.md` and `dead_ends.md`
 3. **Check in** -- "Here's N branches with M budget. Scoring weights X. Ready?"
 4. **Run** -- bootstrap, start dashboard, enter `/loop`. Follow `orchestrator.md` exactly.
@@ -172,9 +165,9 @@ If a user pointed you here, your job is to set up and run a research lab for the
 
 ## Example
 
-**[examples/nlp-sentiment/](examples/nlp-sentiment/)** -- 5-class sentiment on SST-5. CPU-only, 3 seconds per experiment. 43 cycles, 147 experiments.
+**[examples/nlp-sentiment/](examples/nlp-sentiment/)** -- 5-class sentiment on SST-5. CPU-only, 3 seconds per experiment. 43 cycles, 147 experiments, zero human intervention.
 
-The market found 3 axes that matter, 9 that are flat, and that branch winners don't always stack. Production champion: F1=0.398 vs 0.360 baseline. [Full writeup](examples/nlp-sentiment/README.md).
+The autoresearcher found 3 axes that matter, 9 that are flat, and that branch winners don't always stack. Production champion: F1=0.398 vs 0.360 baseline (+10.5%). [Full writeup](examples/nlp-sentiment/README.md).
 
 ## Docs
 
@@ -182,4 +175,4 @@ The market found 3 axes that matter, 9 that are flat, and that branch winners do
 
 ## Credits
 
-Extends [autoresearch](https://github.com/karpathy/autoresearch) with market-based multi-branch allocation and parallel agents. Built with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) at [DXRG](https://dxrg.ai). MIT license.
+Extends [autoresearch](https://github.com/karpathy/autoresearch) with market-based multi-branch allocation, parallel agents, and external knowledge injection. Built with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) at [DXRG](https://dxrg.ai). MIT license.
