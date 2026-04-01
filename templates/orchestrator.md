@@ -102,14 +102,44 @@ This cuts context consumption 60-80% on routine cycles. The handoff carries forw
 
 ## The Cycle
 
+### Step 0: Data Exploration (cycle 0 only, and on expansion cycles)
+
+On the first cycle and during expansion cycles, run a data exploration agent BEFORE selecting branches:
+
+```
+Agent(
+  name="data-explorer",
+  prompt="Analyze the lab's dataset. Run subgroup comparisons on categorical variables, compute correlation matrices for numeric features, and check for distribution shift between train/test periods. Write findings to state/data_profile.json. If you find subgroups with high metric variance, propose them as branch hypotheses.",
+  subagent_type="general-purpose",
+  mode="bypassPermissions"
+)
+```
+
+The explorer writes `state/data_profile.json` with:
+- Feature distributions and outlier counts
+- Subgroup metric comparisons (which categories have the largest spread?)
+- Train/test distribution shift warnings
+- Proposed branch hypotheses based on data patterns
+
+On subsequent cycles, skip Step 0 (the data profile persists in state). On expansion cycles, re-run to catch drift.
+
+Configure in `branches.yaml`:
+```yaml
+data_exploration:
+  on_init: true
+  on_expansion: true
+  analyses: ["subgroup_comparison", "correlation_scan", "distribution_shift"]
+```
+
 ### Step 1: Determine Cycle Type
 
 Read Level 0 files. Based on cycle number and state, determine what kind of cycle this is:
 
 | Cycle condition | Type | Action |
 |----------------|------|--------|
+| `cycle == 0` | **Data Exploration** | Run Step 0, then continue to Step 2 |
 | `cycle % 5 == 0` and `cycle > 0` | **Red Team** | Run negative controls (Step 1b) |
-| `cycle % 20 == 0` and `cycle > 0` | **Expansion** | Run expansion scout (Step 1c) |
+| `cycle % 20 == 0` and `cycle > 0` | **Expansion** | Run Step 0 (re-profile) + expansion scout (Step 1c) |
 | `cycle % 15 == 0` and `cycle > 0` | **Human Checkpoint** | Produce report, pause (Step 1d) |
 | Active agents in `active_agents.json` | **Collection** | Skip to Step 5 (collect results) |
 | All branches converged or exhausted | **Convergence** | Run frame challenge (Step 9) |
@@ -145,7 +175,17 @@ The scout uses WebSearch to find papers, repos, and techniques. The orchestrator
 
 ### Step 1d: Human Checkpoint (every 15th cycle)
 
-Produce a comprehensive report: experiments since last checkpoint by branch, current champions, budget burn rate, stuck/converging branches, key findings, and recommended next steps. Write to `research_lab/logs/checkpoint_cycle_{N}.md`. Set `last_transition: "human_checkpoint"`. Stop the loop and wait for the human to resume.
+Produce a comprehensive report including:
+- Experiments since last checkpoint, grouped by branch
+- Current champions per branch
+- Budget burn rate and remaining budget
+- Stuck/converging branches
+- **Gate analysis**: which gates are blocking the most experiments? Any binding gates (>40% of rejections)?
+- **Failure categories**: dominant failure mode per branch (hard_gate, soft_below, marginal, crashed)
+- **Lab efficiency**: waste rate (% of experiments on branches that never promoted), budget ROI per branch, time-to-first-promote per branch
+- Key findings and recommended next steps
+
+Write to `research_lab/logs/checkpoint_cycle_{N}.md`. Set `last_transition: "human_checkpoint"`. Stop the loop and wait for the human to resume.
 
 ### Step 2: Select Branches (Parallel)
 
@@ -285,7 +325,21 @@ Process all results sequentially to avoid state corruption:
 **7g.** Increment `cycle_counter.json`, update `last_run_at`
 **7h.** Clear completed agents from `active_agents.json` (leave still-running agents)
 
-### Step 7i: Belief Revision
+**7i. Gate failure tracking.** For each REJECT verdict, classify which gate caused the rejection (significance, below_baseline, walk_forward, model_collapsed, causality, soft_below_champion). Update running gate failure counts. If any single gate accounts for >40% of all rejections (minimum 10 total), flag it in the handoff:
+
+> "Gate '{gate}' is the binding constraint: {count}/{total} rejections ({rate}%). Consider whether this gate is appropriate. Experiments blocked by this gate had average metric={X}."
+
+On human checkpoint cycles, additionally propose: "Run the top 3 gate-rejected experiments with the gate disabled to test if the gate is too restrictive."
+
+**7j. Failure categorization.** Classify all non-PROMOTE experiments this cycle:
+- `hard_gate:{gate_name}`: killed by a specific hard gate
+- `soft_below_champion`: passed gates but composite too low
+- `marginal`: within margin but not promoted
+- `crashed`: experiment errored
+
+Log the dominant failure type per branch in the handoff. If a branch has >3 experiments all failing the same gate, note it as a structural problem (the branch might need different scoring, not more experiments).
+
+### Step 7k: Belief Revision
 
 After state updates, check for belief revision triggers. This step prevents the lab from building on invalidated foundations.
 

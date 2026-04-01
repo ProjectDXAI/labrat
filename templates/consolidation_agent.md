@@ -146,6 +146,39 @@ Write a short (200-300 word) digest suitable for sharing with stakeholders who d
 
 Write this to `research_lab/logs/digest_cycle_N.md`.
 
+## Phase 4b: Failure Pattern Analysis
+
+Group all REJECT and MARGINAL experiments by failure type:
+- `hard_gate:significance` -- p-value too high
+- `hard_gate:below_baseline` -- metric below random baseline
+- `hard_gate:walk_forward` -- fewer than 50% positive windows
+- `hard_gate:model_collapsed` -- pred_std too low
+- `soft_below_champion` -- passed gates but score too low
+- `marginal` -- close but not promoted
+- `crashed` -- experiment errored
+
+For each branch, identify the dominant failure mode. Include a table:
+
+| Branch | Dominant Failure | Count | Interpretation |
+|--------|-----------------|-------|----------------|
+| model | hard_gate:significance | 5/8 | Signal too weak for statistical detection |
+| features | soft_below_champion | 4/6 | Feature changes don't improve enough |
+
+If a single gate accounts for >40% of all rejections, flag it prominently: "Gate X is the binding constraint. Recommend testing with gate disabled."
+
+## Phase 4c: Lab Efficiency Analysis
+
+Compute and report:
+- **Waste rate**: % of experiments on branches that never produced a PROMOTE. If >50%, the lab's branch design or early stopping needs work.
+- **Budget ROI per branch**: promotions / budget spent. Branches with ROI=0 after 5+ experiments are candidates for defunding.
+- **Time to first promote**: cycles until each branch first promoted. Early promoters are healthy; late promoters may indicate poor initial search space design.
+- **Explore/exploit ratio**: fraction of experiments on high-uncertainty (>0.5) vs high-EV (>0.3) branches. Healthy labs shift from explore to exploit over time.
+
+Include a table:
+
+| Branch | Experiments | Promotes | Waste | ROI | First Promote |
+|--------|------------|---------|-------|-----|---------------|
+
 ## Output Files
 
 | File | Purpose |

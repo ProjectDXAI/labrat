@@ -167,6 +167,15 @@ def main():
         "rolling_decay_ratio": None,
     })
 
+    # Data profile (populated by Step 0 exploration agent)
+    _write(LAB_ROOT / "state" / "data_profile.json", {
+        "updated_at": None,
+        "subgroups": {},
+        "correlations": {},
+        "distribution_shifts": [],
+        "proposed_branches": [],
+    })
+
     # Handoff
     active = [n for n, c in branches.items() if c.get("initial_budget", 0) > 0]
     meta = [n for n, c in branches.items() if c.get("experiment_type") in ("diagnostic", "meta")]

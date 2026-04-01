@@ -133,6 +133,32 @@ branches:
           - name: "assumption_test"
             description: "List and test all unstated assumptions"
 
+# --- DATA EXPLORATION CONFIGURATION ---
+# Controls the Step 0 data exploration agent.
+
+data_exploration:
+  on_init: true        # run on cycle 0
+  on_expansion: true   # re-run on expansion cycles
+  analyses:
+    - type: "subgroup_comparison"
+      group_by: []     # list categorical columns to compare (customize)
+      metric: "primary_metric"
+    - type: "correlation_scan"
+      features: "all_numeric"
+    - type: "distribution_shift"
+      compare: "train_vs_test"
+
+# --- GATE EVOLUTION CONFIGURATION ---
+# Controls automatic detection and relaxation of overly restrictive gates.
+
+gate_evolution:
+  enabled: true
+  binding_threshold: 0.40   # flag gates causing >40% of rejections
+  min_rejections: 10        # minimum rejections before checking
+  auto_relax: false         # set true to auto-relax binding gates
+  relaxation_factor: 0.80   # multiply threshold by this when relaxing
+  max_relaxations: 2        # max times a single gate can be relaxed
+
 # --- EXTERNAL RESEARCH CONFIGURATION ---
 # Controls how the research scout and expansion agent search for new ideas.
 

@@ -356,6 +356,194 @@ def generate_capstone_combinations(
         return combinations[:max_combinations]
 
 
+def track_gate_failures(
+    experiments: list[dict],
+    min_rejections: int = 10,
+    binding_threshold: float = 0.40,
+) -> dict:
+    """Track which hard gates cause the most rejections.
+
+    Returns dict with:
+    - gate_counts: {gate_name: count}
+    - total_rejections: int
+    - binding_gates: [{gate, count, rate}] where rate > binding_threshold
+    """
+    gate_counts: dict[str, int] = {}
+    total_rejections = 0
+
+    for e in experiments:
+        if e.get("verdict") != "REJECT":
+            continue
+        total_rejections += 1
+
+        # Extract gate failure reasons from the experiment
+        reason = e.get("reason", "")
+        failures = e.get("hard_gate_failures", [])
+
+        # Parse gate names from failure strings
+        if failures:
+            for fail in failures:
+                gate = _classify_gate_failure(fail)
+                gate_counts[gate] = gate_counts.get(gate, 0) + 1
+        elif "p_value" in reason or "p=" in reason:
+            gate_counts["significance"] = gate_counts.get("significance", 0) + 1
+        elif "baseline" in reason.lower() or "metric" in reason.lower():
+            gate_counts["below_baseline"] = gate_counts.get("below_baseline", 0) + 1
+        elif "score=" in reason:
+            gate_counts["soft_below_champion"] = gate_counts.get("soft_below_champion", 0) + 1
+        else:
+            gate_counts["other"] = gate_counts.get("other", 0) + 1
+
+    binding = []
+    if total_rejections >= min_rejections:
+        for gate, count in gate_counts.items():
+            rate = count / total_rejections
+            if rate >= binding_threshold:
+                binding.append({"gate": gate, "count": count, "rate": round(rate, 3)})
+        binding.sort(key=lambda x: -x["rate"])
+
+    return {
+        "gate_counts": gate_counts,
+        "total_rejections": total_rejections,
+        "binding_gates": binding,
+    }
+
+
+def _classify_gate_failure(failure_str: str) -> str:
+    """Map a gate failure string to a gate category."""
+    s = failure_str.lower()
+    if "p_value" in s or "p=" in s or "significant" in s:
+        return "significance"
+    if "baseline" in s or "metric" in s and "<=" in s:
+        return "below_baseline"
+    if "cv" in s or "fold" in s or "walk" in s or "window" in s:
+        return "walk_forward"
+    if "pred_std" in s or "collapsed" in s:
+        return "model_collapsed"
+    if "lag" in s or "causal" in s:
+        return "causality"
+    if "win_rate" in s or "win rate" in s:
+        return "win_rate"
+    return "other"
+
+
+def categorize_failures(experiments: list[dict]) -> dict:
+    """Categorize all non-PROMOTE experiments by failure type.
+
+    Returns:
+    - by_type: {type: count}
+    - by_branch: {branch: {type: count}}
+    - dominant_per_branch: {branch: most_common_failure_type}
+    """
+    by_type: dict[str, int] = {}
+    by_branch: dict[str, dict[str, int]] = {}
+
+    for e in experiments:
+        verdict = e.get("verdict", "")
+        branch = e.get("branch", "unknown")
+
+        if verdict == "PROMOTE" or verdict == "DIAGNOSTIC" or not verdict:
+            continue
+
+        if verdict == "REJECT":
+            failures = e.get("hard_gate_failures", [])
+            if failures:
+                ftype = "hard_gate:" + _classify_gate_failure(failures[0])
+            elif e.get("reason", "").startswith("score="):
+                ftype = "soft_below_champion"
+            else:
+                ftype = "rejected_other"
+        elif verdict == "MARGINAL":
+            ftype = "marginal"
+        elif "ERROR" in str(verdict).upper() or "CRASH" in str(verdict).upper():
+            ftype = "crashed"
+        else:
+            ftype = "other"
+
+        by_type[ftype] = by_type.get(ftype, 0) + 1
+        by_branch.setdefault(branch, {})
+        by_branch[branch][ftype] = by_branch[branch].get(ftype, 0) + 1
+
+    dominant = {}
+    for branch, types in by_branch.items():
+        if types:
+            dominant[branch] = max(types, key=types.get)
+
+    return {
+        "by_type": by_type,
+        "by_branch": by_branch,
+        "dominant_per_branch": dominant,
+    }
+
+
+def compute_efficiency_metrics(
+    experiments: list[dict],
+    beliefs: dict,
+    budget: dict,
+) -> dict:
+    """Compute lab efficiency metrics for meta-analysis.
+
+    Returns:
+    - waste_rate: fraction of experiments on branches that never promoted
+    - budget_roi: {branch: promotions_per_budget_spent}
+    - time_to_first_promote: {branch: cycle_of_first_promote or None}
+    - total_promotions: int
+    - total_experiments: int
+    """
+    branch_promoted = {}  # branch -> bool (ever promoted?)
+    branch_exp_count = {}
+    branch_promote_count = {}
+    branch_first_promote_cycle = {}
+    branch_budget_spent = {}
+
+    for e in experiments:
+        branch = e.get("branch", "unknown")
+        verdict = e.get("verdict", "")
+        cycle = e.get("cycle", 0)
+
+        if verdict in ("PROMOTE", "MARGINAL", "REJECT", "DIAGNOSTIC"):
+            branch_exp_count[branch] = branch_exp_count.get(branch, 0) + 1
+
+        if verdict == "PROMOTE":
+            branch_promoted[branch] = True
+            branch_promote_count[branch] = branch_promote_count.get(branch, 0) + 1
+            if branch not in branch_first_promote_cycle:
+                branch_first_promote_cycle[branch] = cycle
+
+    # Budget spent = initial - remaining
+    initial_budgets = {}
+    for name, b in beliefs.get("branches", {}).items():
+        initial_budgets[name] = b.get("n_experiments", 0)  # experiments run = budget spent
+    branch_budget_spent = initial_budgets
+
+    # Waste rate: experiments on branches that never promoted
+    total_exp = sum(branch_exp_count.values())
+    wasted_exp = sum(
+        count for branch, count in branch_exp_count.items()
+        if not branch_promoted.get(branch, False)
+    )
+    waste_rate = wasted_exp / max(total_exp, 1)
+
+    # Budget ROI
+    budget_roi = {}
+    for branch in branch_exp_count:
+        spent = branch_budget_spent.get(branch, 0)
+        promotes = branch_promote_count.get(branch, 0)
+        budget_roi[branch] = round(promotes / max(spent, 1), 3)
+
+    return {
+        "waste_rate": round(waste_rate, 3),
+        "total_experiments": total_exp,
+        "total_promotions": sum(branch_promote_count.values()),
+        "budget_roi": budget_roi,
+        "time_to_first_promote": branch_first_promote_cycle,
+        "never_promoted": [
+            b for b in branch_exp_count
+            if not branch_promoted.get(b, False)
+        ],
+    }
+
+
 if __name__ == "__main__":
     """CLI for testing allocation logic."""
     import argparse
@@ -366,11 +554,41 @@ if __name__ == "__main__":
     parser.add_argument("--check-convergence", action="store_true")
     parser.add_argument("--check-stuck", action="store_true")
     parser.add_argument("--check-diminishing", action="store_true")
+    parser.add_argument("--check-gates", action="store_true", help="Analyze gate failure patterns")
+    parser.add_argument("--check-failures", action="store_true", help="Categorize all failures")
+    parser.add_argument("--check-efficiency", action="store_true", help="Lab efficiency metrics")
     args = parser.parse_args()
 
     state = load_state(args.lab_dir)
 
-    if args.check_convergence:
+    if args.check_gates:
+        result = track_gate_failures(state["experiments"])
+        print(f"Total rejections: {result['total_rejections']}")
+        print(f"Gate failure counts: {result['gate_counts']}")
+        if result["binding_gates"]:
+            print(f"BINDING GATES (>{40}% of rejections):")
+            for bg in result["binding_gates"]:
+                print(f"  {bg['gate']}: {bg['count']} rejections ({bg['rate']*100:.0f}%)")
+        else:
+            print("No binding gates detected.")
+    elif args.check_failures:
+        result = categorize_failures(state["experiments"])
+        print("Failure types:", result["by_type"])
+        print("Dominant per branch:", result["dominant_per_branch"])
+    elif args.check_efficiency:
+        result = compute_efficiency_metrics(
+            state["experiments"],
+            state.get("branch_beliefs", {}),
+            state.get("budget", {}),
+        )
+        print(f"Waste rate: {result['waste_rate']*100:.0f}% of experiments on branches that never promoted")
+        print(f"Total: {result['total_experiments']} experiments, {result['total_promotions']} promotions")
+        print(f"Budget ROI: {result['budget_roi']}")
+        if result["never_promoted"]:
+            print(f"Never promoted: {result['never_promoted']}")
+        if result["time_to_first_promote"]:
+            print(f"First promote cycle: {result['time_to_first_promote']}")
+    elif args.check_convergence:
         converged, reason = check_convergence(state)
         print(f"Converged: {converged}")
         print(f"Reason: {reason}")
