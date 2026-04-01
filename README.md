@@ -4,21 +4,25 @@
 
 [**Quickstart**](#quickstart) · [**For Agents**](#for-agents) · [**Example**](#example) · [**Docs**](docs/) · [**DXRG**](https://dxrg.ai)
 
-Turn any AI agent into an autonomous researcher. Point it at a problem, give it a budget, walk away. It designs its own experiments, kills dead branches, finds papers when it gets stuck, and tells you what actually matters.
+Multi-agent autoresearch with economics. Parallel agents explore competing research branches while a funding mechanism allocates compute to what produces and defunds what doesn't. You define the branches, the scoring, and the budget rules. The system handles exploration, exploitation, and everything in between.
 
 ![dashboard](docs/dash-sample.png)
 
-147 experiments. Zero human intervention. One command.
+147 experiments across 6 branches. 43 cycles. Zero human intervention. One command.
 
 ## What this is
 
-An autoresearch framework that goes beyond single-metric optimization. Where [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) runs one agent against one metric, labrat runs N agents across N branches simultaneously, with an economic system that routes compute to whatever is producing results.
+A framework for running autonomous research programs where you have more directions than time to explore them. Instead of one agent optimizing one metric, labrat dispatches parallel agents across a tree of competing approaches and uses a UCB1-inspired funding mechanism to decide which branches earn more compute and which get cut.
 
-The agent doesn't just tune hyperparameters. It explores fundamentally different approaches in parallel, scores them mechanically, defunds the losers, and doubles down on the winners. When it runs out of ideas, it searches the internet for papers and proposes new directions it hasn't tried. When it's about to declare convergence, it challenges its own assumptions first.
+The funding mechanism is the core idea. Each branch starts with a budget. Every experiment costs one credit. Branches that produce promotions earn replenishment. Branches that stall get defunded. The allocator balances exploration (try branches with high uncertainty) against exploitation (revisit branches with high expected value) automatically. You can tune the weights, the replenishment rules, the exhaustion thresholds, and the scoring formula to fit any domain.
 
-Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works with Codex, OpenClaw, or any agent that reads markdown and runs shell commands.
+This makes it different from hyperparameter search. Optuna finds the best config within a fixed space. Labrat decides which spaces are worth searching at all, kills the ones that aren't, and goes looking for new ones when it runs out of ideas.
 
-Born out of work at [DXRG](https://dxrg.ai) running autonomous research programs on BTC microstructure (55 cycles, 47 experiments), prediction markets (74 experiments, 18 branches), and NLP (147 experiments, 43 cycles). Every feature exists because something went wrong in a real deployment and we built the fix.
+When branches get stuck, research scouts search arXiv and GitHub for approaches the lab hasn't tried. On a schedule, expansion scouts inject external knowledge to prevent the system from optimizing in a local basin. Before declaring convergence, a frame challenge asks whether the problem was even set up correctly. The whole thing runs on a loop with no human in it.
+
+Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works with Codex, OpenClaw, or any agent harness that reads markdown and runs shell commands.
+
+Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-agent multi-branch with economic allocation. Born out of work at [DXRG](https://dxrg.ai) running autonomous research on BTC microstructure (55 cycles, 47 experiments), prediction markets (74 experiments, 18 branches), and NLP classification (147 experiments, 43 cycles). Every feature exists because something broke in a real deployment.
 
 ## The autoresearch loop
 
@@ -67,27 +71,29 @@ Branches can be narrow (5 values of learning rate) or broad (entirely different 
 
 ## When to use this
 
-You have a baseline, a metric, multiple axes of variation, and more ideas than time to test them.
+You have competing research directions and limited compute. The funding mechanism figures out where to spend.
 
-- **Architecture search** -- attention patterns, layer depths, positional encodings, activation functions. Each branch tests one axis. The allocator finds which dimensions move the needle vs which are flat.
-- **Feature engineering** -- 200 features, most are noise. Branches test subsets, encodings, interactions. The allocator identifies the minimal set.
-- **Trading strategy research** -- signals, execution methods, regime filters, sizing rules across walk-forward windows. The allocator separates real edge from backtest overfitting.
-- **Kernel optimization** -- compiler flags, memory layouts, tiling strategies. Experiments run in seconds. The allocator burns through hundreds of configs.
-- **Prompt / RAG tuning** -- chunking strategies, embedding models, reranking, prompt templates. Each branch is a pipeline axis.
-- **Drug compound screening** -- molecular descriptors, fingerprint types, model architectures. Branches compete for compute based on predicted activity.
+- **Architecture search** -- attention, depth, positional encoding, activations as separate branches. Budget flows to whichever axis actually moves the metric.
+- **Feature engineering** -- 200 features, most noise. Branches compete on subsets, encodings, interactions. The allocator identifies the minimal set and defunds the rest.
+- **Trading strategy research** -- signals, execution, regime filters, sizing as parallel branches. Walk-forward scoring separates real edge from overfitting. Dead branches lose funding.
+- **Kernel optimization** -- compiler flags, memory layouts, tiling, fusion. Experiments run in seconds. Hundreds of configs, budget routes to the 3 that matter.
+- **Prompt / RAG tuning** -- chunking, embedding models, reranking, prompt templates. Each pipeline axis is a funded branch.
+- **Drug compound screening** -- descriptors, fingerprints, model types. Branches compete for compute based on which combos predict activity.
 
-## What the autoresearcher actually does
+## Beyond the loop
 
-It's not just a hyperparameter sweeper. The full v2 loop includes:
+The funding mechanism and parallel agents are the foundation. On top of that:
 
-- **Data profiling** before experiments start (what subgroups have variance? what correlates?)
-- **Research scouts** that search the web for papers when a branch gets stuck
-- **Expansion scouts** that inject external knowledge every 20 cycles to escape local optima
-- **Belief revision** that catches when a new finding invalidates previous results
-- **Gate evolution** that detects when your scoring gates are blocking good experiments
-- **Failure categorization** that tells you WHY experiments fail, not just that they did
-- **Efficiency tracking** that measures waste rate, budget ROI, and time-to-first-promote per branch
-- **Frame challenge** that questions "are we even measuring the right thing?" before convergence
+- **Data profiling** before experiments start -- the system looks at the actual data before designing branches, not just the literature
+- **Research scouts** search arXiv and GitHub when a branch gets stuck, propose new experiments with citations
+- **Expansion scouts** inject external knowledge on a schedule to break out of local optima
+- **Belief revision** catches when a new finding invalidates previous results and flags the downstream damage
+- **Gate evolution** detects when your scoring gates are blocking good experiments and proposes relaxation
+- **Failure categorization** classifies WHY experiments fail (which gate? soft score? crash?) so you fix the right thing
+- **Efficiency tracking** measures waste rate, budget ROI per branch, and time-to-first-promote so you can see where compute went
+- **Frame challenge** questions whether the scoring metric even correlates with what you care about before declaring convergence
+
+The scoring formula, budget rules, gate thresholds, and allocation weights are all configurable per domain. The framework is opinionated about process (mechanical scoring, no human in the loop, red team every 5 cycles) but unopinionated about what you're optimizing.
 
 ## Quickstart
 
