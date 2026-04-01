@@ -24,61 +24,65 @@ Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works w
 
 Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-agent multi-branch with economic allocation. Born out of work at [DXRG](https://dxrg.ai) running autonomous research on BTC microstructure (55 cycles, 47 experiments), prediction markets (74 experiments, 18 branches), and NLP classification (147 experiments, 43 cycles). Every feature exists because something broke in a real deployment.
 
-## The autoresearch loop
+## How it works
+
+Each cycle, the orchestrator picks branches, dispatches parallel agents, scores results, and reallocates budget. Branches that produce keep their funding. Branches that don't get cut.
 
 ```
-  orchestrator
-  │
-  ├─ Profile the data (Step 0: what subgroups have variance?)
-  ├─ Select branches by UCB1 priority
-  ├─ Dispatch labrats in parallel ─────────────────┐
-  │     ├── ᘛ⁐ᕐᐷ~ features: run + judge           │
-  │     ├── ᘛ⁐ᕐᐷ~ model: run + judge               │ concurrent
-  │     └── ᘛ⁐ᕐᐷ~ objectives: run + judge          │
-  ├─ Score mechanically ◄──────────────────────────┘
-  ├─ Synthesize: "what did we learn?"
-  ├─ Update beliefs, budget, champions
-  ├─ Check: any gates blocking good experiments?
-  ├─ Check: any assumptions invalidated?
-  └─ Write handoff → next cycle
+                           ┌─────────────────────────────────────┐
+                           │         ORCHESTRATOR                │
+                           │                                     │
+                           │  1. Read state + last cycle handoff │
+                           │  2. Allocate budget by UCB1         │
+                           │  3. Dispatch parallel agents ──────────┐
+                           │  4. Score results mechanically      │  │
+                           │  5. Synthesize: what did we learn?  │  │
+                           │  6. Reallocate: fund winners,       │  │
+                           │     defund losers                   │  │
+                           │  7. Write handoff → next cycle      │  │
+                           └─────────────────────────────────────┘  │
+                                                                    │
+       ┌────────────────┬────────────────┬────────────────┐         │
+       │                │                │                │  parallel│
+       ▼                ▼                ▼                ▼         │
+  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐        │
+  │ Agent A │    │ Agent B │    │ Agent C │    │ Agent D │        │
+  │ features│    │  model  │    │  data   │    │  loss   │        │
+  │ $15     │    │  $12    │    │  $12    │    │  $8     │        │
+  │ 3 wins  │    │ 0 wins  │    │ 1 win   │    │ 0 wins  │        │
+  └────┬────┘    └────┬────┘    └────┬────┘    └────┬────┘        │
+       │              │              │              │              │
+       ▼              ▼              ▼              ▼              │
+    PROMOTE         REJECT        MARGINAL       REJECT           │
+    +5 budget       -1 budget     -1 budget      -1 budget ◄──────┘
 ```
 
-Every 5th cycle: red team (shuffled labels, is the signal real?). Every 10th: budget replenishment. Every 20th: expansion scout searches arXiv and GitHub for approaches the lab hasn't tried. Stuck branches trigger a research scout that reads papers and proposes new experiments. At convergence: frame challenge tests assumptions before declaring done.
-
-The tree structure is whatever you want it to be:
+After 10 cycles, the budget distribution tells you where the signal is:
 
 ```
-                            baseline
-                          TF-IDF + LR
-                               │
-            ┌──────────┬───────┼───────┬──────────┐
-            │          │       │       │          │
-        features    model   preproc  objectives  ensemble
-        budget:20  budget:20  b:15    b:15       b:10
-            │          │       │       │
-         bigrams     SVM    stopwords balanced    ← promoted
-         trigrams    catboost  min_df   C=0.5     ← tested
-         char_wb    lightgbm  max_df   C=5.0     ← rejected
-         50K feat   rand.for.          C=10
-            │          │       │       │
-            └──────────┴───────┴───────┘
-                               │
-                           capstone
-                     combine branch winners
+  ┌─ features ██████████████████░░  $18  (3 promoted, ROI 0.42)
+  ├─ model    ████░░░░░░░░░░░░░░░░  $4   (0 promoted, ROI 0.00) ← defunded
+  ├─ data     █████████░░░░░░░░░░░  $9   (1 promoted, ROI 0.17)
+  ├─ loss     ███░░░░░░░░░░░░░░░░░  $3   (0 promoted, ROI 0.00) ← defunded
+  └─ capstone ████████████░░░░░░░░  $12  (waiting for branch winners)
 ```
 
-Branches can be narrow (5 values of learning rate) or broad (entirely different algorithmic families). The allocator doesn't care. It just measures what produces and routes budget accordingly.
+The allocator factors in cost per experiment. A branch burning 10 minutes of GPU time per experiment is held to a higher standard than one running 3-second CPU jobs. Expensive branches that don't produce lose funding faster.
+
+Every 5th cycle: red team (shuffled labels). Every 10th: budget replenishment (producers earn more). Every 20th: expansion scout searches arXiv for new approaches. Stuck branches trigger a research scout. At convergence: frame challenge tests whether the problem was set up correctly.
 
 ## When to use this
 
-You have competing research directions and limited compute. The funding mechanism figures out where to spend.
+You have N research directions, budget for maybe N/3 of them, and no idea which ones matter. The funding mechanism runs them all and lets the results decide.
 
-- **Architecture search** -- attention, depth, positional encoding, activations as separate branches. Budget flows to whichever axis actually moves the metric.
-- **Feature engineering** -- 200 features, most noise. Branches compete on subsets, encodings, interactions. The allocator identifies the minimal set and defunds the rest.
-- **Trading strategy research** -- signals, execution, regime filters, sizing as parallel branches. Walk-forward scoring separates real edge from overfitting. Dead branches lose funding.
-- **Kernel optimization** -- compiler flags, memory layouts, tiling, fusion. Experiments run in seconds. Hundreds of configs, budget routes to the 3 that matter.
-- **Prompt / RAG tuning** -- chunking, embedding models, reranking, prompt templates. Each pipeline axis is a funded branch.
-- **Drug compound screening** -- descriptors, fingerprints, model types. Branches compete for compute based on which combos predict activity.
+| Domain | Branches compete on | What the allocator finds |
+|--------|--------------------|-----------------------|
+| Architecture search | attention, depth, encoding, activations | which dimensions move the metric vs which are flat |
+| Feature engineering | subsets, encodings, interactions, normalization | the minimal feature set (defunds the noise) |
+| Trading strategies | signals, execution, regime filters, sizing | real edge vs backtest overfitting |
+| Kernel optimization | compiler flags, memory layouts, tiling, fusion | the 3 configs that matter out of hundreds |
+| RAG / prompt tuning | chunking, embeddings, reranking, templates | which pipeline axis has the most headroom |
+| Drug screening | descriptors, fingerprints, model families | which descriptor/model combos predict activity |
 
 ## Beyond the loop
 

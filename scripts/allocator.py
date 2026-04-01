@@ -41,12 +41,21 @@ def compute_priority(
     beliefs: dict,
     current_cycle: int,
     budget: dict,
+    cost_config: dict | None = None,
 ) -> float | None:
-    """Compute UCB1-inspired priority for a branch.
+    """Compute UCB1-inspired priority for a branch, optionally cost-adjusted.
 
     Returns None if branch should be skipped (exhausted, no budget).
 
-    priority = 0.3 * ev + 0.4 * uncertainty + 0.3 * recency_bonus
+    Base priority:
+        priority = 0.3 * ev + 0.4 * uncertainty + 0.3 * recency_bonus
+
+    With cost awareness (when cost_config is provided):
+        cost_efficiency = promotions / total_cost_for_branch
+        priority *= (1 + 0.2 * cost_efficiency)
+
+    This gives a bonus to branches that produce results cheaply and a
+    penalty to expensive branches that haven't earned their spend.
     """
     b = beliefs.get("branches", {}).get(branch_name, {})
     if b.get("status") in ("exhausted", "converged"):
@@ -60,7 +69,56 @@ def compute_priority(
     last_cycle = b.get("last_explored_cycle", 0)
     recency_bonus = min(1.0, (current_cycle - last_cycle) / 3.0)
 
-    return 0.3 * ev + 0.4 * uncertainty + 0.3 * recency_bonus
+    base = 0.3 * ev + 0.4 * uncertainty + 0.3 * recency_bonus
+
+    # Cost adjustment: reward cheap branches that produce, penalize expensive duds
+    if cost_config and n > 0:
+        cost_per_exp = b.get("avg_cost", cost_config.get("default_cost", 1.0))
+        n_improvements = b.get("n_improvements", 0)
+        total_cost = cost_per_exp * n
+        if total_cost > 0:
+            cost_efficiency = n_improvements / total_cost
+            # Normalize: a branch that promotes every $1 gets a 20% boost
+            base *= (1.0 + 0.2 * min(cost_efficiency, 1.0))
+
+    return base
+
+
+def compute_branch_cost(
+    experiments: list[dict],
+    branch: str,
+    cost_field: str = "elapsed_sec",
+    token_field: str = "tokens_used",
+) -> dict:
+    """Compute cost metrics for a branch from experiment history.
+
+    Returns:
+    - total_cost: sum of cost_field across all experiments
+    - avg_cost: mean cost per experiment
+    - cost_per_promote: total_cost / n_promotions (inf if 0 promotions)
+    - total_tokens: sum of token_field if available
+    """
+    branch_exps = [e for e in experiments if e.get("branch") == branch]
+    if not branch_exps:
+        return {"total_cost": 0, "avg_cost": 0, "cost_per_promote": float("inf"), "total_tokens": 0}
+
+    costs = [e.get(cost_field, e.get("elapsed_seconds", 0)) for e in branch_exps]
+    tokens = [e.get(token_field, 0) for e in branch_exps]
+    n_promote = sum(1 for e in branch_exps if e.get("verdict") == "PROMOTE")
+
+    total = sum(costs)
+    total_tokens = sum(tokens)
+    avg = total / len(costs) if costs else 0
+    cpp = total / n_promote if n_promote > 0 else float("inf")
+
+    return {
+        "total_cost": round(total, 1),
+        "avg_cost": round(avg, 1),
+        "cost_per_promote": round(cpp, 1) if cpp != float("inf") else None,
+        "n_experiments": len(branch_exps),
+        "n_promotions": n_promote,
+        "total_tokens": total_tokens,
+    }
 
 
 def select_branches(

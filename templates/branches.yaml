@@ -39,7 +39,7 @@ branches:
   # Branch 1: Model architecture
   architecture:
     description: "Model architecture variations"
-    initial_budget: 25
+    initial_budget: 15
     search_space:
       - delta_key: "model.type"
         values: ["model_a", "model_b", "model_c"]
@@ -49,7 +49,7 @@ branches:
   # Branch 2: Training recipe
   training:
     description: "Training hyperparameters and schedules"
-    initial_budget: 20
+    initial_budget: 12
     search_space:
       - delta_key: "training.learning_rate"
         values: [0.0001, 0.0005, 0.005, 0.01]
@@ -61,7 +61,7 @@ branches:
   # Branch 3: Data engineering
   data:
     description: "Data preprocessing, augmentation, and selection"
-    initial_budget: 20
+    initial_budget: 12
     search_space:
       - delta_key: "data.augmentation"
         values: ["none", "basic", "aggressive"]
@@ -89,7 +89,7 @@ branches:
   # The orchestrator auto-generates 2^N factorial combinations of branch winners.
   capstone:
     description: "Combined configs from branch winners. Multi-delta allowed."
-    initial_budget: 20
+    initial_budget: 10
     multi_delta: true  # allows changing multiple params at once
     auto_generate: true  # orchestrator generates combinations from branch winners
     search_space:
@@ -189,12 +189,25 @@ external_research:
 
 budget_rules:
   replenish_every_n_cycles: 10
-  base_replenish: 5
-  improvement_bonus: 3
-  max_stale_cycles: 10
-  # New: exhaustion threshold raised from 3 to match scout_trigger
+  base_replenish: 3               # tighter: earn your compute (was 5)
+  improvement_bonus: 5             # reward producers heavily (was 3)
+  max_stale_cycles: 8              # cut unvisited branches faster (was 10)
   exhaustion_threshold: 4
-  # New: max budget cap per branch after replenishment
-  max_budget_cap: 30
-  # New: meta-branches get separate budget pool
+  max_budget_cap: 20               # lower ceiling forces competition (was 30)
   meta_budget_separate: true
+
+# --- COST-AWARE ALLOCATION ---
+# The allocator can factor in experiment cost (time, tokens, compute)
+# when deciding which branches to explore. Expensive branches that
+# don't produce results get deprioritized faster.
+
+cost_tracking:
+  enabled: true                  # cost-aware allocation on by default
+  cost_field: "elapsed_sec"      # field in experiment_log.jsonl to use as cost
+  token_field: "tokens_used"     # optional: track token consumption
+  default_cost: 1.0              # fallback cost per experiment
+  cost_weight: 0.2               # how much cost efficiency influences priority (0-1)
+  # Per-branch cost overrides (e.g., GPU branches cost more than CPU branches)
+  branch_costs: {}
+  #   architecture: 10.0         # each experiment costs ~10 units
+  #   features: 1.0              # cheap experiments
