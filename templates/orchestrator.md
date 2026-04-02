@@ -139,7 +139,7 @@ Read Level 0 files. Based on cycle number and state, determine what kind of cycl
 |----------------|------|--------|
 | `cycle == 0` | **Data Exploration** | Run Step 0, then continue to Step 2 |
 | `cycle % 5 == 0` and `cycle > 0` | **Red Team** | Run negative controls (Step 1b) |
-| `cycle % 20 == 0` and `cycle > 0` | **Expansion** | Run Step 0 (re-profile) + expansion scout (Step 1c) |
+| Diminishing returns OR 50%+ branches exhausted | **Expansion** | Run Step 0 (re-profile) + expansion scout (Step 1c) |
 | `cycle % 15 == 0` and `cycle > 0` | **Human Checkpoint** | Produce report, pause (Step 1d) |
 | Active agents in `active_agents.json` | **Collection** | Skip to Step 5 (collect results) |
 | All branches converged or exhausted | **Convergence** | Run frame challenge (Step 9) |
@@ -158,7 +158,12 @@ For RL: verify random actions produce no reward.
 **PASS if**: negative control metric is within expected random range on BOTH seeds.
 Log result in experiment_log.jsonl with `experiment_type: "red_team"`. Skip to Step 7.
 
-### Step 1c: Expansion Cycle (every 20th cycle)
+### Step 1c: Expansion Cycle (on diminishing returns or 50%+ branches exhausted)
+
+Deploy when the lab is running out of ideas, not on a fixed schedule. Triggers:
+- **Diminishing returns detected** (last 8 experiments all have composite delta < 0.005)
+- **50%+ branches exhausted** (more than half of active branches have no remaining search_space entries AND mutation_mode is not "llm")
+- **Manual**: orchestrator synthesis identifies a gap that internal exploration can't fill
 
 Instead of running experiments, inject external knowledge:
 
@@ -215,6 +220,19 @@ Must not match anything in `dead_ends.md` or `experiment_log.jsonl`.
 
 Write config to: `research_lab/experiments/{branch}/{experiment_id}/config.yaml`
 
+#### LLM Mutation Mode (when search_space is exhausted)
+
+When a branch has no remaining unexplored entries in `search_space` but still has budget, switch to mutation mode instead of marking it exhausted. The subagent proposes its own experiment:
+
+1. Read the branch champion config, the full experiment log for this branch, and `dead_ends.md`
+2. Reason about what single change would most likely improve the metric, given everything tried so far
+3. Propose a config delta with a hypothesis and expected outcome
+4. The mutation must still be single-delta from the current champion
+
+The mutation is constrained by `mutation_constraints` in `branches.yaml` (if defined). Example: a features branch might limit mutations to specific feature families. The constitution's hard gates catch bad proposals.
+
+Log mutation experiments with `experiment_type: "mutation"` and include the reasoning in the `finding` field.
+
 #### Diagnostic Experiments
 Run when you need information, not a score. Examples:
 - Delay audits ("what is the actual latency of our pipeline?")
@@ -248,15 +266,28 @@ Also update **branch notes** in `branch_beliefs.json` with a one-line descriptio
 
 ### Step 4: Run Experiments (Parallel via Subagents)
 
-Launch one subagent per selected branch in a SINGLE message (concurrent execution):
+Launch one subagent per selected branch in a SINGLE message (concurrent execution). Each subagent runs an **inner hill-climbing loop** of 1-5 experiments per invocation (configurable via `inner_loop_budget` in `branches.yaml`, default 1 for backward compatibility):
 
 ```
 Agent(
   name="{branch}-branch",
-  prompt="Run experiment {experiment_id} for branch {branch}. Config at {config_path}. Type: {type}. Run experiment, then judge (unless diagnostic). Return RESULT + VERDICT lines.",
+  prompt="Run up to {inner_loop_budget} experiments for branch {branch}.
+    Starting config: {champion_config_path}. Type: {type}.
+
+    INNER LOOP:
+    1. Propose experiment (from search_space if available, else LLM mutation)
+    2. Run experiment + evaluate with fast metric ({inner_loop_metric})
+    3. If improves: keep as new baseline for next iteration
+    4. If not: revert to previous baseline
+    5. Repeat up to {inner_loop_budget} times
+
+    Return: your BEST result (for full constitutional scoring), plus ALL intermediate results.
+    Format: RESULT + VERDICT lines for each experiment run.",
   mode="bypassPermissions"
 )
 ```
+
+The inner loop uses a **fast metric** (e.g., mean walk-forward IC) for keep/revert decisions. The full constitution (hard gates + composite score) is applied by the orchestrator only to the subagent's best result. This keeps the constitutional gates intact while letting the subagent iterate faster.
 
 Grep for these line formats in output:
 - `RESULT: id=... f1=... acc=... cv_mean=... cv_pos=... p_value=... elapsed=...`
@@ -448,11 +479,19 @@ The frame challenge asks three questions. Work through them yourself based on th
 - Log `last_transition: "new_hypothesis_proposed"` and continue
 - Do NOT converge
 
-**If the frame challenge finds nothing actionable:**
-1. Set `cycle_counter.json` status to `"CONVERGED"`
-2. Write a final handoff summarizing all findings, organized by branch
-3. Write a final report to `research_lab/logs/convergence_report.md`
-4. Stop the loop
+**If the frame challenge finds nothing actionable, run held-out confirmation:**
+
+If `data_splits.held_out_test` is defined in `branches.yaml`, evaluate the production champion exactly ONCE on held-out data before declaring convergence. The runner loads only the held-out period and scores the champion config.
+
+- **If held-out passes** (champion meets all hard gates on held-out data):
+  1. Set `cycle_counter.json` status to `"CONVERGED"`
+  2. Write a final handoff summarizing all findings, organized by branch
+  3. Include held-out confirmation results in `research_lab/logs/convergence_report.md`
+  4. Stop the loop
+
+- **If held-out fails**: convergence is reverted. Log the failure, add it to `dead_ends.md` as a data point, and continue the lab. The champion was overfit.
+
+- **If no held-out test is defined**: skip this step and converge directly.
 
 Do NOT continue running cycles after convergence. Budget replenishment doesn't help if all search spaces are exhausted and the frame challenge found nothing new.
 

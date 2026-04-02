@@ -32,6 +32,17 @@ production_baseline:
       cross_validation: true
       n_folds: 5
 
+# Data splits for held-out validation at convergence.
+# The held_out_test period is NEVER used during exploration.
+# The champion is evaluated on it exactly once before declaring convergence.
+data_splits:
+  train_val:
+    note: "All experimentation happens within this period"
+  held_out_test:
+    note: "Touched ONCE at convergence. Never during exploration."
+    # start: "2025-09-15"
+    # end: "2025-10-14"
+
 # --- STANDARD BRANCHES ---
 # Each branch explores one axis of variation with single-delta experiments.
 
@@ -40,6 +51,9 @@ branches:
   architecture:
     description: "Model architecture variations"
     initial_budget: 15
+    mutation_mode: "llm"          # when search_space exhausted, subagent proposes mutations
+    inner_loop_budget: 3          # experiments per subagent invocation (default 1)
+    inner_loop_metric: "primary_metric"  # fast metric for keep/revert in inner loop
     search_space:
       - delta_key: "model.type"
         values: ["model_a", "model_b", "model_c"]

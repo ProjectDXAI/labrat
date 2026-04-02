@@ -96,8 +96,15 @@ The funding mechanism and parallel agents are the foundation. On top of that:
 - **Failure categorization** classifies WHY experiments fail (which gate? soft score? crash?) so you fix the right thing
 - **Efficiency tracking** measures waste rate, budget ROI per branch, and time-to-first-promote so you can see where compute went
 - **Frame challenge** questions whether the scoring metric even correlates with what you care about before declaring convergence
+- **LLM mutation mode** lets branches propose their own experiments after the predefined search space runs out -- no more dead branches with budget remaining
+- **Inner hill-climbing** runs 3-5 experiments per subagent invocation with keep/revert logic, cutting orchestrator overhead
+- **Held-out test** at convergence validates the champion on untouched data before declaring done
 
 The scoring formula, budget rules, gate thresholds, and allocation weights are all configurable per domain. The framework is opinionated about process (mechanical scoring, no human in the loop, red team every 5 cycles) but unopinionated about what you're optimizing.
+
+### Dashboard
+
+A React dashboard app (`dashboard-app/`) provides interactive monitoring with hover tooltips, animated branch status, and a Recharts scatter plot of experiment progress. Falls back to a static HTML dashboard (`templates/dashboard.html`) for zero-dependency environments.
 
 ## Quickstart
 
