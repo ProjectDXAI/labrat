@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LABRAT / Research Dashboard</title>
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg-base: #F4F3ED;
   --bg-panel: #FAF9F5;
@@ -15,498 +16,1440 @@
   --accent-amber: #A66028;
   --accent-green: #3D7C47;
   --accent-red: #9B3B30;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  --font-ui: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 12px; }
 body {
+  font-family: var(--font-ui);
   background: var(--bg-base);
   color: var(--text-main);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
   line-height: 1.5;
-  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
-.text-meta { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); }
-.text-mono { font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: -0.02em; }
-.text-mono-lg { font-family: var(--font-mono); font-size: 1.25rem; }
 
-/* Ticker */
-.ticker-wrap {
-  width: 100%; background: var(--text-main); color: var(--bg-base);
-  padding: 6px 0; overflow: hidden; border-bottom: 1px solid var(--border-dark);
-  height: 28px; position: relative;
+/* ── TICKER BAR ── */
+.ticker-bar {
+  background: var(--border-dark);
+  color: #D4D0C8;
+  height: 28px;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 2px solid var(--accent-amber);
 }
-.ticker { display: inline-block; white-space: nowrap; padding-left: 100%; animation: tickerScroll 50s linear infinite; }
-.ticker-item { display: inline-block; padding: 0 2.5rem; font-size: 0.72rem; letter-spacing: 0.04em; }
-.ticker-item .tag { color: var(--text-muted); margin-right: 8px; }
-.ticker-promote { color: #D4915A; }
-.ticker-reject { color: #888; }
-@keyframes tickerScroll { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-100%,0,0); } }
+.ticker-track {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  align-items: center;
+  white-space: nowrap;
+  animation: tickerScroll 30s linear infinite;
+}
+.ticker-item {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  padding: 0 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ticker-item .verdict-tag {
+  font-weight: 700;
+  padding: 1px 5px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.verdict-tag.promote { color: var(--accent-amber); }
+.verdict-tag.marginal { color: #999; }
+.verdict-tag.reject { color: #666; }
+.verdict-tag.crashed { color: var(--accent-red); }
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-/* Header */
-.app-header {
-  padding: 16px 48px; display: flex; justify-content: space-between; align-items: center;
+/* ── HEADER ── */
+.header {
+  padding: 20px 32px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--border-light);
 }
-.logo { font-size: 1.5rem; font-weight: 400; letter-spacing: -0.03em; }
-.logo::after { content: "."; }
-.header-stats { display: flex; align-items: center; gap: 24px; }
-.header-stat { display: flex; align-items: center; gap: 8px; }
-.progress-bar { width: 100px; height: 2px; background: var(--border-light); }
-.progress-fill { height: 100%; background: var(--text-main); transition: width 0.8s ease; }
-.refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-light); transition: background 0.3s; }
-.refresh-dot.active { background: var(--accent-amber); }
-
-/* Layout */
-.dashboard { padding: 48px; display: grid; grid-template-columns: 280px 1fr; gap: 48px; max-width: 1600px; margin: 0 auto; }
-
-/* Left panel */
-.side-panel { display: flex; flex-direction: column; gap: 32px; }
-.section-title {
-  font-size: 1rem; font-weight: 400; letter-spacing: -0.01em;
-  border-bottom: 1px solid var(--border-dark); padding-bottom: 8px; margin-bottom: 16px;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
-.mission-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.stat-item { display: flex; flex-direction: column; gap: 4px; }
-
-/* Tree SVG */
-.tree-svg { width: 100%; height: auto; }
-.tree-line { stroke: var(--border-light); stroke-width: 1; fill: none; }
-.tree-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; fill: var(--text-muted); font-family: var(--font-sans); }
-.tree-node { fill: var(--text-muted); }
-.tree-node-active { fill: var(--accent-amber); }
-.tree-node-promoted { fill: var(--accent-green); }
-@keyframes pulse { 0%,100% { r: 3; opacity: 1; } 50% { r: 5; opacity: 0.6; } }
-.tree-node-running { fill: var(--accent-amber); animation: pulse 1.5s ease infinite; }
-
-/* Handoff */
-.handoff-box {
-  background: var(--bg-panel); border: 1px solid var(--border-light);
-  padding: 16px; max-height: 200px; overflow-y: auto;
-  font-size: 0.8rem; line-height: 1.6; color: var(--text-muted); white-space: pre-wrap;
+.logo {
+  font-family: var(--font-ui);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+.logo-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.header-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.header-stat {
+  text-align: right;
+}
+.header-stat-value {
   font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.header-stat-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.refresh-indicator {
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--border-light);
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  transition: all 0.3s;
+}
+.refresh-indicator.active {
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
 }
 
-/* Right panel */
-.main-panel { display: flex; flex-direction: column; gap: 48px; }
-
-/* Branch table */
-.branch-table { width: 100%; border-collapse: collapse; }
-.branch-table th {
-  font-weight: 400; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.1em; border-bottom: 1px solid var(--border-light); padding: 0 0 8px 0; text-align: left;
+/* ── LAYOUT ── */
+.main-wrap {
+  display: flex;
+  min-height: calc(100vh - 80px);
 }
-.branch-table td { padding: 14px 0; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
-.branch-table tr:last-child td { border-bottom: none; }
-.col-branch { width: 18%; font-weight: 500; }
-.col-status { width: 14%; }
-.col-exp { width: 8%; text-align: right; padding-right: 16px !important; }
-.col-wins { width: 8%; text-align: right; padding-right: 16px !important; }
-.col-budget { width: 32%; }
-.col-score { width: 20%; text-align: right; }
-.status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; }
-.dot-active { background: var(--accent-amber); }
-.dot-running { background: var(--accent-amber); animation: dotPulse 1.2s ease infinite; }
-.dot-idle { background: transparent; border: 1px solid var(--text-muted); }
-.dot-exhausted { background: var(--accent-red); }
-.dot-converged { background: var(--accent-green); }
-@keyframes dotPulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(1.5); } }
-.budget-track { width: 100%; height: 1px; background: var(--border-light); position: relative; }
-.budget-fill { position: absolute; top: -1px; left: 0; height: 3px; background: var(--text-main); transition: width 0.8s ease; }
-
-/* Score timeline */
-.plot-box {
-  width: 100%; height: 280px; background: var(--bg-panel); border: 1px solid var(--border-light);
-  padding: 16px; position: relative;
+.left-panel {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--border-light);
+  padding: 20px 20px 40px;
+  background: var(--bg-panel);
 }
-.plot-legend { position: absolute; top: 16px; right: 16px; display: flex; gap: 16px; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--text-muted); }
-.dot-promote { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-amber); }
-.dot-marginal { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--text-muted); }
-.dot-reject-lg { width: 6px; height: 6px; border-radius: 50%; background: var(--border-light); }
-.chart-svg { width: 100%; height: 100%; }
-.grid-line { stroke: var(--border-light); stroke-width: 0.5; stroke-dasharray: 2 4; }
-.axis-line { stroke: var(--border-dark); stroke-width: 1; }
-.axis-label { fill: var(--text-muted); font-size: 10px; font-family: var(--font-sans); }
-
-/* Log table */
-.log-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-.log-table th {
-  font-weight: 400; color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase;
-  letter-spacing: 0.1em; border-bottom: 1px solid var(--border-light); padding: 0 0 6px 0; text-align: left;
+.right-panel {
+  flex: 1;
+  padding: 20px 28px 40px;
+  min-width: 0;
 }
-.log-table td { padding: 8px 0; border-bottom: 1px solid var(--border-light); }
-.log-table tr:last-child td { border-bottom: none; }
-.verdict-promote { color: var(--accent-amber); font-weight: 600; }
+
+/* ── SECTION TITLES ── */
+.section { margin-bottom: 28px; }
+.section-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* ── LEFT: MISSION ── */
+.mission-text {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-main);
+}
+
+/* ── LEFT: CYCLE STATS GRID ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stat-box {
+  background: var(--bg-base);
+  border: 1px solid var(--border-light);
+  padding: 10px 12px;
+}
+.stat-box-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.1;
+}
+.stat-box-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+/* ── LEFT: BRANCH TREE (compact SVG) ── */
+.branch-tree-compact {
+  width: 100%;
+  overflow: visible;
+}
+
+/* ── LEFT: HANDOFF ── */
+.handoff-preview {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ── LEFT: SCORING ── */
+.scoring-formula {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.scoring-formula strong {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* ── RIGHT: BRANCHES TABLE ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  text-align: left;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 5px 8px;
+  border-bottom: 2px solid var(--border-dark);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 6px 8px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+tbody tr:hover { background: rgba(166,96,40,0.03); }
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Status dots */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.status-dot.active { background: var(--accent-green); }
+.status-dot.running { background: var(--accent-amber); animation: pulse 1.5s ease-in-out infinite; }
+.status-dot.paused { background: var(--border-light); border: 1px solid var(--text-muted); }
+.status-dot.exhausted { background: var(--accent-red); opacity: 0.6; }
+.status-dot.converged { background: var(--accent-green); opacity: 0.5; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* Budget bars */
+.budget-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+}
+.budget-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+.budget-bar-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--text-main);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.budget-bar-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* ── RIGHT: RESEARCH TREE (SVG) ── */
+.research-tree-wrap {
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  padding: 12px;
+  overflow-x: auto;
+}
+
+/* Rat mascot animations */
+@keyframes ratWiggle {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(1px) rotate(2deg); }
+  75% { transform: translateX(-1px) rotate(-2deg); }
+}
+.rat-mascot { animation: ratWiggle 0.8s ease-in-out infinite; }
+.rat-mascot-idle { opacity: 0.3; }
+
+/* ── RIGHT: TIMELINE ── */
+.timeline-wrap {
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  padding: 12px;
+  overflow-x: auto;
+}
+
+/* ── RIGHT: EXPERIMENT LOG ── */
+.verdict-promote { color: var(--accent-amber); font-weight: 700; }
 .verdict-marginal { color: var(--text-muted); }
-.verdict-reject { color: var(--border-light); }
-.verdict-crashed { color: var(--accent-red); }
-.verdict-diagnostic { color: var(--accent-green); }
+.verdict-reject { color: #999; }
+.verdict-crashed { color: var(--accent-red); font-weight: 600; }
 
-/* Scoring formula */
-.formula-box {
-  font-size: 0.78rem; color: var(--text-muted); line-height: 1.8;
-  background: var(--bg-panel); border: 1px solid var(--border-light); padding: 12px 16px;
+/* ── RIGHT: HANDOFF (full) ── */
+.handoff-full {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
 }
-.formula-box strong { color: var(--text-main); }
+
+/* ── STATUS BAR (bottom) ── */
+.status-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-light);
+  padding: 4px 32px;
+  font-size: 9px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+}
+
+/* ── TOOLTIP ── */
+.chart-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dark);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  z-index: 100;
+  display: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.chart-tooltip.visible { display: block; }
+
+/* ── ROW FLASH ── */
+@keyframes rowFlash {
+  0% { background: rgba(166,96,40,0.12); }
+  100% { background: transparent; }
+}
+tbody tr.row-new { animation: rowFlash 2.5s ease-out forwards; }
+
+/* ── WAITING STATE ── */
+.waiting {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1200px) {
+  .main-wrap { flex-direction: column; }
+  .left-panel {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 24px;
+  }
+  .right-panel { padding: 16px 24px; }
+  .header { padding: 16px 24px; }
+  .stats-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .header-stats { flex-wrap: wrap; gap: 12px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
 
-<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+<!-- TICKER BAR -->
+<div class="ticker-bar">
+  <div class="ticker-track" id="ticker-track">
+    <span class="ticker-item" style="color:#666">waiting for experiments...</span>
+  </div>
+</div>
 
-<header class="app-header">
-  <div class="logo">LABRAT</div>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <div class="logo">LABRAT</div>
+      <div class="logo-sub">autoresearch framework</div>
+    </div>
+  </div>
   <div class="header-stats">
     <div class="header-stat">
-      <span class="text-meta">Experiments</span>
-      <span class="text-mono" id="exp-count">--</span>
+      <div class="header-stat-value" id="h-experiments">--</div>
+      <div class="header-stat-label">experiments</div>
     </div>
     <div class="header-stat">
-      <span class="text-meta">Cycle</span>
-      <span class="text-mono" id="cycle-count">--</span>
+      <div class="header-stat-value" id="h-cycle">--</div>
+      <div class="header-stat-label">cycle</div>
     </div>
     <div class="header-stat">
-      <span class="text-meta">Runtime</span>
-      <span class="text-mono" id="runtime">--</span>
+      <div class="header-stat-value" id="h-runtime">--</div>
+      <div class="header-stat-label">runtime</div>
     </div>
     <div class="header-stat">
-      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="header-stat-value" id="h-agents">--</div>
+      <div class="header-stat-label">agents</div>
     </div>
-    <div class="refresh-dot" id="refresh-dot"></div>
+    <span class="refresh-indicator" id="refresh-dot"></span>
   </div>
-</header>
+</div>
 
-<main class="dashboard">
-  <aside class="side-panel">
-    <section>
-      <h2 class="section-title">Mission</h2>
-      <p class="mission-text" id="mission-text">Loading...</p>
-    </section>
-    <section>
-      <h2 class="section-title">Cycle Info</h2>
-      <div class="stat-grid">
-        <div class="stat-item">
-          <span class="text-meta">Active Agents</span>
-          <span class="text-mono-lg" id="active-agents">--</span>
+<!-- MAIN LAYOUT -->
+<div class="main-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Mission Context -->
+    <div class="section">
+      <div class="section-title">Mission Context</div>
+      <div class="mission-text" id="mission-text">Loading mission...</div>
+    </div>
+
+    <!-- Cycle Stats -->
+    <div class="section">
+      <div class="section-title">Cycle Stats</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-box-value" id="stat-agents">--</div>
+          <div class="stat-box-label">Active Agents</div>
         </div>
-        <div class="stat-item">
-          <span class="text-meta">Budget Used</span>
-          <span class="text-mono-lg" id="budget-used">--</span>
+        <div class="stat-box">
+          <div class="stat-box-value" id="stat-runtime">--</div>
+          <div class="stat-box-label">Runtime</div>
         </div>
-        <div class="stat-item">
-          <span class="text-meta">Champion IC</span>
-          <span class="text-mono-lg" id="champ-score">--</span>
+        <div class="stat-box">
+          <div class="stat-box-value" id="stat-budget">--</div>
+          <div class="stat-box-label">Budget Left</div>
         </div>
-        <div class="stat-item">
-          <span class="text-meta">Transition</span>
-          <span class="text-mono-lg" id="last-transition" style="font-size:0.85rem">--</span>
+        <div class="stat-box">
+          <div class="stat-box-value" id="stat-champion">--</div>
+          <div class="stat-box-label">Champion Score</div>
         </div>
       </div>
-    </section>
-    <section>
-      <h2 class="section-title">Branch Tree</h2>
-      <svg id="tree-svg" class="tree-svg" viewBox="0 0 280 30"></svg>
-    </section>
-    <section>
-      <h2 class="section-title">Latest Handoff</h2>
-      <div class="handoff-box" id="handoff-content">Loading...</div>
-    </section>
-  </aside>
-
-  <section class="main-panel">
-    <div>
-      <h2 class="section-title">Research Branches</h2>
-      <table class="branch-table">
-        <thead><tr>
-          <th class="col-branch">Branch</th>
-          <th class="col-status">Status</th>
-          <th class="col-exp">Exp</th>
-          <th class="col-wins">Wins</th>
-          <th class="col-budget">Resource Allocation</th>
-          <th class="col-score">Champion</th>
-        </tr></thead>
-        <tbody id="branch-body"></tbody>
-      </table>
     </div>
-    <div>
-      <h2 class="section-title">Progress Timeline</h2>
-      <div class="plot-box">
-        <div class="plot-legend">
-          <div class="legend-item"><span class="dot-promote"></span> Promote</div>
-          <div class="legend-item"><span class="dot-marginal"></span> Marginal</div>
-          <div class="legend-item"><span class="dot-reject-lg"></span> Reject</div>
-        </div>
-        <svg id="timeline-svg" class="chart-svg" viewBox="0 0 800 240" preserveAspectRatio="none"></svg>
+
+    <!-- Branch Tree (compact) -->
+    <div class="section">
+      <div class="section-title">Branch Tree</div>
+      <div id="branch-tree-compact"></div>
+    </div>
+
+    <!-- Latest Handoff -->
+    <div class="section">
+      <div class="section-title">Latest Handoff</div>
+      <div class="handoff-preview" id="handoff-preview">waiting for handoff...</div>
+    </div>
+
+    <!-- Scoring Formula -->
+    <div class="section">
+    <div class="section-title">Scoring Formula</div>
+    <div class="scoring-formula">
+        <strong>composite = weighted score from the lab's judge and scoring rules</strong><br>
+        Primary metric, robustness, calibration, complexity, and risk can all contribute.<br>
+        The exact formula is lab-specific and should be documented in the lab's local brief or scoring notes.<br><br>
+        <strong>verdict:</strong> promote, marginal, reject, or crashed based on the lab's current scoring policy
       </div>
     </div>
-    <div>
-      <h2 class="section-title">Experiment Log</h2>
-      <table class="log-table">
-        <thead><tr>
-          <th style="width:8%">Cycle</th>
-          <th style="width:18%">Branch</th>
-          <th style="width:30%">Experiment</th>
-          <th style="width:12%;text-align:right">IC</th>
-          <th style="width:12%;text-align:right">Score</th>
-          <th style="width:20%;text-align:right">Verdict</th>
-        </tr></thead>
-        <tbody id="log-body"></tbody>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Research Branches Table -->
+    <div class="section">
+      <div class="section-title">Research Branches</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Branch</th>
+            <th>Status</th>
+            <th class="num">Wins</th>
+            <th>Budget</th>
+            <th class="num">Champion Score</th>
+          </tr>
+        </thead>
+        <tbody id="branches-body">
+          <tr><td colspan="5" class="waiting">waiting for branch data</td></tr>
+        </tbody>
       </table>
     </div>
-  </section>
-</main>
+
+    <!-- Research Tree (SVG) -->
+    <div class="section">
+      <div class="section-title">Research Tree</div>
+      <div class="research-tree-wrap" id="research-tree"></div>
+    </div>
+
+    <!-- Progress Timeline -->
+    <div class="section">
+      <div class="section-title">Progress Timeline</div>
+      <div class="timeline-wrap" id="score-timeline"></div>
+    </div>
+
+    <!-- Experiment Log -->
+    <div class="section">
+      <div class="section-title">Experiment Log (last 15)</div>
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Cycle</th>
+            <th>Branch</th>
+            <th>Experiment</th>
+            <th class="num">Primary Metric</th>
+            <th class="num">Score</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          <tr><td colspan="6" class="waiting">no experiments yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Handoff (full) -->
+    <div class="section">
+      <div class="section-title">Handoff</div>
+      <div class="handoff-full" id="handoff-full">waiting for handoff...</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span id="status-left">all rats idle</span>
+  <span>auto-refresh 30s</span>
+  <span id="status-right">--</span>
+</div>
+
+<!-- TOOLTIP -->
+<div class="chart-tooltip" id="chart-tooltip"></div>
 
 <script>
 (function(){
-var STATE='state/', LOGS='logs/', REFRESH=30000;
-var _agents={}, _mission=null;
+'use strict';
 
-function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+var REFRESH_MS = 30000;
+var STATE = './state/';
+var LOGS = './logs/';
 
-function xhr(path,cb){
-  var r=new XMLHttpRequest();
-  r.open('GET',path,true);
-  r.onload=function(){ if(r.status===200) cb(null,r.responseText); else cb(true); };
-  r.onerror=function(){ cb(true); };
-  r.send();
-}
-function loadJSON(path,cb){ xhr(path,function(err,t){ if(err)cb(err); else try{cb(null,JSON.parse(t));}catch(e){cb(e);} }); }
-function loadJSONL(path,cb){ xhr(path,function(err,t){ if(err){cb(err);return;} var lines=t.trim().split('\n').filter(Boolean); var items=[]; for(var i=0;i<lines.length;i++){try{items.push(JSON.parse(lines[i]));}catch(e){}} cb(null,items); }); }
+// ── State ──
+var _prevExpCount = -1;
+var _startedISO = null;
+var _tooltip = null;
+var _activeAgentsMap = {};
+var _branchColors = {};
+var _colorPalette = [
+  '#A66028', '#3D7C47', '#5B6CA8', '#9B3B30', '#7B6B43',
+  '#4A8B8C', '#8B5E83', '#6B7B3D', '#A6784B', '#5B8FA6'
+];
 
-function ago(iso){
-  if(!iso) return '--';
-  var ms=Date.now()-new Date(iso).getTime();
-  var m=Math.floor(ms/60000), h=Math.floor(m/60);
-  if(h>0) return h+'h '+( m%60)+'m';
-  return m+'m';
-}
-
-function renderHeader(cc){
-  document.getElementById('exp-count').textContent=cc.total_experiments||0;
-  document.getElementById('cycle-count').textContent=cc.cycle||0;
-  document.getElementById('runtime').textContent=ago(cc.started_at);
-  document.getElementById('last-transition').textContent=cc.last_transition||'init';
+// ── Utilities ──
+function esc(s) {
+  if (s == null) return '';
+  var d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
 }
 
-function renderBranches(beliefs,budget,champions){
-  var el=document.getElementById('branch-body');
-  if(!beliefs||!beliefs.branches){el.innerHTML='<tr><td colspan="6">No data</td></tr>';return;}
-  var names=Object.keys(beliefs.branches);
-  var maxBudget=0;
-  for(var k in budget||{}) maxBudget=Math.max(maxBudget,budget[k]||0);
-  if(maxBudget<1) maxBudget=20;
-  var html='';
-  for(var i=0;i<names.length;i++){
-    var nm=names[i], b=beliefs.branches[nm], bgt=(budget&&budget[nm])||0;
-    var bc=(champions&&champions.branches&&champions.branches[nm])||{};
-    var score=bc.scores?bc.scores.composite_score:null;
-    var isRunning=_agents[nm]&&_agents[nm].status==='running';
-    var dotClass='dot-idle', statusText='Idle';
-    if(b.status==='exhausted'){dotClass='dot-exhausted';statusText='Exhausted';}
-    else if(b.status==='converged'){dotClass='dot-converged';statusText='Converged';}
-    else if(isRunning){dotClass='dot-running';statusText='Running';}
-    else if(b.n_experiments>0){dotClass='dot-active';statusText='Active';}
-    var pct=Math.round(bgt/maxBudget*100);
-    html+='<tr>';
-    html+='<td class="col-branch">'+esc(nm)+'</td>';
-    html+='<td class="col-status"><span class="status-badge"><span class="status-dot '+dotClass+'"></span> '+statusText+'</span></td>';
-    html+='<td class="col-exp text-mono" style="text-align:right;padding-right:16px">'+b.n_experiments+'</td>';
-    html+='<td class="col-wins text-mono" style="text-align:right;padding-right:16px">'+b.n_improvements+'</td>';
-    html+='<td class="col-budget"><div class="budget-track"><div class="budget-fill" style="width:'+pct+'%"></div></div></td>';
-    html+='<td class="col-score text-mono" style="text-align:right">'+(score!=null?score.toFixed(3):'--')+'</td>';
-    html+='</tr>';
+function fmt(n, decimals) {
+  if (n == null || isNaN(n)) return '--';
+  return Number(n).toFixed(decimals != null ? decimals : 4);
+}
+
+function fmtDuration(startISO) {
+  if (!startISO) return '--';
+  try {
+    var diff = Math.max(0, Date.now() - new Date(startISO).getTime());
+    var hours = Math.floor(diff / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    if (hours >= 24) {
+      var days = Math.floor(hours / 24);
+      hours = hours % 24;
+      return days + 'd ' + hours + 'h';
+    }
+    return hours + 'h ' + mins + 'm';
+  } catch(e) { return '--'; }
+}
+
+function fmtAgo(iso) {
+  if (!iso) return '--';
+  try {
+    var diff = Math.max(0, Date.now() - new Date(iso).getTime());
+    var secs = Math.floor(diff / 1000);
+    if (secs < 5) return 'just now';
+    if (secs < 60) return secs + 's ago';
+    var mins = Math.floor(secs / 60);
+    if (mins < 60) return mins + 'm ago';
+    var hours = Math.floor(mins / 60);
+    return hours + 'h ' + (mins % 60) + 'm ago';
+  } catch(e) { return '--'; }
+}
+
+function getBranchColor(name) {
+  if (_branchColors[name]) return _branchColors[name];
+  var idx = Object.keys(_branchColors).length % _colorPalette.length;
+  _branchColors[name] = _colorPalette[idx];
+  return _branchColors[name];
+}
+
+// ── XHR Loaders ──
+function loadJSON(path, cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', path, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 || xhr.status === 0) {
+        try { cb(null, JSON.parse(xhr.responseText)); }
+        catch(e) { cb(e, null); }
+      } else { cb(new Error('HTTP ' + xhr.status), null); }
+    }
+  };
+  xhr.onerror = function() { cb(new Error('network'), null); };
+  try { xhr.send(); } catch(e) { cb(e, null); }
+}
+
+function loadJSONL(path, cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', path, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 || xhr.status === 0) {
+        var text = (xhr.responseText || '').trim();
+        if (!text) { cb(null, []); return; }
+        var lines = text.split('\n');
+        var results = [];
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].trim()) {
+            try { results.push(JSON.parse(lines[i])); } catch(e) {}
+          }
+        }
+        cb(null, results);
+      } else { cb(new Error('HTTP ' + xhr.status), null); }
+    }
+  };
+  xhr.onerror = function() { cb(new Error('network'), null); };
+  try { xhr.send(); } catch(e) { cb(e, null); }
+}
+
+function loadText(path, cb) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', path, true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 || xhr.status === 0) { cb(null, xhr.responseText || ''); }
+      else { cb(new Error('HTTP ' + xhr.status), null); }
+    }
+  };
+  xhr.onerror = function() { cb(new Error('network'), null); };
+  try { xhr.send(); } catch(e) { cb(e, null); }
+}
+
+// ── Tooltip ──
+function getTooltip() {
+  if (!_tooltip) _tooltip = document.getElementById('chart-tooltip');
+  return _tooltip;
+}
+function showTooltip(evt, html) {
+  var tip = getTooltip();
+  tip.innerHTML = html;
+  tip.className = 'chart-tooltip visible';
+  var x = evt.clientX + 14;
+  var y = evt.clientY - 12;
+  var rect = tip.getBoundingClientRect();
+  if (x + rect.width > window.innerWidth - 8) x = evt.clientX - rect.width - 14;
+  if (y + rect.height > window.innerHeight - 8) y = evt.clientY - rect.height - 12;
+  if (y < 4) y = 4;
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+function hideTooltip() { getTooltip().className = 'chart-tooltip'; }
+
+// ── Ticker Bar ──
+function renderTicker(entries) {
+  var track = document.getElementById('ticker-track');
+  if (!entries || entries.length === 0) {
+    track.innerHTML = '<span class="ticker-item" style="color:#666">waiting for experiments...</span>';
+    return;
   }
-  el.innerHTML=html;
-}
+  var exps = [];
+  for (var i = 0; i < entries.length; i++) {
+    if (entries[i].branch && entries[i].experiment_id) exps.push(entries[i]);
+  }
+  var last = exps.slice(-5).reverse();
+  if (last.length === 0) return;
 
-function renderTree(beliefs){
-  var el=document.getElementById('tree-svg');
-  if(!beliefs||!beliefs.branches) return;
-  var names=Object.keys(beliefs.branches);
-  var n=names.length;
-  var h=n*28+20;
-  el.setAttribute('viewBox','0 0 280 '+h);
-  var svg='';
-  // Main trunk
-  svg+='<line x1="20" y1="10" x2="20" y2="'+(n*28)+'" class="tree-line"/>';
-  for(var i=0;i<n;i++){
-    var y=20+i*28, nm=names[i], b=beliefs.branches[nm];
-    var isRunning=_agents[nm]&&_agents[nm].status==='running';
-    var nodeClass=isRunning?'tree-node-running':(b.n_improvements>0?'tree-node-promoted':'tree-node');
-    svg+='<line x1="20" y1="'+y+'" x2="38" y2="'+y+'" class="tree-line"/>';
-    svg+='<circle cx="42" cy="'+y+'" r="3" class="'+nodeClass+'"/>';
-    svg+='<text x="50" y="'+(y+3)+'" class="tree-label">'+esc(nm.toUpperCase())+'</text>';
-    // Experiment count
-    if(b.n_experiments>0){
-      svg+='<text x="270" y="'+(y+3)+'" class="tree-label" text-anchor="end" style="fill:var(--text-main)">'+b.n_experiments+'</text>';
+  var html = '';
+  // Double the items for seamless loop
+  for (var rep = 0; rep < 2; rep++) {
+    for (var j = 0; j < last.length; j++) {
+      var e = last[j];
+      var verdict = (e.verdict || '?').toUpperCase();
+      var score = '--';
+      if (e.scores && e.scores.composite_score != null) score = fmt(e.scores.composite_score, 4);
+      else if (e.composite_score != null) score = fmt(e.composite_score, 4);
+      var vclass = 'reject';
+      if (verdict === 'PROMOTE') vclass = 'promote';
+      else if (verdict === 'MARGINAL') vclass = 'marginal';
+      else if (verdict === 'CRASHED') vclass = 'crashed';
+
+      html += '<span class="ticker-item">';
+      html += '<span style="color:#888">[EXP-' + (e.cycle || '?') + ']</span> ';
+      html += esc(e.branch) + ' ';
+      html += '<span style="color:#aaa">' + esc(e.experiment_id) + '</span>: ';
+      html += '<span class="verdict-tag ' + vclass + '">' + verdict + '</span> ';
+      html += '<span style="color:#777">(score=' + score + ')</span>';
+      html += '</span>';
     }
   }
-  el.innerHTML=svg;
+  track.innerHTML = html;
+  // Adjust animation speed based on content width
+  var trackWidth = track.scrollWidth / 2;
+  var speed = Math.max(15, trackWidth / 40);
+  track.style.animationDuration = speed + 's';
 }
 
-function renderTimeline(entries){
-  var el=document.getElementById('timeline-svg');
-  if(!entries||!entries.length){el.innerHTML='';return;}
-  var scored=entries.filter(function(e){return e.composite_score!=null||e.rank_ic!=null;});
-  if(!scored.length){el.innerHTML='';return;}
-  var n=scored.length;
-  var padL=45, padR=20, padT=20, padB=30, w=800, h=240;
-  var plotW=w-padL-padR, plotH=h-padT-padB;
-  // Use rank_ic as y-axis (more informative than composite)
-  var vals=scored.map(function(e){return e.rank_ic||e.composite_score||0;});
-  var yMax=Math.max.apply(null,vals)*1.15;
-  if(yMax<0.1) yMax=0.5;
-  var svg='';
-  // Grid
-  for(var g=0;g<=4;g++){
-    var gy=padT+plotH*(1-g/4);
-    var label=(yMax*g/4).toFixed(2);
-    svg+='<line x1="'+padL+'" y1="'+gy+'" x2="'+(w-padR)+'" y2="'+gy+'" class="grid-line"/>';
-    svg+='<text x="'+(padL-6)+'" y="'+(gy+3)+'" class="axis-label" text-anchor="end">'+label+'</text>';
+// ── Header ──
+function renderHeader(cycle, agents, champions) {
+  var expEl = document.getElementById('h-experiments');
+  var cycleEl = document.getElementById('h-cycle');
+  var runtimeEl = document.getElementById('h-runtime');
+  var agentsEl = document.getElementById('h-agents');
+
+  var totalExp = cycle && cycle.total_experiments != null ? cycle.total_experiments : '--';
+  var cycleNum = cycle && cycle.cycle != null ? cycle.cycle : '--';
+  _startedISO = cycle ? cycle.started_at : null;
+
+  expEl.textContent = totalExp;
+  cycleEl.textContent = cycleNum;
+  runtimeEl.textContent = fmtDuration(_startedISO);
+
+  var nActive = 0;
+  if (agents && typeof agents === 'object') {
+    var keys = Object.keys(agents);
+    for (var i = 0; i < keys.length; i++) {
+      if (agents[keys[i]] && agents[keys[i]].status === 'running') nActive++;
+    }
+    _activeAgentsMap = agents;
   }
-  svg+='<line x1="'+padL+'" y1="'+(h-padB)+'" x2="'+(w-padR)+'" y2="'+(h-padB)+'" class="axis-line"/>';
-  svg+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(h-padB)+'" class="axis-line"/>';
-  // Points
-  for(var i=0;i<n;i++){
-    var e=scored[i];
-    var x=padL+(i/(Math.max(n-1,1)))*plotW;
-    var v=e.rank_ic||e.composite_score||0;
-    var y=padT+plotH*(1-v/yMax);
-    var verdict=e.verdict||'';
-    if(verdict==='PROMOTE'){
-      svg+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="var(--accent-amber)"/>';
-    } else if(verdict==='MARGINAL'){
-      svg+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>';
-    } else if(verdict==='CRASHED'){
-      svg+='<text x="'+x+'" y="'+(y+3)+'" text-anchor="middle" fill="var(--accent-red)" font-size="10" font-weight="bold">x</text>';
+  agentsEl.textContent = nActive > 0 ? nActive : '0';
+}
+
+// ── Mission Context ──
+function renderMission(yamlText) {
+  var el = document.getElementById('mission-text');
+  if (!yamlText) { el.textContent = 'No mission defined'; return; }
+  // Extract mission field from YAML
+  var m = yamlText.match(/mission:\s*[|>]?\s*\n?([\s\S]*?)(?:\n\w|\n\n|$)/);
+  if (m) {
+    el.textContent = m[1].replace(/^\s+/gm, '').trim();
+  } else {
+    var simple = yamlText.match(/mission:\s*["']?(.+?)["']?\s*$/m);
+    if (simple) {
+      el.textContent = simple[1].trim();
     } else {
-      svg+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="var(--border-light)"/>';
+      el.textContent = 'Mission not found in branches.yaml';
     }
   }
-  el.innerHTML=svg;
 }
 
-function renderLog(entries){
-  var el=document.getElementById('log-body');
-  if(!entries||!entries.length){el.innerHTML='<tr><td colspan="6" style="color:var(--text-muted)">No experiments yet</td></tr>';return;}
-  var recent=entries.slice(-15).reverse();
-  var html='';
-  for(var i=0;i<recent.length;i++){
-    var e=recent[i];
-    if(e.type==='budget_replenishment'||e.type==='frame_challenge'){
-      html+='<tr><td class="text-mono">'+(e.cycle||'')+'</td><td colspan="4" style="color:var(--text-muted)">'+esc(e.type)+'</td><td></td></tr>';
-      continue;
+// ── Cycle Stats (left panel) ──
+function renderCycleStats(cycle, agents, budget, champions) {
+  // Agents
+  var nActive = 0;
+  if (agents && typeof agents === 'object') {
+    var keys = Object.keys(agents);
+    for (var i = 0; i < keys.length; i++) {
+      if (agents[keys[i]] && agents[keys[i]].status === 'running') nActive++;
     }
-    var v=e.verdict||'';
-    var vClass='verdict-reject';
-    if(v==='PROMOTE') vClass='verdict-promote';
-    else if(v==='MARGINAL') vClass='verdict-marginal';
-    else if(v==='CRASHED') vClass='verdict-crashed';
-    else if(v==='DIAGNOSTIC') vClass='verdict-diagnostic';
-    var ic=e.rank_ic!=null?(typeof e.rank_ic==='number'?e.rank_ic.toFixed(3):e.rank_ic):'--';
-    var sc=e.composite_score!=null?(typeof e.composite_score==='number'?e.composite_score.toFixed(3):e.composite_score):'--';
-    html+='<tr>';
-    html+='<td class="text-mono">'+(e.cycle||'')+'</td>';
-    html+='<td>'+esc(e.branch||'')+'</td>';
-    html+='<td class="text-mono" style="font-size:0.78rem">'+esc(e.experiment_id||'')+'</td>';
-    html+='<td class="text-mono" style="text-align:right">'+ic+'</td>';
-    html+='<td class="text-mono" style="text-align:right">'+sc+'</td>';
-    html+='<td style="text-align:right" class="'+vClass+'">'+esc(v)+'</td>';
-    html+='</tr>';
   }
-  el.innerHTML=html;
-}
+  document.getElementById('stat-agents').textContent = nActive > 0 ? nActive : '0';
 
-function renderTicker(entries){
-  var el=document.getElementById('ticker');
-  if(!entries||!entries.length) return;
-  var recent=entries.slice(-8).reverse();
-  var html='';
-  for(var i=0;i<recent.length;i++){
-    var e=recent[i];
-    var v=e.verdict||e.type||'';
-    var cls=v==='PROMOTE'?'ticker-promote':(v==='REJECT'||v==='CRASHED'?'ticker-reject':'');
-    var ic=e.rank_ic!=null?' IC='+(typeof e.rank_ic==='number'?e.rank_ic.toFixed(3):e.rank_ic):'';
-    html+='<div class="ticker-item"><span class="tag">['+esc(e.branch||e.type||'SYS')+']</span> ';
-    html+=esc(e.experiment_id||e.type||'')+(ic?' <span class="'+cls+'">'+ic+'</span>':'');
-    if(v) html+=' <span class="'+cls+'">'+esc(v)+'</span>';
-    html+='</div>';
+  // Runtime
+  var startISO = cycle ? cycle.started_at : null;
+  document.getElementById('stat-runtime').textContent = fmtDuration(startISO);
+
+  // Budget
+  var totalBudget = 0;
+  if (budget && typeof budget === 'object') {
+    var bkeys = Object.keys(budget);
+    for (var j = 0; j < bkeys.length; j++) {
+      totalBudget += (budget[bkeys[j]] || 0);
+    }
   }
-  // Double for seamless loop
-  el.innerHTML=html+html;
-}
+  document.getElementById('stat-budget').textContent = totalBudget;
 
-function renderHandoff(text){
-  var el=document.getElementById('handoff-content');
-  el.textContent=text?(text.length>1500?text.substring(0,1500)+'...':text):'No handoff yet';
-}
-
-function renderMission(text){
-  var el=document.getElementById('mission-text');
-  if(!text){el.textContent='No mission defined';return;}
-  var m=text.match(/^mission:\s*["'](.+?)["']/m);
-  el.textContent=m?m[1]:'No mission defined';
-}
-
-function renderStats(cc,budget,agents,champions){
-  var nAgents=0;
-  if(agents&&agents.agents) for(var k in agents.agents) if(agents.agents[k].status==='running') nAgents++;
-  document.getElementById('active-agents').textContent=nAgents;
-  var totalBudget=0, initialBudget=0;
-  for(var k in budget||{}) totalBudget+=(budget[k]||0);
-  // Rough estimate: initial was ~90
-  var pct=totalBudget>0?Math.round((1-totalBudget/Math.max(totalBudget+((cc&&cc.total_experiments)||0),1))*100):0;
-  document.getElementById('budget-used').textContent=pct+'%';
-  document.getElementById('progress-fill').style.width=pct+'%';
-  var champScore='--';
-  if(champions&&champions.production_champion&&champions.production_champion.scores){
-    var cs=champions.production_champion.scores.composite_score;
-    champScore=cs!=null?cs.toFixed(3):'--';
+  // Champion
+  var champScore = '--';
+  if (champions && champions.production_champion && champions.production_champion.scores) {
+    var cs = champions.production_champion.scores.composite_score;
+    if (cs != null) champScore = fmt(cs, 4);
   }
-  document.getElementById('champ-score').textContent=champScore;
+  document.getElementById('stat-champion').textContent = champScore;
+
+  // Status bar
+  var statusLeft = document.getElementById('status-left');
+  statusLeft.textContent = nActive > 0 ? nActive + ' rat' + (nActive > 1 ? 's' : '') + ' running' : 'all rats idle';
 }
 
-function refresh(){
-  var dot=document.getElementById('refresh-dot');
-  dot.className='refresh-dot active';
-  setTimeout(function(){dot.className='refresh-dot';},800);
+// ── Branches Table ──
+function renderBranchesTable(beliefs, budget, champions, agents) {
+  var body = document.getElementById('branches-body');
+  if (!beliefs || !beliefs.branches) {
+    body.innerHTML = '<tr><td colspan="5" class="waiting">waiting for branch data</td></tr>';
+    return;
+  }
 
-  loadJSON(STATE+'cycle_counter.json',function(err,cc){
-    if(!err&&cc) renderHeader(cc);
-    loadJSON(STATE+'active_agents.json',function(err2,ag){
-      _agents=(ag&&ag.agents)?ag.agents:{};
-      loadJSON(STATE+'branch_beliefs.json',function(err3,bel){
-        loadJSON(STATE+'budget.json',function(err4,bud){
-          loadJSON(STATE+'champions.json',function(err5,champ){
-            if(bel) renderBranches(bel,bud,champ);
-            if(bel) renderTree(bel);
-            renderStats(cc||{},bud,ag,champ);
-          });
-        });
-      });
-    });
+  var branches = beliefs.branches;
+  var names = Object.keys(branches);
+  var html = '';
+
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    var b = branches[name];
+    var budgetVal = (budget && budget[name] != null) ? budget[name] : 0;
+    var initialBudget = budgetVal + (b.n_experiments || 0);
+    if (initialBudget <= 0) initialBudget = 1;
+    var pct = Math.round((budgetVal / initialBudget) * 100);
+
+    var bStatus = b.status || 'active';
+    var agentRunning = agents && agents[name] && agents[name].status === 'running';
+
+    // Status dot class
+    var dotClass = 'active';
+    if (agentRunning) dotClass = 'running';
+    else if (bStatus === 'paused' || bStatus === 'blocked') dotClass = 'paused';
+    else if (bStatus === 'exhausted') dotClass = 'exhausted';
+    else if (bStatus === 'converged') dotClass = 'converged';
+
+    var statusLabel = bStatus;
+    if (agentRunning) statusLabel = 'running';
+
+    // Champion score
+    var champScore = '--';
+    if (champions && champions.branches && champions.branches[name]) {
+      var cs = champions.branches[name];
+      if (cs.scores && cs.scores.composite_score != null) {
+        champScore = fmt(cs.scores.composite_score, 4);
+      }
+    }
+
+    html += '<tr>';
+    html += '<td style="font-weight:600">' + esc(name) + '</td>';
+    html += '<td><span class="status-dot ' + dotClass + '"></span>' + esc(statusLabel) + '</td>';
+    html += '<td class="num">' + (b.n_improvements || 0) + '</td>';
+    html += '<td><div class="budget-bar-wrap"><div class="budget-bar"><div class="budget-bar-fill" style="width:' + pct + '%"></div></div><span class="budget-bar-text">' + budgetVal + '</span></div></td>';
+    html += '<td class="num">' + champScore + '</td>';
+    html += '</tr>';
+  }
+  body.innerHTML = html;
+}
+
+// ── Branch Tree (compact, left panel SVG) ──
+function renderBranchTreeCompact(beliefs, agents, budget) {
+  var el = document.getElementById('branch-tree-compact');
+  if (!beliefs || !beliefs.branches) {
+    el.innerHTML = '<div class="waiting">no branches</div>';
+    return;
+  }
+
+  var branches = beliefs.branches;
+  var names = Object.keys(branches);
+  var nodeH = 28;
+  var rootY = 20;
+  var leftMargin = 14;
+  var branchX = 70;
+  var W = 240;
+  var H = rootY + 30 + names.length * nodeH;
+
+  var svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="display:block">';
+
+  // Root node
+  svg += '<circle cx="' + leftMargin + '" cy="' + rootY + '" r="5" fill="var(--border-dark)" />';
+  svg += '<text x="' + (leftMargin + 12) + '" y="' + (rootY + 4) + '" font-family="var(--font-ui)" font-size="10" font-weight="700" fill="var(--text-main)">ROOT</text>';
+
+  // Vertical trunk line
+  var lastY = rootY + 20 + (names.length - 1) * nodeH;
+  svg += '<line x1="' + leftMargin + '" y1="' + (rootY + 8) + '" x2="' + leftMargin + '" y2="' + lastY + '" stroke="var(--border-light)" stroke-width="1.5" />';
+
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    var b = branches[name];
+    var y = rootY + 20 + i * nodeH;
+    var isActive = b.status === 'active';
+    var isRunning = agents && agents[name] && agents[name].status === 'running';
+    var hasWins = (b.n_improvements || 0) > 0;
+    var bgt = (budget && budget[name] != null) ? budget[name] : 0;
+    var isExhausted = b.status === 'exhausted' || bgt <= 0;
+
+    // Horizontal branch line
+    svg += '<line x1="' + leftMargin + '" y1="' + y + '" x2="' + (branchX - 10) + '" y2="' + y + '" stroke="var(--border-light)" stroke-width="1" />';
+
+    // Branch node circle
+    var fillColor = 'var(--border-light)';
+    if (isRunning) fillColor = 'var(--accent-amber)';
+    else if (hasWins) fillColor = 'var(--accent-amber)';
+    else if (isExhausted) fillColor = '#ccc';
+    else if (isActive) fillColor = 'var(--text-muted)';
+
+    if (isRunning) {
+      svg += '<circle cx="' + (branchX - 4) + '" cy="' + y + '" r="4" fill="' + fillColor + '">';
+      svg += '<animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />';
+      svg += '</circle>';
+      // Rat mascot
+      svg += '<g class="rat-mascot" transform="translate(' + (branchX + 2) + ',' + (y - 6) + ')">';
+      svg += '<text font-size="10" fill="var(--accent-amber)">\u1699</text>';
+      svg += '</g>';
+    } else {
+      svg += '<circle cx="' + (branchX - 4) + '" cy="' + y + '" r="3.5" fill="' + fillColor + '" />';
+    }
+
+    // Branch label
+    var labelX = isRunning ? branchX + 14 : branchX + 6;
+    var labelColor = isExhausted ? 'var(--text-muted)' : 'var(--text-main)';
+    var labelWeight = isRunning ? '700' : '600';
+    svg += '<text x="' + labelX + '" y="' + (y + 3.5) + '" font-family="var(--font-ui)" font-size="9" font-weight="' + labelWeight + '" fill="' + labelColor + '">' + esc(name.toUpperCase()) + '</text>';
+  }
+
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+// ── Research Tree (larger SVG, right panel) ──
+function renderResearchTree(beliefs, budget, champions, agents, yamlText) {
+  var el = document.getElementById('research-tree');
+  if (!beliefs || !beliefs.branches) {
+    el.innerHTML = '<div class="waiting">no branch data</div>';
+    return;
+  }
+
+  var branches = beliefs.branches;
+  var names = Object.keys(branches);
+
+  // Parse baseline from YAML
+  var baseline = 'baseline';
+  if (yamlText) {
+    var m = yamlText.match(/experiment_id:\s*["']?([^"'\n]+)/);
+    if (m) baseline = m[1].trim();
+  }
+
+  var prodChamp = champions && champions.production_champion;
+  var prodId = prodChamp ? prodChamp.experiment_id || baseline : baseline;
+
+  // Layout
+  var nodeSpacingY = 52;
+  var rootX = 60;
+  var rootY = 36;
+  var branchStartX = 180;
+  var W = Math.max(600, branchStartX + 360);
+  var H = rootY + 30 + names.length * nodeSpacingY + 40;
+
+  var svg = '<svg width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="display:block">';
+
+  // Root / baseline node
+  svg += '<rect x="' + (rootX - 30) + '" y="' + (rootY - 12) + '" width="60" height="24" fill="var(--border-dark)" rx="2" />';
+  svg += '<text x="' + rootX + '" y="' + (rootY + 2) + '" text-anchor="middle" font-family="var(--font-ui)" font-size="9" font-weight="700" fill="var(--bg-panel)">' + esc(baseline.toUpperCase().substring(0, 10)) + '</text>';
+
+  // Production champion label
+  svg += '<text x="' + rootX + '" y="' + (rootY - 18) + '" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--text-muted)">champion: ' + esc(prodId) + '</text>';
+
+  // Vertical trunk
+  var firstBranchY = rootY + 30;
+  var lastBranchY = rootY + 30 + (names.length - 1) * nodeSpacingY;
+
+  // Hub point
+  var hubX = branchStartX - 30;
+  var hubY = firstBranchY + (lastBranchY - firstBranchY) / 2;
+
+  // Line from root to hub
+  svg += '<line x1="' + (rootX + 30) + '" y1="' + rootY + '" x2="' + hubX + '" y2="' + hubY + '" stroke="var(--border-light)" stroke-width="1.5" stroke-dasharray="4,3" />';
+  svg += '<circle cx="' + hubX + '" cy="' + hubY + '" r="3" fill="var(--text-muted)" />';
+
+  // Vertical connector from hub
+  svg += '<line x1="' + hubX + '" y1="' + firstBranchY + '" x2="' + hubX + '" y2="' + lastBranchY + '" stroke="var(--border-light)" stroke-width="1" />';
+
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    var b = branches[name];
+    var y = firstBranchY + i * nodeSpacingY;
+    var isRunning = agents && agents[name] && agents[name].status === 'running';
+    var hasWins = (b.n_improvements || 0) > 0;
+    var bgt = (budget && budget[name] != null) ? budget[name] : 0;
+    var isExhausted = b.status === 'exhausted' || bgt <= 0;
+    var isConverged = b.status === 'converged';
+    var color = getBranchColor(name);
+
+    // Horizontal connector
+    svg += '<line x1="' + hubX + '" y1="' + y + '" x2="' + (branchStartX - 8) + '" y2="' + y + '" stroke="' + (isExhausted ? 'var(--border-light)' : color) + '" stroke-width="1" />';
+
+    // Branch node
+    var nodeR = isRunning ? 8 : 6;
+    var nodeFill = isExhausted ? 'var(--border-light)' : (isConverged ? 'var(--accent-green)' : color);
+    var nodeStroke = isExhausted ? 'var(--text-muted)' : 'none';
+
+    if (isRunning) {
+      svg += '<circle cx="' + branchStartX + '" cy="' + y + '" r="' + nodeR + '" fill="' + nodeFill + '" stroke="' + nodeStroke + '" stroke-width="1">';
+      svg += '<animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite" />';
+      svg += '<animate attributeName="opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite" />';
+      svg += '</circle>';
+      // Rat mascot
+      svg += '<g class="rat-mascot" transform="translate(' + (branchStartX + 12) + ',' + (y - 7) + ')">';
+      svg += '<text font-size="12" fill="' + color + '">\u1699</text>';
+      svg += '<text font-size="8" x="10" y="0" fill="' + color + '">~</text>';
+      svg += '</g>';
+    } else if (isExhausted) {
+      svg += '<circle cx="' + branchStartX + '" cy="' + y + '" r="' + nodeR + '" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />';
+    } else {
+      svg += '<circle cx="' + branchStartX + '" cy="' + y + '" r="' + nodeR + '" fill="' + nodeFill + '" />';
+    }
+
+    // Branch name
+    var labelX = branchStartX + (isRunning ? 28 : 14);
+    var labelOpacity = isExhausted ? '0.5' : '1';
+    svg += '<text x="' + labelX + '" y="' + (y + 4) + '" font-family="var(--font-ui)" font-size="11" font-weight="700" fill="var(--text-main)" opacity="' + labelOpacity + '">' + esc(name) + '</text>';
+
+    // Experiment count + champion score
+    var infoLine = (b.n_experiments || 0) + ' exp';
+    if (hasWins) infoLine += ', ' + b.n_improvements + ' wins';
+    infoLine += ', budget=' + bgt;
+
+    var champScoreText = '';
+    if (champions && champions.branches && champions.branches[name]) {
+      var cs = champions.branches[name];
+      if (cs.scores && cs.scores.composite_score != null) {
+        champScoreText = ' | score=' + fmt(cs.scores.composite_score, 3);
+      }
+    }
+    svg += '<text x="' + labelX + '" y="' + (y + 16) + '" font-family="var(--font-mono)" font-size="8" fill="var(--text-muted)" opacity="' + labelOpacity + '">' + esc(infoLine + champScoreText) + '</text>';
+  }
+
+  // Capstone node (if present)
+  if (branches['capstone']) {
+    var capY = lastBranchY + nodeSpacingY;
+    H = capY + 30;
+    svg += '<line x1="' + hubX + '" y1="' + lastBranchY + '" x2="' + hubX + '" y2="' + capY + '" stroke="var(--border-light)" stroke-width="1" />';
+    svg += '<line x1="' + hubX + '" y1="' + capY + '" x2="' + (branchStartX - 8) + '" y2="' + capY + '" stroke="var(--accent-amber)" stroke-width="2" />';
+    svg += '<rect x="' + (branchStartX - 4) + '" y="' + (capY - 10) + '" width="80" height="20" fill="var(--accent-amber)" rx="2" />';
+    svg += '<text x="' + (branchStartX + 36) + '" y="' + (capY + 4) + '" text-anchor="middle" font-family="var(--font-ui)" font-size="9" font-weight="700" fill="white">CAPSTONE</text>';
+  }
+
+  // Legend
+  svg += '<text x="10" y="' + (H - 8) + '" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)">';
+  svg += '\u25cf active  \u25cb exhausted  \u2738 running  \u25a0 converged';
+  svg += '</text>';
+
+  svg += '</svg>';
+  el.innerHTML = svg;
+}
+
+// ── Progress Timeline (SVG scatter) ──
+function renderTimeline(entries, champions) {
+  var el = document.getElementById('score-timeline');
+  if (!entries || entries.length === 0) {
+    el.innerHTML = '<div class="waiting">no experiment data</div>';
+    return;
+  }
+
+  var exps = [];
+  var rejectCount = 0;
+  for (var i = 0; i < entries.length; i++) {
+    var e = entries[i];
+    if (!e.branch || !e.experiment_id) continue;
+    var s = 0;
+    if (e.scores && e.scores.composite_score != null) s = e.scores.composite_score;
+    else if (e.composite_score != null) s = e.composite_score;
+    var verdict = (e.verdict || '').toUpperCase();
+    if (s > 0.005 || verdict === 'CRASHED') {
+      exps.push({ entry: e, score: s, verdict: verdict });
+    } else {
+      rejectCount++;
+    }
+  }
+  if (exps.length === 0) {
+    el.innerHTML = '<div class="waiting">no scored experiments</div>';
+    return;
+  }
+
+  var champScore = 0;
+  if (champions && champions.production_champion && champions.production_champion.scores) {
+    champScore = champions.production_champion.scores.composite_score || 0;
+  }
+
+  // Y bounds
+  var yMin = 1, yMax = 0;
+  for (var si = 0; si < exps.length; si++) {
+    if (exps[si].score < yMin && exps[si].score > 0) yMin = exps[si].score;
+    if (exps[si].score > yMax) yMax = exps[si].score;
+  }
+  if (champScore > 0) { yMin = Math.min(yMin, champScore); yMax = Math.max(yMax, champScore); }
+  var yRange = yMax - yMin;
+  var yPad = Math.max(yRange * 0.15, 0.01);
+  yMin = Math.floor((yMin - yPad) * 100) / 100;
+  yMax = Math.ceil((yMax + yPad) * 100) / 100;
+  if (yMin < 0) yMin = 0;
+  if (yMax > 1) yMax = 1;
+  if (yMax - yMin < 0.04) { yMin -= 0.02; yMax += 0.02; }
+
+  var W = 700, H = 240;
+  var pad = { top: 24, right: 80, bottom: 44, left: 56 };
+  var plotW = W - pad.left - pad.right;
+  var plotH = H - pad.top - pad.bottom;
+  var n = exps.length;
+
+  function xPos(idx) { return pad.left + (n === 1 ? plotW / 2 : (idx / (n - 1)) * plotW); }
+  function yPos(val) { return pad.top + ((yMax - val) / (yMax - yMin)) * plotH; }
+
+  var svg = '<svg width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="display:block">';
+
+  // Y grid
+  var ySteps = 4;
+  var yStep = (yMax - yMin) / ySteps;
+  for (var g = 0; g <= ySteps; g++) {
+    var yv = yMin + g * yStep;
+    var gy = yPos(yv);
+    svg += '<line x1="' + pad.left + '" y1="' + gy + '" x2="' + (W - pad.right) + '" y2="' + gy + '" stroke="var(--border-light)" stroke-width="1" />';
+    svg += '<text x="' + (pad.left - 8) + '" y="' + (gy + 3) + '" text-anchor="end" font-family="var(--font-mono)" font-size="8" fill="var(--text-muted)">' + yv.toFixed(3) + '</text>';
+  }
+
+  // Y axis label
+  svg += '<text x="12" y="' + (pad.top + plotH / 2) + '" text-anchor="middle" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)" transform="rotate(-90,12,' + (pad.top + plotH / 2) + ')">composite score</text>';
+
+  // X axis labels
+  var xLabelStep = Math.max(1, Math.floor(n / 8));
+  for (var xi = 0; xi < n; xi++) {
+    if (xi === 0 || xi === n - 1 || xi % xLabelStep === 0) {
+      svg += '<text x="' + xPos(xi) + '" y="' + (H - pad.bottom + 16) + '" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--text-muted)">' + (xi + 1) + '</text>';
+    }
+  }
+  svg += '<text x="' + (pad.left + plotW / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)">experiment # (' + rejectCount + ' hard rejects not shown)</text>';
+
+  // Champion line
+  if (champScore > 0 && champScore >= yMin && champScore <= yMax) {
+    var cy = yPos(champScore);
+    svg += '<line x1="' + pad.left + '" y1="' + cy + '" x2="' + (W - pad.right) + '" y2="' + cy + '" stroke="var(--accent-amber)" stroke-width="1.5" stroke-dasharray="6,4" />';
+    svg += '<text x="' + (W - pad.right + 4) + '" y="' + (cy - 5) + '" font-family="var(--font-ui)" font-size="8" fill="var(--accent-amber)" font-weight="700">champion</text>';
+    svg += '<text x="' + (W - pad.right + 4) + '" y="' + (cy + 8) + '" font-family="var(--font-mono)" font-size="10" fill="var(--accent-amber)" font-weight="700">' + champScore.toFixed(4) + '</text>';
+  }
+
+  // Branch trajectory lines
+  var branchOrder = {};
+  for (var bi = 0; bi < n; bi++) {
+    var br = exps[bi].entry.branch || '?';
+    if (!branchOrder[br]) branchOrder[br] = [];
+    branchOrder[br].push({ idx: bi, score: exps[bi].score });
+  }
+  var branchNamesArr = Object.keys(branchOrder);
+  for (var bni = 0; bni < branchNamesArr.length; bni++) {
+    var pts = branchOrder[branchNamesArr[bni]];
+    if (pts.length < 2) continue;
+    var bColor = getBranchColor(branchNamesArr[bni]);
+    for (var pi = 1; pi < pts.length; pi++) {
+      svg += '<line x1="' + xPos(pts[pi - 1].idx) + '" y1="' + yPos(pts[pi - 1].score) + '" x2="' + xPos(pts[pi].idx) + '" y2="' + yPos(pts[pi].score) + '" stroke="' + bColor + '" stroke-width="0.8" stroke-dasharray="2,3" opacity="0.4" />';
+    }
+  }
+
+  // Data points
+  for (var di = 0; di < n; di++) {
+    var exp = exps[di];
+    var cx = xPos(di);
+    var cyDot = yPos(exp.score);
+    var v = exp.verdict;
+
+    if (v === 'PROMOTE') {
+      // Filled amber circle
+      svg += '<circle cx="' + cx + '" cy="' + cyDot + '" r="5" fill="var(--accent-amber)" stroke="none" />';
+    } else if (v === 'MARGINAL') {
+      // Hollow circle
+      svg += '<circle cx="' + cx + '" cy="' + cyDot + '" r="4" fill="none" stroke="var(--text-muted)" stroke-width="1.5" />';
+    } else if (v === 'CRASHED') {
+      // Red X
+      svg += '<line x1="' + (cx - 4) + '" y1="' + (cyDot - 4) + '" x2="' + (cx + 4) + '" y2="' + (cyDot + 4) + '" stroke="var(--accent-red)" stroke-width="2" />';
+      svg += '<line x1="' + (cx + 4) + '" y1="' + (cyDot - 4) + '" x2="' + (cx - 4) + '" y2="' + (cyDot + 4) + '" stroke="var(--accent-red)" stroke-width="2" />';
+    } else {
+      // Small gray dot (REJECT)
+      svg += '<circle cx="' + cx + '" cy="' + cyDot + '" r="3" fill="#C4C0B8" stroke="none" />';
+    }
+
+    // Hover target
+    svg += '<circle cx="' + cx + '" cy="' + cyDot + '" r="10" fill="transparent" stroke="none" class="timeline-dot" data-idx="' + di + '" style="cursor:pointer" />';
+  }
+
+  // Legend
+  var ly = H - 6;
+  svg += '<circle cx="' + (pad.left + 6) + '" cy="' + (ly - 2) + '" r="3.5" fill="var(--accent-amber)" />';
+  svg += '<text x="' + (pad.left + 14) + '" y="' + ly + '" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)">promote</text>';
+  svg += '<circle cx="' + (pad.left + 58) + '" cy="' + (ly - 2) + '" r="3" fill="none" stroke="var(--text-muted)" stroke-width="1" />';
+  svg += '<text x="' + (pad.left + 66) + '" y="' + ly + '" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)">marginal</text>';
+  svg += '<circle cx="' + (pad.left + 114) + '" cy="' + (ly - 2) + '" r="2.5" fill="#C4C0B8" />';
+  svg += '<text x="' + (pad.left + 122) + '" y="' + ly + '" font-family="var(--font-ui)" font-size="8" fill="var(--text-muted)">reject</text>';
+  svg += '<text x="' + (pad.left + 158) + '" y="' + ly + '" font-family="var(--font-ui)" font-size="8" fill="var(--accent-red)">\u00d7 crashed</text>';
+
+  svg += '</svg>';
+  el.innerHTML = svg;
+
+  // Hover tooltips
+  el._exps = exps;
+  var dots = el.querySelectorAll('.timeline-dot');
+  for (var dj = 0; dj < dots.length; dj++) {
+    (function(dotEl) {
+      function buildTip(evt) {
+        var idx = parseInt(dotEl.getAttribute('data-idx'), 10);
+        var d = el._exps[idx];
+        if (!d) return;
+        var e = d.entry;
+        var metric = '--';
+        if (e.metrics && e.metrics.test) {
+          var mt = e.metrics.test;
+          var val = mt.primary_metric || mt.IC || mt.ic || mt.f1_macro || mt.accuracy;
+          if (val != null) metric = fmt(val, 4);
+        } else if (e.primary_metric != null) { metric = fmt(e.primary_metric, 4); }
+        else if (e.f1 != null) { metric = fmt(e.f1, 4); }
+        showTooltip(evt,
+          '<strong>' + esc(e.experiment_id || '?') + '</strong>'
+          + '<br>branch: ' + esc(e.branch || '?')
+          + '<br>delta: ' + esc(e.delta || '--')
+          + '<br>primary metric: ' + metric
+          + '<br>score: ' + fmt(d.score, 4)
+          + '<br>verdict: <strong style="color:' + (d.verdict === 'PROMOTE' ? 'var(--accent-amber)' : d.verdict === 'CRASHED' ? 'var(--accent-red)' : 'inherit') + '">' + esc(d.verdict) + '</strong>');
+      }
+      dotEl.addEventListener('mouseenter', buildTip);
+      dotEl.addEventListener('mousemove', buildTip);
+      dotEl.addEventListener('mouseleave', hideTooltip);
+    })(dots[dj]);
+  }
+}
+
+// ── Experiment Log Table ──
+function renderExperimentLog(entries) {
+  var body = document.getElementById('log-body');
+  if (!entries || entries.length === 0) {
+    body.innerHTML = '<tr><td colspan="6" class="waiting">no experiments yet</td></tr>';
+    _prevExpCount = 0;
+    return;
+  }
+
+  var currentCount = entries.length;
+  var newCount = 0;
+  if (_prevExpCount >= 0 && currentCount > _prevExpCount) {
+    newCount = currentCount - _prevExpCount;
+  }
+  _prevExpCount = currentCount;
+
+  var experiments = [];
+  for (var j = 0; j < entries.length; j++) {
+    if (entries[j].branch && entries[j].experiment_id) experiments.push(entries[j]);
+  }
+  var recent = experiments.slice(-15).reverse();
+  var html = '';
+
+  for (var i = 0; i < recent.length; i++) {
+    var e = recent[i];
+    var verdict = (e.verdict || '').toUpperCase();
+    var verdictClass = 'verdict-reject';
+    if (verdict === 'PROMOTE') verdictClass = 'verdict-promote';
+    else if (verdict === 'MARGINAL') verdictClass = 'verdict-marginal';
+    else if (verdict === 'CRASHED') verdictClass = 'verdict-crashed';
+
+    // Primary metric
+    var metric = '--';
+    if (e.metrics && e.metrics.test) {
+      var m = e.metrics.test;
+      var val = m.primary_metric || m.IC || m.ic || m.f1_macro || m.accuracy;
+      if (val != null) metric = fmt(val, 4);
+    } else if (e.primary_metric != null) { metric = fmt(e.primary_metric, 4); }
+    else if (e.f1 != null) { metric = fmt(e.f1, 4); }
+
+    // Score
+    var score = '--';
+    if (e.scores && e.scores.composite_score != null) score = fmt(e.scores.composite_score, 4);
+    else if (e.composite_score != null) score = fmt(e.composite_score, 4);
+
+    var rowClass = (newCount > 0 && i < newCount) ? ' class="row-new"' : '';
+
+    html += '<tr' + rowClass + '>';
+    html += '<td class="num">' + (e.cycle != null ? e.cycle : '--') + '</td>';
+    html += '<td style="font-weight:600">' + esc(e.branch || '--') + '</td>';
+    html += '<td><span style="font-family:var(--font-mono);font-size:10px">' + esc(e.experiment_id || '--') + '</span></td>';
+    html += '<td class="num">' + metric + '</td>';
+    html += '<td class="num">' + score + '</td>';
+    html += '<td class="' + verdictClass + '">' + esc(verdict || '--') + '</td>';
+    html += '</tr>';
+  }
+  body.innerHTML = html;
+}
+
+// ── Handoff ──
+function renderHandoff(text) {
+  var preview = document.getElementById('handoff-preview');
+  var full = document.getElementById('handoff-full');
+  if (!text || !text.trim()) {
+    preview.textContent = 'waiting for handoff...';
+    full.textContent = 'waiting for handoff...';
+    return;
+  }
+  // Preview: first 500 chars
+  var trimmed = text.trim();
+  preview.textContent = trimmed.length > 500 ? trimmed.substring(0, 500) + '...' : trimmed;
+  full.textContent = trimmed;
+}
+
+// ── Main Refresh Loop ──
+var _beliefs = null, _budget = null, _champions = null, _agents = null, _entries = null, _yamlText = null;
+
+function refresh() {
+  var dot = document.getElementById('refresh-dot');
+  dot.className = 'refresh-indicator active';
+  setTimeout(function() { dot.className = 'refresh-indicator'; }, 600);
+
+  var loaded = 0;
+  var total = 7;
+  function checkDone() {
+    loaded++;
+    if (loaded >= total) renderAll();
+  }
+
+  loadJSON(STATE + 'cycle_counter.json', function(err, data) {
+    if (!err && data) window._cycle = data;
+    checkDone();
   });
-  loadJSONL(STATE+'experiment_log.jsonl',function(err,entries){
-    if(!err&&entries){
-      renderLog(entries);
-      renderTimeline(entries);
-      renderTicker(entries);
-    }
+
+  loadJSON(STATE + 'branch_beliefs.json', function(err, data) {
+    if (!err && data) _beliefs = data;
+    checkDone();
   });
-  xhr(LOGS+'handoff.md',function(err,t){ renderHandoff(err?null:t); });
-  if(!_mission){
-    xhr('./branches.yaml',function(err,t){
-      if(!err&&t){ _mission=t; renderMission(t); }
+
+  loadJSON(STATE + 'budget.json', function(err, data) {
+    if (!err && data) _budget = data;
+    checkDone();
+  });
+
+  loadJSON(STATE + 'champions.json', function(err, data) {
+    if (!err && data) _champions = data;
+    checkDone();
+  });
+
+  loadJSON(STATE + 'active_agents.json', function(err, data) {
+    if (!err && data) _agents = data;
+    checkDone();
+  });
+
+  loadJSONL(STATE + 'experiment_log.jsonl', function(err, data) {
+    if (!err && data) _entries = data;
+    checkDone();
+  });
+
+  loadText(LOGS + 'handoff.md', function(err, data) {
+    if (!err) window._handoffText = data;
+    checkDone();
+  });
+
+  // Load YAML once
+  if (!_yamlText) {
+    loadText('./branches.yaml', function(err, data) {
+      if (!err) _yamlText = data;
     });
   }
 }
 
+function renderAll() {
+  var cycle = window._cycle || {};
+  var agents = _agents || {};
+  var handoffText = window._handoffText || '';
+
+  renderHeader(cycle, agents, _champions);
+  renderCycleStats(cycle, agents, _budget, _champions);
+  renderMission(_yamlText);
+  renderBranchesTable(_beliefs, _budget, _champions, agents);
+  renderBranchTreeCompact(_beliefs, agents, _budget);
+  renderResearchTree(_beliefs, _budget, _champions, agents, _yamlText);
+  renderTimeline(_entries, _champions);
+  renderExperimentLog(_entries);
+  renderTicker(_entries);
+  renderHandoff(handoffText);
+
+  // Update status bar
+  document.getElementById('status-right').textContent = 'updated ' + new Date().toLocaleTimeString();
+}
+
+// ── Runtime clock (updates header runtime every 10s between full refreshes) ──
+function updateRuntimeDisplay() {
+  if (_startedISO) {
+    document.getElementById('h-runtime').textContent = fmtDuration(_startedISO);
+    document.getElementById('stat-runtime').textContent = fmtDuration(_startedISO);
+  }
+}
+
+// ── Init ──
 refresh();
-setInterval(refresh,REFRESH);
+setInterval(refresh, REFRESH_MS);
+setInterval(updateRuntimeDisplay, 10000);
+
 })();
 </script>
 </body>
