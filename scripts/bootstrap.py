@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Bootstrap the research lab: create directories, initialize state files.
 
-v2: Adds transition_log, belief_chain, scout_history, lab_registry support.
+v2: Adds transition_log, belief_chain, scout_history, and optional lab registry support.
 
 Usage:
-    python research_lab/scripts/bootstrap.py
-    python research_lab/scripts/bootstrap.py --inherit-from /path/to/parent/lab
+    python scripts/bootstrap.py
+    python scripts/bootstrap.py --inherit-from /path/to/parent/lab
+    python scripts/bootstrap.py --lab-dir /path/to/lab
 """
 
 from __future__ import annotations
@@ -17,9 +18,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
+from lab_core import find_readiness_issues
 
-LAB_ROOT = Path(__file__).resolve().parent.parent
-PROJECT_ROOT = LAB_ROOT.parent
+SCRIPT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def main():
@@ -28,13 +29,44 @@ def main():
         "--inherit-from", type=Path, default=None,
         help="Path to a parent lab to inherit dead_ends and findings from",
     )
+    parser.add_argument(
+        "--allow-incomplete",
+        action="store_true",
+        help="Bypass the Phase 0 readiness gate for maintainers and partial scaffolds.",
+    )
+    parser.add_argument(
+        "--lab-dir",
+        type=Path,
+        default=SCRIPT_ROOT,
+        help="Path to the lab root. Defaults to the parent of this scripts directory.",
+    )
     args = parser.parse_args()
+    lab_root = args.lab_dir.resolve()
+    project_root = _resolve_project_root(lab_root)
 
     print("Bootstrapping research lab...\n")
 
+    issues = find_readiness_issues(lab_root)
+    if issues and not args.allow_incomplete:
+        print("ERROR: Phase 0 is not complete.\n")
+        for issue in issues:
+            print(f"  - {issue}")
+        print()
+        print("Run:")
+        print("  python scripts/operator_helper.py check-readiness")
+        print("  python scripts/operator_helper.py next-prompt --runner claude --phase design")
+        print("or")
+        print("  python scripts/operator_helper.py next-prompt --runner codex --phase design")
+        sys.exit(1)
+    if issues and args.allow_incomplete:
+        print("WARNING: bootstrapping an incomplete lab.")
+        for issue in issues:
+            print(f"  - {issue}")
+        print()
+
     # Validate required files exist
     required = ["branches.yaml", "scripts/run_experiment.py", "scripts/judge.py"]
-    missing = [f for f in required if not (LAB_ROOT / f).exists()]
+    missing = [f for f in required if not (lab_root / f).exists()]
     if missing:
         print("ERROR: Missing required files:")
         for f in missing:
@@ -44,15 +76,15 @@ def main():
 
     # Create optional files from templates if missing
     for tmpl in ["constitution.md", "dead_ends.md"]:
-        dest = LAB_ROOT / tmpl
-        src = PROJECT_ROOT / "templates" / tmpl
+        dest = lab_root / tmpl
+        src = project_root / "templates" / tmpl
         if not dest.exists() and src.exists():
             import shutil
             shutil.copy2(src, dest)
             print(f"  Created {tmpl} from template")
 
     # Load branch definitions
-    with open(LAB_ROOT / "branches.yaml") as f:
+    with open(lab_root / "branches.yaml") as f:
         config = yaml.safe_load(f)
 
     branches = config.get("branches", {})
@@ -60,30 +92,30 @@ def main():
     # Create directories
     print("Creating directories:")
     dirs = [
-        LAB_ROOT / "state",
-        LAB_ROOT / "logs" / "cycles",
-        LAB_ROOT / "logs" / "scouts",
-        LAB_ROOT / "logs" / "expansions",
-        LAB_ROOT / "logs" / "consolidations",
+        lab_root / "state",
+        lab_root / "logs" / "cycles",
+        lab_root / "logs" / "scouts",
+        lab_root / "logs" / "expansions",
+        lab_root / "logs" / "consolidations",
     ]
     for d in dirs:
         d.mkdir(parents=True, exist_ok=True)
-        print(f"  {d.relative_to(PROJECT_ROOT)}")
+        print(f"  {_display_path(d, project_root)}")
 
     for branch in list(branches.keys()) + ["red_team"]:
-        d = LAB_ROOT / "experiments" / branch
+        d = lab_root / "experiments" / branch
         d.mkdir(parents=True, exist_ok=True)
         # Scout proposals dir per branch
         scout_dir = d / "scout_proposals"
         scout_dir.mkdir(exist_ok=True)
-        print(f"  {d.relative_to(PROJECT_ROOT)}")
+        print(f"  {_display_path(d, project_root)}")
 
     # Initialize state
     print("\nInitializing state:")
     now = datetime.now(UTC).isoformat()
 
     # Cycle counter (with transition tracking)
-    _write(LAB_ROOT / "state" / "cycle_counter.json", {
+    _write(lab_root / "state" / "cycle_counter.json", {
         "cycle": 0,
         "total_experiments": 0,
         "started_at": now,
@@ -99,7 +131,7 @@ def main():
 
     # Budget
     budget = {name: cfg.get("initial_budget", 0) for name, cfg in branches.items()}
-    _write(LAB_ROOT / "state" / "budget.json", budget)
+    _write(lab_root / "state" / "budget.json", budget)
 
     # Branch beliefs
     beliefs = {"updated_at": now, "branches": {}}
@@ -116,7 +148,7 @@ def main():
             "notes": [],
             "experiment_type": cfg.get("experiment_type", "standard"),
         }
-    _write(LAB_ROOT / "state" / "branch_beliefs.json", beliefs)
+    _write(lab_root / "state" / "branch_beliefs.json", beliefs)
 
     # Champions
     baseline = {
@@ -130,28 +162,28 @@ def main():
         "production_champion": baseline,
         "branches": {name: baseline.copy() for name in branches},
     }
-    _write(LAB_ROOT / "state" / "champions.json", champions)
+    _write(lab_root / "state" / "champions.json", champions)
 
     # Experiment log (empty, append-only)
-    (LAB_ROOT / "state" / "experiment_log.jsonl").write_text("")
+    (lab_root / "state" / "experiment_log.jsonl").write_text("")
 
     # Active agents (for dashboard live status)
-    _write(LAB_ROOT / "state" / "active_agents.json", {
+    _write(lab_root / "state" / "active_agents.json", {
         "updated_at": now, "agents": {},
     })
 
     # Transition log (tracks cycle endings with named types)
-    (LAB_ROOT / "state" / "transition_log.jsonl").write_text("")
+    (lab_root / "state" / "transition_log.jsonl").write_text("")
 
     # Belief chain (tracks assumption dependencies)
-    _write(LAB_ROOT / "state" / "belief_chain.json", {
+    _write(lab_root / "state" / "belief_chain.json", {
         "updated_at": now,
         "assumptions": {},
         "invalidations": [],
     })
 
     # Scout history (tracks what external searches have been done)
-    _write(LAB_ROOT / "state" / "scout_history.json", {
+    _write(lab_root / "state" / "scout_history.json", {
         "updated_at": now,
         "searches": [],
         "proposals_accepted": 0,
@@ -161,14 +193,14 @@ def main():
     })
 
     # Decay tracking (val/test performance ratio)
-    _write(LAB_ROOT / "state" / "decay_tracking.json", {
+    _write(lab_root / "state" / "decay_tracking.json", {
         "updated_at": now,
         "entries": [],
         "rolling_decay_ratio": None,
     })
 
     # Data profile (populated by Step 0 exploration agent)
-    _write(LAB_ROOT / "state" / "data_profile.json", {
+    _write(lab_root / "state" / "data_profile.json", {
         "updated_at": None,
         "subgroups": {},
         "correlations": {},
@@ -179,10 +211,11 @@ def main():
     # Handoff
     active = [n for n, c in branches.items() if c.get("initial_budget", 0) > 0]
     meta = [n for n, c in branches.items() if c.get("experiment_type") in ("diagnostic", "meta")]
-    (LAB_ROOT / "logs" / "handoff.md").write_text(
+    (lab_root / "logs" / "handoff.md").write_text(
         f"# Research Lab Handoff\n\n## Cycle 0 -- Bootstrap\n\n"
         f"Lab initialized. Active branches: {', '.join(active)}.\n"
         f"Meta-branches: {', '.join(meta) or 'none'}.\n\n"
+        "Phase 0 artifacts detected: branches.yaml, research_brief.md, research_sources.md.\n\n"
         f"External research: scouts trigger after "
         f"{config.get('external_research', {}).get('scout_trigger', {}).get('consecutive_non_improvements', 4)} "
         f"consecutive non-improvements. Expansion every "
@@ -191,52 +224,58 @@ def main():
 
     # Inherit from parent lab if specified
     if args.inherit_from:
-        _inherit_from_parent(args.inherit_from)
+        _inherit_from_parent(args.inherit_from, lab_root)
 
     # Copy dashboard if template exists
-    template_dash = PROJECT_ROOT / "templates" / "dashboard.html"
-    lab_dash = LAB_ROOT / "dashboard.html"
+    template_dash = project_root / "templates" / "dashboard.html"
+    lab_dash = lab_root / "dashboard.html"
     if template_dash.exists() and not lab_dash.exists():
         import shutil
         shutil.copy2(template_dash, lab_dash)
-        print(f"  Copied dashboard to {lab_dash.relative_to(PROJECT_ROOT)}")
+        print(f"  Copied dashboard to {_display_path(lab_dash, project_root)}")
 
-    # Update lab registry
-    _update_lab_registry(config)
+    # Update lab registry when the repo already uses one.
+    _update_lab_registry(config, lab_root, project_root)
 
     # Print research tree
     try:
         from scripts.tree_render import render_tree, load_lab
-        _, state = load_lab(LAB_ROOT)
+        _, state = load_lab(lab_root)
         print("\n" + render_tree(config, state, compact=True))
     except Exception:
         pass
+
+    lab_rel = _display_path(lab_root, project_root)
 
     print(f"Bootstrap complete. {len(active)} active branches, {sum(budget.values())} total budget.")
     print(f"Meta-branches: {len(meta)}")
     print()
     print("To start:")
-    print("  cd research_lab && python -m http.server 8787 &")
+    print(f"  cd {lab_rel} && python -m http.server 8787 &")
     print("  open http://localhost:8787/dashboard.html")
     print()
-    print("Then in Claude Code:")
-    print("  Read research_lab/orchestrator.md and execute one research cycle.")
+    print("Then get the exact next prompt from the local helper:")
+    print("  python scripts/operator_helper.py status")
+    print("  python scripts/operator_helper.py next-prompt --runner claude --phase auto")
+    print("  python scripts/operator_helper.py next-prompt --runner codex --phase auto")
     print()
-    print("For tree design (optional, uses web research to design branches):")
-    print("  Agent: Read labrat/templates/tree_designer.md. Design branches for: [your mission]")
-    print()
-    print("For continuous operation:")
-    print("  /loop 10m Read research_lab/orchestrator.md and execute one research cycle.")
+    print("For continuous operation, keep the agent in the lab-local prompt flow.")
 
 
-def _inherit_from_parent(parent_path: Path):
+def _resolve_project_root(lab_root: Path) -> Path:
+    if (SCRIPT_ROOT / "templates").exists() and (SCRIPT_ROOT / "scripts").exists():
+        return SCRIPT_ROOT
+    return lab_root.parent
+
+
+def _inherit_from_parent(parent_path: Path, lab_root: Path):
     """Inherit dead ends and findings from a parent lab."""
     print(f"\nInheriting from parent lab: {parent_path}")
 
     # Copy dead ends
     parent_dead = parent_path / "dead_ends.md"
     if parent_dead.exists():
-        local_dead = LAB_ROOT / "dead_ends.md"
+        local_dead = lab_root / "dead_ends.md"
         if local_dead.exists():
             # Append parent dead ends
             existing = local_dead.read_text()
@@ -252,7 +291,7 @@ def _inherit_from_parent(parent_path: Path):
     # Copy findings
     parent_findings = parent_path / "FINDINGS.md"
     if parent_findings.exists():
-        dest = LAB_ROOT / "logs" / "parent_findings.md"
+        dest = lab_root / "logs" / "parent_findings.md"
         import shutil
         shutil.copy2(parent_findings, dest)
         print(f"  Inherited FINDINGS.md -> logs/parent_findings.md")
@@ -260,25 +299,25 @@ def _inherit_from_parent(parent_path: Path):
     # Copy champion config for reference
     parent_champs = parent_path / "state" / "champions.json"
     if parent_champs.exists():
-        dest = LAB_ROOT / "logs" / "parent_champions.json"
+        dest = lab_root / "logs" / "parent_champions.json"
         import shutil
         shutil.copy2(parent_champs, dest)
         print(f"  Inherited champions.json -> logs/parent_champions.json")
 
 
-def _update_lab_registry(config: dict):
+def _update_lab_registry(config: dict, lab_root: Path, project_root: Path):
     """Update the global lab registry with this lab's info."""
-    registry_path = PROJECT_ROOT / "lab_registry.json"
+    registry_path = project_root / "lab_registry.json"
 
-    if registry_path.exists():
-        with open(registry_path) as f:
-            registry = json.load(f)
-    else:
-        registry = {"labs": {}, "updated_at": None}
+    if not registry_path.exists():
+        return
 
-    lab_name = LAB_ROOT.name
+    with open(registry_path) as f:
+        registry = json.load(f)
+
+    lab_name = lab_root.name
     registry["labs"][lab_name] = {
-        "path": str(LAB_ROOT),
+        "path": str(lab_root),
         "mission": config.get("mission", ""),
         "branches": list(config.get("branches", {}).keys()),
         "created_at": datetime.now(UTC).isoformat(),
@@ -294,7 +333,15 @@ def _update_lab_registry(config: dict):
 def _write(path: Path, data: dict):
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
-    print(f"  {path.relative_to(PROJECT_ROOT)}")
+    project_root = _resolve_project_root(path.parent.parent if path.name.endswith(".json") else path.parent)
+    print(f"  {_display_path(path, project_root)}")
+
+
+def _display_path(path: Path, project_root: Path) -> str:
+    try:
+        return str(path.relative_to(project_root))
+    except ValueError:
+        return str(path)
 
 
 if __name__ == "__main__":

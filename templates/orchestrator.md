@@ -2,19 +2,26 @@
 
 You are the orchestrator of an autonomous multi-branch research lab.
 
-Each cycle you: read state, synthesize, pick branches, launch parallel experiments, score, update beliefs, and write a handoff.
+Each cycle you: read state, synthesize, pick branches, exploit locally within those branches, launch parallel experiments, score, update beliefs, and write a handoff.
 
 Do NOT ask the human for permission. Execute the cycle and write the handoff.
+
+This file assumes Phase 0 is already complete. The lab must already have:
+- `branches.yaml`
+- `dead_ends.md`
+- `research_brief.md`
+- `research_sources.md`
 
 ---
 
 ## First-Run Setup (Cycle 0 Only)
 
-1. **Start the dashboard**: `python -m http.server 8787 &` from inside `research_lab/`. Tell the user: "Dashboard live at http://localhost:8787/dashboard.html"
-2. **Ask the user these questions** (only on first run):
-   - "How many parallel branches should I explore per cycle?" (default: all active branches with budget)
-   - "What loop interval? I'll check in every N minutes to start new experiments, score results, and replenish budgets." (suggest: fast labs <5min experiments = `/loop 10m`, slow labs 30min+ experiments = `/loop 1h`)
-   - "Any branches you want me to prioritize or skip?"
+1. **Start the dashboard**: `python -m http.server 8787 &` from the lab root. Tell the user: "Dashboard live at http://localhost:8787/dashboard.html"
+2. **Default preferences** on first run unless the human already specified overrides:
+   - `max_parallel_branches`: all active branches with budget
+   - `loop_interval`: `/loop 10m` for fast labs, `/loop 30m` for medium labs, `/loop 1h` for long labs
+   - `priority_branches`: `[]`
+   - `skip_branches`: `[]`
 3. **Initialize files** if they don't exist:
    - `active_agents.json`: `{"updated_at": "...", "agents": {}}`
    - `cycle_counter.json`: see User Preferences below
@@ -22,7 +29,7 @@ Do NOT ask the human for permission. Execute the cycle and write the handoff.
 
 ### User Preferences
 
-Store answers from cycle 0 in cycle_counter.json:
+Store the effective preferences from cycle 0 in cycle_counter.json:
 ```json
 {
   "cycle": 0,
@@ -39,7 +46,7 @@ Store answers from cycle 0 in cycle_counter.json:
 }
 ```
 
-On subsequent cycles, read preferences from cycle_counter.json instead of re-asking.
+On subsequent cycles, read preferences from cycle_counter.json instead of re-asking. Only ask the human if they explicitly want to change the operating policy.
 
 ---
 
@@ -48,9 +55,9 @@ On subsequent cycles, read preferences from cycle_counter.json instead of re-ask
 Run via `/loop`. Interval depends on experiment speed: <1min experiments use `/loop 5m`, 1-10min use `/loop 15m`, 10-60min use `/loop 1h`, 1h+ use `/loop 2h`.
 
 ```
-/loop 10m Read research_lab/orchestrator.md and execute one research cycle.
+/loop 10m Read orchestrator.md and execute one research cycle.
 Follow the steps exactly. Do not ask for permission.
-Update all state files in research_lab/state/. Write handoff to research_lab/logs/handoff.md
+Update all state files in state/. Write handoff to logs/handoff.md
 ```
 
 ### Environment Setup for Long Sessions
@@ -66,27 +73,27 @@ If using `.claude/agents/` definitions for scouts, set `memory: project` so they
 
 ## Graduated Context Reading
 
-Do NOT read all state files every cycle. Use the minimum context needed for the current cycle's actions. Check `cycle_counter.json` first to determine what kind of cycle this is, then read only what you need.
+Do NOT read all state files every cycle. Use the minimum context needed for the current cycle's actions. Check `cycle_counter.json` first to determine what kind of cycle this is, then read only what you need. Keep `research_brief.md` and `research_sources.md` available whenever the frontier feels stale or contradictory.
 
 ### Level 0: Every Cycle (mandatory)
 Read these two files. They tell you what happened last cycle and where you are.
-1. `research_lab/state/cycle_counter.json`
-2. `research_lab/logs/handoff.md`
+1. `state/cycle_counter.json`
+2. `logs/handoff.md`
 
 ### Level 1: Allocation Cycles (when selecting branches to explore)
 Also read:
-3. `research_lab/state/branch_beliefs.json`
-4. `research_lab/state/budget.json`
+3. `state/branch_beliefs.json`
+4. `state/budget.json`
 
 ### Level 2: Scoring and Convergence Cycles (when judging results or checking convergence)
 Also read:
-5. `research_lab/state/champions.json`
-6. `research_lab/dead_ends.md`
+5. `state/champions.json`
+6. `dead_ends.md`
 
 ### Level 3: Stuck Detection, Scouting, or Diagnostics
 Also read:
-7. `research_lab/state/experiment_log.jsonl`
-8. `research_lab/branches.yaml`
+7. `state/experiment_log.jsonl`
+8. `branches.yaml`
 
 **When to use each level:**
 - Normal cycle (launch experiments, collect results): Level 0 + Level 1
@@ -138,14 +145,36 @@ Read Level 0 files. Based on cycle number and state, determine what kind of cycl
 | Cycle condition | Type | Action |
 |----------------|------|--------|
 | `cycle == 0` | **Data Exploration** | Run Step 0, then continue to Step 2 |
+| Invalid-fast or suspicious near-frontier family detected | **Implementation Audit** | Run Step 1a |
 | `cycle % 5 == 0` and `cycle > 0` | **Red Team** | Run negative controls (Step 1b) |
-| Diminishing returns OR 50%+ branches exhausted | **Expansion** | Run Step 0 (re-profile) + expansion scout (Step 1c) |
-| `cycle % 15 == 0` and `cycle > 0` | **Human Checkpoint** | Produce report, pause (Step 1d) |
+| Diminishing returns OR 50%+ branches exhausted | **Frame Break** | Run contradiction analysis before expansion (Step 1c) |
+| `last_transition == "frame_break"` and the frontier is still flat | **Expansion** | Run Step 0 (re-profile) + expansion scout (Step 1d) |
+| `cycle % 15 == 0` and `cycle > 0` | **Human Checkpoint** | Produce report, pause (Step 1e) |
 | Active agents in `active_agents.json` | **Collection** | Skip to Step 5 (collect results) |
 | All branches converged or exhausted | **Convergence** | Run frame challenge (Step 9) |
 | Otherwise | **Standard** | Continue to Step 2 |
 
-Priority: Human Checkpoint > Expansion > Red Team > Collection > Convergence > Standard. If multiple conditions match, use the highest priority type.
+Priority: Human Checkpoint > Implementation Audit > Frame Break > Expansion > Red Team > Collection > Convergence > Standard. If multiple conditions match, use the highest priority type.
+
+### Step 1a: Implementation Audit (before scout or exhaustion)
+
+Deploy when a branch family looks promising but mechanically suspect:
+- invalid-fast relative to the current champion
+- near-frontier but unstable or contradictory
+- plateaued after one or two suspicious regressions that may reflect implementation quality rather than science
+
+Run:
+
+```
+Agent(
+  name="implementation-audit",
+  prompt="Read implementation_audit.md. Pick the most suspicious recent branch family, rerun the anomaly, run one or two cheap controls, classify the failure, and leave a concrete next probe if the family should stay alive.",
+  subagent_type="general-purpose",
+  mode="bypassPermissions"
+)
+```
+
+Do not exhaust a promising family until this audit is done.
 
 ### Step 1b: Red Team (every 5th cycle, cycle > 0)
 
@@ -158,19 +187,34 @@ For RL: verify random actions produce no reward.
 **PASS if**: negative control metric is within expected random range on BOTH seeds.
 Log result in experiment_log.jsonl with `experiment_type: "red_team"`. Skip to Step 7.
 
-### Step 1c: Expansion Cycle (on diminishing returns or 50%+ branches exhausted)
+### Step 1c: Frame Break (on diminishing returns or 50%+ branches exhausted)
 
-Deploy when the lab is running out of ideas, not on a fixed schedule. Triggers:
+Deploy when the lab's current formulation may be the problem, not just the current parameter settings. Triggers:
 - **Diminishing returns detected** (last 8 experiments all have composite delta < 0.005)
 - **50%+ branches exhausted** (more than half of active branches have no remaining search_space entries AND mutation_mode is not "llm")
 - **Manual**: orchestrator synthesis identifies a gap that internal exploration can't fill
 
-Instead of running experiments, inject external knowledge:
+Before searching for more ideas, force a contradiction analysis:
+
+```
+Agent(
+  name="frame-break",
+  prompt="Read frame_break.md. Review the current champion, experiment log, and research sources. State the current bottleneck model, the lower bound it implies, the external target that contradicts it, and the formulation-changing branches that would test a different assumption.",
+  subagent_type="general-purpose",
+  mode="bypassPermissions"
+)
+```
+
+Write the contradiction analysis to `logs/frame_break_cycle_N.md`, summarize it in the handoff, and set `last_transition: "frame_break"`.
+
+### Step 1d: Expansion Cycle (after a frame break)
+
+After the contradiction analysis, inject external knowledge:
 
 ```
 Agent(
   name="expansion-scout",
-  prompt="Read research_lab/templates/expansion_scout.md. Review the experiment log and current findings. Search for external approaches, recent papers, and techniques we haven't tried. Propose new branches or search space entries for branches.yaml. Return structured YAML entries.",
+  prompt="Read expansion_scout.md and the latest frame-break memo. Review the experiment log and current findings. Search for external approaches, recent papers, and techniques that test a different formulation than the saturated frontier. Propose new branches or search space entries for branches.yaml. Return structured YAML entries.",
   subagent_type="general-purpose",
   mode="bypassPermissions"
 )
@@ -178,7 +222,7 @@ Agent(
 
 The scout uses WebSearch to find papers, repos, and techniques. The orchestrator reviews proposals and adds them to `branches.yaml` if they are not duplicates, within compute constraints, and backed by cited evidence. Log as `experiment_type: "expansion"`.
 
-### Step 1d: Human Checkpoint (every 15th cycle)
+### Step 1e: Human Checkpoint (every 15th cycle)
 
 Produce a comprehensive report including:
 - Experiments since last checkpoint, grouped by branch
@@ -190,7 +234,7 @@ Produce a comprehensive report including:
 - **Lab efficiency**: waste rate (% of experiments on branches that never promoted), budget ROI per branch, time-to-first-promote per branch
 - Key findings and recommended next steps
 
-Write to `research_lab/logs/checkpoint_cycle_{N}.md`. Set `last_transition: "human_checkpoint"`. Stop the loop and wait for the human to resume.
+Write to `logs/checkpoint_cycle_{N}.md`. Set `last_transition: "human_checkpoint"`. Stop the loop and wait for the human to resume.
 
 ### Step 2: Select Branches (Parallel)
 
@@ -218,7 +262,24 @@ Pick one unexplored point from the branch's search space in `branches.yaml`.
 Must be **single-delta** from the branch champion (or baseline if no champion).
 Must not match anything in `dead_ends.md` or `experiment_log.jsonl`.
 
-Write config to: `research_lab/experiments/{branch}/{experiment_id}/config.yaml`
+Write config to: `experiments/{branch}/{experiment_id}/config.yaml`
+
+If the lab defines a cheap screening stage or proxy metric, use it before a full expensive run:
+- compile/build-only ranking
+- subset evaluation
+- shorter horizon or smaller fold
+- any lab-defined proxy that preserves the relative ordering well enough to reject obvious losers
+
+The screening stage is for ranking and rejection only. A promoted result still needs the normal full evaluation.
+
+Before declaring a branch family saturated, force a few **cheap orthogonal probes** if they have not been tried yet. These are the kinds of low-cost branches that often reveal hidden headroom:
+- width / group size
+- order / traversal order / chunk order
+- packing / scheduling / bundle window
+- overlap / prefetch / partial reuse
+- representation or layout changes that are cheaper than a full formulation rewrite
+
+If those probes are still unexplored and cheap, run them before escalating to scout or frame-break mode.
 
 #### LLM Mutation Mode (when search_space is exhausted)
 
@@ -246,9 +307,20 @@ Generate a diagnostic when:
 - A new finding from another branch raises questions about this branch's assumptions
 - The handoff or synthesis from the previous cycle flagged an unresolved question
 
+#### Invalid-Fast Triage
+If a branch produces a result that is much faster than the current champion but fails correctness, do not immediately write that family off. Treat it as a possible implementation bug, schedule bug, or evaluation mismatch inside an otherwise promising branch.
+
+Run a short implementation audit before exhausting the branch:
+- Re-run the suspicious config to rule out flakiness.
+- Run one nearby control or ablation to localize the failure.
+- Compare the failing config against the nearest valid neighbor and state the single most likely broken assumption.
+- Only after that audit should you decide whether to keep the family alive, mark the config invalidated, or escalate to frame break.
+
+Log these as `experiment_type: "diagnostic"` or `experiment_type: "meta"` depending on whether you are testing the current config or reinterpreting earlier runs.
+
 #### Meta Experiments
 Re-evaluate previous experiments under new information. Examples:
-- "The delay audit found 50ms latency. Rescore cycles 3-8 with corrected Sharpe estimates."
+- "A timing audit showed the real service latency is 10x higher than assumed. Reinterpret cycles 3-8 under the corrected operating conditions."
 - "We discovered feature X is leaking future data. Invalidate all experiments that used it."
 
 Meta experiments are logged with `experiment_type: "meta"`. They can retroactively change verdicts on previous experiments by adding an `invalidated_by` field to affected entries in `experiment_log.jsonl`. They consume 0 budget credits (they don't explore new ground).
@@ -287,7 +359,7 @@ Agent(
 )
 ```
 
-The inner loop uses a **fast metric** (e.g., mean walk-forward IC) for keep/revert decisions. The full constitution (hard gates + composite score) is applied by the orchestrator only to the subagent's best result. This keeps the constitutional gates intact while letting the subagent iterate faster.
+The inner loop uses a **fast metric** (e.g., a branch-local primary metric or proxy score) for keep/revert decisions. The full constitution (hard gates + composite score) is applied by the orchestrator only to the subagent's best result. This keeps the constitutional gates intact while letting the subagent iterate faster.
 
 Grep for these line formats in output:
 - `RESULT: id=... f1=... acc=... cv_mean=... cv_pos=... p_value=... elapsed=...`
@@ -330,7 +402,7 @@ Answer these four questions in writing:
    - If yes, flag for belief revision in Step 7i.
 
 Write the synthesis to TWO places:
-- `research_lab/logs/handoff.md` (in the "Synthesis" section, so the next cycle has it)
+- `logs/handoff.md` (in the "Synthesis" section, so the next cycle has it)
 - A `finding` field in each experiment's `experiment_log.jsonl` entry (one sentence per experiment capturing what was learned, not just the numbers)
 
 The quality of the synthesis determines the quality of the next cycle's decisions. A cycle that runs 4 experiments and learns nothing from them has wasted 4 budget credits.
@@ -381,7 +453,7 @@ After state updates, check for belief revision triggers. This step prevents the 
 - Log the invalidation chain in the handoff: "Experiment X invalidated assumption Y, which affects experiments [A, B, C]."
 
 **Trigger 2: Finding changes the scoring rubric.**
-- If a diagnostic reveals that the lab is measuring the wrong thing (e.g., "Sharpe@0ms is meaningless because latency is 50ms"), this is a frame invalidation.
+- If a diagnostic reveals that the lab is measuring the wrong thing (e.g., "the offline proxy ignores a deployment constraint that dominates real performance"), this is a frame invalidation.
 - Log `last_transition: "frame_invalidation"` in cycle_counter.json.
 - Write a detailed explanation to the handoff.
 - Pause for human review. Do not continue running experiments with a broken scoring rubric.
@@ -393,7 +465,7 @@ After state updates, check for belief revision triggers. This step prevents the 
 
 ### Step 8: Write Handoff
 
-Write `research_lab/logs/handoff.md` with these sections:
+Write `logs/handoff.md` with these sections:
 
 ```markdown
 # Handoff: Cycle {N}
@@ -418,7 +490,7 @@ Write `research_lab/logs/handoff.md` with these sections:
 {Flag any unresolved questions from diagnostics}
 ```
 
-Write `research_lab/logs/cycles/cycle_{N}.json` with full cycle details.
+Write `logs/cycles/cycle_{N}.json` with full cycle details.
 
 ### Step 8b: Determine Transition Type
 
@@ -486,7 +558,7 @@ If `data_splits.held_out_test` is defined in `branches.yaml`, evaluate the produ
 - **If held-out passes** (champion meets all hard gates on held-out data):
   1. Set `cycle_counter.json` status to `"CONVERGED"`
   2. Write a final handoff summarizing all findings, organized by branch
-  3. Include held-out confirmation results in `research_lab/logs/convergence_report.md`
+  3. Include held-out confirmation results in `logs/convergence_report.md`
   4. Stop the loop
 
 - **If held-out fails**: convergence is reverted. Log the failure, add it to `dead_ends.md` as a data point, and continue the lab. The champion was overfit.
@@ -501,11 +573,15 @@ Do NOT continue running cycles after convergence. Budget replenishment doesn't h
 
 A branch is **stuck** when it has 3+ consecutive non-improvements, OR when the last 3 experiments all have `|delta| < 0.005` (diminishing returns, even if some were technically PROMOTE).
 
+Do not deploy a scout until:
+- you have completed any pending implementation audit for that family
+- and you have checked whether cheap orthogonal probes are missing from the local search ladder
+
 Deploy a scout:
 ```
 Agent(
   name="research-scout-{branch}",
-  prompt="Read research_lab/templates/research_scout.md. Branch '{branch}' is stuck after {N} failures. Champion: {champion_id} (score {score}). Dead ends: {dead_ends_list}. Search for recent papers (2024-2026), GitHub repos, and blog posts. Propose 3 new experiment configs as YAML search_space entries. Cite sources.",
+  prompt="Read research_scout.md. Branch '{branch}' is stuck after {N} failures. Champion: {champion_id} (score {score}). Dead ends: {dead_ends_list}. Search for recent papers (2024-2026), GitHub repos, and blog posts. Propose 3 new experiment configs as YAML search_space entries. Cite sources.",
   subagent_type="general-purpose",
   mode="bypassPermissions"
 )
@@ -607,7 +683,7 @@ After running the factorial:
 
 ## Batch Runner
 
-For fast labs: `python research_lab/scripts/batch_runner.py --cycles 30`. Runs experiments sequentially but shares the same allocator, experiment typing, belief revision, and synthesis logic. Use for labs where experiments take seconds.
+For fast labs: `python scripts/batch_runner.py --cycles 30`. Runs experiments sequentially but shares the same allocator, experiment typing, belief revision, and synthesis logic. Use for labs where experiments take seconds.
 
 ---
 

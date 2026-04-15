@@ -1,113 +1,123 @@
-# Running on Different Systems
+# Running `labrat` With Agents
 
-## Claude Code (Primary)
+`labrat` is built first for **Claude Code** and **Codex**.
 
-**Single cycle:**
-```
-Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
-Redirect experiment output to files and grep for RESULT lines.
-Update all state files in research_lab/state/.
-Write handoff to research_lab/logs/handoff.md
-```
+Both runners use the same lab-local files:
 
-**Looped:**
-```
-/loop 10m Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
-Redirect experiment output to files and grep for RESULT lines.
-Update all state files in research_lab/state/.
-Write handoff to research_lab/logs/handoff.md
-```
+- `agent_prompts/` for the operating prompts
+- `orchestrator.md` for the cycle contract
+- `research_brief.md` and `research_sources.md` for the preserved knowledge trail
+- `state/` for the live state
+- `scripts/operator_helper.py` for readiness checks, status, and next-prompt selection
+- `implementation_audit.md` when the helper routes into audit mode
 
-### Parallel Branch Execution
+## Shared Operating Model
 
-Claude Code supports the `Agent` tool for launching concurrent subagents. The orchestrator uses this to run one experiment per branch simultaneously:
+For a new lab:
 
-```
-# The orchestrator does this automatically:
-Agent(name="features-branch", prompt="Run experiment ...", mode="bypassPermissions")
-Agent(name="model-branch", prompt="Run experiment ...", mode="bypassPermissions")
-Agent(name="objectives-branch", prompt="Run experiment ...", mode="bypassPermissions")
-```
+1. scaffold the lab
+2. run Phase 0 deep research
+3. define cheap probes, audit policy, and formulation-change triggers
+4. confirm readiness
+5. bootstrap
+6. start autonomous cycles
 
-All agents launch in one message and run concurrently. The orchestrator collects results and updates state sequentially. This is 3-5x faster than sequential execution.
+For an existing lab:
 
-### Dashboard
+1. run `python scripts/operator_helper.py status`
+2. run `python scripts/operator_helper.py next-prompt --runner ... --phase auto`
+3. give that prompt to the agent
 
-The orchestrator starts a dashboard server on first run:
+## Claude Code
+
+Claude Code is the cleanest fit for long-running loops and parallel branch work.
+
+### Phase 0
+
 ```bash
-cd research_lab && python -m http.server 8787 &
+python scripts/operator_helper.py next-prompt --runner claude --phase design
 ```
-Open http://localhost:8787/dashboard.html to watch experiments in real-time. Shows live agent indicators, budget bars, experiment verdicts, and the current handoff.
 
-Native `/loop` command handles scheduling. The orchestrator.md IS the agent.
+### Normal operation
 
-### Choosing Your Loop Interval
-
-Run one experiment manually and time it. Then:
-
-| Experiment time | Loop interval | Rationale |
-|----------------|---------------|-----------|
-| < 30 seconds | `/loop 5m` | Burn through fast, 4 experiments per tick |
-| 30s - 5 min | `/loop 10m` | One full batch per tick |
-| 5 - 30 min | `/loop 30m` | Allow completion + state update |
-| 30 min - 2 hr | `/loop 1h` | One experiment per tick |
-| 2+ hr | `/loop 2h` | Avoid wasted polling |
-
-The orchestrator starts experiments, checks if previous ones finished, scores results, and dispatches new work each tick. Shorter intervals mean faster convergence but more orchestrator overhead.
-
-## Cursor / Windsurf
-
-Open `orchestrator.md`, tell the assistant to follow the instructions. For recurring:
 ```bash
-while true; do cursor-cli "Read research_lab/orchestrator.md and execute one cycle"; sleep 3600; done
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
-## Headless (cron + Anthropic API)
+### Repeated cycles
 
-```python
-# run_one_cycle.py
-import anthropic
+After the lab is bootstrapped and stable, reuse the cycle prompt with `/loop`.
 
-client = anthropic.Anthropic()
-orchestrator = open("research_lab/orchestrator.md").read()
+Cadence defaults:
 
-response = client.messages.create(
-    model="claude-sonnet-4-20250514",
-    max_tokens=8000,
-    system=orchestrator,
-    messages=[{"role": "user", "content": "Execute one research cycle."}],
-    tools=[...],  # file read/write/bash tools
-)
+- fast CPU labs: `/loop 5m` to `/loop 10m`
+- medium experiments: `/loop 30m`
+- long GPU runs: `/loop 1h`
+
+## Codex
+
+Codex works well for the same workflow, but it relies more on the helper prompts and thread continuity than on a built-in `/loop` pattern.
+
+### Phase 0
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase design
 ```
 
-Cron: `0 * * * * cd /project && python run_one_cycle.py >> lab.log 2>&1`
+### Normal operation
 
-## GitHub Actions
-
-```yaml
-name: Research Cycle
-on:
-  schedule:
-    - cron: '0 * * * *'
-jobs:
-  cycle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: python run_one_cycle.py
-      - run: |
-          git add research_lab/state/ research_lab/logs/
-          git commit -m "Lab cycle $(cat research_lab/state/cycle_counter.json | jq .cycle)"
-          git push
+```bash
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner codex --phase auto
 ```
 
-## Any System That Can
+### Repeated cycles
 
-1. Read markdown files
-2. Execute shell commands
-3. Write JSON/YAML files
-4. Follow multi-step instructions
+Reuse the same thread and keep handing Codex the next helper-generated prompt. If you want scheduled runs in Codex desktop, use an automation that reuses the same helper command and prompt path.
 
-That's the entire requirement.
+## Scout, Audit, And Expansion Phases
+
+When the helper routes the lab into audit mode:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner claude --phase audit
+```
+
+Or:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase audit
+```
+
+When the helper routes the lab into scout or expansion mode:
+
+```bash
+python scripts/operator_helper.py prepare-scout --all-stuck
+python scripts/operator_helper.py next-prompt --runner claude --phase scout
+```
+
+Or:
+
+```bash
+python scripts/operator_helper.py prepare-scout --expansion
+python scripts/operator_helper.py next-prompt --runner codex --phase expansion
+```
+
+`auto` may now resolve to `design`, `cycle`, `audit`, `scout`, `frame_break`, `expansion`, or `checkpoint` depending on the lab state.
+
+## Dashboard
+
+The static dashboard is always the baseline path:
+
+```bash
+python -m http.server 8787
+```
+
+The React dashboard remains optional:
+
+```bash
+cd dashboard-app
+npm install
+npm run dev
+```

@@ -1,128 +1,172 @@
 # SST-5 Sentiment Lab Orchestrator
 
-You are the orchestrator of the labrat research lab for SST-5 sentiment classification.
+You are the orchestrator of the `labrat` SST-5 sentiment lab.
 
-**This is a fast-cycle lab.** Experiments take 1-3 minutes. Run proxy AND confirm in the same cycle. Explore multiple branches per cycle via parallel subagents.
+This is a fast CPU lab. Experiments usually finish in seconds, so the right behavior is:
 
-## First-Run Setup (cycle 0 only)
+- use cheap probes before expensive sweeps when the branch allows it
+- exploit locally inside strong branches
+- audit suspicious near-miss families before writing them off
+- keep multiple branches moving
+- scout when a branch stalls
+- expand when the whole frontier flattens
+- leave a clean handoff every cycle
 
-1. **Start the dashboard**: `cd research_lab && python -m http.server 8787 &`
-   Tell the user: "Dashboard live at http://localhost:8787/dashboard.html"
-2. **Ask the user**:
-   - "How many parallel branches per cycle?" (default: all active with budget)
-   - "What loop interval? Experiments here take ~3 seconds, so I suggest `/loop 5m`."
-   - "Any branches to prioritize or skip?"
-3. **Initialize `state/active_agents.json`** if missing: `{"updated_at": "...", "agents": {}}`
-4. **Always update `last_run_at`** in `cycle_counter.json` at the end of every cycle.
+Phase 0 is already complete in this example. The local source of truth is:
 
-## Loop Timing
+- `branches.yaml`
+- `dead_ends.md`
+- `research_brief.md`
+- `research_sources.md`
 
-This is a fast lab (experiments < 5 seconds). Recommended: `/loop 5m`
+Do not ask the human for permission during a cycle. Execute the cycle and update the state.
 
-```
-/loop 5m Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
-Redirect experiment output to files and grep for RESULT lines.
-Update all state files in research_lab/state/.
-Write handoff to research_lab/logs/handoff.md
-```
+## First Run
 
-Each tick: check in, score results, select branches, launch subagents, update state, sleep.
+1. Start the dashboard from the lab root:
+   - `python -m http.server 8787 &`
+2. Use default preferences unless the human already specified overrides:
+   - all active branches per cycle
+   - `/loop 5m` for repeated execution
+   - no priority or skip list
+3. Initialize any missing state files.
+4. Recover orphaned agents from `state/active_agents.json` before launching new work.
 
 ## Read Order
-1. `research_lab/state/cycle_counter.json`
-2. `research_lab/logs/handoff.md`
-3. `research_lab/state/branch_beliefs.json`
-4. `research_lab/state/champions.json`
-5. `research_lab/state/budget.json`
-6. `research_lab/dead_ends.md`
-7. `research_lab/branches.yaml`
 
-## The Cycle
+Minimum read set every cycle:
 
-### Step 1: Red Team (every 5th cycle, cycle > 0)
-Run the experiment runner with shuffled labels. Verify F1 drops to ~0.20. Use seed = 42 + cycle_number.
+1. `state/cycle_counter.json`
+2. `logs/handoff.md`
+3. `research_brief.md`
+4. `research_sources.md`
 
-### Step 2: Select Branches (Parallel)
-```
+Add as needed:
+
+5. `state/branch_beliefs.json`
+6. `state/budget.json`
+7. `state/champions.json`
+8. `dead_ends.md`
+9. `state/experiment_log.jsonl`
+10. `branches.yaml`
+
+## Cycle Types
+
+- `audit`: when a branch family is invalid-fast, suspiciously close, or mechanically suspect
+- `checkpoint`: every 15th cycle
+- `expansion`: when the recent frontier is flat or too many branches are exhausted
+- `scout`: when one or more branches hit the stuck threshold
+- `red_team`: every 5th cycle
+- `cycle`: normal exploitation/exploration
+
+## Normal Cycle
+
+### 1. Select branches
+
+Use the usual branch priority formula:
+
+```text
 priority = 0.3 * ev + 0.4 * uncertainty + 0.3 * recency_bonus
 ```
-Skip branches with budget=0 or status=exhausted. Max-stale rule: 8 cycles.
-Select ALL eligible branches for parallel execution (or user-specified limit).
 
-### Step 3: Generate Experiments
-For each selected branch, pick ONE untried variation from its search space. Write config YAML to `research_lab/experiments/{branch}/{experiment_id}/config.yaml`. Each config must include ALL keys from the production_baseline, with exactly ONE changed.
+Respect the max-stale rule. In this lab, all active branches should usually move unless the human explicitly limited parallelism.
 
-### Step 3b: Update Agent Status
-Write `state/active_agents.json` with all branches about to run:
-```json
-{"agents": {"model": {"status": "running", "experiment_id": "...", "started_at": "..."}}}
-```
+### 2. Exploit locally inside each selected branch
 
-### Step 4: Run Experiments (Parallel Subagents)
-Launch one Agent per branch, ALL in a single message:
-```
-Agent(name="{branch}-branch", prompt="Run experiment {id}. Config at {path}. Run experiment, then judge.", mode="bypassPermissions")
-```
+Do not stop at one naive proposal. For each selected branch:
 
-Each subagent runs:
-```bash
-python research_lab/scripts/run_experiment.py \
-  --config {config.yaml} --output-dir {experiment_dir} \
-  > {experiment_dir}/run.log 2>&1
-```
-Then:
-```bash
-python research_lab/scripts/judge.py \
-  --result {experiment_dir}/result.json \
-  --champion research_lab/state/champions.json \
-  --branch {branch}
-```
+1. start from the branch champion or the production baseline
+2. try the cheapest meaningful orthogonal probes first when they exist:
+   - width
+   - order
+   - feature budget
+   - packing or overlap
+3. try up to 3 local mutations or untried search points
+4. keep the best local move
+5. revert clearly worse moves
+6. stop early if the local frontier is obviously flat
 
-**Kill if**: F1 < 0.15 or experiment crashed.
+This is the branch-local hill-climbing step. The whole point is to avoid wasting a cycle on one shallow guess.
 
-### Step 5: Collect Results
-Gather RESULT and VERDICT lines from all subagents.
+### 3. Generate runnable configs
 
-### Step 6: Update State (Sequential)
-Process each experiment result one at a time:
-- Append to experiment_log.jsonl
-- Update branch_beliefs.json (n_experiments++, EV update, uncertainty update)
-- Update champions.json if PROMOTE
-- Update budget.json (decrement by 1)
-- Replenish every 10 cycles (+5 base, +3 bonus)
-- Clear active_agents.json (set agents to {})
-- Increment cycle_counter.json
+Write configs to:
 
-### Step 7: Write Handoff
-Write `research_lab/logs/handoff.md` and `research_lab/logs/cycles/cycle_{N}.json`.
+`experiments/{branch}/{experiment_id}/config.yaml`
+
+Every config should remain a coherent single-step or tightly related local mutation from the current branch champion.
+
+### 4. Launch parallel work
+
+Run one subagent per selected branch. Each subagent:
+
+1. runs `scripts/run_experiment.py`
+2. runs `scripts/judge.py`
+3. returns the important `RESULT` and `VERDICT` lines
+
+Redirect noisy output to files.
+
+### 5. Collect and score
+
+Process each finished experiment sequentially:
+
+- append to `state/experiment_log.jsonl`
+- update `state/branch_beliefs.json`
+- update `state/champions.json` if promoted
+- decrement budget
+- clear finished agent entries from `state/active_agents.json`
+
+### 6. Write handoff
+
+Update:
+
+- `logs/handoff.md`
+- `logs/cycles/cycle_{N}.json`
+
+The handoff should say:
+
+- what moved
+- what stalled
+- what the next likely phase is
+
+## Scout Phase
+
+If one or more branches are stuck:
+
+1. run `python scripts/operator_helper.py prepare-scout --all-stuck`
+2. read the new scout request files
+3. use `research_scout.md`
+4. write proposals and a short memo
+
+## Audit Phase
+
+If a family is invalid-fast, suspiciously close to the current champion, or may just be mechanically broken:
+
+1. use `implementation_audit.md`
+2. rerun the anomaly
+3. run one or two cheap controls
+4. decide whether the issue is scientific or mechanical
+5. leave behind a concrete follow-up probe when the family survives
+
+## Expansion Phase
+
+If the whole frontier is flattening:
+
+1. use `expansion_scout.md`
+2. search for orthogonal CPU-friendly directions
+3. write the expansion report and worldview memo
+4. only return to normal cycles after the new directions are concrete
+
+## Red Team
+
+Every 5th cycle, run shuffled-label checks. This lab should drop near random macro F1 on both seeds.
 
 ## Rules
-1. One experiment per BRANCH per cycle. Multiple branches run in parallel.
-2. SINGLE DELTA from parent config.
-3. Do NOT ask for permission.
-4. Redirect output to files. Grep for RESULT/VERDICT.
-5. If crash, log error, mark REJECT, continue.
-6. Be aggressive about finding high F1. Push every axis hard.
-7. Always update active_agents.json before and after experiments.
-8. Start the dashboard on first run.
 
-## Working Directory
-All paths are relative to `labrat/examples/nlp-sentiment/`.
-
-## Parallel Execution Model
-```
-Orchestrator (you)
-├── Read state, select N branches
-├── Generate N configs
-├── Write active_agents.json
-├── Launch N subagents IN PARALLEL ──────────────┐
-│     ├── features-branch: run + judge           │
-│     ├── model-branch: run + judge              │ concurrent
-│     ├── preprocessing-branch: run + judge      │
-│     └── objectives-branch: run + judge         │
-├── Collect results ◄────────────────────────────┘
-├── Update state SEQUENTIALLY
-├── Clear active_agents.json
-└── Write handoff
-```
+1. Stay within the example's CPU-only reduced-lab constraints unless you clearly mark an idea as reference-only.
+2. Use branch-local exploitation by default. Do not waste a cycle on a single shallow attempt.
+3. Force a few cheap orthogonal probes before you declare a family flat.
+4. When the explicit search space is exhausted, reason about the next best local mutation instead of immediately stalling.
+5. Route suspicious invalid-fast or near-miss families to audit before you discard them.
+6. When the branch family itself looks exhausted, route to scout or expansion instead of doing tiny meaningless sweeps.
+7. Always leave the next agent a usable handoff.

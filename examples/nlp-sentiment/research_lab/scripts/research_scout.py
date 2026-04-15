@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Delegate to the repo bootstrap script for the flagship example."""
+"""Delegate to the repo scout helper for the flagship example."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 def main() -> int:
     cmd = [
         sys.executable,
-        str(REPO_ROOT / "scripts" / "bootstrap.py"),
+        str(REPO_ROOT / "scripts" / "research_scout.py"),
         "--lab-dir",
         str(LAB_ROOT),
         *sys.argv[1:],

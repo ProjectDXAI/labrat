@@ -2,194 +2,182 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 
-[**Quickstart**](#quickstart) · [**For Agents**](#for-agents) · [**Example**](#example) · [**Docs**](docs/) · [**DXRG**](https://dxrg.ai)
+Multi-branch autoresearch with funding as the control loop. `labrat` helps an agent explore competing research branches, reallocate budget to what works, and leave behind a state trail you can audit.
 
-Multi-agent autoresearch with economics. Parallel agents explore competing research branches while a funding mechanism allocates compute to what produces and defunds what doesn't. You define the branches, the scoring, and the budget rules. The system handles exploration, exploitation, and everything in between.
+![labrat dashboard](docs/dash-sample.png)
 
-![dashboard](docs/dash-sample.png)
+`labrat` is the broad version of the idea behind `autoresearch`.
 
-147 experiments across 6 branches. 43 cycles. Zero human intervention. One command.
+- `autoresearch` is one research thread against one fixed target.
+- `labrat` is a research program with competing branches, shared budget, and an explicit exploration/exploitation loop.
 
-## What this is
+The repo is built first for **Claude Code** and **Codex**.
 
-A framework for running autonomous research programs where you have more directions than time to explore them. Instead of one agent optimizing one metric, labrat dispatches parallel agents across a tree of competing approaches and uses a UCB1-inspired funding mechanism to decide which branches earn more compute and which get cut.
+## Why labrat
 
-The funding mechanism is the core idea. Each branch starts with a budget. Every experiment costs one credit. Branches that produce promotions earn replenishment. Branches that stall get defunded. The allocator balances exploration (try branches with high uncertainty) against exploitation (revisit branches with high expected value) automatically. You can tune the weights, the replenishment rules, the exhaustion thresholds, and the scoring formula to fit any domain.
+- **Multi-branch search**: run several lines of attack instead of one long thread.
+- **Funding as control loop**: branches earn future compute from results, not vibes.
+- **Agent-native workflow**: markdown prompts, YAML search spaces, JSON state, local scripts.
+- **Readable state**: budgets, beliefs, champions, scouts, and handoffs are plain files.
 
-This makes it different from hyperparameter search. Optuna finds the best config within a fixed space. Labrat decides which spaces are worth searching at all, kills the ones that aren't, and goes looking for new ones when it runs out of ideas.
+## Two ways to start
 
-When branches get stuck, research scouts search arXiv and GitHub for approaches the lab hasn't tried. On a schedule, expansion scouts inject external knowledge to prevent the system from optimizing in a local basin. Before declaring convergence, a frame challenge asks whether the problem was even set up correctly. The whole thing runs on a loop with no human in it.
+### 1. Evaluate the repo quickly
 
-Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Works with Codex, OpenClaw, or any agent harness that reads markdown and runs shell commands.
-
-Extends [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) from single-agent single-metric to multi-agent multi-branch with economic allocation. Born out of work at [DXRG](https://dxrg.ai) running autonomous research on BTC microstructure (55 cycles, 47 experiments), prediction markets (74 experiments, 18 branches), and NLP classification (147 experiments, 43 cycles). Every feature exists because something broke in a real deployment.
-
-## How it works
-
-Each cycle, the orchestrator picks branches, dispatches parallel agents, scores results, and reallocates budget. Branches that produce keep their funding. Branches that don't get cut.
-
-```
-                           ┌─────────────────────────────────────┐
-                           │         ORCHESTRATOR                │
-                           │                                     │
-                           │  1. Read state + last cycle handoff │
-                           │  2. Allocate budget by UCB1         │
-                           │  3. Dispatch parallel agents ──────────┐
-                           │  4. Score results mechanically      │  │
-                           │  5. Synthesize: what did we learn?  │  │
-                           │  6. Reallocate: fund winners,       │  │
-                           │     defund losers                   │  │
-                           │  7. Write handoff → next cycle      │  │
-                           └─────────────────────────────────────┘  │
-                                                                    │
-       ┌────────────────┬────────────────┬────────────────┐         │
-       │                │                │                │  parallel│
-       ▼                ▼                ▼                ▼         │
-  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐        │
-  │ Agent A │    │ Agent B │    │ Agent C │    │ Agent D │        │
-  │ features│    │  model  │    │  data   │    │  loss   │        │
-  │ $15     │    │  $12    │    │  $12    │    │  $8     │        │
-  │ 3 wins  │    │ 0 wins  │    │ 1 win   │    │ 0 wins  │        │
-  └────┬────┘    └────┬────┘    └────┬────┘    └────┬────┘        │
-       │              │              │              │              │
-       ▼              ▼              ▼              ▼              │
-    PROMOTE         REJECT        MARGINAL       REJECT           │
-    +5 budget       -1 budget     -1 budget      -1 budget ◄──────┘
-```
-
-After 10 cycles, the budget distribution tells you where the signal is:
-
-```
-  ┌─ features ██████████████████░░  $18  (3 promoted, ROI 0.42)
-  ├─ model    ████░░░░░░░░░░░░░░░░  $4   (0 promoted, ROI 0.00) ← defunded
-  ├─ data     █████████░░░░░░░░░░░  $9   (1 promoted, ROI 0.17)
-  ├─ loss     ███░░░░░░░░░░░░░░░░░  $3   (0 promoted, ROI 0.00) ← defunded
-  └─ capstone ████████████░░░░░░░░  $12  (waiting for branch winners)
-```
-
-The allocator factors in cost per experiment. A branch burning 10 minutes of GPU time per experiment is held to a higher standard than one running 3-second CPU jobs. Expensive branches that don't produce lose funding faster.
-
-Every 5th cycle: red team (shuffled labels). Every 10th: budget replenishment (producers earn more). Every 20th: expansion scout searches arXiv for new approaches. Stuck branches trigger a research scout. At convergence: frame challenge tests whether the problem was set up correctly.
-
-## When to use this
-
-You have N research directions, budget for maybe N/3 of them, and no idea which ones matter. The funding mechanism runs them all and lets the results decide.
-
-| Domain | Branches compete on | What the allocator finds |
-|--------|--------------------|-----------------------|
-| Architecture search | attention, depth, encoding, activations | which dimensions move the metric vs which are flat |
-| Feature engineering | subsets, encodings, interactions, normalization | the minimal feature set (defunds the noise) |
-| Trading strategies | signals, execution, regime filters, sizing | real edge vs backtest overfitting |
-| Kernel optimization | compiler flags, memory layouts, tiling, fusion | the 3 configs that matter out of hundreds |
-| RAG / prompt tuning | chunking, embeddings, reranking, templates | which pipeline axis has the most headroom |
-| Drug screening | descriptors, fingerprints, model families | which descriptor/model combos predict activity |
-
-## Beyond the loop
-
-The funding mechanism and parallel agents are the foundation. On top of that:
-
-- **Data profiling** before experiments start -- the system looks at the actual data before designing branches, not just the literature
-- **Research scouts** search arXiv and GitHub when a branch gets stuck, propose new experiments with citations
-- **Expansion scouts** inject external knowledge on a schedule to break out of local optima
-- **Belief revision** catches when a new finding invalidates previous results and flags the downstream damage
-- **Gate evolution** detects when your scoring gates are blocking good experiments and proposes relaxation
-- **Failure categorization** classifies WHY experiments fail (which gate? soft score? crash?) so you fix the right thing
-- **Efficiency tracking** measures waste rate, budget ROI per branch, and time-to-first-promote so you can see where compute went
-- **Frame challenge** questions whether the scoring metric even correlates with what you care about before declaring convergence
-- **LLM mutation mode** lets branches propose their own experiments after the predefined search space runs out -- no more dead branches with budget remaining
-- **Inner hill-climbing** runs 3-5 experiments per subagent invocation with keep/revert logic, cutting orchestrator overhead
-- **Held-out test** at convergence validates the champion on untouched data before declaring done
-
-The scoring formula, budget rules, gate thresholds, and allocation weights are all configurable per domain. The framework is opinionated about process (mechanical scoring, no human in the loop, red team every 5 cycles) but unopinionated about what you're optimizing.
-
-### Dashboard
-
-A React dashboard app (`dashboard-app/`) provides interactive monitoring with hover tooltips, animated branch status, and a Recharts scatter plot of experiment progress. Falls back to a static HTML dashboard (`templates/dashboard.html`) for zero-dependency environments.
-
-## Quickstart
-
-**1. Design your research tree.** Option A: let the agent do it. The tree designer surveys the landscape via web search before writing a single line of YAML:
-
-```
-# In Claude Code:
-Read labrat/templates/tree_designer.md and design a research tree for:
-Mission: Maximize macro F1 on 5-class sentiment. Baseline F1=0.36.
-Constraints: CPU only, <8K samples, no pretrained embeddings.
-```
-
-Option B: write the YAML yourself or use a deep research model:
-
-```yaml
-mission: "Maximize macro F1 on 5-class sentiment. Baseline F1=0.36."
-
-branches:
-  model:
-    initial_budget: 25
-    search_space:
-      - delta_key: "model.type"
-        values: ["svm", "catboost", "random_forest"]
-  features:
-    initial_budget: 20
-    search_space:
-      - delta_key: "features.ngram_max"
-        values: [2, 3]
-```
-
-**2. Write your experiment runner** -- thin wrapper around your eval pipeline:
-
-```python
-# research_lab/scripts/run_experiment.py
-def run_experiment(config):
-    model = train(config)
-    return {"metrics": {"test": {"primary_metric": evaluate(model).f1}}, ...}
-```
-
-**3. Bootstrap and loop:**
+Run the flagship example if you want to understand the framework before you build on it.
 
 ```bash
-cp templates/* research_lab/
-cd research_lab && python scripts/bootstrap.py
-python -m http.server 8787 &
+python -m venv .venv
+source .venv/bin/activate
+pip install -r examples/nlp-sentiment/requirements.txt
+cd examples/nlp-sentiment/research_lab
+python scripts/bootstrap.py
+python -m http.server 8787
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
-Then tell your agent:
+Use `--runner codex` for Codex.
+
+### 2. Create a real lab
+
+For a new lab, the default path is **deep research first**, not “run one cycle and hope.”
+
+```bash
+python scripts/new_lab.py my_lab
+cd my_lab
+python scripts/operator_helper.py next-prompt --runner claude --phase design
+python scripts/operator_helper.py check-readiness
+python scripts/bootstrap.py
+python -m http.server 8787
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
-/loop 10m Read research_lab/orchestrator.md and execute one research cycle.
-```
 
-Watch it run at `localhost:8787/dashboard.html`.
+That flow is:
 
-## For agents
+1. scaffold the lab
+2. survey the landscape
+3. define the search ladder:
+   - cheap probes
+   - normal exploitation
+   - implementation audit
+   - formulation change
+4. finalize `branches.yaml`, `dead_ends.md`, `research_brief.md`, and `research_sources.md`
+5. bootstrap
+6. start autonomous cycles
 
-If a user pointed you here, your job is to set up and run an autonomous research lab for their problem.
+## How it differs from autoresearch
 
-**If they haven't given you context yet**, ask:
+| | `autoresearch` | `labrat` |
+| --- | --- | --- |
+| Search unit | one line of attack | multiple competing branches |
+| Control loop | keep or revert | reallocate budget across branches |
+| Operator surface | one research thread | tree design, branch loop, scouts, expansion |
+| State | lightweight history | branch beliefs, budgets, champions, memos |
+| Best fit | one tight optimization problem | broader research programs with several plausible axes |
 
-1. What problem are you solving? What's your baseline and target metric?
-2. What are your constraints? (compute, time, dataset size)
-3. Any recent papers or prior experiments to build on?
-4. Do you have an eval pipeline, or should I build one?
+The design goal is still simplicity. The difference is where the simplicity lives:
 
-**Once you have the problem:**
+- `autoresearch` keeps the code surface tiny.
+- `labrat` keeps the **operator workflow** coherent while exposing a broader search model.
 
-1. **Design the tree** -- run the tree designer or use deep research to map the problem space, convert to `branches.yaml`
-2. **Build the lab** -- create `run_experiment.py`, customize `constitution.md` and `dead_ends.md`
-3. **Check in** -- "Here's N branches with M budget. Scoring weights X. Ready?"
-4. **Run** -- bootstrap, start dashboard, enter `/loop`. Follow `orchestrator.md` exactly.
-5. **Report** -- when converged, summarize: what matters, what's flat, what surprised you.
+## Deep-research-first scaffold
 
-`templates/orchestrator.md` is your brain during the loop. Everything is in there.
+A new lab now generates:
 
-## Example
+- Phase 0 prompt assets:
+  - `tree_designer.md`
+  - `research_scout.md`
+  - `expansion_scout.md`
+  - `consolidation_agent.md`
+  - `implementation_audit.md`
+  - `frame_break.md`
+  - `agent_prompts/`
+- Phase 0 outputs:
+  - `branches.yaml`
+  - `dead_ends.md`
+  - `research_brief.md`
+  - `research_sources.md`
+- support scripts:
+  - `scripts/bootstrap.py`
+  - `scripts/operator_helper.py`
+  - `scripts/research_scout.py`
+  - `scripts/judge.py`
+  - `scripts/run_experiment.py`
 
-**[examples/nlp-sentiment/](examples/nlp-sentiment/)** -- 5-class sentiment on SST-5. CPU-only, 3 seconds per experiment. 43 cycles, 147 experiments, zero human intervention.
+`bootstrap.py` now enforces the Phase 0 gate by default. If the scaffold still contains `LABRAT_PLACEHOLDER` values or the brief/source files are incomplete, bootstrap fails with a clear message.
 
-The autoresearcher found 3 axes that matter, 9 that are flat, and that branch winners don't always stack. Production champion: F1=0.398 vs 0.360 baseline (+10.5%). [Full writeup](examples/nlp-sentiment/README.md).
+Phase 0 should not just list branches. It should also define how the lab escapes shallow search:
 
-## Docs
+- what the cheap screening or proxy stage is
+- which orthogonal probes should be tried before a full frame break
+- when a suspicious family should go to implementation audit
+- what contradiction would force a formulation-change branch
 
-[Getting Started](docs/getting-started.md) · [Architecture](docs/ARCHITECTURE.md) · [Deep Research Guide](docs/DEEP_RESEARCH.md) · [Data Splitting](docs/data-splitting.md) · [Economics](docs/economics.md) · [Domains](docs/domains.md) · [Runners](docs/runners.md) · [Assessment](docs/ASSESSMENT.md) · [Visual Identity](docs/labrats-visual-guide.md)
+## Funding loop
 
-## Credits
+The core idea is simple:
 
-Extends [autoresearch](https://github.com/karpathy/autoresearch) with market-based multi-branch allocation, parallel agents, and external knowledge injection. Built with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) at [DXRG](https://dxrg.ai). MIT license.
+![funding loop](docs/funding-loop.svg)
+
+1. start with a baseline and a few candidate branches
+2. spend one credit per experiment
+3. score the results mechanically
+4. refill productive branches and let weak ones run out of budget
+5. use cheap probes and implementation audits before declaring a family dead
+6. use scouts and expansion when the frontier flattens for real
+7. repeat until the tree is genuinely mapped
+
+The novel part is the funding loop. The deep-research-first scaffold exists to keep that loop honest, and the probe/audit/frame-break ladder exists to keep it from converging too early on the wrong story.
+
+## Dashboard
+
+`labrat` ships with two dashboard surfaces:
+
+- `templates/dashboard.html` for the zero-dependency path
+- `dashboard-app/` for the cleaner React view
+
+The static dashboard is the baseline. The React app is the polished monitoring surface.
+
+## Example and origin
+
+### Flagship example
+
+`examples/nlp-sentiment` is the first-run example.
+
+- CPU only
+- fast to reproduce on a laptop
+- includes a completed Phase 0 trail and a runnable reduced lab
+- now acts as the reference lab for the helper-driven workflow
+
+### Real origin
+
+The framework was pressure-tested in real iterative research programs before this repo refresh.
+
+- repeated branch competition forced the allocator, scoring, and dead-end tracking to stay honest
+- that history is why `labrat` is opinionated about budgets, handoffs, and readable state
+
+Those validation runs informed the framework, but they are not the onboarding path.
+
+## Repo map
+
+- `program.md`: repo-level agent entrypoint
+- `docs/getting-started.md`: starter flow
+- `docs/runners.md`: Claude Code and Codex usage
+- `docs/DEEP_RESEARCH.md`: longer research-program playbook
+- `templates/`: scaffold source files
+- `scripts/`: bootstrap, helper, scout, judge, and scaffold utilities
+- `examples/nlp-sentiment`: flagship example
+
+## Constraints
+
+`labrat` is not a hosted platform. No database. No control plane. No mandatory SDK.
+
+The loop is built from:
+
+- markdown instructions
+- YAML branch definitions
+- JSON state files
+- Python support scripts
+- an agent that can read, run commands, and write files
+
+That keeps the repo easy to fork, easy to audit, and easy to bend to a specific domain.

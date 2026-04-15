@@ -6,31 +6,58 @@
 #
 # v2: Added meta-branches, external research hooks, multi-delta capstone,
 #     expansion triggers, and per-branch scoring overrides.
+# v3: Adds optional screening and exploration-policy fields so the agent can
+#     naturally try cheap orthogonal probes and implementation audits before
+#     exhausting a frontier family.
 
 # One line: what is this lab trying to achieve? Shown in the dashboard header.
-mission: "Describe your goal, baseline metric, and target. This appears in the dashboard header."
+mission: "LABRAT_PLACEHOLDER: replace with the goal, baseline metric, and target shown in the dashboard header."
 
 # Your current best configuration (the thing to beat)
 production_baseline:
-  experiment_id: "baseline_v1"
-  description: "Current best approach"
+  experiment_id: "LABRAT_PLACEHOLDER_baseline_v1"
+  description: "LABRAT_PLACEHOLDER: replace with the current best approach"
   config:
     # YOUR baseline config here
     data:
-      dataset: "your_dataset"
+      dataset: "LABRAT_PLACEHOLDER_dataset"
       train_split: "train"
       test_split: "test"
     model:
-      type: "your_model"
+      type: "LABRAT_PLACEHOLDER_model"
       params: {}
     training:
       epochs: 10
       batch_size: 32
       learning_rate: 0.001
     evaluation:
-      metric: "your_primary_metric"
+      metric: "LABRAT_PLACEHOLDER_primary_metric"
       cross_validation: true
       n_folds: 5
+
+# Optional cheap-ranking stage used before full expensive runs.
+# If your domain has a reliable proxy (build-only cost, subset eval, short horizon),
+# define it here so the orchestrator can screen obvious losers cheaply.
+screening:
+  enabled: true
+  stage: "LABRAT_PLACEHOLDER_build_only_or_subset_eval"
+  proxy_metric: "LABRAT_PLACEHOLDER_proxy_metric"
+  validate_top_k: 1
+  notes: "LABRAT_PLACEHOLDER: explain when the proxy is safe and when it is not"
+
+# Exploration policy tells the orchestrator how aggressive it should be about
+# cheap orthogonal probes and implementation audits before escalating outward.
+exploration_policy:
+  require_cheap_orthogonal_probes: true
+  cheap_probe_families:
+    - "width_or_group_size"
+    - "order_or_traversal"
+    - "packing_or_schedule"
+    - "overlap_or_prefetch"
+    - "lightweight_layout_change"
+  implementation_audit_on_invalid_fast: true
+  implementation_audit_on_near_miss: true
+  near_miss_delta: 0.02
 
 # Data splits for held-out validation at convergence.
 # The held_out_test period is NEVER used during exploration.
@@ -49,20 +76,20 @@ data_splits:
 branches:
   # Branch 1: Model architecture
   architecture:
-    description: "Model architecture variations"
+    description: "LABRAT_PLACEHOLDER: replace with a research-backed model architecture branch"
     initial_budget: 15
     mutation_mode: "llm"          # when search_space exhausted, subagent proposes mutations
     inner_loop_budget: 3          # experiments per subagent invocation (default 1)
     inner_loop_metric: "primary_metric"  # fast metric for keep/revert in inner loop
     search_space:
       - delta_key: "model.type"
-        values: ["model_a", "model_b", "model_c"]
+        values: ["LABRAT_PLACEHOLDER_model_a", "LABRAT_PLACEHOLDER_model_b", "LABRAT_PLACEHOLDER_model_c"]
       - delta_key: "model.params.hidden_size"
         values: [128, 256, 512, 1024]
 
   # Branch 2: Training recipe
   training:
-    description: "Training hyperparameters and schedules"
+    description: "LABRAT_PLACEHOLDER: replace with a research-backed training recipe branch"
     initial_budget: 12
     search_space:
       - delta_key: "training.learning_rate"
@@ -74,29 +101,42 @@ branches:
 
   # Branch 3: Data engineering
   data:
-    description: "Data preprocessing, augmentation, and selection"
+    description: "LABRAT_PLACEHOLDER: replace with a research-backed data engineering branch"
     initial_budget: 12
     search_space:
       - delta_key: "data.augmentation"
-        values: ["none", "basic", "aggressive"]
+        values: ["LABRAT_PLACEHOLDER_none", "LABRAT_PLACEHOLDER_basic", "LABRAT_PLACEHOLDER_aggressive"]
       - delta_key: "data.preprocessing"
-        values: ["standard", "normalized", "quantile"]
+        values: ["LABRAT_PLACEHOLDER_standard", "LABRAT_PLACEHOLDER_normalized", "LABRAT_PLACEHOLDER_quantile"]
 
   # Branch 4: Objective function
   objectives:
-    description: "Loss function and optimization target"
+    description: "LABRAT_PLACEHOLDER: replace with a research-backed objective branch"
     initial_budget: 15
     search_space:
       - delta_key: "training.loss"
-        values: ["cross_entropy", "focal", "label_smoothing"]
+        values: ["LABRAT_PLACEHOLDER_cross_entropy", "LABRAT_PLACEHOLDER_focal", "LABRAT_PLACEHOLDER_label_smoothing"]
 
   # Branch 5: Generalization
   generalization:
-    description: "Cross-domain and robustness tests"
+    description: "LABRAT_PLACEHOLDER: replace with a research-backed robustness branch"
     initial_budget: 10
     search_space:
       - delta_key: "data.dataset"
-        values: ["dataset_b", "dataset_c"]
+        values: ["LABRAT_PLACEHOLDER_dataset_b", "LABRAT_PLACEHOLDER_dataset_c"]
+
+  # Branch 6: Cheap orthogonal probes
+  # Use this for low-cost frontier questions like order, width, schedule,
+  # overlap, lightweight layout, or other structure-preserving probes.
+  cheap_probes:
+    description: "LABRAT_PLACEHOLDER: replace with a cheap orthogonal probe branch"
+    initial_budget: 10
+    search_space:
+      - delta_key: "config.probe_family"
+        values:
+          - "LABRAT_PLACEHOLDER_width"
+          - "LABRAT_PLACEHOLDER_order"
+          - "LABRAT_PLACEHOLDER_overlap"
 
   # --- CAPSTONE BRANCH ---
   # Multi-delta: combines winners from other branches.
@@ -131,6 +171,8 @@ branches:
             description: "Test sensitivity to execution assumptions"
           - name: "scoring_metric_correlation"
             description: "Does our scoring metric predict live performance?"
+          - name: "implementation_audit"
+            description: "Is a promising invalid-fast or near-miss branch mechanically broken rather than scientifically dead?"
 
   frame_challenge:
     description: "Challenges fundamental assumptions when lab converges"

@@ -1,122 +1,158 @@
 # Getting Started
 
-Detailed setup guide. For the quick version, see the README.
+`labrat` has two supported starts:
 
-## Step 0: Design Your Research Tree
+1. evaluate the repo quickly
+2. create a real lab
 
-Use a frontier model (GPT-5.4 Pro, Claude Opus, etc.) to design your tree. Give it:
+If you are new to the repo, run the example first. If you are starting a real lab, Phase 0 deep research comes before bootstrap.
 
-1. Your problem statement and current best approach
-2. Recent papers (2024-2026) on the topic (or have it find them)
-3. Your constraints (compute, data, timeline)
-4. What you've already tried
+## Path A: Evaluate The Repo Quickly
 
-Ask for: branch taxonomy (5-8 branches), search spaces, scoring formula, dead ends, branch interactions.
+This is the fastest way to understand the repo and see the loop shape.
 
-This is the most important step. The system optimizes within the tree you define. A bad tree wastes cycles.
-
-## Step 0.5: Establish Your Dataset
-
-All branches must evaluate against the same dataset and benchmark.
-
-**If you have data**: Define train/val/holdout splits. Holdout is never touched by the loop.
-
-**If you don't**: Find one first. HuggingFace Datasets, Kaggle, Papers With Code all have benchmarks. Using a public benchmark means your results are comparable to published work.
-
-**If you need novel data**: Make data collection the first branch. Score it on downstream task performance.
-
-The key: every branch evaluated on the same terms.
-
-## Step 1: Convert Frontier Model Output to YAML
-
-The frontier model gives you prose. You need YAML. Three options:
-
-**Option A**: Ask the same model to output YAML (paste the template schema from `templates/branches.yaml`)
-
-**Option B**: Do it yourself in 15 min. Read the prose, map each suggestion to `delta_key` + `values`.
-
-**Option C**: Paste into Claude Code with "convert this to labrat format."
-
-## Step 2: Write Your Experiment Runner
-
-The only file touching your code:
-
-```python
-# research_lab/scripts/run_experiment.py
-def run_experiment(config):
-    # YOUR pipeline: load data, train, evaluate
-    return {
-        "experiment_id": config["experiment_id"],
-        "metrics": {"test": {"primary_metric": 0.87}},
-        "cv_folds": [...],
-        "config": config,
-    }
-```
-
-## Step 2.5: Create Supporting Files
-
-Before bootstrapping, ensure these files exist in your research_lab/:
-
-**constitution.md** -- Your scoring rules. Copy from `templates/constitution.md` and customize:
-- Set the hard gates (minimum metric, p-value threshold)
-- Set the soft score weights (deployment, robustness, generalization, calibration, complexity)
-- Set the D normalization target (e.g., F1/0.50 for classification)
-
-**dead_ends.md** -- Known failures. Copy from `templates/dead_ends.md` and add entries from your frontier model's dead ends list.
-
-**scripts/judge.py** -- Mechanical scorer. Copy from `templates/` or write your own. Must:
-- Read result.json and champion.json
-- Apply hard gates (auto-reject)
-- Compute composite score
-- Output: `VERDICT: id=X score=Y champion_score=Z delta=+/-W verdict=PROMOTE/MARGINAL/REJECT`
-
-**scripts/run_experiment.py** -- Your experiment harness. Must:
-- Accept `--config config.yaml --output-dir dir`
-- Train model, evaluate, cross-validate
-- Write result.json with this schema:
-  ```json
-  {
-    "experiment_id": "name",
-    "config": {...},
-    "metrics": {"test": {"primary_metric": 0.87, "accuracy": 0.90, "p_value": 0.01}},
-    "cv_folds": [{"fold": 0, "primary_metric": 0.85}, ...],
-    "diagnostics": {"n_train": 1000, "n_features": 500, "pred_std": 0.05}
-  }
-  ```
-- Print: `RESULT: id=X f1=Y acc=Z cv_mean=W p_value=V elapsed=Ns`
-
-Bootstrap will validate these exist and error if missing.
-
-## Step 3: Bootstrap, Dashboard, and Run
+### Install the example dependencies
 
 ```bash
-python research_lab/scripts/bootstrap.py
-
-# Copy dashboard into your lab
-cp labrat/templates/dashboard.html research_lab/dashboard.html
-
-# Start the dashboard
-cd research_lab && python -m http.server 8787 &
-# Open http://localhost:8787/dashboard.html
+python -m venv .venv
+source .venv/bin/activate
+pip install -r examples/nlp-sentiment/requirements.txt
 ```
 
-Then in Claude Code:
-```
-Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
-Redirect experiment output to files and grep for RESULT lines.
-Update all state files in research_lab/state/.
-Write handoff to research_lab/logs/handoff.md
+### Bootstrap and serve the example
+
+```bash
+cd examples/nlp-sentiment/research_lab
+python scripts/bootstrap.py
+python -m http.server 8787
 ```
 
-The orchestrator will:
-1. Ask you setup questions on the first run (parallelism, loop interval, branch priorities)
-2. Select multiple branches and run them in parallel via subagents
-3. Update `state/active_agents.json` so the dashboard shows live agent status
-4. Score, update state, write handoff
+Open `http://localhost:8787/dashboard.html`.
 
-For continuous operation:
+### Point your agent at the example
+
+Use the lab-local helper instead of guessing the next prompt.
+
+```bash
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
-/loop 10m Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
+
+Or:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase auto
 ```
+
+If you want the React dashboard:
+
+```bash
+cd dashboard-app
+npm install
+npm run dev
+```
+
+## Path B: Create A Real Lab
+
+Use this when you want a new research program, not a toy first cycle.
+
+### Scaffold a new lab
+
+From the repo root:
+
+```bash
+python scripts/new_lab.py my_lab
+cd my_lab
+```
+
+This creates:
+
+- local prompt assets:
+  - `tree_designer.md`
+  - `research_scout.md`
+  - `expansion_scout.md`
+  - `consolidation_agent.md`
+  - `implementation_audit.md`
+  - `frame_break.md`
+  - `agent_prompts/`
+- Phase 0 artifacts:
+  - `branches.yaml`
+  - `dead_ends.md`
+  - `research_brief.md`
+  - `research_sources.md`
+- support scripts:
+  - `scripts/bootstrap.py`
+  - `scripts/operator_helper.py`
+  - `scripts/research_scout.py`
+  - `scripts/judge.py`
+  - `scripts/run_experiment.py`
+
+### Complete Phase 0
+
+Use one of these:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner claude --phase design
+```
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase design
+```
+
+Phase 0 is complete only when:
+
+- every `LABRAT_PLACEHOLDER` token is gone
+- `branches.yaml` is concrete
+- `dead_ends.md` is source-backed
+- `research_brief.md` is written
+- `research_sources.md` maps branches to sources
+- the lab has a search ladder:
+  - cheap probes
+  - normal exploitation
+  - implementation audit
+  - formulation change
+- the cheap screening or proxy stage is explicit when the domain allows one
+
+### Confirm readiness and bootstrap
+
+```bash
+python scripts/operator_helper.py check-readiness
+python scripts/bootstrap.py
+python -m http.server 8787
+```
+
+`bootstrap.py` will fail by default if Phase 0 is incomplete. Use `--allow-incomplete` only for maintainers or partial scaffolds.
+
+### Start autonomous operation
+
+```bash
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
+```
+
+Or:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase auto
+```
+
+## What The Framework Assumes
+
+The agent is the orchestrator. Python does not run the research loop by itself.
+
+Python handles:
+
+- readiness checks
+- state summarization
+- scout request generation
+- scoring and bookkeeping utilities
+
+The agent handles:
+
+- Phase 0 deep research
+- cheap probe and screening decisions
+- branch-local exploitation
+- implementation audits for suspicious families
+- mutation decisions
+- scouting and expansion
+- synthesis and handoff

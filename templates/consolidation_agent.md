@@ -13,12 +13,12 @@ Inspired by Claude Code's auto-dream: a background process that periodically rev
 ## Inputs
 
 You read:
-1. `research_lab/state/experiment_log.jsonl` -- the full experiment history (every experiment, every metric, every verdict)
-2. `research_lab/state/branch_beliefs.json` -- per-branch statistics
-3. `research_lab/state/champions.json` -- current best per branch
-4. `research_lab/dead_ends.md` -- known failures
-5. `research_lab/branches.yaml` -- the search space definition
-6. `research_lab/FINDINGS.md` (if it exists) -- previous consolidation output
+1. `state/experiment_log.jsonl` -- the full experiment history (every experiment, every metric, every verdict)
+2. `state/branch_beliefs.json` -- per-branch statistics
+3. `state/champions.json` -- current best per branch
+4. `dead_ends.md` -- known failures
+5. `branches.yaml` -- the search space definition
+6. `FINDINGS.md` (if it exists) -- previous consolidation output
 
 ## Phase 1: Pattern Extraction
 
@@ -55,7 +55,7 @@ Group rejected experiments and look for patterns:
 
 ## Phase 2: Write FINDINGS.md
 
-Create or update `research_lab/FINDINGS.md` with these sections:
+Create or update `FINDINGS.md` with these sections:
 
 ```markdown
 # Research Findings
@@ -144,7 +144,7 @@ Write a short (200-300 word) digest suitable for sharing with stakeholders who d
 3. What's still open / what would we do with more budget?
 4. One surprise finding that changes how we think about the problem
 
-Write this to `research_lab/logs/digest_cycle_N.md`.
+Write this to `logs/digest_cycle_N.md`.
 
 ## Phase 4b: Failure Pattern Analysis
 
@@ -183,8 +183,8 @@ Include a table:
 
 | File | Purpose |
 |------|---------|
-| `research_lab/FINDINGS.md` | Full research findings (created or updated) |
-| `research_lab/logs/digest_cycle_N.md` | Stakeholder-facing summary |
+| `FINDINGS.md` | Full research findings (created or updated) |
+| `logs/digest_cycle_N.md` | Stakeholder-facing summary |
 
 Proposed updates to dead_ends.md and branches.yaml are written as sections within FINDINGS.md, not applied directly. The orchestrator decides whether to adopt them.
 
@@ -206,6 +206,6 @@ The consolidation agent should have read access to all state files but only writ
 1. **Show the data.** Every claim in FINDINGS.md must reference specific experiments. "SVM wins" is not a finding. "SVM (experiment svm_v3, cycle 12, F1=0.395) beats all tested models" is a finding.
 2. **Flat axes are findings.** If an axis doesn't matter, that's as valuable as finding the best value. It tells the orchestrator to stop exploring that axis and spend budget elsewhere.
 3. **Don't extrapolate.** Report what was tested and what happened. If a value between two tested points might be optimal, note it as a suggestion, not a conclusion.
-4. **Preserve surprise findings.** Results that contradict the research frame are the most valuable. Give them their own section. The BTC research program's delay audit (invalidating 6 prior experiments) is the template for what a surprise finding looks like.
+4. **Preserve surprise findings.** Results that contradict the research frame are the most valuable. Give them their own section. A good surprise finding often invalidates several earlier assumptions at once.
 5. **Proposed updates are proposals.** Write them clearly enough that the orchestrator can adopt them mechanically, but don't assume they will be adopted. The orchestrator or user may disagree.
 6. **The digest is for humans.** No jargon, no config paths, no experiment IDs. Write it like you're explaining to someone who wants to know "did it work and what did we learn."

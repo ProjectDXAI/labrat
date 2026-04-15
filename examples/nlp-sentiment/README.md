@@ -1,34 +1,57 @@
 # Worked Example: NLP Sentiment Classification
 
-This walks through the full process from problem definition to running lab,
-including the messy middle part: taking a frontier model's freeform research
-design and turning it into a working labrat setup.
+This walks through the full process from problem definition to a working `labrat` setup, including the messy middle part: turning a frontier model's freeform research design into a runnable lab with a preserved source trail.
 
 The example comes in two layers:
 
-1. **The tree design** (below) shows how a frontier model would architect a full production research program with transformers, distillation, calibration, etc.
+1. **The tree design** (below) shows how a frontier model would architect a full production research program with transformers, distillation, calibration, and richer serving constraints.
 2. **The runnable lab** (in `research_lab/`) is a CPU-only TF-IDF version that actually executes on SST-5 in seconds. Same framework, smaller scale, real results you can reproduce.
 
+The runnable lab now includes the full deep-research-first surface:
+
+- `research_lab/research_brief.md`
+- `research_lab/research_sources.md`
+- `research_lab/implementation_audit.md`
+- `research_lab/frame_break.md`
+- `research_lab/agent_prompts/`
+- `research_lab/scripts/operator_helper.py`
+
 ## Quick Start (reproduce the results)
+
+This is the flagship `labrat` example. If you are new to the repo, start here.
 
 ```bash
 cd examples/nlp-sentiment/research_lab
 python scripts/bootstrap.py
 python -m http.server 8787 &
+python scripts/operator_helper.py status
 ```
 
 Then in Claude Code:
-```
-Read research_lab/orchestrator.md and execute one research cycle.
-Follow the 8 steps exactly. Do not ask for permission.
+
+```bash
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
-Or loop it: `/loop 5m Read research_lab/orchestrator.md and execute one research cycle.`
+Or in Codex:
+
+```bash
+python scripts/operator_helper.py next-prompt --runner codex --phase auto
+```
+
+`auto` may route you into `cycle`, `audit`, `scout`, `frame_break`, `expansion`, or `checkpoint` depending on the lab state.
+
+If you want repeated execution after the first clean cycle, keep using the helper-generated prompt and move it into `/loop 5m`.
 
 All supporting files are already in place:
 - `research_lab/branches.yaml` -- 6 branches, 95 budget credits
+- `research_lab/research_brief.md` -- the completed Phase 0 rationale
+- `research_lab/research_sources.md` -- the branch-to-source map and negative space
+- `research_lab/implementation_audit.md` -- the mechanical-vs-scientific audit contract
+- `research_lab/agent_prompts/` -- helper-driven runner prompts
 - `research_lab/scripts/run_experiment.py` -- SST-5 harness (TF-IDF + sklearn)
 - `research_lab/scripts/judge.py` -- composite scorer
+- `research_lab/scripts/operator_helper.py` -- status, readiness, and next-prompt helper
 - `research_lab/dead_ends.md` -- 4 known dead ends from the literature
 
 ## The Runnable Lab
@@ -42,6 +65,17 @@ This is what actually runs when you `bootstrap.py` and start the loop.
 - **Constraints**: CPU-only, M4 MacBook Pro, ~3 seconds per experiment
 - **Primary metric**: Macro F1 (weighted equally across all 5 classes)
 - **Goal**: Maximize macro F1 using only TF-IDF + sklearn classifiers
+
+### Full lifecycle in the example
+
+The example is meant to show the whole lifecycle, not just the fast loop:
+
+1. completed Phase 0 tree design
+2. cheap probes and branch-local exploitation
+3. implementation audits for suspicious families
+4. runnable reduced lab
+5. local helper-driven prompts for Claude Code and Codex
+6. scout and expansion surfaces when the frontier flattens for real
 
 ### Scoring System
 

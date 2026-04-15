@@ -1,4 +1,4 @@
-# Deep Research Agents with labrat + Claude Code
+# Deep Research Agents with labrat + Claude Code or Codex
 
 How to deploy autonomous research agents that define their own research trees, expand exploration via external data, and avoid context collapse.
 
@@ -8,10 +8,11 @@ How to deploy autonomous research agents that define their own research trees, e
 
 A naive autonomous research loop optimizes within its initial frame and gets stuck. It tries variations of what it already knows, declares convergence when the predefined search space is exhausted, and misses the highest-value discoveries -- which usually come from changing the frame, not optimizing within it.
 
-The fix has three parts:
+The fix has four parts:
 1. **Upfront tree design** via deep research agents that survey the landscape before defining branches
-2. **Periodic expansion** via external data (papers, repos, APIs) that injects new ideas at set intervals
-3. **Graduated context management** that prevents the agent from drowning in its own history
+2. **A search ladder** that forces cheap probes and implementation audits before premature convergence
+3. **Periodic expansion** via external data (papers, repos, APIs) that injects new ideas at set intervals
+4. **Graduated context management** that prevents the agent from drowning in its own history
 
 ---
 
@@ -20,7 +21,7 @@ The fix has three parts:
 ```
 Phase 0: TREE DESIGN (one-time, before lab starts)
     tree_designer.md agent surveys the landscape via WebSearch
-    -> Outputs branches.yaml, dead_ends.md, research_brief.md
+    -> Outputs branches.yaml, dead_ends.md, research_brief.md, research_sources.md
 
 Phase 1: EXPLORATION (the main loop)
     orchestrator.md runs /loop cycles
@@ -28,7 +29,13 @@ Phase 1: EXPLORATION (the main loop)
     -> Mechanical scoring via judge.py
     -> Synthesis step extracts insights (not just metrics)
 
-Phase 2: EXPANSION (every 20 cycles)
+Phase 1.5: IMPLEMENTATION AUDIT (when a frontier is suspicious)
+    implementation_audit.md inspects invalid-fast and near-miss families
+    -> Re-run anomaly
+    -> Run one or two cheap controls
+    -> Decide whether the issue is mechanical or scientific
+
+Phase 2: EXPANSION (when frame break says the tree is structurally incomplete)
     expansion_scout.md agent searches for external approaches
     -> Proposes new branches based on papers/repos/blog posts
     -> Prevents local optima by injecting orthogonal ideas
@@ -48,7 +55,7 @@ Phase 4: FRAME CHALLENGE (at convergence)
 
 ---
 
-## Deploying with Claude Code
+## Deploying with Claude Code or Codex
 
 ### Quick Start: Automated Tree Design
 
@@ -56,7 +63,7 @@ Instead of manually writing branches.yaml, use the tree designer:
 
 ```bash
 # In Claude Code:
-Read labrat/templates/tree_designer.md and design a research tree for:
+Read tree_designer.md and design a research tree for:
 Mission: Maximize macro F1 on SST-5 sentiment classification.
 Baseline: TF-IDF + Logistic Regression, F1=0.36.
 Constraints: CPU only, <8K training samples, no pretrained embeddings.
@@ -67,21 +74,42 @@ The tree designer will:
 2. Search for "TF-IDF text classification improvements"
 3. Search for "small dataset NLP techniques"
 4. Design 6-8 branches based on what it finds
-5. Write branches.yaml, dead_ends.md, and a research brief
+5. Define the search ladder:
+   - cheap probes
+   - normal exploitation
+   - implementation audit
+   - formulation change
+6. Write branches.yaml, dead_ends.md, a research brief, and a source ledger
 
 ### Running the Main Loop
 
 ```bash
-# Start the lab
-cd research_lab && python scripts/bootstrap.py
+# Start the lab after Phase 0 is complete
+python scripts/operator_helper.py check-readiness
+python scripts/bootstrap.py
 python -m http.server 8787 &
 
-# In Claude Code, start the loop:
-/loop 10m Read research_lab/orchestrator.md and execute one research cycle. \
-Follow the steps exactly. Do not ask for permission. \
-Redirect output to files and grep for RESULT lines. \
-Update all state files. Write handoff.
+# Ask the helper for the exact next prompt:
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
+
+Use `--runner codex` for Codex. `auto` may resolve to `cycle`, `audit`, `scout`, `expansion`, or `checkpoint` depending on the state.
+
+### Search Ladder Before Frame Break
+
+Do not jump straight from "branch stalled" to "invent a new worldview."
+
+The default ladder is:
+
+1. **Cheap probes**
+   Try the cheapest orthogonal axes first: width, order, packing, overlap, layout, proxy screens.
+2. **Normal exploitation**
+   Run branch-local hill climbing against the branch champion.
+3. **Implementation audit**
+   If a family is invalid-fast or suspiciously close, use `implementation_audit.md` to decide whether the issue is mechanical.
+4. **Frame break**
+   Only after the first three steps fail should the lab conclude the current formulation is missing something structural.
 
 ### Parallel Branch Execution
 
@@ -101,12 +129,12 @@ Claude Code runs these concurrently. Each subagent:
 
 ### Research Scouts (External Data)
 
-When a branch gets stuck (4+ consecutive non-improvements), the orchestrator deploys a research scout:
+When a branch gets stuck (4+ consecutive non-improvements), the orchestrator deploys a research scout. But if the request says the branch needs audit first, fix the mechanics before treating it as a scientific dead end:
 
 ```
 Agent(
   name="research-scout-model",
-  prompt="Read research_lab/templates/research_scout.md. \
+  prompt="Read research_scout.md. \
     Branch 'model' is stuck after 4 failures: [catboost, lightgbm, rf, gbm all plateau]. \
     The domain is SST-5 sentiment with TF-IDF features. \
     Search for recent papers and repos with novel approaches. \
@@ -124,12 +152,12 @@ It returns proposed branch entries as YAML blocks that the orchestrator can add 
 
 ### Expansion Cycles (Preventing Context Collapse)
 
-Every 20th cycle, instead of running experiments, the orchestrator runs an expansion cycle:
+When frame-break concludes the current tree is structurally incomplete, the orchestrator runs an expansion cycle:
 
 ```
 Agent(
   name="expansion-scout",
-  prompt="Read research_lab/templates/expansion_scout.md. \
+  prompt="Read expansion_scout.md. \
     Review FINDINGS.md and dead_ends.md. \
     Search for approaches we haven't tried. \
     Focus on orthogonal directions. \
@@ -138,7 +166,7 @@ Agent(
 )
 ```
 
-This is the key mechanism for preventing context collapse. Without external input, the lab converges to a local optimum. The expansion scout breaks this by finding genuinely new ideas.
+This is the key mechanism for preventing context collapse. Without external input, the lab converges to a local optimum. The expansion scout breaks this by finding genuinely new ideas, but it should only fire after cheap probes and implementation audits are no longer the right next step.
 
 ### Persistent Subagent Memory
 
@@ -169,7 +197,7 @@ Add a pre-experiment hook that blocks near-duplicate experiments before they was
 python3 -c "
 import json, sys
 config = json.load(open(sys.argv[1]))
-with open('research_lab/state/experiment_log.jsonl') as f:
+with open('state/experiment_log.jsonl') as f:
     for line in f:
         e = json.loads(line)
         if e.get('delta') == config.get('delta') and e.get('branch') == config.get('branch'):
@@ -197,7 +225,7 @@ Every 10 cycles, a consolidation agent distills the growing experiment log into 
 ```
 Agent(
   name="consolidation",
-  prompt="Read research_lab/templates/consolidation_agent.md. \
+  prompt="Read consolidation_agent.md. \
     Distill experiment_log.jsonl into updated FINDINGS.md. \
     Identify scaling curves, dead ends, and surprise findings.",
   subagent_type="general-purpose"
@@ -273,12 +301,12 @@ The expansion scout can reference findings from related labs when proposing new 
 
 ## Domain-Specific Patterns
 
-### Trading / Microstructure
+### Time-Series / Sequential Decision
 
-- Tree designer searches for: order book features, market microstructure papers, high-frequency trading approaches
-- Expansion scouts search for: alternative execution models, cross-asset transfer, regime detection methods
-- Key meta-branches: delay sensitivity audit, fill probability calibration, execution realism validation
-- Red team: bootstrap shuffle on trade timestamps, not outcomes
+- Tree designer searches for: sequential feature sets, drift-aware forecasting papers, low-latency decision approaches
+- Expansion scouts search for: alternative execution or intervention models, transfer across related regimes, regime detection methods
+- Key meta-branches: delay sensitivity audit, intervention realism validation, latency-to-outcome gap checks
+- Red team: shuffle timestamps or intervention timing, not just labels
 
 ### Prediction Markets
 

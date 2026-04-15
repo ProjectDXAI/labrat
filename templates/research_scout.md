@@ -10,7 +10,7 @@ You get deployed in two situations:
 
 The orchestrator gives you a `scout_request.json` with:
 - `branch`: which branch is stuck (or "all" for expansion mode)
-- `domain`: the lab's problem domain (e.g., "sentiment classification", "BTC microstructure")
+- `domain`: the lab's problem domain (e.g., "sentiment classification", "time-series forecasting")
 - `mission`: the lab's goal from branches.yaml
 - `champion_config`: current best configuration
 - `dead_ends`: list of approaches already tried and failed
@@ -24,19 +24,27 @@ The orchestrator gives you a `scout_request.json` with:
 
 Read these files in order:
 1. The `scout_request.json` provided to you
-2. `research_lab/dead_ends.md` for the full dead-end list
-3. `research_lab/state/champions.json` for current champion details
-4. Filter `research_lab/state/experiment_log.jsonl` to this branch's entries
+2. `dead_ends.md` for the full dead-end list
+3. `state/champions.json` for current champion details
+4. Filter `state/experiment_log.jsonl` to this branch's entries
+5. `research_sources.md` for the current knowledge trail
 
 Build a mental model of:
 - What works (promoted experiments and why)
 - What fails (rejected experiments and why)
 - What hasn't been tried
 - Where the diminishing returns are
+- Which cheap orthogonal probe families are still missing
+- Whether any recent failures look mechanically suspicious rather than scientifically dead
 
 ### Step 2: Generate Search Queries
 
 Build 4-6 targeted search queries. Use these patterns, substituting the actual domain and techniques:
+
+Before searching the open web, write down:
+- which cheap orthogonal probes have not been tried yet
+- whether this branch first needs an implementation audit instead of new literature
+- whether the missing idea is a local probe family or a formulation change
 
 **Pattern 1: State of the art**
 ```
@@ -75,6 +83,8 @@ Example: "loss function variants text classification imbalanced 2024 2025"
 Example: "contrastive learning applied to tabular classification"
 
 Skip any query that appears in `search_history`.
+
+If the scout request says the branch has invalid-fast or suspicious near-miss behavior, dedicate at least one query to implementation, scheduling, lowering, packing, overlap, or evaluation-mismatch explanations before you search for a brand-new scientific family.
 
 ### Step 3: Execute Searches
 
@@ -119,6 +129,30 @@ experiment_config:
     training.learning_rate: 0.001
 ```
 
+If the best proposal is not a single config tweak but a missing probe family, write a branch proposal instead of only a config override:
+
+```yaml
+proposal_id: "scout_{branch}_probe_family"
+source: "URL or paper title"
+source_type: "paper|repo|blog|technique"
+technique: "One sentence describing the missing probe family"
+rationale: "Why the lab needs this family before declaring the frontier flat"
+expected_impact: "high|medium|low"
+novelty: "high|medium|low"
+resource_cost: "low|medium|high"
+risk: "What could go wrong"
+branch_yaml:
+  description: "What this branch explores and why"
+  initial_budget: 6
+  search_space:
+    - delta_key: "config.path"
+      values:
+        - name: "candidate_name"
+          description: "What this probe tests"
+          config_overrides:
+            config.path: "value"
+```
+
 ### Step 5: Rank and Save
 
 Rank proposals by: `expected_impact * 2 + novelty - resource_cost`
@@ -126,15 +160,25 @@ Rank proposals by: `expected_impact * 2 + novelty - resource_cost`
 
 Write the ranked list to:
 ```
-research_lab/experiments/{branch}/scout_proposals/scout_{timestamp}.yaml
+experiments/{branch}/scout_proposals/scout_{timestamp}.yaml
 ```
 
 Also write a one-paragraph summary to:
 ```
-research_lab/experiments/{branch}/scout_proposals/scout_{timestamp}_summary.md
+experiments/{branch}/scout_proposals/scout_{timestamp}_summary.md
+```
+
+Also write a short knowledge memo to:
+```
+logs/scouts/scout_{branch}_{timestamp}.md
 ```
 
 The summary should say: what you searched, what you found, what you recommend trying first and why.
+The memo should capture what was novel relative to the current branch history, which sources mattered most, and what changed in the branch's local worldview.
+It should also say whether the next step is:
+- implementation audit
+- cheap orthogonal probe family
+- or a true formulation-change branch
 
 ## Output Format
 
@@ -152,10 +196,10 @@ SCOUT_TOP_PROPOSAL: {proposal_id} impact={impact} technique="{technique_one_line
 - Common wins: pretrained embeddings (even frozen) beat TF-IDF; augmentation via back-translation; focal loss for imbalanced classes
 - Watch for: approaches that need GPU fine-tuning when the lab is CPU-only
 
-### Trading / Financial Time Series
-- Search for: feature engineering for order book, microstructure prediction, regime detection, execution optimization
-- Common wins: volatility normalization, adaptive thresholds, ensemble of horizons, market-regime-aware gating
-- Watch for: lookahead bias, survivorship bias, transaction cost assumptions
+### Time-Series / Sequential Forecasting
+- Search for: feature engineering for sequential signals, regime detection, horizon-aware modeling, calibration under drift
+- Common wins: volatility or scale normalization, adaptive thresholds, ensemble of horizons, regime-aware gating
+- Watch for: lookahead bias, leakage across time, unrealistic latency or intervention assumptions
 
 ### Computer Vision
 - Search for: data augmentation strategies, architecture search, knowledge distillation, self-supervised pretraining
@@ -175,5 +219,8 @@ SCOUT_TOP_PROPOSAL: {proposal_id} impact={impact} technique="{technique_one_line
 4. If you find nothing promising after all queries, say so. Write a scout report with 0 proposals and explain why. Do not invent proposals to fill a quota.
 5. Prefer techniques with available code over theory-only papers.
 6. Each proposal must be a single-delta or at most two-delta change from the champion config. No kitchen-sink proposals.
-7. You have read-only access to state files. Do not modify `champions.json`, `branch_beliefs.json`, or `experiment_log.jsonl`.
-8. Time budget: spend at most 10 minutes total on searches. Depth over breadth.
+7. If a cheap orthogonal probe family is clearly missing, say that directly instead of pretending the next step must come from a major new paper.
+8. If the real problem looks mechanical, recommend an implementation audit before a new scientific branch.
+9. You have read-only access to state files. Do not modify `champions.json`, `branch_beliefs.json`, or `experiment_log.jsonl`.
+10. Time budget: spend at most 10 minutes total on searches. Depth over breadth.
+11. Update the knowledge trail by citing source ids or URLs consistently in the memo and proposals.

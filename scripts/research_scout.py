@@ -6,16 +6,16 @@ files that a Claude Code agent picks up and executes with WebSearch/WebFetch.
 
 Usage:
     # Scout a specific stuck branch
-    python scripts/research_scout.py --branch model --lab-dir research_lab/
+    python scripts/research_scout.py --branch model --lab-dir /path/to/lab
 
     # Auto-detect and scout all stuck branches
-    python scripts/research_scout.py --all-stuck --lab-dir research_lab/
+    python scripts/research_scout.py --all-stuck --lab-dir /path/to/lab
 
     # Full expansion mode: scout even non-stuck branches for new ideas
-    python scripts/research_scout.py --expansion --lab-dir research_lab/
+    python scripts/research_scout.py --expansion --lab-dir /path/to/lab
 
     # Merge approved proposals back into branches.yaml
-    python scripts/research_scout.py --merge --branch model --lab-dir research_lab/
+    python scripts/research_scout.py --merge --branch model --lab-dir /path/to/lab
 """
 
 from __future__ import annotations
@@ -27,6 +27,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
+
+SCRIPT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_state(lab_dir: Path) -> dict:
@@ -141,6 +143,42 @@ def load_search_history(lab_dir: Path, branch: str) -> list[str]:
     return history
 
 
+def best_cycles_from_state(state: dict, lab_dir: Path) -> int | None:
+    champions = state.get("champions", {})
+    prod = champions.get("production_champion", {})
+    result_path = prod.get("result_path")
+    if not result_path:
+        return None
+    resolved = (lab_dir / result_path).resolve() if not Path(result_path).is_absolute() else Path(result_path)
+    if not resolved.exists():
+        return None
+    try:
+        with open(resolved) as f:
+            data = json.load(f)
+        return int(data.get("metrics", {}).get("test", {}).get("cycles"))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def latest_frontier_gap(state: dict) -> dict:
+    rows = list(reversed(state.get("experiments", [])))
+    for row in rows:
+        findings = row.get("findings")
+        if not isinstance(findings, dict):
+            continue
+        if findings.get("kind") in {"frontier_gap_audit", "structure_gap_review"}:
+            return findings
+    return {}
+
+
+def cheap_probe_families(state: dict) -> list[str]:
+    return (
+        state.get("branches_config", {})
+        .get("exploration_policy", {})
+        .get("cheap_probe_families", [])
+    )
+
+
 def build_search_queries(state: dict, branch: str) -> list[str]:
     """Generate targeted search queries based on branch context."""
     config = state.get("branches_config", {})
@@ -148,8 +186,17 @@ def build_search_queries(state: dict, branch: str) -> list[str]:
     branch_info = config.get("branches", {}).get(branch, {})
     branch_desc = branch_info.get("description", branch)
 
-    # Extract domain keywords from mission
-    domain = mission.split(".")[0] if mission else branch_desc
+    search_terms = (
+        config.get("external_research", {})
+        .get("search_config", {})
+        .get("domain_terms", [])
+    )
+    if search_terms:
+        domain = search_terms[0]
+    elif mission:
+        domain = " ".join(mission.split()[:8])
+    else:
+        domain = branch_desc
 
     # Get the champion config to know what's currently winning
     champions = state.get("champions", {})
@@ -164,10 +211,6 @@ def build_search_queries(state: dict, branch: str) -> list[str]:
         if line.startswith("- **") and "**" in line[4:]:
             technique = line[4:line.index("**", 4)]
             dead_techniques.append(technique)
-
-    # Get recent experiment descriptions for context
-    branch_exps = get_branch_experiments(state, branch)
-    recent_descs = [e.get("delta", "") for e in branch_exps[-5:]]
 
     queries = []
 
@@ -194,6 +237,13 @@ def build_search_queries(state: dict, branch: str) -> list[str]:
     # Pattern 6: Cross-domain (only in expansion mode, but include one always)
     queries.append(f"novel {branch} optimization techniques machine learning 2025")
 
+    frontier_gap = latest_frontier_gap(state)
+    for family in frontier_gap.get("missing_families", [])[:2]:
+        queries.append(f"{domain} {family} recent results")
+
+    for probe in cheap_probe_families(state)[:2]:
+        queries.append(f"{domain} {probe} optimization technique")
+
     return queries
 
 
@@ -213,6 +263,22 @@ def build_scout_request(state: dict, branch: str, lab_dir: Path,
     queries = [q for q in queries if q not in search_history]
 
     cycle = state.get("cycle_counter", {}).get("cycle", 0)
+    frontier_gap = latest_frontier_gap(state)
+    best_cycles = best_cycles_from_state(state, lab_dir)
+    invalid_fast_branches = sorted(
+        {
+            e.get("branch")
+            for e in state.get("experiments", [])[-8:]
+            if e.get("valid") is False and e.get("verdict") == "REJECT" and e.get("branch")
+        }
+    )
+    search_directives = {
+        "audit_first": branch in invalid_fast_branches,
+        "cheap_probe_families": cheap_probe_families(state),
+        "stuck_branches": find_stuck_branches(state),
+        "diminishing_branches": find_diminishing_branches(state),
+        "frontier_questions": frontier_gap.get("missing_families", []),
+    }
 
     request = {
         "branch": branch,
@@ -235,10 +301,30 @@ def build_scout_request(state: dict, branch: str, lab_dir: Path,
             "remaining_budget": state.get("budget", {}).get(branch, 0),
             "current_cycle": cycle,
         },
+        "frontier_gap": frontier_gap,
+        "best_cycles": best_cycles,
+        "invalid_fast_branches": invalid_fast_branches,
+        "search_directives": search_directives,
         "search_queries": queries,
         "search_history": search_history,
         "created_at": datetime.now(UTC).isoformat(),
     }
+
+    if mode == "expansion":
+        request["proposal_contract"] = {
+            "kind": "new_branch",
+            "output_file": "experiments/expansion_meta/scout_proposals/expansion_cycle_N.yaml",
+            "required_fields": [
+                "proposal_id",
+                "approved",
+                "orthogonality",
+                "reason_broken_assumption",
+                "source_refs",
+                "implementation_todo",
+                "branch_name",
+                "branch_yaml",
+            ],
+        }
 
     return request
 
@@ -333,6 +419,105 @@ def merge_proposals(lab_dir: Path, branch: str, dry_run: bool = False) -> int:
     return merged
 
 
+def merge_expansion_proposals(lab_dir: Path, dry_run: bool = False) -> int:
+    scout_dir = lab_dir / "experiments" / "expansion_meta" / "scout_proposals"
+    if not scout_dir.exists():
+        print("No expansion scout proposals found.")
+        return 0
+
+    branches_path = lab_dir / "branches.yaml"
+    with open(branches_path) as f:
+        branches_config = yaml.safe_load(f)
+
+    branches = branches_config.setdefault("branches", {})
+    state_dir = lab_dir / "state"
+    budget_path = state_dir / "budget.json"
+    beliefs_path = state_dir / "branch_beliefs.json"
+    champions_path = state_dir / "champions.json"
+    budget = {}
+    beliefs = {"branches": {}}
+    champions = {"branches": {}}
+    if budget_path.exists():
+        with open(budget_path) as f:
+            budget = json.load(f)
+    if beliefs_path.exists():
+        with open(beliefs_path) as f:
+            beliefs = json.load(f)
+    if champions_path.exists():
+        with open(champions_path) as f:
+            champions = json.load(f)
+    baseline = branches_config.get("production_baseline", {})
+    baseline_entry = {
+        "experiment_id": baseline.get("experiment_id", "baseline"),
+        "description": baseline.get("description", "Baseline"),
+        "scores": None,
+        "result_path": None,
+    }
+    now = datetime.now(UTC).isoformat()
+    merged = 0
+    for proposal_file in sorted(scout_dir.glob("*.yaml")):
+        try:
+            with open(proposal_file) as f:
+                proposals = yaml.safe_load(f)
+        except (yaml.YAMLError, OSError):
+            continue
+
+        if not isinstance(proposals, dict):
+            continue
+
+        items = proposals.get("proposals", [proposals])
+        if not isinstance(items, list):
+            items = [items]
+
+        for prop in items:
+            if not isinstance(prop, dict) or not prop.get("approved", False):
+                continue
+            branch_name = prop.get("branch_name")
+            branch_yaml = prop.get("branch_yaml")
+            if not branch_name or not isinstance(branch_yaml, dict):
+                continue
+            if branch_name in branches:
+                print(f"  Skipped existing branch: {branch_name}")
+                continue
+            branches[branch_name] = branch_yaml
+            budget[branch_name] = int(branch_yaml.get("initial_budget", 0))
+            beliefs.setdefault("branches", {})[branch_name] = {
+                "n_experiments": 0,
+                "n_improvements": 0,
+                "current_ev": 0.0,
+                "uncertainty": 1.0,
+                "last_explored_cycle": 0,
+                "best_composite_score": None,
+                "status": "exhausted" if int(branch_yaml.get("initial_budget", 0)) == 0 else "active",
+                "flat_axes": [],
+                "notes": [],
+                "experiment_type": branch_yaml.get("experiment_type", "standard"),
+            }
+            champions.setdefault("branches", {})[branch_name] = baseline_entry.copy()
+            merged += 1
+            print(f"  Merged new branch: {branch_name} from {proposal_file.name}")
+
+    if merged > 0 and not dry_run:
+        with open(branches_path, "w") as f:
+            yaml.dump(branches_config, f, default_flow_style=False, sort_keys=False)
+        if budget_path.exists():
+            with open(budget_path, "w") as f:
+                json.dump(budget, f, indent=2)
+        if beliefs_path.exists():
+            beliefs["updated_at"] = now
+            with open(beliefs_path, "w") as f:
+                json.dump(beliefs, f, indent=2)
+        if champions_path.exists():
+            champions["updated_at"] = now
+            with open(champions_path, "w") as f:
+                json.dump(champions, f, indent=2)
+        print(f"\nWrote {merged} new branch entries to {branches_path}")
+    elif merged > 0:
+        print(f"\n[dry run] Would write {merged} new branch entries to {branches_path}")
+
+    return merged
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Research scout: find new experiment ideas for stuck branches"
@@ -344,10 +529,16 @@ def main():
                         help="Scout all active branches for new ideas")
     parser.add_argument("--merge", action="store_true",
                         help="Merge approved proposals into branches.yaml")
+    parser.add_argument("--merge-expansion", action="store_true",
+                        help="Merge approved expansion proposals into new branches")
     parser.add_argument("--dry-run", action="store_true",
                         help="Show what would be merged without writing")
-    parser.add_argument("--lab-dir", type=str, default="research_lab/",
-                        help="Path to research lab directory")
+    parser.add_argument(
+        "--lab-dir",
+        type=str,
+        default=str(SCRIPT_ROOT),
+        help="Path to the lab root. Defaults to the parent of this scripts directory.",
+    )
     parser.add_argument("--stuck-threshold", type=int, default=3,
                         help="Consecutive non-improvements to count as stuck")
     args = parser.parse_args()
@@ -358,6 +549,11 @@ def main():
         sys.exit(1)
 
     # Merge mode: just merge proposals and exit
+    if args.merge_expansion:
+        merged = merge_expansion_proposals(lab_dir, dry_run=args.dry_run)
+        print(f"Merged {merged} expansion proposals")
+        return
+
     if args.merge:
         if not args.branch:
             print("ERROR: --merge requires --branch")
@@ -385,9 +581,12 @@ def main():
 
     elif args.expansion:
         beliefs = state.get("branch_beliefs", {}).get("branches", {})
-        for name, b in beliefs.items():
-            if b.get("status") not in ("blocked", "exhausted"):
-                branches_to_scout.append((name, "expansion"))
+        if "expansion_meta" in beliefs and beliefs["expansion_meta"].get("status") not in ("blocked", "exhausted"):
+            branches_to_scout.append(("expansion_meta", "expansion"))
+        else:
+            for name, b in beliefs.items():
+                if b.get("status") not in ("blocked", "exhausted"):
+                    branches_to_scout.append((name, "expansion"))
 
     else:
         parser.print_help()
@@ -431,7 +630,7 @@ def main():
     for path in requests_written:
         branch = path.parent.parent.name
         print(f'  Agent(name="scout-{branch}", '
-              f'prompt="Read {path} and research_lab/templates/research_scout.md. '
+              f'prompt="Read {path} and research_scout.md. '
               f'Execute the scout protocol.")')
     print()
     print("After the scout writes proposals, approve good ones by adding")
@@ -439,6 +638,8 @@ def main():
     for branch, _ in branches_to_scout:
         print(f"  python scripts/research_scout.py --merge --branch {branch} "
               f"--lab-dir {lab_dir}")
+    if any(mode == "expansion" for _, mode in branches_to_scout):
+        print(f"  python scripts/research_scout.py --merge-expansion --lab-dir {lab_dir}")
 
 
 if __name__ == "__main__":
