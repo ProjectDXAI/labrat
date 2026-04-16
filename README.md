@@ -81,9 +81,28 @@ What you get from the example:
 - held-out decisive challenges on top of search / selection metrics
 - a reference supervisor + worker flow that you can copy into a new lab
 
-## Create your own lab
+## Start from a profile
 
-The default path is deep research first.
+If you already know the shape of your research problem, a profile scaffolds a runnable lab in one command. No Phase 0 hand-editing, no `LABRAT_PLACEHOLDER` stubs.
+
+```bash
+python scripts/new_lab.py my_transformer_search --profile=transformer-arch
+cd my_transformer_search
+python scripts/operator_helper.py check-readiness
+python scripts/bootstrap.py
+```
+
+From there, open Claude Code in the lab directory and type `/next` — the profile ships its own slash commands (`/next`, `/why-stuck`, `/synthesize`, `/audit-candidate`, `/frame-break`, `/consolidate`). You can also hand-run `python scripts/operator_helper.py next-prompt --runner claude --phase auto`.
+
+Available profiles:
+
+- `transformer-arch` — tiny character-level transformer architecture search with held-out-distribution decisive challenges. CPU-runnable in its default synthetic mode; flip `training.mode: "real"` after installing torch for real training.
+
+More profiles (world-model, multi-dataset) land in follow-up PRs. See [docs/PROFILES.md](docs/PROFILES.md) for the profile contract and [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md) for interim-checkpoint and long-running-job conventions.
+
+## Create your own lab from scratch
+
+If no profile fits your problem, scaffold an empty lab and finish Phase 0 by hand. The default path is deep research first.
 
 ```bash
 python scripts/new_lab.py my_lab
@@ -111,6 +130,8 @@ Phase 0 must produce:
 - [program.md](program.md): repo-level entrypoint
 - [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
+- [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
+- [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts
 
 ## Background
 

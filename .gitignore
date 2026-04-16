@@ -10,6 +10,9 @@ catboost_info/
 **/research_lab/experiments/
 **/research_lab/logs/cycles/
 
+# Smoke test leftovers from `make smoke ...`
+_smoke_*/
+
 # OS
 .DS_Store
 Thumbs.db

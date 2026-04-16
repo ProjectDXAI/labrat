@@ -39,7 +39,8 @@ The design files tell you what the runtime is supposed to search:
 Open these only on demand:
 
 - `state/candidates.jsonl`
-- `state/evaluations.jsonl`
+- `state/evaluations.jsonl` — pay attention to `failure_class` and `checkpoint_summary.trend` per row
+- `state/pareto.json` — Pareto rank per candidate when `pareto.py` is enabled
 - candidate artifact directories under `experiments/`
 - `coordination/implementation_log.md`
 - `coordination/experiment_log.md`
@@ -60,13 +61,19 @@ Open these only on demand:
    `python scripts/runtime.py reap`
 2. Inspect the runtime with:
    `python scripts/runtime.py summary`
-3. Refresh `coordination/prioritized_tasks.md` with a short, durable note about the next highest-leverage work.
-4. If the queue is thinner than the number of workers, dispatch more work:
+3. **Synthesize** the last ~10 entries of `state/evaluations.jsonl` before writing new control intent. Note:
+   - the dominant `failure_class` across recent evaluations,
+   - the `checkpoint_summary.trend` distribution (`improving`, `plateau`, `regressing`, `collapsed`),
+   - which family is closest to winning a decisive challenge it has not won yet,
+   - whether the Pareto context in `state/pareto.json` (when present) suggests an under-served frontier.
+   Keep the synthesis brief and durable — it informs credit allocation, not plan text.
+4. Refresh `coordination/prioritized_tasks.md` with a short, durable note about the next highest-leverage work, explicitly informed by step 3.
+5. If the queue is thinner than the number of workers, dispatch more work:
    `python scripts/runtime.py dispatch`
-5. If an audit queue exists, stop normal expansion and run `implementation_audit.md`.
-6. If `state/frontier.json` says `frame_break_required: true` and there are no remaining cheap probes, stop normal expansion and run `frame_break.md`.
-7. If `pending_expansion` exists, run `expansion_scout.md`, merge approved patches, and resume dispatch.
-8. Otherwise keep the worker pool busy.
+6. If an audit queue exists, stop normal expansion and run `implementation_audit.md`.
+7. If `state/frontier.json` says `frame_break_required: true` and there are no remaining cheap probes, stop normal expansion and run `frame_break.md`.
+8. If `pending_expansion` exists, run `expansion_scout.md`, merge approved patches, and resume dispatch.
+9. Otherwise keep the worker pool busy.
 
 ## Worker modes
 

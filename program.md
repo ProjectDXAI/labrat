@@ -19,9 +19,23 @@ python scripts/operator_helper.py next-prompt --runner claude --phase auto
 
 Codex uses the same flow with `--runner codex`.
 
-## Path 2: Create a real lab
+## Path 2: Start from a profile
 
-Use this when the user wants a new runtime-backed research program.
+Use this when the user arrives with a concrete research workload that matches an existing profile.
+
+```bash
+python scripts/new_lab.py my_search --profile=transformer-arch
+cd my_search
+python scripts/operator_helper.py check-readiness
+python scripts/bootstrap.py
+python scripts/operator_helper.py next-prompt --runner claude --phase auto
+```
+
+Profiles ship with filled Phase 0 files, a working `run_experiment.py`, a `CLAUDE.md`, and `.claude/commands/` slash commands. `transformer-arch` is the first profile. See [docs/PROFILES.md](docs/PROFILES.md) for the full list and contract.
+
+## Path 3: Create a real lab from scratch
+
+Use this when no profile fits and the user wants a new runtime-backed research program.
 
 1. scaffold a new lab with `scripts/new_lab.py`
 2. finish Phase 0:

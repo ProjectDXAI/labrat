@@ -1,0 +1,32 @@
+checkpoint_interval: 10
+
+workers:
+  pools:
+    - resource_class: "cpu"
+      slots: 2
+      lease_timeout_seconds: 1800
+      heartbeat_timeout_seconds: 600
+    # Uncomment for real GPU training with longer per-candidate budgets.
+    # - resource_class: "gpu"
+    #   slots: 1
+    #   lease_timeout_seconds: 43200
+    #   heartbeat_timeout_seconds: 1800
+
+selection:
+  crossover_probability: 0.2
+  max_concurrent_per_lineage: 3
+  elite_archive:
+    global_top_k: 8
+    family_top_k: 2
+  pareto_mode: "read_only"
+
+funding:
+  dispatch_cost: 1
+  promote_credit: 3
+  stable_credit: 1
+  novelty_credit: 1
+  prediction_credit: 2
+
+plateau:
+  window: 4
+  min_delta: 0.002

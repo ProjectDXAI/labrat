@@ -746,7 +746,7 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
 
     with open(result_path) as f:
         result = json.load(f)
-    evaluation = evaluate_result(result, state["evaluation_config"])
+    evaluation = evaluate_result(result, state["evaluation_config"], artifact_dir=result_path.parent)
     evaluation_record = {
         "candidate_id": candidate_id,
         "attempt": matching_job["attempt"],

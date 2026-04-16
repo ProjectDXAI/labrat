@@ -9,6 +9,7 @@ Read:
 Then:
 
 - reap stale leases
+- synthesize the last ~10 evaluations in `state/evaluations.jsonl` (dominant `failure_class`, `checkpoint_summary.trend`, closest decisive challenge) before dispatching
 - top up the queue if needed
 - keep workers busy
 - defer scoring to the runtime

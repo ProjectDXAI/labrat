@@ -1,0 +1,51 @@
+mode: "external_consistent"
+
+search_eval:
+  path: "metrics.search.primary_metric"
+  direction: "maximize"
+
+selection_eval:
+  path: "metrics.selection.primary_metric"
+  direction: "maximize"
+
+final_eval:
+  enabled: true
+  path: "metrics.final.primary_metric"
+  direction: "maximize"
+
+prediction_tests:
+  - name: "holdout_generalization"
+    description: "Held-out perplexity on a text sample drawn from a different distribution than training. A family that only memorizes the training corpus cannot win this."
+    path: "metrics.challenges.holdout_generalization.primary_metric"
+    direction: "maximize"
+    decisive: true
+  - name: "holdout_stability"
+    description: "Held-out perplexity at an intermediate training checkpoint versus the final checkpoint. A stable family does not collapse late in training."
+    path: "metrics.challenges.holdout_stability.primary_metric"
+    direction: "maximize"
+    decisive: true
+
+pareto_metrics:
+  - path: "metrics.selection.primary_metric"
+    direction: "maximize"
+    label: "held_out_score"
+  - path: "metrics.challenges.holdout_generalization.primary_metric"
+    direction: "maximize"
+    label: "ood_score"
+  - path: "proxy_metrics.elapsed_seconds"
+    direction: "minimize"
+    label: "elapsed_sec"
+  - path: "proxy_metrics.param_count"
+    direction: "minimize"
+    label: "param_count"
+
+consistency:
+  fixed_seed: 1337
+  fixed_split_id: "transformer_arch_v1"
+  sealed_eval: null
+
+rerun_policy:
+  min_reruns_for_promotion: 2
+  max_relative_std: 0.12
+  suspicious_improvement_margin: 0.01
+  invalid_fast_margin: 0.02

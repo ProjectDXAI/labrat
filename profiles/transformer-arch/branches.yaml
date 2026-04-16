@@ -1,0 +1,135 @@
+mission: "Discover a small character-level transformer architecture that generalizes to held-out text outside the training distribution, given a fixed CPU training budget."
+
+production_baseline:
+  experiment_id: "baseline_tiny_transformer"
+  description: "A 2-layer, 2-head, d_model=32 character transformer trained for 100 steps on the training text."
+  resource_class: "cpu"
+  config:
+    data:
+      train_path: "data/train_corpus.txt"
+      holdout_path: "data/holdout_corpus.txt"
+      block_size: 32
+    model:
+      depth: 2
+      heads: 2
+      d_model: 32
+      activation: "gelu"
+      dropout: 0.0
+    training:
+      mode: "synthetic"
+      steps: 100
+      lr: 0.003
+      batch_size: 16
+      warmup_steps: 10
+      seed: 1337
+      checkpoint_every: 20
+  seed_metrics:
+    search_eval: 0.0
+    selection_eval: 0.0
+    final_eval: 0.0
+
+families:
+  scale_search:
+    description: "Probe depth and width jointly. A transformer that helps locally on the training distribution should still not collapse on held-out perplexity."
+    scientific_rationale: "On small corpora, naive scaling overfits long before it generalizes. We look for the scale that keeps held-out perplexity dropping, not the one that minimizes train loss."
+    decisive_challenge_claim: "This family should win the holdout_generalization decisive test — held-out perplexity below the training-only baseline by a measurable margin."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "deeper_narrow"
+        description: "Probe a deeper narrow model to see if depth alone helps before width does."
+        config_patch:
+          model:
+            depth: 4
+            heads: 2
+            d_model: 32
+      - name: "wider_shallow"
+        description: "Probe a wider shallow model to see whether width alone beats depth on this corpus."
+        config_patch:
+          model:
+            depth: 2
+            heads: 4
+            d_model: 64
+    mutation_policy:
+      axes:
+        - path: "model.depth"
+          values: [2, 3, 4, 6]
+        - path: "model.d_model"
+          values: [32, 48, 64, 96]
+        - path: "model.heads"
+          values: [2, 4, 8]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  optimizer_search:
+    description: "Probe learning-rate schedule and training-step count holding architecture at the baseline."
+    scientific_rationale: "For tiny transformers on small corpora, the wrong LR can make a good architecture look broken. We isolate optimizer effects before concluding a family is degenerate."
+    decisive_challenge_claim: "This family should win the holdout_stability decisive test — low variance in held-out perplexity across two seeds, not just a single lucky run."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "long_run_slow_lr"
+        description: "Twice the steps at half the LR. Does more compute alone lift held-out perplexity?"
+        config_patch:
+          training:
+            lr: 0.0015
+            steps: 200
+      - name: "short_run_fast_lr"
+        description: "Half the steps at double the LR. Does aggressive fitting generalize at all?"
+        config_patch:
+          training:
+            lr: 0.006
+            steps: 50
+    mutation_policy:
+      axes:
+        - path: "training.lr"
+          values: [0.001, 0.003, 0.006, 0.01]
+        - path: "training.steps"
+          values: [50, 100, 200, 400]
+        - path: "training.warmup_steps"
+          values: [0, 10, 25]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  capstone_mix:
+    description: "Combine a scale_search winner with an optimizer_search winner and measure whether the combined candidate owns both decisive holdouts."
+    scientific_rationale: "A strong scale and a strong optimizer often compose, but sometimes the best combined run costs a held-out regression elsewhere. We only promote capstones that own both holdouts."
+    decisive_challenge_claim: "This family should own both holdout_generalization and holdout_stability at the same time. Owning only one is not enough to justify the capstone."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 4
+    cheap_probes: []
+    mutation_policy:
+      axes: []
+    crossover_policy:
+      enabled: true
+      compatible_families:
+        - scale_search
+        - optimizer_search
+      config_patch:
+        capstone:
+          enabled: true
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 2
+      min_remaining_probes: 0
