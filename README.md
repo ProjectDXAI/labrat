@@ -144,3 +144,12 @@ This is a runtime overhaul.
 - `scripts/runtime.py`: queue, lease, complete, reap, summary
 - `scripts/evaluator.py`: external consistent evaluator
 - `examples/nlp-sentiment/research_lab`: canonical example lab
+
+## References
+
+`labrat` is its own system, but the current shape is informed by a few clear predecessors and adjacent designs:
+
+- [karpathy/autoresearch](https://github.com/karpathy/autoresearch): the minimal agent-driven autonomous experiment loop that helped establish the basic pattern of fixed evaluation plus overnight iteration.
+- [AIRA_2](https://arxiv.org/abs/2603.26499): population search, stronger evaluation discipline, and stateful operator quality as first-class system levers.
+- [Toward Autonomous Long-Horizon Engineering for ML Research](https://arxiv.org/abs/2604.13018): hierarchical orchestration, File-as-Bus coordination, progressive disclosure, and thin control over thick state.
+- [Stanford Encyclopedia of Philosophy: Imre Lakatos](https://plato.stanford.edu/archives/fall2020/entries/lakatos/): useful framing for when a family is still progressive versus when it has become degenerating and should escalate to audit or frame break.

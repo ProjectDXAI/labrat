@@ -84,3 +84,12 @@ The runtime is not cycle-based.
 - completed candidates are rerun or promoted without waiting for a global barrier
 
 This is what makes the funding loop useful at scale instead of just tidy on paper.
+
+## References and provenance
+
+These ideas did not come from nowhere, and the repo should say that plainly.
+
+- [karpathy/autoresearch](https://github.com/karpathy/autoresearch) is the clearest immediate ancestor for the agent-run experiment loop pattern.
+- [AIRA_2](https://arxiv.org/abs/2603.26499) is the strongest direct influence on the population-runtime direction: throughput, evaluation quality, and operator quality as systems problems.
+- [Toward Autonomous Long-Horizon Engineering for ML Research](https://arxiv.org/abs/2604.13018) is the source for the File-as-Bus and progressive-disclosure refinements added here.
+- [Lakatos](https://plato.stanford.edu/archives/fall2020/entries/lakatos/) is included only as a heuristic for progressive versus degenerating local search, not as a literal implementation claim.

@@ -51,3 +51,11 @@ python scripts/operator_helper.py next-prompt --runner claude --phase auto
 - `search_eval` and `selection_eval` are separate by default.
 - Cheap probes and audits come before frame break.
 - The static dashboard is the canonical UI.
+
+## Lineage
+
+If you want the shortest explanation of where this repo is coming from:
+
+- [karpathy/autoresearch](https://github.com/karpathy/autoresearch) for the compact autonomous experiment loop
+- [AIRA_2](https://arxiv.org/abs/2603.26499) for population-level search and evaluation discipline
+- [Toward Autonomous Long-Horizon Engineering for ML Research](https://arxiv.org/abs/2604.13018) for artifact-mediated coordination and workspace continuity
