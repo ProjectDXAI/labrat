@@ -77,8 +77,35 @@ The evaluator reads any interim `checkpoints.jsonl` and surfaces `checkpoint_sum
 
 ## Permissions and autonomy
 
-To run autonomously across many turns, the user can drop a `.claude/settings.json` in the lab root with an allowlist for the operator scripts. A minimal version is documented in [docs/AUTONOMY.md](../docs/AUTONOMY.md). Without it, Claude Code will prompt for each bash invocation — still workable, just higher-touch.
+Claude Code prompts for each bash invocation by default. For hands-off multi-turn operation, drop this exact file at `.claude/settings.json` in this lab's root — it allowlists the operator scripts and nothing else. Destructive operations (`rm`, `git push`, arbitrary shell) will still prompt.
 
-Anything destructive (`rm`, `git push`, arbitrary shell) should still prompt the user whether or not the allowlist is in place; don't try to work around that — surface the intent instead.
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/runtime.py:*)",
+      "Bash(python scripts/operator_helper.py:*)",
+      "Bash(python scripts/evaluator.py:*)",
+      "Bash(python scripts/pareto.py:*)",
+      "Bash(python scripts/run_experiment.py:*)",
+      "Bash(python scripts/research_scout.py:*)",
+      "Bash(python scripts/bootstrap.py)",
+      "Bash(python -m http.server:*)",
+      "Bash(mkdir:experiments/*)",
+      "Bash(mkdir:logs/*)"
+    ]
+  }
+}
+```
 
-See [docs/PROFILES.md](../docs/PROFILES.md) for profile authoring, [docs/LONG_HORIZON.md](../docs/LONG_HORIZON.md) for interim-checkpoint conventions, and [docs/AUTONOMY.md](../docs/AUTONOMY.md) for the operator permission allowlist and `/loop` cadence guidance.
+**If the user asks for hands-off / autonomous mode**, offer to create the file above. Writing this file counts as a permission change, so Claude Code will prompt the user to approve the write — that is the user's one explicit opt-in. After the file exists, kick off continuous operation with:
+
+```
+/loop 300s /next
+```
+
+Pick `270s` or `1800s+` rather than exactly 300s — see [docs/AUTONOMY.md](../docs/AUTONOMY.md) for the prompt-cache-window reasoning. Shorter intervals for synthetic runs, longer for candidates that actually train.
+
+Without the allowlist the lab still works end-to-end; the user just has to click "allow" on each bash command. Surface the allowlist offer once and move on if they decline.
+
+See [docs/PROFILES.md](../docs/PROFILES.md) for profile authoring, [docs/LONG_HORIZON.md](../docs/LONG_HORIZON.md) for interim-checkpoint conventions, and [docs/AUTONOMY.md](../docs/AUTONOMY.md) for the full autonomy doc including stop criteria and cold-start recovery.
