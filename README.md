@@ -6,6 +6,8 @@
 
 `labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
 
+Population search, not single-thread. Families of ideas compete for compute budget. The ones that produce real signal earn more room to keep going.
+
 In plain English:
 
 - you define a problem and a baseline
@@ -55,15 +57,7 @@ If you only open three things first:
 
 `labrat` is not a philosophy-of-science engine, but Lakatos is a useful mental model for the runtime.
 
-Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/).
-
-That is not just about getting a slightly better score on known data. A stronger family should also land a decisive hard test that rivals did not already own, the same way Halley’s prediction mattered because Newtonian mechanics made a precise novel prediction instead of merely fitting old observations.
-
-That is close to the `labrat` search ladder:
-
-- cheap probes and mutation test whether the current family is still progressive
-- implementation audit checks whether the failure is in execution rather than in the family itself
-- frame break and expansion happen when local search is no longer earning the right to continue
+Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/). In `labrat`, that means a family should not only improve the known metric, but also win a decisive held-out test that rivals do not already own. More on that in [docs/DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md).
 
 ## Run it in 5 minutes
 
@@ -114,84 +108,11 @@ Phase 0 must produce:
 
 `evaluation.yaml` now includes at least one held-out `prediction_tests` challenge. That is how the runtime distinguishes “fit the known metric a bit better” from “this family actually predicted something hard.”
 
-## Runtime model
-
-The authoritative runtime state is:
-
-- `state/runtime.json`
-- `state/candidates.jsonl`
-- `state/jobs.json`
-- `state/workers.json`
-- `state/evaluations.jsonl`
-- `state/frontier.json`
-- `state/checkpoints.jsonl`
-
-The runtime uses:
-
-- temperature-scaled steady-state dispatch
-- family credits instead of isolated branch budgets
-- rerun / stability checks before promotion
-- audit routing for invalid-fast or unstable near-miss candidates
-- frame break only after cheap probes and audits no longer justify more local search
-
-## Required scaffold files
-
-Every new lab now includes:
-
-- `evaluation.yaml`
-- `runtime.yaml`
-- `coordination/workspace_map.md` after bootstrap
-- `coordination/prioritized_tasks.md`
-- `coordination/implementation_log.md`
-- `coordination/experiment_log.md`
-- `orchestrator.md`
-- `probe_worker.md`
-- `mutation_worker.md`
-- `crossover_worker.md`
-- `implementation_audit.md`
-- `frame_break.md`
-- `expansion_scout.md`
-- `agent_prompts/`
-
-`run_experiment.py` produces artifacts and metrics.
-
-`evaluator.py` is the only canonical source of:
-
-- `search_eval`
-- `selection_eval`
-- `final_eval`
-
-## UI
-
-The tracked UI is the static dashboard at `templates/dashboard.html`.
-
-It is now runtime-centric:
-
-- worker pool health
-- queue depth
-- family funding
-- candidate frontier
-- audit queue
-- expansion state
-
-## Clean break
-
-This is a runtime overhaul.
-
-- old cycle-based labs are not supported without re-scaffolding
-- the static dashboard is the required UI surface
-- no hosted control plane or database is required
-
 ## Repo map
 
-- `program.md`: repo-level entrypoint
-- `docs/getting-started.md`: practical startup flow
-- `docs/runners.md`: Claude Code and Codex usage
-- `docs/DEEP_RESEARCH.md`: design guidance for real labs
-- `docs/ARCHITECTURE.md`: runtime model
-- `scripts/runtime.py`: queue, lease, complete, reap, summary
-- `scripts/evaluator.py`: external consistent evaluator
-- `examples/nlp-sentiment/research_lab`: canonical example lab
+- [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md): repo-level entrypoint
+- [docs/getting-started.md](/Users/punkyrest/infiniteagentworks/labrat/docs/getting-started.md): setup and first-run flow
+- [docs/ARCHITECTURE.md](/Users/punkyrest/infiniteagentworks/labrat/docs/ARCHITECTURE.md): runtime, state, and evaluation details
 
 ## References
 

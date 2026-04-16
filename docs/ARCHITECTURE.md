@@ -30,6 +30,31 @@
 5. **UI**
    - static dashboard fed directly by runtime state
 
+## Required scaffold surface
+
+Every new lab is expected to define or generate:
+
+- `branches.yaml`
+- `dead_ends.md`
+- `research_brief.md`
+- `research_sources.md`
+- `evaluation.yaml`
+- `runtime.yaml`
+- `coordination/workspace_map.md` after bootstrap
+- `coordination/prioritized_tasks.md`
+- `coordination/implementation_log.md`
+- `coordination/experiment_log.md`
+- `orchestrator.md`
+- `probe_worker.md`
+- `mutation_worker.md`
+- `crossover_worker.md`
+- `implementation_audit.md`
+- `frame_break.md`
+- `expansion_scout.md`
+- `agent_prompts/`
+
+`run_experiment.py` produces artifacts and metrics. `evaluator.py` is the canonical source of `search_eval`, `selection_eval`, `final_eval`, and `prediction_tests`.
+
 ## Authoritative files
 
 Old branch-belief / budget / cycle files are retired.
@@ -71,3 +96,25 @@ Funding is now attached to families in a shared population.
 - decisive challenge wins can mint extra prediction credit
 
 That keeps the funding loop, but it now funds descendants rather than isolated branch loops.
+
+## UI surface
+
+The tracked UI is the static dashboard at `templates/dashboard.html`.
+
+It is runtime-centric:
+
+- worker pool health
+- queue depth
+- family funding
+- candidate frontier
+- decisive challenge leaders
+- audit queue
+- expansion state
+
+## Compatibility
+
+This is a runtime overhaul.
+
+- old cycle-based labs are not supported without re-scaffolding
+- the static dashboard is the required UI surface
+- no hosted control plane or database is required
