@@ -2,11 +2,15 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-`labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
+`labrat` is a local-first runtime that puts Claude Code or Codex on a real research problem with a scoreboard and enough structure to run for hours. Population search, not single-thread — families of ideas compete for compute budget, and the ones that produce real signal earn more room to keep going.
+
+![labrat dashboard](docs/dash-sample.png)
+
+<sub>Live example run: the baseline still leads on the main selection metric, while `classifier_search` has already won two decisive held-out challenges and earned extra funding.</sub>
 
 Designed around Claude Opus 4.7 as the supervisor. The synthesis, audit, and consolidation steps are where a frontier-grade model pays off the most; Codex and other coding agents work too, but stronger models make the population search meaningfully sharper.
 
-Population search, not single-thread. Families of ideas compete for compute budget. The ones that produce real signal earn more room to keep going.
+**Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
 
 In plain English:
 
@@ -15,10 +19,6 @@ In plain English:
 - the runtime keeps the queue moving
 - the evaluator scores results consistently
 - families gain real status by winning hard held-out challenges, not just by overfitting the local hill-climb
-
-![labrat dashboard](docs/dash-sample.png)
-
-<sub>Live example run: the baseline still leads on the main selection metric, while `classifier_search` has already won two decisive held-out challenges and earned extra funding.</sub>
 
 ## Why it exists
 
