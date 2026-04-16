@@ -2,8 +2,6 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-<sub>The English README is the canonical source of truth. The Chinese translation is provided for accessibility and may lag slightly behind.</sub>
-
 `labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
 
 Population search, not single-thread. Families of ideas compete for compute budget. The ones that produce real signal earn more room to keep going.
@@ -114,6 +112,10 @@ Phase 0 must produce:
 - [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 
+## Background
+
+`labrat` comes out of DXRG. We first used variants of this runtime internally to explore different financial world-model architectures and adjacent research workflows, then published the parts that generalized cleanly beyond that domain.
+
 ## References
 
 `labrat` is its own system, but the current shape is informed by a few clear predecessors and adjacent designs:
@@ -122,3 +124,5 @@ Phase 0 must produce:
 - [AIRA_2](https://arxiv.org/abs/2603.26499): population search, stronger evaluation discipline, and stateful operator quality as first-class system levers.
 - [Toward Autonomous Long-Horizon Engineering for ML Research](https://arxiv.org/abs/2604.13018): hierarchical orchestration, File-as-Bus coordination, progressive disclosure, and thin control over thick state.
 - [Stanford Encyclopedia of Philosophy: Imre Lakatos](https://plato.stanford.edu/archives/fall2020/entries/lakatos/): useful framing for when a family is still progressive versus when it has become degenerating and should escalate to audit or frame break.
+
+<sub>English is canonical. The Chinese README is included for accessibility and may lag slightly behind.</sub>

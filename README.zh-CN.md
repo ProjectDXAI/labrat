@@ -2,8 +2,6 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-<sub>英文 README 是规范版本。中文翻译用于提升可读性，内容可能会略晚于英文更新。</sub>
-
 `labrat` 是一个本地优先的研究运行时，用来把 Claude Code 或 Codex 放到一个真实研究问题前：有问题定义、有基线、有计分板，也有足够的结构让它持续跑上几个小时。
 
 用更直白的话说：
@@ -47,9 +45,9 @@
 
 如果你第一次打开仓库，只看这三个入口：
 
-- [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md)
-- [examples/nlp-sentiment/research_lab](/Users/punkyrest/infiniteagentworks/labrat/examples/nlp-sentiment/research_lab)
-- [docs/DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md)
+- [program.md](program.md)
+- [examples/nlp-sentiment/research_lab](examples/nlp-sentiment/research_lab)
+- [docs/DEEP_RESEARCH.md](docs/DEEP_RESEARCH.md)
 
 ## 一个有用的理解框架
 
@@ -174,24 +172,18 @@ Phase 0 必须产出：
 - audit 队列
 - expansion 状态
 
-## 明确的“新旧分界”
+## 背景
 
-这是一次运行时层面的重构。
-
-- 老的 cycle-based labs 不重新脚手架化就不再支持
-- 静态 dashboard 是当前的规范 UI
-- 不需要托管式控制平面，也不需要数据库
+`labrat` 来自 DXRG。我们最早在内部用它来探索不同的金融 world-model 架构以及其他研究工作流，后来把那些能明显泛化到更广问题上的部分整理并开源。
 
 ## 仓库地图
 
-- `program.md`：仓库级入口
-- `docs/getting-started.md`：实操启动流程
-- `docs/runners.md`：Claude Code 和 Codex 的使用方式
-- `docs/DEEP_RESEARCH.md`：真实 lab 的设计指导
-- `docs/ARCHITECTURE.md`：运行时模型
-- `scripts/runtime.py`：queue、lease、complete、reap、summary
-- `scripts/evaluator.py`：外部一致评估器
-- `examples/nlp-sentiment/research_lab`：规范参考示例
+- [program.md](program.md)：仓库级入口
+- [docs/getting-started.md](docs/getting-started.md)：实操启动流程
+- [docs/runners.md](docs/runners.md)：Claude Code 和 Codex 的使用方式
+- [docs/DEEP_RESEARCH.md](docs/DEEP_RESEARCH.md)：真实 lab 的设计指导
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)：运行时模型
+- [examples/nlp-sentiment/research_lab](examples/nlp-sentiment/research_lab)：规范参考示例
 
 ## 参考来源
 
@@ -201,3 +193,5 @@ Phase 0 必须产出：
 - [AIRA_2](https://arxiv.org/abs/2603.26499)：人口式搜索、严格评估纪律、以及把 operator 质量视为系统问题。
 - [Toward Autonomous Long-Horizon Engineering for ML Research](https://arxiv.org/abs/2604.13018)：分层编排、File-as-Bus 协调、渐进披露、以及“薄控制层管理厚状态”。
 - [Stanford Encyclopedia of Philosophy: Imre Lakatos](https://plato.stanford.edu/archives/fall2020/entries/lakatos/)：帮助理解一个家族何时仍然 progressive，何时已经 degenerating，需要升级到 audit 或 frame break。
+
+<sub>英文 README 为规范版本。中文翻译仅用于提升可访问性，内容可能会略晚于英文更新。</sub>
