@@ -49,15 +49,15 @@ Good examples:
 
 If you only open three things first:
 
-- [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md)
-- [examples/nlp-sentiment/research_lab](/Users/punkyrest/infiniteagentworks/labrat/examples/nlp-sentiment/research_lab)
-- [docs/DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md)
+- [program.md](program.md)
+- [examples/nlp-sentiment/research_lab](examples/nlp-sentiment/research_lab)
+- [docs/DEEP_RESEARCH.md](docs/DEEP_RESEARCH.md)
 
 ## A useful framing
 
 `labrat` is not a philosophy-of-science engine, but Lakatos is a useful mental model for the runtime.
 
-Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/). In `labrat`, that means a family should not only improve the known metric, but also win a decisive held-out test that rivals do not already own. More on that in [docs/DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md).
+Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/). In `labrat`, that means a family should not only improve the known metric, but also win a decisive held-out test that rivals do not already own. More on that in [docs/DEEP_RESEARCH.md](docs/DEEP_RESEARCH.md).
 
 ## Run it in 5 minutes
 
@@ -110,9 +110,9 @@ Phase 0 must produce:
 
 ## Repo map
 
-- [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md): repo-level entrypoint
-- [docs/getting-started.md](/Users/punkyrest/infiniteagentworks/labrat/docs/getting-started.md): setup and first-run flow
-- [docs/ARCHITECTURE.md](/Users/punkyrest/infiniteagentworks/labrat/docs/ARCHITECTURE.md): runtime, state, and evaluation details
+- [program.md](program.md): repo-level entrypoint
+- [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 
 ## References
 
