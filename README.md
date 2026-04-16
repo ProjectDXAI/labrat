@@ -12,6 +12,7 @@ It treats research as a shared candidate population with family funding, asynchr
 - **Funding over families**: credits are minted by stable, reproducible progress and spent on new descendants.
 - **Consistent external evaluation**: workers produce artifacts, not authoritative verdicts.
 - **Supervisor + worker model**: the agent supervises the runtime, while probe / mutation / crossover / audit workers execute bounded tasks.
+- **File-as-Bus workspace**: durable files and append-only logs carry state forward so the supervisor can keep thin control over thick project state.
 
 ## A useful framing
 
@@ -91,6 +92,10 @@ Every new lab now includes:
 
 - `evaluation.yaml`
 - `runtime.yaml`
+- `coordination/workspace_map.md` after bootstrap
+- `coordination/prioritized_tasks.md`
+- `coordination/implementation_log.md`
+- `coordination/experiment_log.md`
 - `orchestrator.md`
 - `probe_worker.md`
 - `mutation_worker.md`

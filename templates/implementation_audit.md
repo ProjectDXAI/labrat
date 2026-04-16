@@ -4,12 +4,15 @@ Use this for invalid-fast and unstable near-frontier candidates.
 
 ## Read
 
-1. `logs/handoff.md`
-2. `branches.yaml`
-3. `evaluation.yaml`
-4. `state/frontier.json`
-5. `state/candidates.jsonl`
-6. `state/evaluations.jsonl`
+1. `coordination/workspace_map.md`
+2. `logs/handoff.md`
+3. `coordination/implementation_log.md`
+4. `coordination/experiment_log.md`
+5. `branches.yaml`
+6. `evaluation.yaml`
+7. `state/frontier.json`
+8. `state/candidates.jsonl`
+9. `state/evaluations.jsonl`
 
 ## Job
 
@@ -32,6 +35,7 @@ Write:
 
 1. `logs/implementation_audit_<timestamp>.md`
 2. `logs/implementation_audit_<timestamp>_patch.yaml` when the family should stay alive
+3. append a concise note to `coordination/implementation_log.md`
 
 The patch should either:
 

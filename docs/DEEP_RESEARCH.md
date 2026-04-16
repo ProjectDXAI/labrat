@@ -23,6 +23,19 @@ The runtime then executes steady-state asynchronous search:
 - the evaluator scores them externally
 - the frontier mints new credits only for stable progress
 
+## File-as-Bus continuity
+
+The supervisor should not keep re-reading the whole lab from scratch.
+
+Use durable artifacts as the system of record:
+
+- `coordination/workspace_map.md` for navigation
+- `coordination/prioritized_tasks.md` for concise control intent
+- `coordination/implementation_log.md` for debugging and repair notes
+- `coordination/experiment_log.md` for compact experiment carry-forward
+
+This is progressive disclosure: control stays light, while detailed state remains available on demand.
+
 ## Search ladder
 
 Every serious lab should encode:

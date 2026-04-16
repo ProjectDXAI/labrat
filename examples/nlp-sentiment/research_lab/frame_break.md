@@ -4,18 +4,21 @@ Use this when the frontier is flat after cheap probes and audits, or when the ru
 
 ## Read
 
-1. `logs/handoff.md`
-2. `research_brief.md`
-3. `research_sources.md`
-4. `branches.yaml`
-5. `state/frontier.json`
-6. `state/evaluations.jsonl`
+1. `coordination/workspace_map.md`
+2. `logs/handoff.md`
+3. `coordination/prioritized_tasks.md`
+4. `research_brief.md`
+5. `research_sources.md`
+6. `branches.yaml`
+7. `state/frontier.json`
+8. `state/evaluations.jsonl`
 
 ## Produce
 
 1. `logs/frame_break_<timestamp>.md`
 2. `logs/expansions/frame_break_<timestamp>_memo.md`
 3. `logs/expansions/frame_break_<timestamp>_patch.yaml`
+4. refresh `coordination/prioritized_tasks.md` with the next structural direction
 
 ## Required sections
 

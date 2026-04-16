@@ -19,6 +19,10 @@
    - `state/candidates.jsonl`
    - `state/evaluations.jsonl`
    - `experiments/<family>/<candidate>/`
+   - `coordination/workspace_map.md`
+   - `coordination/prioritized_tasks.md`
+   - `coordination/implementation_log.md`
+   - `coordination/experiment_log.md`
 4. **Operator prompts**
    - `orchestrator.md`
    - worker prompts
@@ -39,6 +43,12 @@ The runtime now trusts:
 - `state/evaluations.jsonl`
 - `state/frontier.json`
 - `state/checkpoints.jsonl`
+
+The supervisor should usually enter through:
+
+- `coordination/workspace_map.md`
+
+and then open deeper state only as needed for the current phase.
 
 ## Promotion path
 

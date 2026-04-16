@@ -62,12 +62,131 @@ def load_state(lab_root: Path) -> dict[str, Any]:
     }
 
 
+def dashboard_payload(state: dict[str, Any]) -> dict[str, Any]:
+    branches = state.get("branches_config", {})
+    baseline = branches.get("production_baseline", {})
+    families = branches.get("families") or {}
+    return {
+        "mission": branches.get("mission"),
+        "baseline_description": baseline.get("description"),
+        "baseline_experiment_id": baseline.get("experiment_id"),
+        "families": {
+            family_name: {
+                "description": family.get("description"),
+                "resource_class": family.get("resource_class", "cpu"),
+            }
+            for family_name, family in families.items()
+        },
+        "updated_at": now_iso(),
+    }
+
+
+def workspace_map_payload(lab_root: Path, state: dict[str, Any]) -> dict[str, Any]:
+    frontier = state.get("frontier", {})
+    runtime = state.get("runtime", {})
+    return {
+        "lab_root": str(lab_root),
+        "mission": state.get("branches_config", {}).get("mission"),
+        "active_phase": runtime.get("active_phase"),
+        "step_count": int(runtime.get("step_count", 0) or 0),
+        "global_champion": frontier.get("global_champion"),
+        "audit_queue": frontier.get("audit_queue", []),
+        "pending_expansion": frontier.get("pending_expansion"),
+        "artifact_regions": {
+            "design": [
+                "branches.yaml",
+                "dead_ends.md",
+                "research_brief.md",
+                "research_sources.md",
+                "evaluation.yaml",
+                "runtime.yaml",
+            ],
+            "coordination": [
+                "coordination/workspace_map.md",
+                "coordination/prioritized_tasks.md",
+                "coordination/implementation_log.md",
+                "coordination/experiment_log.md",
+            ],
+            "runtime_state": [
+                "state/runtime.json",
+                "state/frontier.json",
+                "state/jobs.json",
+                "state/workers.json",
+                "state/dashboard.json",
+                "state/workspace_map.json",
+            ],
+            "artifact_streams": [
+                "state/candidates.jsonl",
+                "state/evaluations.jsonl",
+                "state/checkpoints.jsonl",
+            ],
+            "candidate_artifacts": [
+                "experiments/<family>/<candidate>/candidate.json",
+                "experiments/<family>/<candidate>/result.json",
+            ],
+            "prompts": [
+                "orchestrator.md",
+                "probe_worker.md",
+                "mutation_worker.md",
+                "crossover_worker.md",
+                "implementation_audit.md",
+                "frame_break.md",
+                "expansion_scout.md",
+            ],
+        },
+        "updated_at": now_iso(),
+    }
+
+
+def render_workspace_map(payload: dict[str, Any]) -> str:
+    champion = payload.get("global_champion")
+    champion_line = "none"
+    if champion:
+        champion_line = (
+            f"{champion.get('candidate_id')} "
+            f"(selection={champion.get('selection_eval')}, family={champion.get('family')})"
+        )
+    lines = [
+        "# Workspace Map",
+        "",
+        f"- mission: {payload.get('mission') or 'unset'}",
+        f"- active_phase: {payload.get('active_phase') or 'idle'}",
+        f"- step_count: {payload.get('step_count', 0)}",
+        f"- global_champion: {champion_line}",
+        f"- audit_queue: {', '.join(payload.get('audit_queue', [])) or 'none'}",
+        f"- pending_expansion: {payload.get('pending_expansion') or 'none'}",
+        "",
+        "## Artifact Regions",
+    ]
+    for region, items in payload.get("artifact_regions", {}).items():
+        lines.append(f"### {region}")
+        for item in items:
+            lines.append(f"- `{item}`")
+        lines.append("")
+    lines.append("Use this map as the default control surface. Read deeper artifacts only when the current phase requires them.")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def append_coordination_log(lab_root: Path, name: str, message: str) -> None:
+    coordination = lab_root / "coordination"
+    coordination.mkdir(parents=True, exist_ok=True)
+    path = coordination / name
+    with open(path, "a") as f:
+        f.write(message.rstrip() + "\n")
+
+
 def save_runtime_files(lab_root: Path, state: dict[str, Any]) -> None:
     sdir = state_dir(lab_root)
     write_json(sdir / "runtime.json", state["runtime"])
     write_json(sdir / "jobs.json", state["jobs"])
     write_json(sdir / "workers.json", state["workers"])
     write_json(sdir / "frontier.json", state["frontier"])
+    write_json(sdir / "dashboard.json", dashboard_payload(state))
+    workspace_payload = workspace_map_payload(lab_root, state)
+    write_json(sdir / "workspace_map.json", workspace_payload)
+    coordination = lab_root / "coordination"
+    coordination.mkdir(parents=True, exist_ok=True)
+    (coordination / "workspace_map.md").write_text(render_workspace_map(workspace_payload))
 
 
 def append_candidate(lab_root: Path, candidate: dict[str, Any]) -> None:
@@ -160,6 +279,17 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
     (lab_root / "logs" / "expansions").mkdir(parents=True, exist_ok=True)
     (lab_root / "logs" / "checkpoints").mkdir(parents=True, exist_ok=True)
     (lab_root / "experiments").mkdir(parents=True, exist_ok=True)
+    coordination = lab_root / "coordination"
+    coordination.mkdir(parents=True, exist_ok=True)
+    placeholder_files = {
+        "prioritized_tasks.md": "# Prioritized Tasks\n\nUse this file for concise supervisor directives.\n",
+        "implementation_log.md": "# Implementation Log\n\nAppend durable implementation notes here.\n",
+        "experiment_log.md": "# Experiment Log\n\nAppend durable experiment summaries here.\n",
+    }
+    for name, body in placeholder_files.items():
+        path = coordination / name
+        if not path.exists():
+            path.write_text(body)
 
     runtime_state = {
         "version": "vnext",
@@ -706,6 +836,15 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
 
     append_candidate(lab_root, candidate)
     state["candidates"][candidate_id] = candidate
+    append_coordination_log(
+        lab_root,
+        "experiment_log.md",
+        (
+            f"- [{now_iso()}] `{candidate_id}` -> {candidate['status']} | "
+            f"family={family_name} | search={candidate.get('search_eval')} | "
+            f"selection={candidate.get('selection_eval')} | finding={candidate.get('finding') or 'none'}"
+        ),
+    )
     state["runtime"]["step_count"] = int(state["runtime"].get("step_count", 0) or 0) + 1
     state["runtime"]["updated_at"] = now_iso()
     state["runtime"]["last_supervisor_action"] = f"completed {candidate_id}"

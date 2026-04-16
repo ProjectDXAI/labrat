@@ -78,6 +78,8 @@ def prompt_for_phase(lab_root: Path, runner: str, phase: str) -> str:
         f"Read agent_prompts/{runner_file}.",
         f"Read agent_prompts/shared/{phase_file}.",
     ]
+    if (lab_root / "coordination" / "workspace_map.md").exists():
+        lines.append("Read coordination/workspace_map.md first and use it as your navigation surface.")
     if phase != "design":
         lines.append("Read orchestrator.md after the phase prompt.")
 

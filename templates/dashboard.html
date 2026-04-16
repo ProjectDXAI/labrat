@@ -286,8 +286,8 @@ function renderPills(id, values, emptyLabel) {
 }
 
 async function refresh() {
-  const [branches, runtime, jobs, workers, frontier, candidates, evals, handoff] = await Promise.all([
-    loadJson('branches.yaml', {}),
+  const [dashboard, runtime, jobs, workers, frontier, candidates, evals, handoff] = await Promise.all([
+    loadJson('state/dashboard.json', {}),
     loadJson('state/runtime.json', {}),
     loadJson('state/jobs.json', {queued: [], leased: [], finished: []}),
     loadJson('state/workers.json', {workers: {}}),
@@ -300,8 +300,8 @@ async function refresh() {
   const latestCandidates = latestBy(candidates, 'candidate_id')
     .sort((a, b) => (b.selection_eval ?? -999) - (a.selection_eval ?? -999));
 
-  setText('mission', branches.mission || 'No mission defined yet');
-  setText('baseline', branches.production_baseline?.description || 'No baseline description');
+  setText('mission', dashboard.mission || 'No mission defined yet');
+  setText('baseline', dashboard.baseline_description || 'No baseline description');
   setText('stepCount', runtime.step_count ?? 0);
   setText('queuedJobs', jobs.queued?.length ?? 0);
   setText('leasedJobs', jobs.leased?.length ?? 0);
