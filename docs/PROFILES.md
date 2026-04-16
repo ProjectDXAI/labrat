@@ -28,7 +28,7 @@ The base files and the profile's files merge via `shutil.copytree(..., dirs_exis
 
 | Profile | Workload | Status |
 |---|---|---|
-| `transformer-arch` | Tiny character-level transformer architecture search, with held-out-distribution decisive challenges. CPU-runnable in synthetic mode; PyTorch opt-in for real training. | shipped |
+| `transformer-arch` | Tiny character-level transformer architecture search, with held-out-distribution decisive challenges. Ships a synthetic runner that exercises the whole loop without a training framework; swap in your own trainer (PyTorch, JAX, etc.) when you want real training. | shipped |
 | `world-model` | Latent-dynamics model with environment-rollout decisive challenges. | follow-up PR |
 | `multi-dataset` | Multi-dataset mixing with leave-one-dataset-out decisive challenges. | follow-up PR |
 
@@ -88,7 +88,7 @@ May also append interim checkpoints to `<artifact_dir>/checkpoints.jsonl` — se
 
 ### Synthetic-first principle
 
-A profile should default to a mode that runs without heavy dependencies (no `torch`, no `jax`, no GPU). This keeps clone-and-run functional on a bare laptop and makes `make smoke-transformer`-style end-to-end checks cheap. Real training can be opt-in via a `training.mode` field or similar per-profile config gate.
+A profile should default to a runner that works without heavy dependencies (no `torch`, no `jax`, no GPU). This keeps clone-and-run functional on a bare laptop and makes `make smoke`-style end-to-end checks cheap. When the user wants real training, they replace `scripts/run_experiment.py` with their own — the contract is the result shape, not the implementation.
 
 ### Dead ends
 

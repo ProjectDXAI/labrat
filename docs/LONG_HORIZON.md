@@ -82,13 +82,11 @@ rerun_policy:
 
 If your workload has structural high variance that doesn't relax with more seeds, consider a checkpoint-based selection criterion instead: emit interim holdout metrics, and treat the *best* intermediate checkpoint as the candidate's score, not the final step. This is still on labrat's roadmap; until then, relax `max_relative_std` with eyes open.
 
-## Synthetic-first smoke test
+## Synthetic-first runners
 
-Every long-horizon profile should ship a synthetic mode that runs the full runtime loop without a real training framework. This is how `make smoke-transformer` and similar Makefile targets exercise the end-to-end path (scaffold → bootstrap → dispatch → evaluate → consolidate) without depending on torch / jax / a GPU being present on the CI box.
+Every long-horizon profile should ship a synthetic `run_experiment.py` that runs the full runtime loop without a real training framework. This is how `make smoke` exercises the end-to-end path (scaffold → bootstrap → dispatch → evaluate → consolidate) without depending on torch / jax / a GPU being present. Real training is the user's responsibility: they replace `scripts/run_experiment.py` with their own runner that honours the same result + `checkpoints.jsonl` contract.
 
-For transformer-arch, the switch is `training.mode: "synthetic"` (default) vs `"real"` (opt-in). The synthetic path produces realistic-shape metrics and a plausible `checkpoints.jsonl` trajectory. The real path trains a tiny PyTorch transformer.
-
-Profile authors should design their synthetic mode so that:
+Profile authors should design their synthetic runner so that:
 
 - the three canonical metrics (`search`, `selection`, `final`) respect the config axes,
 - the decisive-challenge metrics reward the right shape (e.g., a family that would overfit produces a lower `holdout_generalization` score),

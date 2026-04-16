@@ -1,5 +1,5 @@
-# Base lab deps (pyyaml and numpy come from the parent labrat repo's requirements.txt).
+# The transformer-arch profile's default runner is synthetic and uses only the
+# standard library + pyyaml + numpy that already come from the top-level
+# labrat requirements.txt. No profile-specific deps required.
 
-# For training.mode: "real" — install these in your lab venv when you are ready
-# to move off synthetic training. Synthetic mode does not need torch.
-# torch>=2.0
+# When you swap in a real trainer (e.g. PyTorch, JAX), add its deps here.

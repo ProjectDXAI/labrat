@@ -16,7 +16,6 @@ production_baseline:
       activation: "gelu"
       dropout: 0.0
     training:
-      mode: "synthetic"
       steps: 100
       lr: 0.003
       batch_size: 16

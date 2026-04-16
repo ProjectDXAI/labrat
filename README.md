@@ -4,6 +4,8 @@
 
 `labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
 
+Designed around Claude Opus 4.7 as the supervisor. The synthesis, audit, and consolidation steps are where a frontier-grade model pays off the most; Codex and other coding agents work too, but stronger models make the population search meaningfully sharper.
+
 Population search, not single-thread. Families of ideas compete for compute budget. The ones that produce real signal earn more room to keep going.
 
 In plain English:
@@ -86,17 +88,28 @@ What you get from the example:
 If you already know the shape of your research problem, a profile scaffolds a runnable lab in one command. No Phase 0 hand-editing, no `LABRAT_PLACEHOLDER` stubs.
 
 ```bash
-python scripts/new_lab.py my_transformer_search --profile=transformer-arch
-cd my_transformer_search
+python scripts/new_lab.py my_search --profile=transformer-arch
+cd my_search
 python scripts/operator_helper.py check-readiness
 python scripts/bootstrap.py
 ```
 
-From there, open Claude Code in the lab directory and type `/next` — the profile ships its own slash commands (`/next`, `/why-stuck`, `/synthesize`, `/audit-candidate`, `/frame-break`, `/consolidate`). You can also hand-run `python scripts/operator_helper.py next-prompt --runner claude --phase auto`.
+### Slash commands
 
-Available profiles:
+Every lab — profile-scaffolded or hand-built — ships a `CLAUDE.md` and a `.claude/commands/` directory of Claude Code slash commands. These are short markdown files that Claude Code turns into commands you can type in-session; each one wraps a common operator action so you don't have to remember the CLI invocations:
 
-- `transformer-arch` — tiny character-level transformer architecture search with held-out-distribution decisive challenges. CPU-runnable in its default synthetic mode; flip `training.mode: "real"` after installing torch for real training.
+- `/next` — print the prompt for the current phase and execute it.
+- `/why-stuck` — diagnose a stalled frontier from `state/frontier.json` and recent evaluations.
+- `/synthesize` — summarise the last ~10 evaluations before dispatching more work.
+- `/audit-candidate` — walk the highest-signal suspicious candidate through the audit worker.
+- `/frame-break` — propose a structural pivot once cheap probes and audits are exhausted.
+- `/consolidate` — write a compact checkpoint note to `logs/checkpoints/`.
+
+Open Claude Code in the lab directory and type `/next`, or hand-run `python scripts/operator_helper.py next-prompt --runner claude --phase auto` if you prefer raw CLI.
+
+### Available profiles
+
+- `transformer-arch` — tiny character-level transformer architecture search with held-out-distribution decisive challenges. Ships a synthetic runner so you can exercise the full runtime loop without a training framework; replace `scripts/run_experiment.py` with your own trainer when you want real training.
 
 More profiles (world-model, multi-dataset) land in follow-up PRs. See [docs/PROFILES.md](docs/PROFILES.md) for the profile contract and [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md) for interim-checkpoint and long-running-job conventions.
 

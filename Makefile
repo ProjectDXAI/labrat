@@ -24,16 +24,16 @@ smoke: clean-smoke
 	@$(PYTHON) scripts/new_lab.py $(SMOKE_LAB) --profile=$(PROFILE) > /dev/null
 	@echo ">>> Verifying Phase 0 readiness..."
 	@cd $(SMOKE_LAB) && $(PYTHON) scripts/operator_helper.py check-readiness
-	@echo ">>> Verifying synthetic run_experiment.py (dry-run, should be < 1s)..."
+	@echo ">>> Verifying synthetic run_experiment.py (should be < 1s)..."
 	@cd $(SMOKE_LAB) && mkdir -p experiments/_smoke/c0 && \
-		printf '{"candidate_id":"c0","family":"scale_search","operator_type":"probe","resolved_config":{"data":{"train_path":"data/train_corpus.txt","holdout_path":"data/holdout_corpus.txt","block_size":32},"model":{"depth":4,"heads":4,"d_model":64,"activation":"gelu","dropout":0.0},"training":{"mode":"synthetic","steps":100,"lr":0.003,"batch_size":16,"warmup_steps":10,"seed":1337,"checkpoint_every":20}}}' > experiments/_smoke/c0/candidate.json && \
-		$(PYTHON) scripts/run_experiment.py --candidate experiments/_smoke/c0/candidate.json --output experiments/_smoke/c0/result.json --dry-run && \
+		printf '{"candidate_id":"c0","family":"scale_search","operator_type":"probe","resolved_config":{"data":{"train_path":"data/train_corpus.txt","holdout_path":"data/holdout_corpus.txt","block_size":32},"model":{"depth":4,"heads":4,"d_model":64,"activation":"gelu","dropout":0.0},"training":{"steps":100,"lr":0.003,"batch_size":16,"warmup_steps":10,"seed":1337,"checkpoint_every":20}}}' > experiments/_smoke/c0/candidate.json && \
+		$(PYTHON) scripts/run_experiment.py --candidate experiments/_smoke/c0/candidate.json --output experiments/_smoke/c0/result.json && \
 		test -f experiments/_smoke/c0/checkpoints.jsonl
 	@echo ">>> Verifying evaluator picks up checkpoints.jsonl and infers failure_class..."
 	@cd $(SMOKE_LAB) && $(PYTHON) scripts/evaluator.py --result experiments/_smoke/c0/result.json --config evaluation.yaml | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['checkpoint_summary']['trend']=='improving', f'expected improving trend, got {d[\"checkpoint_summary\"][\"trend\"]}'; assert d['failure_class'] is None, f'expected no failure_class for clean run, got {d[\"failure_class\"]}'; print('  evaluator OK: trend=improving failure_class=None')"
 	@echo ">>> Simulating a NaN-collapse run..."
 	@cd $(SMOKE_LAB) && mkdir -p experiments/_smoke/c_nan && \
-		printf '{"candidate_id":"c_nan","family":"scale_search","operator_type":"mutation","resolved_config":{"data":{"train_path":"data/train_corpus.txt","holdout_path":"data/holdout_corpus.txt","block_size":32},"model":{"depth":4,"heads":4,"d_model":64,"activation":"gelu","dropout":0.0},"training":{"mode":"synthetic","steps":200,"lr":0.015,"batch_size":16,"warmup_steps":0,"seed":42,"checkpoint_every":20}}}' > experiments/_smoke/c_nan/candidate.json && \
+		printf '{"candidate_id":"c_nan","family":"scale_search","operator_type":"mutation","resolved_config":{"data":{"train_path":"data/train_corpus.txt","holdout_path":"data/holdout_corpus.txt","block_size":32},"model":{"depth":4,"heads":4,"d_model":64,"activation":"gelu","dropout":0.0},"training":{"steps":200,"lr":0.015,"batch_size":16,"warmup_steps":0,"seed":42,"checkpoint_every":20}}}' > experiments/_smoke/c_nan/candidate.json && \
 		$(PYTHON) scripts/run_experiment.py --candidate experiments/_smoke/c_nan/candidate.json --output experiments/_smoke/c_nan/result.json && \
 		$(PYTHON) scripts/evaluator.py --result experiments/_smoke/c_nan/result.json --config evaluation.yaml | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['failure_class']=='nan', f'expected failure_class=nan, got {d[\"failure_class\"]}'; assert d['checkpoint_summary']['trend']=='collapsed', f'expected collapsed trend, got {d[\"checkpoint_summary\"][\"trend\"]}'; print('  NaN path OK: failure_class=nan trend=collapsed')"
 	@echo ">>> Bootstrapping the runtime..."

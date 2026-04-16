@@ -38,11 +38,8 @@ A family that only improves `search_eval` (training-distribution fit) without wi
 - No benchmark leaderboards. The decisive challenges are *this lab's* held-out corpora, not GLUE / WMT / LLM benchmarks.
 - No architecture exotica that requires custom kernels. GELU / ReLU / SiLU activations, scaled dot-product attention, LayerNorm — that's the palette.
 
-## Modes
+## Runner
 
-`scripts/run_experiment.py` in this profile has two modes, selected by `candidate.resolved_config.training.mode`:
+`scripts/run_experiment.py` in this profile is a synthetic runner. It reads the candidate's `resolved_config`, produces realistic-shape metrics (three canonical scores, two decisive-challenge scores, a per-step `checkpoints.jsonl` trajectory, and an auto-classified `failure_class` for configurations that would collapse) without a training framework. That is enough to exercise the whole labrat loop — dispatch, evaluator, mutation worker reading sibling failure_class, Pareto labelling, consolidation — with no heavy dependencies.
 
-- `"synthetic"` (default in the baseline) — stdlib-only surrogate that produces realistic-shape metrics and a checkpoint series from the config. Lets the runtime loop, evaluator, mutation worker, and Pareto helper all be exercised with no torch install. This is how `make smoke PROFILE=transformer-arch` verifies the end-to-end path.
-- `"real"` — pure-PyTorch character-level tiny transformer with manual training loop. Uncomment `torch>=2.0` in `requirements.txt`, install it, then flip the baseline's `training.mode` to `"real"` (or override it per-family in `branches.yaml`). Same result contract, same interim checkpoint format; the runtime does not know which mode produced a candidate.
-
-Switch to real mode only after you are confident the search space in `branches.yaml` is worth real compute. Synthetic first, real second.
+When you're ready to train a real model, replace `scripts/run_experiment.py` with a runner that honours the same result contract (see [docs/PROFILES.md](../../docs/PROFILES.md)) and the same `checkpoints.jsonl` shape (see [docs/LONG_HORIZON.md](../../docs/LONG_HORIZON.md)). The runtime does not care which framework you use.
