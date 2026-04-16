@@ -13,6 +13,18 @@ final_eval:
   path: "metrics.final.primary_metric"
   direction: "maximize"
 
+prediction_tests:
+  - name: "extreme_polarity_holdout"
+    description: "Held-out polarity extremes across the selection and final slices."
+    path: "metrics.challenges.extreme_polarity.primary_metric"
+    direction: "maximize"
+    decisive: true
+  - name: "mixed_signal_holdout"
+    description: "Held-out mixed-signal language containing words like still, mostly, or acceptable."
+    path: "metrics.challenges.mixed_signal.primary_metric"
+    direction: "maximize"
+    decisive: true
+
 consistency:
   fixed_seed: 1337
   fixed_split_id: "sentiment_toy_v1"

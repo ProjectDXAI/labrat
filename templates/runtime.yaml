@@ -19,6 +19,7 @@ funding:
   promote_credit: 3
   stable_credit: 1
   novelty_credit: 1
+  prediction_credit: 2
 
 plateau:
   window: 6

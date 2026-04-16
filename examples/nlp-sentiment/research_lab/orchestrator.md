@@ -50,8 +50,9 @@ Open these only on demand:
 2. The runtime is steady-state and asynchronous. There is no global cycle barrier.
 3. Family funding is the control loop. Each queued job spends one credit.
 4. Stable improvements, novelty, and reproducibility mint credits.
-5. Invalid-fast or unstable near-miss candidates go to audit before a family is exhausted.
-6. Frame break is for structural incompleteness, not for ordinary local disappointment.
+5. Decisive challenge wins mint extra status because they test whether a family predicts something hard beyond the local hill-climb.
+6. Invalid-fast or unstable near-miss candidates go to audit before a family is exhausted.
+7. Frame break is for structural incompleteness, not for ordinary local disappointment.
 
 ## Default supervisor loop
 
@@ -102,6 +103,7 @@ When a worker finishes a candidate:
 At checkpoint time:
 
 - summarize the current champion frontier
+- summarize which families have actually won decisive held-out challenges
 - explain where credits are concentrating
 - state whether the current bottleneck looks like throughput, evaluation noise, or operator quality
 - leave a short note in `logs/handoff.md`

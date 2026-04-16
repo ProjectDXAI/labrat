@@ -22,6 +22,7 @@ The runtime then executes steady-state asynchronous search:
 - workers run descendants independently
 - the evaluator scores them externally
 - the frontier mints new credits only for stable progress
+- decisive challenge wins mint extra status when a family lands a hard held-out test that was not already the inner search objective
 
 ## File-as-Bus continuity
 
@@ -60,6 +61,8 @@ A family behaves like a provisional research programme:
 
 The useful threshold is not “did one run fail?” It is “is this family still paying for more attention?” Lakatos's shorthand for that distinction is that a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/).
 
+The practical version inside `labrat` is stricter than “benchmark score went up.” A strong family should also win a decisive held-out challenge that was not already baked into the local hill-climb. That is the closest runtime analogue to a novel, risky prediction.
+
 ## External consistent evaluation
 
 `evaluation.yaml` is the real replacement for the old constitution-style scoring file.
@@ -69,6 +72,7 @@ Use it to define:
 - `search_eval`
 - `selection_eval`
 - `final_eval`
+- `prediction_tests`
 - fixed splits or fixed seeds
 - rerun policy
 - invalid-fast thresholds

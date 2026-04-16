@@ -55,9 +55,10 @@ and then open deeper state only as needed for the current phase.
 1. worker writes `result.json`
 2. runtime calls `evaluator.py`
 3. evaluator returns `search_eval`, `selection_eval`, `final_eval`, and validity
-4. runtime may queue reruns
-5. only stable candidates promote
-6. family credits mint only after promotion
+4. evaluator also returns `prediction_tests` for decisive held-out challenges
+5. runtime may queue reruns
+6. only stable candidates promote
+7. family credits mint only after promotion, with extra credit for decisive challenge wins
 
 ## Family funding
 
@@ -67,5 +68,6 @@ Funding is now attached to families in a shared population.
 - promotion mints credits
 - stable promotion mints more
 - crossover or frame-break spawn can earn novelty credit
+- decisive challenge wins can mint extra prediction credit
 
 That keeps the funding loop, but it now funds descendants rather than isolated branch loops.

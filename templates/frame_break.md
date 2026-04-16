@@ -28,9 +28,11 @@ Use this when the frontier is flat after cheap probes and audits, or when the ru
 4. which assumption must be false if the target is real
 5. one missing middle rung, if any, that should be tried before a radical jump
 6. one or two concrete family proposals
+7. which decisive challenge the next family should try to own that the current frontier does not
 
 ## Rules
 
 1. If the family can still win through implementation quality, route to audit instead of frame break.
 2. If the family’s raw-work floor is already above the target, say so plainly.
 3. Leave a patch file with runnable family definitions, not just prose.
+4. If a family has never landed a decisive held-out challenge, do not treat small benchmark gains as real status.

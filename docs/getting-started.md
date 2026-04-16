@@ -20,6 +20,7 @@ The example includes:
 - a runtime-backed `branches.yaml`
 - `evaluation.yaml` and `runtime.yaml`
 - a working external evaluator
+- decisive held-out challenge tests beyond the search metric
 - audit and frame-break fixtures
 
 ## 2. Start a real lab
@@ -52,10 +53,13 @@ Each family must define:
 - cheap probes
 - mutation policy
 - crossover compatibility
+- decisive challenge claim
 - resource class
 - funding prior
 - audit triggers
 - frame-break triggers
+
+`evaluation.yaml` must also define at least one held-out `prediction_tests` challenge. Families earn extra status when they win those tests, not just when they climb the local search score.
 
 ## Operating phases
 

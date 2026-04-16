@@ -49,6 +49,7 @@ def load_state(lab_root: Path) -> dict[str, Any]:
                 "family_champions": {},
                 "elite_archive": {"global": [], "families": {}},
                 "family_funding": {},
+                "decisive_challenges": {},
                 "audit_queue": [],
                 "invalid_fast_candidates": [],
                 "unstable_candidates": [],
@@ -106,6 +107,7 @@ def workspace_map_payload(lab_root: Path, state: dict[str, Any]) -> dict[str, An
                 "coordination/prioritized_tasks.md",
                 "coordination/implementation_log.md",
                 "coordination/experiment_log.md",
+                "coordination/prediction_log.md",
             ],
             "runtime_state": [
                 "state/runtime.json",
@@ -212,6 +214,7 @@ def family_defaults(runtime_cfg: dict[str, Any]) -> dict[str, Any]:
         "promote_credit": int(funding.get("promote_credit", 3)),
         "stable_credit": int(funding.get("stable_credit", 1)),
         "novelty_credit": int(funding.get("novelty_credit", 1)),
+        "prediction_credit": int(funding.get("prediction_credit", 2)),
         "dispatch_cost": int(funding.get("dispatch_cost", 1)),
         "crossover_probability": float(runtime_cfg.get("selection", {}).get("crossover_probability", 0.2)),
         "max_lineage": int(runtime_cfg.get("selection", {}).get("max_concurrent_per_lineage", 3)),
@@ -285,6 +288,7 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
         "prioritized_tasks.md": "# Prioritized Tasks\n\nUse this file for concise supervisor directives.\n",
         "implementation_log.md": "# Implementation Log\n\nAppend durable implementation notes here.\n",
         "experiment_log.md": "# Experiment Log\n\nAppend durable experiment summaries here.\n",
+        "prediction_log.md": "# Prediction Log\n\nAppend decisive challenge wins and misses here.\n",
     }
     for name, body in placeholder_files.items():
         path = coordination / name
@@ -309,6 +313,7 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
         "family_champions": {},
         "elite_archive": {"global": [], "families": {}},
         "family_funding": {},
+        "decisive_challenges": {},
         "audit_queue": [],
         "invalid_fast_candidates": [],
         "unstable_candidates": [],
@@ -349,6 +354,8 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
             "stability": {"runs": 0, "stable": True, "relative_std": 0.0},
             "resource_floor": baseline.get("seed_metrics", {}).get("resource_floor"),
             "finding": baseline.get("description"),
+            "prediction_scores": baseline.get("seed_metrics", {}).get("prediction_scores", {}),
+            "decisive_wins": [],
             "artifact_dir": None,
             "created_at": now_iso(),
             "updated_at": now_iso(),
@@ -534,6 +541,8 @@ def create_candidate_record(candidate_spec: dict[str, Any], state: dict[str, Any
         "stability": {"runs": 0, "stable": False, "relative_std": None},
         "resource_floor": None,
         "finding": candidate_spec.get("finding"),
+        "prediction_scores": {},
+        "decisive_wins": [],
         "artifact_dir": None,
         "created_at": now_iso(),
         "updated_at": now_iso(),
@@ -558,6 +567,31 @@ def materialize_candidate(lab_root: Path, candidate: dict[str, Any], state: dict
         json.dump(payload, f, indent=2)
         f.write("\n")
     candidate["artifact_dir"] = str(artifact_dir.relative_to(lab_root))
+
+
+def aggregate_prediction_scores(candidate_evals: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    aggregates: dict[str, dict[str, Any]] = {}
+    for row in candidate_evals:
+        for name, test in (row.get("prediction_tests") or {}).items():
+            score = test.get("score")
+            bucket = aggregates.setdefault(
+                name,
+                {
+                    "scores": [],
+                    "description": test.get("description"),
+                    "decisive": bool(test.get("decisive", True)),
+                },
+            )
+            if score is not None:
+                bucket["scores"].append(float(score))
+    summary: dict[str, dict[str, Any]] = {}
+    for name, bucket in aggregates.items():
+        scores = bucket.pop("scores")
+        summary[name] = {
+            "score": (sum(scores) / len(scores)) if scores else None,
+            **bucket,
+        }
+    return summary
 
 
 def generate_candidate_spec(family_name: str, state: dict[str, Any]) -> dict[str, Any] | None:
@@ -765,6 +799,7 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
     ]
     search_scores = [row["search_eval"] for row in candidate_evals if row.get("search_eval") is not None]
     selection_scores = [row["selection_eval"] for row in candidate_evals if row.get("selection_eval") is not None]
+    final_scores = [row["final_eval"] for row in candidate_evals if row.get("final_eval") is not None]
     valid_runs = [row.get("valid", False) for row in candidate_evals]
 
     relative_std = None
@@ -780,7 +815,8 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
     candidate["stability"] = stability
     candidate["search_eval"] = sum(search_scores) / len(search_scores) if search_scores else None
     candidate["selection_eval"] = sum(selection_scores) / len(selection_scores) if selection_scores else None
-    candidate["final_eval"] = selection_scores[-1] if selection_scores else None
+    candidate["final_eval"] = sum(final_scores) / len(final_scores) if final_scores else None
+    candidate["prediction_scores"] = aggregate_prediction_scores(candidate_evals)
 
     promotable = (
         candidate["selection_eval"] is not None
@@ -810,7 +846,7 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
         enqueue_unique(state["frontier"]["invalid_fast_candidates"], candidate_id)
     elif promotable and stability["stable"]:
         candidate["status"] = "promoted"
-        promote_candidate(state, candidate)
+        promote_candidate(state, candidate, lab_root)
         family_state["plateau_counter"] = 0
     elif promotable:
         candidate["status"] = "rejected"
@@ -842,7 +878,9 @@ def complete_job(lab_root: Path, state: dict[str, Any], candidate_id: str, resul
         (
             f"- [{now_iso()}] `{candidate_id}` -> {candidate['status']} | "
             f"family={family_name} | search={candidate.get('search_eval')} | "
-            f"selection={candidate.get('selection_eval')} | finding={candidate.get('finding') or 'none'}"
+            f"selection={candidate.get('selection_eval')} | "
+            f"decisive={', '.join(candidate.get('decisive_wins', [])) or 'none'} | "
+            f"finding={candidate.get('finding') or 'none'}"
         ),
     )
     state["runtime"]["step_count"] = int(state["runtime"].get("step_count", 0) or 0) + 1
@@ -874,17 +912,41 @@ def enqueue_unique(items: list[str], value: str) -> None:
         items.append(value)
 
 
-def promote_candidate(state: dict[str, Any], candidate: dict[str, Any]) -> None:
+def update_decisive_challenges(state: dict[str, Any], candidate: dict[str, Any]) -> list[str]:
+    frontier = state["frontier"]
+    leaders = frontier.setdefault("decisive_challenges", {})
+    wins: list[str] = []
+    for name, test in (candidate.get("prediction_scores") or {}).items():
+        if test.get("score") is None or not test.get("decisive", True):
+            continue
+        prior = leaders.get(name)
+        prior_score = float(prior.get("score", -math.inf) or -math.inf) if prior else -math.inf
+        candidate_score = float(test["score"])
+        if candidate_score > prior_score:
+            leaders[name] = {
+                "candidate_id": candidate["candidate_id"],
+                "family": candidate["family"],
+                "score": candidate_score,
+                "description": test.get("description"),
+            }
+            wins.append(name)
+    return wins
+
+
+def promote_candidate(state: dict[str, Any], candidate: dict[str, Any], lab_root: Path | None = None) -> None:
     frontier = state["frontier"]
     runtime_cfg = state["runtime_config"]
     defaults = family_defaults(runtime_cfg)
     family_name = candidate["family"]
+    decisive_wins = update_decisive_challenges(state, candidate)
+    candidate["decisive_wins"] = decisive_wins
     candidate_summary = {
         "candidate_id": candidate["candidate_id"],
         "family": family_name,
         "selection_eval": candidate["selection_eval"],
         "search_eval": candidate["search_eval"],
         "operator_type": candidate["operator_type"],
+        "decisive_wins": decisive_wins,
     }
     frontier["family_champions"][family_name] = candidate_summary
     if frontier.get("global_champion") is None or float(candidate["selection_eval"] or -math.inf) > float(
@@ -907,9 +969,21 @@ def promote_candidate(state: dict[str, Any], candidate: dict[str, Any]) -> None:
         minted += defaults["stable_credit"]
     if candidate["operator_type"] in {"crossover", "frame_break_spawn"}:
         minted += defaults["novelty_credit"]
+    if decisive_wins:
+        minted += defaults["prediction_credit"] * len(decisive_wins)
     family_state["credits"] += minted
     family_state["minted"] += minted
     family_state["last_promoted_at"] = now_iso()
+    if lab_root and decisive_wins:
+        append_coordination_log(
+            lab_root,
+            "prediction_log.md",
+            (
+                f"- [{now_iso()}] `{candidate['candidate_id']}` won decisive challenge"
+                f"{'s' if len(decisive_wins) != 1 else ''}: {', '.join(decisive_wins)} | "
+                f"family={family_name} | selection={candidate.get('selection_eval')}"
+            ),
+        )
 
 
 def maybe_checkpoint(lab_root: Path, state: dict[str, Any]) -> None:
@@ -921,6 +995,7 @@ def maybe_checkpoint(lab_root: Path, state: dict[str, Any]) -> None:
         "checkpoint_at": now_iso(),
         "step_count": step_count,
         "global_champion": state["frontier"].get("global_champion"),
+        "decisive_challenges": state["frontier"].get("decisive_challenges", {}),
         "audit_queue": list(state["frontier"].get("audit_queue", [])),
         "family_credits": {
             name: family_state.get("credits", 0)
@@ -977,6 +1052,7 @@ def summary_payload(state: dict[str, Any]) -> dict[str, Any]:
         "leased_jobs": len(state["jobs"].get("leased", [])),
         "audit_queue": state["frontier"].get("audit_queue", []),
         "invalid_fast_candidates": state["frontier"].get("invalid_fast_candidates", []),
+        "decisive_challenges": state["frontier"].get("decisive_challenges", {}),
         "pending_expansion": state["frontier"].get("pending_expansion"),
         "family_credits": {
             name: family_state.get("credits", 0)
@@ -1031,6 +1107,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"leased_jobs: {payload['leased_jobs']}")
             print(f"audit_queue: {', '.join(payload['audit_queue']) or 'none'}")
             print(f"family_credits: {payload['family_credits']}")
+            print(f"decisive_challenges: {payload['decisive_challenges']}")
             print(f"global_champion: {payload['global_champion']}")
         return 0
 

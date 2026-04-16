@@ -201,20 +201,28 @@
           <div style="height:10px"></div>
           <div class="pill-row" id="invalidFast"></div>
         </div>
+        <div class="panel">
+          <h2>Decisive Challenges</h2>
+          <p class="muted">Held-out tests that are not directly optimized by the local hill-climb.</p>
+          <table id="challengeTable">
+            <thead><tr><th>Challenge</th><th>Leader</th><th>Score</th><th>Family</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="stack">
         <div class="panel">
           <h2>Frontier</h2>
           <table id="frontierTable">
-            <thead><tr><th>Candidate</th><th>Family</th><th>Selection</th><th>Status</th><th>Parents</th></tr></thead>
+            <thead><tr><th>Candidate</th><th>Family</th><th>Selection</th><th>Status</th><th>Wins</th><th>Parents</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
         <div class="panel">
           <h2>Recent Evaluations</h2>
           <table id="evalTable">
-            <thead><tr><th>Candidate</th><th>Attempt</th><th>Search</th><th>Selection</th><th>Valid</th></tr></thead>
+            <thead><tr><th>Candidate</th><th>Attempt</th><th>Search</th><th>Selection</th><th>Challenges</th><th>Valid</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
@@ -347,6 +355,18 @@ async function refresh() {
   renderPills('auditQueue', frontier.audit_queue || [], 'Audit queue empty');
   renderPills('invalidFast', frontier.invalid_fast_candidates || [], 'No invalid-fast candidates');
 
+  const decisiveChallenges = Object.entries(frontier.decisive_challenges || {});
+  renderRows(
+    'challengeTable',
+    decisiveChallenges,
+    ([name, info]) => `<tr>
+      <td>${name}</td>
+      <td class="mono">${info.candidate_id || '—'}</td>
+      <td class="mono">${info.score == null ? '—' : info.score.toFixed(4)}</td>
+      <td>${info.family || '—'}</td>
+    </tr>`
+  );
+
   renderRows(
     'frontierTable',
     latestCandidates.slice(0, 12),
@@ -355,6 +375,7 @@ async function refresh() {
       <td>${candidate.family}</td>
       <td class="mono">${candidate.selection_eval == null ? '—' : candidate.selection_eval.toFixed(4)}</td>
       <td>${candidate.status}</td>
+      <td class="mono">${(candidate.decisive_wins || []).length}</td>
       <td class="mono">${(candidate.parent_ids || []).join(', ') || '—'}</td>
     </tr>`
   );
@@ -362,13 +383,17 @@ async function refresh() {
   renderRows(
     'evalTable',
     evals.slice(-12).reverse(),
-    row => `<tr>
+    row => {
+      const challengeCount = Object.values(row.prediction_tests || {}).filter(test => test && test.score != null).length;
+      return `<tr>
       <td class="mono">${row.candidate_id}</td>
       <td class="mono">${row.attempt}</td>
       <td class="mono">${row.search_eval == null ? '—' : row.search_eval.toFixed(4)}</td>
       <td class="mono">${row.selection_eval == null ? '—' : row.selection_eval.toFixed(4)}</td>
+      <td class="mono">${challengeCount}</td>
       <td class="${row.valid ? 'good' : 'bad'}">${row.valid ? 'valid' : 'invalid'}</td>
-    </tr>`
+    </tr>`;
+    }
   );
 }
 

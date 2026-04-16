@@ -35,6 +35,7 @@ families:
   text_representation:
     description: "Cheap orthogonal probes over word and character TF-IDF choices."
     scientific_rationale: "The smallest reliable jump on tiny sentiment corpora often comes from representation choice before classifier changes."
+    decisive_challenge_claim: "If this family is real, it should improve the mixed-signal holdout where wording and boundary phrases matter more than raw classifier margin."
     resource_class: "cpu"
     funding:
       initial_credits: 6
@@ -70,6 +71,7 @@ families:
   classifier_search:
     description: "Classifier family over logistic regression, linear SVM, and multinomial Naive Bayes."
     scientific_rationale: "Once the text representation is decent, the best cheap gains often come from margin shape and class reweighting."
+    decisive_challenge_claim: "If this family is real, it should win the extreme-polarity holdout by sharpening the cleanest negative and positive boundaries."
     resource_class: "cpu"
     funding:
       initial_credits: 8
@@ -106,6 +108,7 @@ families:
   fusion_frontier:
     description: "Combines the best representation and classifier winners, then optionally calibrates them."
     scientific_rationale: "Representation and classifier improvements often stack; calibration only matters once the frontier is worth stabilizing."
+    decisive_challenge_claim: "If this family is real, it should own both held-out challenges at once rather than only nudging the search split."
     resource_class: "cpu"
     funding:
       initial_credits: 4

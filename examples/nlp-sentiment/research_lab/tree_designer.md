@@ -49,13 +49,20 @@ The design must explicitly encode this ladder:
 
 Do not skip directly from “one family plateaued” to “invent a new worldview” unless the cheap probes and audit logic are already exhausted.
 
-### 3. Evaluation protocol
+### 3. Decisive challenges, not just better fit
+
+Your design must force at least one held-out decisive challenge that is not already identical to the local hill-climb metric.
+
+For each family, say what it predicts on that challenge. A family should gain real status by landing a specific hard test that rivals do not own, not just by climbing the search metric.
+
+### 4. Evaluation protocol
 
 You must define `evaluation.yaml` with:
 
 - `search_eval`
 - `selection_eval`
 - `final_eval`
+- at least one `prediction_tests` challenge
 - fixed split or fixed seed policy
 - rerun policy for suspicious wins
 - invalid-fast margin
@@ -67,7 +74,7 @@ This must be external-consistent:
 - the evaluator is
 - search and selection signals are separate
 
-### 4. Runtime protocol
+### 5. Runtime protocol
 
 You must define `runtime.yaml` with:
 
@@ -79,7 +86,7 @@ You must define `runtime.yaml` with:
 - elite archive sizes
 - plateau window
 
-### 5. Negative space
+### 6. Negative space
 
 `dead_ends.md` must name:
 
@@ -87,7 +94,7 @@ You must define `runtime.yaml` with:
 - expensive but low-value directions
 - what signal would be needed to revive them
 
-### 6. Sources
+### 7. Sources
 
 `research_sources.md` must map each family to concrete sources and say what each source contributed.
 
@@ -98,3 +105,4 @@ You must define `runtime.yaml` with:
 3. Give the runtime a path to combine winners across families.
 4. If a family could look invalid-fast for mechanical reasons, say so in the audit triggers.
 5. If a family’s raw work floor will likely miss the target, force a frame-break trigger earlier.
+6. Prefer challenge tests that feel like “Halley’s comet” checks: precise, risky, and not already baked into the inner hill-climb.

@@ -8,6 +8,7 @@ The runnable lab lives in `research_lab/`.
 
 - async population runtime
 - external consistent evaluation
+- decisive held-out challenges that are separate from the search metric
 - three families:
   - `text_representation`
   - `classifier_search`
@@ -16,6 +17,7 @@ The runnable lab lives in `research_lab/`.
 - one mutation-heavy family
 - one crossover family
 - audit and frame-break fixtures
+- family-level challenge claims in `branches.yaml`
 
 ## Quick start
 

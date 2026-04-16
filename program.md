@@ -49,6 +49,7 @@ python scripts/operator_helper.py next-prompt --runner claude --phase auto
 - The runtime is async and steady-state.
 - `evaluator.py` is authoritative for scores.
 - `search_eval` and `selection_eval` are separate by default.
+- `prediction_tests` define decisive held-out challenges that are not the same as the local hill-climb metric.
 - Cheap probes and audits come before frame break.
 - The static dashboard is the canonical UI.
 

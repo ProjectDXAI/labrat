@@ -55,11 +55,26 @@ def score_from_spec(result: dict[str, Any], spec: dict[str, Any]) -> float | Non
     return total / weight_sum
 
 
+def evaluate_prediction_tests(result: dict[str, Any], config: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    payload: dict[str, dict[str, Any]] = {}
+    for test in config.get("prediction_tests", []) or []:
+        name = test.get("name")
+        if not name:
+            continue
+        payload[name] = {
+            "score": score_from_spec(result, test),
+            "description": test.get("description"),
+            "decisive": bool(test.get("decisive", True)),
+        }
+    return payload
+
+
 def evaluate_result(result: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     search_eval = score_from_spec(result, config.get("search_eval", {}))
     selection_eval = score_from_spec(result, config.get("selection_eval", {}))
     final_spec = config.get("final_eval", {})
     final_eval = score_from_spec(result, final_spec) if final_spec.get("enabled", False) else None
+    prediction_tests = evaluate_prediction_tests(result, config)
 
     valid = bool(result.get("valid", True))
     if result.get("metrics", {}).get("error"):
@@ -74,6 +89,7 @@ def evaluate_result(result: dict[str, Any], config: dict[str, Any]) -> dict[str,
         "resource_floor": result.get("resource_floor"),
         "finding": result.get("finding"),
         "metrics": result.get("metrics", {}),
+        "prediction_tests": prediction_tests,
     }
     return payload
 

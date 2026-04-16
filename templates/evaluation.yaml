@@ -13,6 +13,13 @@ final_eval:
   path: "metrics.final.primary_metric"
   direction: "maximize"
 
+prediction_tests:
+  - name: "LABRAT_PLACEHOLDER_decisive_challenge"
+    description: "LABRAT_PLACEHOLDER: a held-out challenge that is not directly optimized by the local hill-climb."
+    path: "metrics.challenges.LABRAT_PLACEHOLDER_decisive.primary_metric"
+    direction: "maximize"
+    decisive: true
+
 consistency:
   fixed_seed: 1337
   fixed_split_id: "LABRAT_PLACEHOLDER_split"

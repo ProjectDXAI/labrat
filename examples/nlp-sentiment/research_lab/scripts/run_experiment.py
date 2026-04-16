@@ -51,7 +51,7 @@ def build_features(config: dict) -> tuple[TfidfVectorizer, TfidfVectorizer | Non
     return word_vectorizer, char_vectorizer
 
 
-def vectorize(config: dict, rows: list[dict]) -> tuple[dict[str, sparse.spmatrix], dict[str, np.ndarray]]:
+def vectorize(config: dict, rows: list[dict]) -> tuple[dict[str, sparse.spmatrix], dict[str, np.ndarray], dict[str, list[str]]]:
     dataset_path = Path(config["data"]["dataset_path"])
     _ = dataset_path  # kept for config completeness
     splits = {"train": [], "search": [], "selection": [], "final": []}
@@ -76,7 +76,7 @@ def vectorize(config: dict, rows: list[dict]) -> tuple[dict[str, sparse.spmatrix
             ).tocsr()
 
     y = {split: np.array(values) for split, values in labels.items()}
-    return matrices, y
+    return matrices, y, splits
 
 
 def build_estimator(config: dict):
@@ -116,6 +116,32 @@ def score_split(estimator, X, y) -> dict:
     }
 
 
+def score_slice(estimator, X, y) -> dict:
+    if len(y) == 0:
+        return {"primary_metric": 0.0, "accuracy": 0.0, "count": 0}
+    preds = estimator.predict(X)
+    return {
+        "primary_metric": float(f1_score(y, preds, average="macro")),
+        "accuracy": float(accuracy_score(y, preds)),
+        "count": int(len(y)),
+    }
+
+
+def challenge_metrics(estimator, matrices, labels, texts) -> dict:
+    challenge_X = sparse.vstack([matrices["selection"], matrices["final"]]).tocsr()
+    challenge_y = np.concatenate([labels["selection"], labels["final"]])
+    challenge_texts = texts["selection"] + texts["final"]
+
+    extreme_mask = np.isin(challenge_y, [0, 4])
+    mixed_tokens = ("still", "mostly", "acceptable", "partial", "rough", "yet", "but")
+    mixed_mask = np.array([any(token in text for token in mixed_tokens) for text in challenge_texts])
+
+    return {
+        "extreme_polarity": score_slice(estimator, challenge_X[extreme_mask], challenge_y[extreme_mask]),
+        "mixed_signal": score_slice(estimator, challenge_X[mixed_mask], challenge_y[mixed_mask]),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run a toy sentiment experiment.")
     parser.add_argument("--candidate", type=Path, required=True)
@@ -129,13 +155,14 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         rows = load_rows(dataset_path)
-        matrices, labels = vectorize(config, rows)
+        matrices, labels, texts = vectorize(config, rows)
         estimator = build_estimator(config)
         estimator.fit(matrices["train"], labels["train"])
 
         search_metrics = score_split(estimator, matrices["search"], labels["search"])
         selection_metrics = score_split(estimator, matrices["selection"], labels["selection"])
         final_metrics = score_split(estimator, matrices["final"], labels["final"])
+        challenges = challenge_metrics(estimator, matrices, labels, texts)
 
         feature_count = int(matrices["train"].shape[1])
         elapsed = time.perf_counter() - started
@@ -150,6 +177,7 @@ def main(argv: list[str] | None = None) -> int:
                 "search": search_metrics,
                 "selection": selection_metrics,
                 "final": final_metrics,
+                "challenges": challenges,
             },
             "finding": (
                 f"{config['model']['type']} with word_ngram_max={config['features']['word_ngram_max']} "

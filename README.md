@@ -1,18 +1,27 @@
 # labrat
 
-`labrat` is a local-first research runtime for Claude Code and Codex.
+`labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
 
-It treats research as a shared candidate population with family funding, asynchronous workers, and external consistent evaluation.
+In plain English:
+
+- you define a problem and a baseline
+- the agent explores multiple families of ideas
+- the runtime keeps the queue moving
+- the evaluator scores results consistently
+- families gain real status by winning hard held-out challenges, not just by overfitting the local hill-climb
 
 ![labrat dashboard](docs/dash-sample.png)
 
-## Core ideas
+## Why it exists
 
 - **Async population search**: no global cycle barrier; workers keep evaluating descendants as soon as slots free up.
 - **Funding over families**: credits are minted by stable, reproducible progress and spent on new descendants.
 - **Consistent external evaluation**: workers produce artifacts, not authoritative verdicts.
 - **Supervisor + worker model**: the agent supervises the runtime, while probe / mutation / crossover / audit workers execute bounded tasks.
 - **File-as-Bus workspace**: durable files and append-only logs carry state forward so the supervisor can keep thin control over thick project state.
+- **Decisive challenges**: a family earns extra status when it wins a held-out challenge that was not already baked into the local search metric.
+
+This means a family can become strategically important even before it becomes the global selection champion. The dashboard now shows both the current champion and the current decisive-challenge leaders.
 
 ## A useful framing
 
@@ -20,13 +29,15 @@ It treats research as a shared candidate population with family funding, asynchr
 
 Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/).
 
+That is not just about getting a slightly better score on known data. A stronger family should also land a decisive hard test that rivals did not already own, the same way Halley’s prediction mattered because Newtonian mechanics made a precise novel prediction instead of merely fitting old observations.
+
 That is close to the `labrat` search ladder:
 
 - cheap probes and mutation test whether the current family is still progressive
 - implementation audit checks whether the failure is in execution rather than in the family itself
 - frame break and expansion happen when local search is no longer earning the right to continue
 
-## Quick evaluation path
+## Run it in 5 minutes
 
 Start with the flagship example:
 
@@ -43,7 +54,14 @@ python scripts/operator_helper.py next-prompt --runner claude --phase auto
 
 Use `--runner codex` for Codex.
 
-## Create a new lab
+What you get from the example:
+
+- a running dashboard
+- a fully scaffolded lab
+- held-out decisive challenges on top of search / selection metrics
+- a reference supervisor + worker flow that you can copy into a new lab
+
+## Create your own lab
 
 The default path is deep research first.
 
@@ -65,6 +83,8 @@ Phase 0 must produce:
 - `research_sources.md`
 - `evaluation.yaml`
 - `runtime.yaml`
+
+`evaluation.yaml` now includes at least one held-out `prediction_tests` challenge. That is how the runtime distinguishes “fit the known metric a bit better” from “this family actually predicted something hard.”
 
 ## Runtime model
 

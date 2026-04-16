@@ -22,6 +22,7 @@ families:
   cheap_probe_family:
     description: "LABRAT_PLACEHOLDER: low-cost orthogonal probes against the baseline"
     scientific_rationale: "LABRAT_PLACEHOLDER: why these probes matter before deeper search"
+    decisive_challenge_claim: "LABRAT_PLACEHOLDER: what this family predicts on a held-out decisive challenge."
     resource_class: "cpu"
     funding:
       initial_credits: 6
@@ -51,6 +52,7 @@ families:
   mutation_family:
     description: "LABRAT_PLACEHOLDER: a deeper family with real local exploitation"
     scientific_rationale: "LABRAT_PLACEHOLDER: why mutations here could beat the baseline"
+    decisive_challenge_claim: "LABRAT_PLACEHOLDER: which hard held-out behavior this family should win if it is real."
     resource_class: "cpu"
     funding:
       initial_credits: 8
@@ -80,6 +82,7 @@ families:
   crossover_family:
     description: "LABRAT_PLACEHOLDER: combines complementary winners from other families"
     scientific_rationale: "LABRAT_PLACEHOLDER: why the families should compose"
+    decisive_challenge_claim: "LABRAT_PLACEHOLDER: what novel held-out success this combined family should unlock."
     resource_class: "cpu"
     funding:
       initial_credits: 4

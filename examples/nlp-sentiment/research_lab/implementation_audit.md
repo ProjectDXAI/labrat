@@ -28,6 +28,7 @@ Pick the strongest suspicious candidate and answer:
    - `true_dead_end`
    - `still_promising`
 5. the exact next step
+6. whether the family is failing the decisive challenge because the idea is weak or because the implementation is undercooked
 
 ## Outputs
 

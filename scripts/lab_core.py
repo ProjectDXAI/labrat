@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ STATE_FILES = [
 
 
 def now_iso() -> str:
-    return datetime.now(UTC).isoformat()
+    return datetime.now(timezone.utc).isoformat()
 
 
 def load_json(path: Path, default: Any | None = None) -> Any:
@@ -108,6 +108,8 @@ def find_readiness_issues(lab_root: Path) -> list[str]:
     eval_cfg = load_yaml(lab_root / "evaluation.yaml", {})
     if not eval_cfg.get("search_eval") or not eval_cfg.get("selection_eval"):
         issues.append("evaluation.yaml must define both `search_eval` and `selection_eval`.")
+    if not eval_cfg.get("prediction_tests"):
+        issues.append("evaluation.yaml must define at least one held-out `prediction_tests` challenge.")
 
     return issues
 
@@ -132,6 +134,7 @@ def load_lab_state(lab_root: Path) -> dict[str, Any]:
             "family_champions": {},
             "elite_archive": {"global": [], "families": {}},
             "family_funding": {},
+            "decisive_challenges": {},
             "audit_queue": [],
             "invalid_fast_candidates": [],
             "unstable_candidates": [],
