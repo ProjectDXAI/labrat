@@ -1,5 +1,9 @@
 # labrat
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
+<sub>The English README is the canonical source of truth. The Chinese translation is provided for accessibility and may lag slightly behind.</sub>
+
 `labrat` is a local-first runtime for giving Claude Code or Codex a real research problem, a scoreboard, and enough structure to keep going for hours.
 
 In plain English:
