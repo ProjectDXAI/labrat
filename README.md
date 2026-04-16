@@ -25,6 +25,28 @@ In plain English:
 
 This means a family can become strategically important even before it becomes the global selection champion. The dashboard now shows both the current champion and the current decisive-challenge leaders.
 
+## Good first problems
+
+`labrat` works best when the problem has:
+
+- a clear baseline
+- a bounded experiment runner
+- a metric you can score consistently
+- at least one harder held-out challenge beyond the main hill-climb metric
+
+Good examples:
+
+- tune a small classifier or ranking model
+- iterate on prompt + rubric combinations with fixed evaluation
+- search over retrieval / reranking strategies
+- compare workflow variants where one family should win a specific hard slice, not just the average score
+
+If you only open three things first:
+
+- [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md)
+- [examples/nlp-sentiment/research_lab](/Users/punkyrest/infiniteagentworks/labrat/examples/nlp-sentiment/research_lab)
+- [docs/DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md)
+
 ## A useful framing
 
 `labrat` is not a philosophy-of-science engine, but Lakatos is a useful mental model for the runtime.
