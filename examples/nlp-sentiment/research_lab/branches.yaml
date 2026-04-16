@@ -1,91 +1,129 @@
-# SST-5 Sentiment Classification -- labrat branches
-# CPU-only, M4 MacBook Pro, ~2-3 min per experiment
-# Illustrative example pushing for real performance on a public benchmark
-
-mission: "SST-5 fine-grained sentiment (5-class, 8.5K train). Maximize macro F1 with TF-IDF + sklearn on CPU. Baseline F1=0.36. Composite score blends F1 (40%), robustness (25%), generalization (20%), calibration (10%), minus complexity (5%)."
+mission: "Maximize macro F1 on a small five-class sentiment corpus using CPU-only sklearn models while preserving a stable held-out selection signal."
 
 production_baseline:
-  experiment_id: "baseline_tfidf_logreg"
-  description: "TF-IDF (unigram, 10K features) + LogisticRegression"
+  experiment_id: "baseline_logreg_unigram"
+  description: "Word unigram TF-IDF with logistic regression."
+  resource_class: "cpu"
   config:
+    data:
+      dataset_path: "data/sentiment_toy.jsonl"
+      text_key: "text"
+      label_key: "label"
+      split_key: "split"
     features:
-      ngram_min: 1
-      ngram_max: 1
-      max_features: 10000
-      sublinear_tf: true
-      analyzer: "word"
-      min_df: 2
-      max_df: 0.95
-    preprocessing:
-      lowercase: true
-      stop_words: false
+      word_ngram_max: 1
+      char_ngrams: false
+      char_ngram_max: 4
+      max_features: 800
+      min_df: 1
     model:
-      type: "logistic"
-      params:
-        C: 1.0
-        max_iter: 1000
+      type: "logreg"
+      C: 1.0
+      alpha: 0.7
+      class_weight: null
+    calibration:
+      enabled: false
+      method: "sigmoid"
+    training:
+      seed: 1337
+  seed_metrics:
+    search_eval: 0.48
+    selection_eval: 0.46
+    final_eval: 0.45
 
-branches:
-  features:
-    description: "TF-IDF feature engineering: ngrams, vocabulary size, char vs word"
-    initial_budget: 20
-    search_space:
-      - delta_key: "features.ngram_max"
-        values: [2, 3]
-      - delta_key: "features.max_features"
-        values: [5000, 20000, 50000]
-      - delta_key: "features.analyzer"
-        values: ["char_wb"]
-      - delta_key: "features.sublinear_tf"
-        values: [false]
+families:
+  text_representation:
+    description: "Cheap orthogonal probes over word and character TF-IDF choices."
+    scientific_rationale: "The smallest reliable jump on tiny sentiment corpora often comes from representation choice before classifier changes."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "bigrams"
+        description: "Test whether adding word bigrams lifts the fixed-split search score."
+        config_patch:
+          features:
+            word_ngram_max: 2
+      - name: "char_mix"
+        description: "Add character n-grams for misspelling tolerance."
+        config_patch:
+          features:
+            char_ngrams: true
+            char_ngram_max: 5
+    mutation_policy:
+      axes:
+        - path: "features.max_features"
+          values: [600, 1200, 2000]
+        - path: "features.min_df"
+          values: [1, 2]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0
 
-  model:
-    description: "Classifier type: CatBoost, LightGBM, SVM, RandomForest, GBM"
-    initial_budget: 20
-    search_space:
-      - delta_key: "model.type"
-        values: ["catboost", "lightgbm", "svm", "random_forest", "gradient_boosting"]
+  classifier_search:
+    description: "Classifier family over logistic regression, linear SVM, and multinomial Naive Bayes."
+    scientific_rationale: "Once the text representation is decent, the best cheap gains often come from margin shape and class reweighting."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "linearsvc_seed"
+        description: "Swap logistic regression for a linear margin model."
+        config_patch:
+          model:
+            type: "linearsvc"
+            C: 1.0
+      - name: "nb_seed"
+        description: "Try multinomial Naive Bayes as a calibration-light baseline."
+        config_patch:
+          model:
+            type: "nb"
+            alpha: 0.7
+    mutation_policy:
+      axes:
+        - path: "model.C"
+          values: [0.5, 1.0, 2.0]
+        - path: "model.class_weight"
+          values: [null, "balanced"]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0
 
-  preprocessing:
-    description: "Text preprocessing: stopwords, min_df, max_df"
-    initial_budget: 15
-    search_space:
-      - delta_key: "preprocessing.stop_words"
-        values: [true]
-      - delta_key: "features.min_df"
-        values: [1, 5, 10]
-      - delta_key: "features.max_df"
-        values: [0.80, 0.90]
-
-  objectives:
-    description: "Class weighting and regularization"
-    initial_budget: 15
-    search_space:
-      - delta_key: "model.params.class_weight"
-        values: ["balanced"]
-      - delta_key: "model.params.C"
-        values: [0.1, 0.5, 5.0, 10.0]
-
-  ensemble:
-    description: "Ensemble methods (after individual branch winners found)"
-    initial_budget: 10
-    search_space:
-      - delta_key: "model.type"
-        values: ["voting_soft", "stacking"]
-        note: "Requires branch winners to be identified first"
-
-  capstone:
-    description: "Combined configs from branch winners"
-    initial_budget: 15
-    search_space:
-      - delta_key: "combined"
-        values:
-          - name: "all_winners"
-            description: "Best features + best model + best preprocessing + best objectives"
-            config_overrides: {}
-
-budget_rules:
-  replenish_every_n_cycles: 10
-  base_replenish: 5
-  improvement_bonus: 3
-  max_stale_cycles: 8
+  fusion_frontier:
+    description: "Combines the best representation and classifier winners, then optionally calibrates them."
+    scientific_rationale: "Representation and classifier improvements often stack; calibration only matters once the frontier is worth stabilizing."
+    resource_class: "cpu"
+    funding:
+      initial_credits: 4
+    cheap_probes: []
+    mutation_policy:
+      axes: []
+    crossover_policy:
+      enabled: true
+      compatible_families:
+        - text_representation
+        - classifier_search
+      config_patch:
+        calibration:
+          enabled: true
+          method: "sigmoid"
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 2
+      min_remaining_probes: 0

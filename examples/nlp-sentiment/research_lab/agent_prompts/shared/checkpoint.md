@@ -1,5 +1,8 @@
-# Phase: Checkpoint And Consolidation
+Read:
 
-Read `consolidation_agent.md`, `logs/handoff.md`, `research_brief.md`, and `research_sources.md`.
+1. `consolidation_agent.md`
+2. `state/frontier.json`
+3. `state/candidates.jsonl`
+4. `state/evaluations.jsonl`
 
-Leave a checkpoint that a fresh context window can resume without rereading the whole experiment log.
+Write a compact checkpoint note for the current frontier.

@@ -1,11 +1,28 @@
 # Research Brief
 
-The runnable SST-5 lab is a reduced version of a larger sentiment research program. The real objective is to maximize macro F1 on five-way sentiment labels while staying CPU-only, fast to iterate, and honest about minority-class performance. That constraint rules out heavyweight transformer fine-tuning in the runnable example, but it still leaves meaningful room in features, class weighting, preprocessing, objective choices, and cheap ensembles.
+Mission:
+Maximize macro F1 on a five-class sentiment dataset using only CPU-friendly sklearn pipelines.
 
-The competitive landscape has two layers. At the top end, modern encoder models and larger fine-tuned systems push SST-5 materially higher than bag-of-words baselines. At the small-compute end, however, the strongest practical wins come from better feature spaces, better handling of class imbalance, and tighter evaluation discipline. That is why this reduced lab keeps a TF-IDF plus scikit-learn baseline but still preserves the broader research shape from the full tree design.
+Baseline:
+Word unigram TF-IDF plus logistic regression.
 
-The branch design reflects that split. `features` and `model` carry the most budget because published baselines and practical experience both say n-grams, vocabulary control, and linear-margin variants are the biggest cheap levers. `preprocessing` and `objectives` exist because small text labs are sensitive to token cleaning, stopword policy, and class weighting. `ensemble` and `assumption_audit` cover two things that often matter more than another random sweep: simple model combinations and sanity checks that keep the metric honest.
+Target:
+Beat the baseline on both search and held-out selection splits without relying on noisy one-off wins.
 
-The main interaction expectation is that feature-space choices and class balancing compound. Bigger n-gram windows can help minority recall, but only if the vocabulary is constrained enough to stay stable. Ensemble combinations are only worth it after the individual axes settle. The largest risk is that the reduced CPU-only frame simply cannot express the best ideas from the full production-scale sentiment tree, which is why the example keeps the deep-research trail visible instead of pretending the reduced lab is the whole problem.
+Constraints:
+- CPU only
+- local fixed dataset file
+- fast enough for repeated reruns
+- no model self-reporting of canonical scores
 
-Recommended order: push `features` and `model` first, use `objectives` and `preprocessing` to clean up promising lines, then run cheap ensemble and audit passes once the local frontier flattens.
+Search ladder:
+1. cheap probes on text representation and classifier choice
+2. mutation around the best local family
+3. implementation audit for invalid-fast or unstable near-miss candidates
+4. frame break if both families plateau
+5. expansion if a frame-break memo says the current families are structurally incomplete
+
+Family graph summary:
+- `text_representation` asks what the model sees.
+- `classifier_search` asks how the decision boundary should be fit.
+- `fusion_frontier` combines winners from the first two families and calibrates them.

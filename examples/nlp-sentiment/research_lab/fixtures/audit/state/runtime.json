@@ -1,0 +1,11 @@
+{
+  "version": "vnext",
+  "status": "idle",
+  "active_phase": "supervisor",
+  "created_at": "2026-04-15T00:00:00+00:00",
+  "updated_at": "2026-04-15T00:00:00+00:00",
+  "last_supervisor_action": "fixture",
+  "stagnation_counter": 1,
+  "step_count": 3,
+  "last_checkpoint_at": null
+}

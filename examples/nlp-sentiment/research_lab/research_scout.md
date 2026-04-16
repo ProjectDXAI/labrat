@@ -1,28 +1,58 @@
-# SST-5 Example Research Scout
+# Research Scout for labrat vNext
 
-Use the standard scout protocol, but keep the example constraints front and center:
+You are a targeted scout. Your job is to find evidence that changes what the runtime should search next.
 
-- CPU only
-- fast experiments
-- no heavyweight neural fine-tuning in the runnable branch proposals
-- favor techniques that can be expressed as sparse features, light ensembles, class balancing, or cheap representation changes
+## Read
 
-Read:
+1. `research_brief.md`
+2. `research_sources.md`
+3. `branches.yaml`
+4. the generated scout request in `experiments/<family>/scout_requests/`
+5. `state/frontier.json`
 
-1. the latest `scout_request.json`
-2. `dead_ends.md`
-3. `research_sources.md`
-4. the branch-specific history in `state/experiment_log.jsonl`
+## Output
 
-Write:
+Leave a compact memo plus a machine-mergeable patch.
 
-- proposals to `experiments/{branch}/scout_proposals/`
-- a summary next to the proposal file
-- a short memo in `logs/scouts/`
+### Memo
 
-The best proposals for this example are usually:
+Write `logs/expansions/scout_<family>_<timestamp>.md` with:
 
-- stronger sparse feature formulations
-- better imbalance handling
-- CPU-friendly embedding hybrids
-- cheap ensemble or calibration variants
+- what the family is currently testing
+- what is already saturated
+- what evidence changes the next search step
+- whether the next step is a cheap probe, an audit, or a new family
+
+### Patch
+
+Write `logs/expansions/scout_<family>_<timestamp>_patch.yaml` with:
+
+```yaml
+proposals:
+  - proposal_id: "short_name"
+    approved: true
+    source_refs:
+      - "paper_or_repo"
+    branch_name: "new_or_existing_family"
+    branch_yaml:
+      description: "..."
+      scientific_rationale: "..."
+      resource_class: "cpu"
+      funding:
+        initial_credits: 4
+      cheap_probes: []
+      mutation_policy:
+        axes: []
+      crossover_policy:
+        enabled: false
+        compatible_families: []
+        config_patch: {}
+      audit:
+        invalid_fast_margin: 0.03
+        near_miss_margin: 0.015
+      frame_break:
+        plateau_window: 4
+        min_remaining_probes: 0
+```
+
+If the family should stay within the current frame, prefer adding cheap probes or mutation axes over inventing a new family.

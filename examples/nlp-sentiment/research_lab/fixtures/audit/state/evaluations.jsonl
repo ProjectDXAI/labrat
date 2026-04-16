@@ -1,0 +1,1 @@
+{"candidate_id":"classifier_search_mutation_badfast","attempt":1,"result_path":"fixtures/audit/result.json","evaluated_at":"2026-04-15T00:00:00+00:00","valid":false,"search_eval":0.67,"selection_eval":0.0,"final_eval":0.0,"proxy_metrics":{},"resource_floor":0.35,"finding":"invalid fast","metrics":{"error":"simulated invalid-fast result"}}

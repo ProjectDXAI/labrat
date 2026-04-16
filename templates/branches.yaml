@@ -1,269 +1,102 @@
-# Research Lab: Branch Tree Template
-#
-# CUSTOMIZE THIS FILE for your domain.
-# Each branch explores one axis of variation.
-# The allocator picks the highest-priority branch each cycle.
-#
-# v2: Added meta-branches, external research hooks, multi-delta capstone,
-#     expansion triggers, and per-branch scoring overrides.
-# v3: Adds optional screening and exploration-policy fields so the agent can
-#     naturally try cheap orthogonal probes and implementation audits before
-#     exhausting a frontier family.
+# labrat vNext family spec
 
-# One line: what is this lab trying to achieve? Shown in the dashboard header.
-mission: "LABRAT_PLACEHOLDER: replace with the goal, baseline metric, and target shown in the dashboard header."
+mission: "LABRAT_PLACEHOLDER: replace with the goal, baseline metric, and target."
 
-# Your current best configuration (the thing to beat)
 production_baseline:
-  experiment_id: "LABRAT_PLACEHOLDER_baseline_v1"
-  description: "LABRAT_PLACEHOLDER: replace with the current best approach"
+  experiment_id: "LABRAT_PLACEHOLDER_baseline"
+  description: "LABRAT_PLACEHOLDER: current production baseline"
+  resource_class: "cpu"
   config:
-    # YOUR baseline config here
-    data:
-      dataset: "LABRAT_PLACEHOLDER_dataset"
-      train_split: "train"
-      test_split: "test"
     model:
       type: "LABRAT_PLACEHOLDER_model"
-      params: {}
+    data:
+      dataset: "LABRAT_PLACEHOLDER_dataset"
     training:
-      epochs: 10
-      batch_size: 32
-      learning_rate: 0.001
-    evaluation:
-      metric: "LABRAT_PLACEHOLDER_primary_metric"
-      cross_validation: true
-      n_folds: 5
+      seed: 1337
+  seed_metrics:
+    search_eval: 0.0
+    selection_eval: 0.0
+    final_eval: 0.0
 
-# Optional cheap-ranking stage used before full expensive runs.
-# If your domain has a reliable proxy (build-only cost, subset eval, short horizon),
-# define it here so the orchestrator can screen obvious losers cheaply.
-screening:
-  enabled: true
-  stage: "LABRAT_PLACEHOLDER_build_only_or_subset_eval"
-  proxy_metric: "LABRAT_PLACEHOLDER_proxy_metric"
-  validate_top_k: 1
-  notes: "LABRAT_PLACEHOLDER: explain when the proxy is safe and when it is not"
+families:
+  cheap_probe_family:
+    description: "LABRAT_PLACEHOLDER: low-cost orthogonal probes against the baseline"
+    scientific_rationale: "LABRAT_PLACEHOLDER: why these probes matter before deeper search"
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "probe_one"
+        description: "LABRAT_PLACEHOLDER probe"
+        config_patch:
+          probe:
+            name: "LABRAT_PLACEHOLDER_probe"
+    mutation_policy:
+      axes:
+        - path: "model.type"
+          values:
+            - "LABRAT_PLACEHOLDER_model_a"
+            - "LABRAT_PLACEHOLDER_model_b"
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
 
-# Exploration policy tells the orchestrator how aggressive it should be about
-# cheap orthogonal probes and implementation audits before escalating outward.
-exploration_policy:
-  require_cheap_orthogonal_probes: true
-  cheap_probe_families:
-    - "width_or_group_size"
-    - "order_or_traversal"
-    - "packing_or_schedule"
-    - "overlap_or_prefetch"
-    - "lightweight_layout_change"
-  implementation_audit_on_invalid_fast: true
-  implementation_audit_on_near_miss: true
-  near_miss_delta: 0.02
+  mutation_family:
+    description: "LABRAT_PLACEHOLDER: a deeper family with real local exploitation"
+    scientific_rationale: "LABRAT_PLACEHOLDER: why mutations here could beat the baseline"
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "seed_variant"
+        description: "LABRAT_PLACEHOLDER seed"
+        config_patch:
+          model:
+            variant: "LABRAT_PLACEHOLDER_seed"
+    mutation_policy:
+      axes:
+        - path: "training.learning_rate"
+          values: [0.001, 0.003, 0.01]
+        - path: "training.regularization"
+          values: [0.0, 0.1, 0.2]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
 
-# Data splits for held-out validation at convergence.
-# The held_out_test period is NEVER used during exploration.
-# The champion is evaluated on it exactly once before declaring convergence.
-data_splits:
-  train_val:
-    note: "All experimentation happens within this period"
-  held_out_test:
-    note: "Touched ONCE at convergence. Never during exploration."
-    # start: "2025-09-15"
-    # end: "2025-10-14"
-
-# --- STANDARD BRANCHES ---
-# Each branch explores one axis of variation with single-delta experiments.
-
-branches:
-  # Branch 1: Model architecture
-  architecture:
-    description: "LABRAT_PLACEHOLDER: replace with a research-backed model architecture branch"
-    initial_budget: 15
-    mutation_mode: "llm"          # when search_space exhausted, subagent proposes mutations
-    inner_loop_budget: 3          # experiments per subagent invocation (default 1)
-    inner_loop_metric: "primary_metric"  # fast metric for keep/revert in inner loop
-    search_space:
-      - delta_key: "model.type"
-        values: ["LABRAT_PLACEHOLDER_model_a", "LABRAT_PLACEHOLDER_model_b", "LABRAT_PLACEHOLDER_model_c"]
-      - delta_key: "model.params.hidden_size"
-        values: [128, 256, 512, 1024]
-
-  # Branch 2: Training recipe
-  training:
-    description: "LABRAT_PLACEHOLDER: replace with a research-backed training recipe branch"
-    initial_budget: 12
-    search_space:
-      - delta_key: "training.learning_rate"
-        values: [0.0001, 0.0005, 0.005, 0.01]
-      - delta_key: "training.batch_size"
-        values: [16, 64, 128]
-      - delta_key: "training.epochs"
-        values: [5, 20, 50]
-
-  # Branch 3: Data engineering
-  data:
-    description: "LABRAT_PLACEHOLDER: replace with a research-backed data engineering branch"
-    initial_budget: 12
-    search_space:
-      - delta_key: "data.augmentation"
-        values: ["LABRAT_PLACEHOLDER_none", "LABRAT_PLACEHOLDER_basic", "LABRAT_PLACEHOLDER_aggressive"]
-      - delta_key: "data.preprocessing"
-        values: ["LABRAT_PLACEHOLDER_standard", "LABRAT_PLACEHOLDER_normalized", "LABRAT_PLACEHOLDER_quantile"]
-
-  # Branch 4: Objective function
-  objectives:
-    description: "LABRAT_PLACEHOLDER: replace with a research-backed objective branch"
-    initial_budget: 15
-    search_space:
-      - delta_key: "training.loss"
-        values: ["LABRAT_PLACEHOLDER_cross_entropy", "LABRAT_PLACEHOLDER_focal", "LABRAT_PLACEHOLDER_label_smoothing"]
-
-  # Branch 5: Generalization
-  generalization:
-    description: "LABRAT_PLACEHOLDER: replace with a research-backed robustness branch"
-    initial_budget: 10
-    search_space:
-      - delta_key: "data.dataset"
-        values: ["LABRAT_PLACEHOLDER_dataset_b", "LABRAT_PLACEHOLDER_dataset_c"]
-
-  # Branch 6: Cheap orthogonal probes
-  # Use this for low-cost frontier questions like order, width, schedule,
-  # overlap, lightweight layout, or other structure-preserving probes.
-  cheap_probes:
-    description: "LABRAT_PLACEHOLDER: replace with a cheap orthogonal probe branch"
-    initial_budget: 10
-    search_space:
-      - delta_key: "config.probe_family"
-        values:
-          - "LABRAT_PLACEHOLDER_width"
-          - "LABRAT_PLACEHOLDER_order"
-          - "LABRAT_PLACEHOLDER_overlap"
-
-  # --- CAPSTONE BRANCH ---
-  # Multi-delta: combines winners from other branches.
-  # The orchestrator auto-generates 2^N factorial combinations of branch winners.
-  capstone:
-    description: "Combined configs from branch winners. Multi-delta allowed."
-    initial_budget: 10
-    multi_delta: true  # allows changing multiple params at once
-    auto_generate: true  # orchestrator generates combinations from branch winners
-    search_space:
-      - delta_key: "combined"
-        values:
-          - name: "optimal_combined"
-            description: "All branch winners combined"
-            config_overrides: {}  # filled after branch exploration
-
-  # --- META-BRANCHES ---
-  # These don't test configs. They test assumptions.
-
-  assumption_audit:
-    description: "Tests whether our methodology is sound"
-    initial_budget: 10
-    experiment_type: "diagnostic"  # no composite scoring
-    search_space:
-      - delta_key: "audit_type"
-        values:
-          - name: "data_leakage_check"
-            description: "Verify no future data leaks into features"
-          - name: "oos_split_validation"
-            description: "Compare close_time vs snapshot_time splits"
-          - name: "fill_probability_sensitivity"
-            description: "Test sensitivity to execution assumptions"
-          - name: "scoring_metric_correlation"
-            description: "Does our scoring metric predict live performance?"
-          - name: "implementation_audit"
-            description: "Is a promising invalid-fast or near-miss branch mechanically broken rather than scientifically dead?"
-
-  frame_challenge:
-    description: "Challenges fundamental assumptions when lab converges"
-    initial_budget: 5
-    experiment_type: "meta"  # can retroactively change verdicts
-    trigger: "convergence"  # only activates when lab is about to converge
-    search_space:
-      - delta_key: "challenge_type"
-        values:
-          - name: "wrong_metric"
-            description: "Are we optimizing the wrong thing?"
-          - name: "dead_end_revival"
-            description: "What would make our dead ends work?"
-          - name: "assumption_test"
-            description: "List and test all unstated assumptions"
-
-# --- DATA EXPLORATION CONFIGURATION ---
-# Controls the Step 0 data exploration agent.
-
-data_exploration:
-  on_init: true        # run on cycle 0
-  on_expansion: true   # re-run on expansion cycles
-  analyses:
-    - type: "subgroup_comparison"
-      group_by: []     # list categorical columns to compare (customize)
-      metric: "primary_metric"
-    - type: "correlation_scan"
-      features: "all_numeric"
-    - type: "distribution_shift"
-      compare: "train_vs_test"
-
-# --- GATE EVOLUTION CONFIGURATION ---
-# Controls automatic detection and relaxation of overly restrictive gates.
-
-gate_evolution:
-  enabled: true
-  binding_threshold: 0.40   # flag gates causing >40% of rejections
-  min_rejections: 10        # minimum rejections before checking
-  auto_relax: false         # set true to auto-relax binding gates
-  relaxation_factor: 0.80   # multiply threshold by this when relaxing
-  max_relaxations: 2        # max times a single gate can be relaxed
-
-# --- EXTERNAL RESEARCH CONFIGURATION ---
-# Controls how the research scout and expansion agent search for new ideas.
-
-external_research:
-  # When to deploy research scouts
-  scout_trigger:
-    consecutive_non_improvements: 4  # per branch (raised from 3)
-    all_branches_stuck: true  # scout all branches simultaneously
-    on_convergence: true  # before declaring convergence
-
-  # When to run expansion cycles (inject external knowledge)
-  expansion_trigger:
-    every_n_cycles: 20
-    on_diminishing_returns: true
-
-  # Search configuration for scouts
-  search_config:
-    # Domain-specific search terms (customize these)
-    domain_terms: ["your domain", "your technique"]
-    # Venues to prioritize
-    venues: ["arxiv", "github", "neurips", "icml"]
-    # Year range for papers
-    year_range: [2024, 2026]
-    # Max proposals per scout run
-    max_proposals: 5
-
-# --- BUDGET RULES ---
-
-budget_rules:
-  replenish_every_n_cycles: 10
-  base_replenish: 3               # tighter: earn your compute (was 5)
-  improvement_bonus: 5             # reward producers heavily (was 3)
-  max_stale_cycles: 8              # cut unvisited branches faster (was 10)
-  exhaustion_threshold: 4
-  max_budget_cap: 20               # lower ceiling forces competition (was 30)
-  meta_budget_separate: true
-
-# --- COST-AWARE ALLOCATION ---
-# The allocator can factor in experiment cost (time, tokens, compute)
-# when deciding which branches to explore. Expensive branches that
-# don't produce results get deprioritized faster.
-
-cost_tracking:
-  enabled: true                  # cost-aware allocation on by default
-  cost_field: "elapsed_sec"      # field in experiment_log.jsonl to use as cost
-  token_field: "tokens_used"     # optional: track token consumption
-  default_cost: 1.0              # fallback cost per experiment
-  cost_weight: 0.2               # how much cost efficiency influences priority (0-1)
-  # Per-branch cost overrides (e.g., GPU branches cost more than CPU branches)
-  branch_costs: {}
-  #   architecture: 10.0         # each experiment costs ~10 units
-  #   features: 1.0              # cheap experiments
+  crossover_family:
+    description: "LABRAT_PLACEHOLDER: combines complementary winners from other families"
+    scientific_rationale: "LABRAT_PLACEHOLDER: why the families should compose"
+    resource_class: "cpu"
+    funding:
+      initial_credits: 4
+    cheap_probes: []
+    mutation_policy:
+      axes: []
+    crossover_policy:
+      enabled: true
+      compatible_families:
+        - cheap_probe_family
+        - mutation_family
+      config_patch:
+        crossover:
+          enabled: true
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0

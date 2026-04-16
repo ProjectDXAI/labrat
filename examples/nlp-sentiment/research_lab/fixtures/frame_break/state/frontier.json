@@ -1,0 +1,26 @@
+{
+  "updated_at": "2026-04-15T00:00:00+00:00",
+  "global_champion": {
+    "candidate_id": "fusion_frontier_crossover_plateau",
+    "family": "fusion_frontier",
+    "selection_eval": 0.58,
+    "search_eval": 0.59,
+    "operator_type": "crossover"
+  },
+  "family_champions": {
+    "text_representation": {"candidate_id":"text_representation_best","family":"text_representation","selection_eval":0.56,"search_eval":0.57,"operator_type":"mutation"},
+    "classifier_search": {"candidate_id":"classifier_search_best","family":"classifier_search","selection_eval":0.57,"search_eval":0.58,"operator_type":"mutation"},
+    "fusion_frontier": {"candidate_id":"fusion_frontier_crossover_plateau","family":"fusion_frontier","selection_eval":0.58,"search_eval":0.59,"operator_type":"crossover"}
+  },
+  "elite_archive": {"global": [], "families": {}},
+  "family_funding": {
+    "text_representation": {"credits": 1, "spent": 6, "minted": 1, "remaining_cheap_probes": 0, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 3, "last_promoted_at": null, "status": "active", "exhausted": false},
+    "classifier_search": {"credits": 1, "spent": 7, "minted": 2, "remaining_cheap_probes": 0, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 3, "last_promoted_at": null, "status": "active", "exhausted": false},
+    "fusion_frontier": {"credits": 1, "spent": 3, "minted": 1, "remaining_cheap_probes": 0, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 2, "last_promoted_at": null, "status": "active", "exhausted": false}
+  },
+  "audit_queue": [],
+  "invalid_fast_candidates": [],
+  "unstable_candidates": [],
+  "pending_expansion": null,
+  "frame_break_required": true
+}

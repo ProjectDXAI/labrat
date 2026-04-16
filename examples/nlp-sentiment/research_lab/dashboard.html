@@ -3,1065 +3,377 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>labrat / lab dashboard</title>
+<title>labrat vNext Dashboard</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #ffffff;
-  --fg: #111111;
-  --muted: #888888;
-  --faint: #aaaaaa;
-  --border: #cccccc;
-  --border-dark: #111111;
-  --font: 'SF Mono', 'JetBrains Mono', 'Fira Code', 'Iosevka', 'Consolas', monospace;
-}
-html { font-size: 11px; }
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--fg);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 32px 24px 64px;
-}
-.ticker-wrap {
-  border-bottom: 1px solid var(--border);
-  padding: 6px 0;
-  margin-bottom: 0;
-  height: 24px;
-  overflow: hidden;
-  position: relative;
-}
-.ticker-item {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 4px 0;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-.ticker-item.active { opacity: 1; }
-.ticker-label {
-  color: var(--faint);
-  margin-right: 8px;
-  text-transform: uppercase;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-}
-.lab-header {
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 16px;
-  margin-bottom: 32px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.lab-monolith {
-  font-size: 5px;
-  line-height: 1.0;
-  white-space: pre;
-  font-family: var(--font);
-  color: var(--fg);
-  flex-shrink: 0;
-  user-select: none;
-}
-.lab-header-right {
-  flex: 1;
-  min-width: 0;
-}
-.lab-name-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-.lab-name {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.lab-subtitle {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-.progress-ring-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.progress-ring {
-  width: 24px;
-  height: 24px;
-  transform: rotate(-90deg);
-}
-.progress-ring-bg {
-  fill: none;
-  stroke: #eeeeee;
-  stroke-width: 2.5;
-}
-.progress-ring-fill {
-  fill: none;
-  stroke: var(--fg);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-dasharray: 62.83;
-  stroke-dashoffset: 62.83;
-  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.progress-ring-text {
-  font-size: 9px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.lab-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-}
-.meta-item { display: flex; gap: 6px; }
-.meta-label { color: var(--muted); }
-.meta-value { font-weight: 600; }
-.section { margin-bottom: 40px; }
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg);
-  border-bottom: 1px dashed var(--border);
-  padding-bottom: 6px;
-  margin-bottom: 12px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
-}
-thead th {
-  text-align: left;
-  font-weight: 600;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 10px;
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--border-dark);
-  white-space: nowrap;
-}
-tbody td {
-  padding: 4px 8px;
-  border-bottom: 1px solid #eeeeee;
-  vertical-align: top;
-}
-tbody tr:last-child td { border-bottom: 1px solid var(--border); }
-tbody tr:hover { background: #fafafa; }
-@keyframes rowFlash {
-  0% { background: #e8e8e8; }
-  100% { background: transparent; }
-}
-tbody tr.row-new { animation: rowFlash 2s ease-out forwards; }
-.status-active { font-weight: 600; }
-.status-exhausted { color: var(--faint); font-style: italic; }
-.labrat-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-}
-.labrat-icon {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.labrat-icon.idle { color: var(--faint); }
-.labrat-icon.running { color: var(--fg); font-weight: 600; }
-.labrat-icon.stuck { color: var(--muted); }
-@keyframes wiggle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.rat-tail {
-  display: inline-block;
-  animation: wiggle 1s ease-in-out infinite;
-}
-.labrat-label { color: var(--muted); }
-.labrat-label.running { color: var(--fg); font-weight: 600; }
-.branch-note-group { margin-bottom: 12px; }
-.branch-note-header {
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.branch-note-header:hover { color: var(--muted); }
-.branch-note-toggle {
-  font-size: 9px;
-  color: var(--muted);
-  transition: transform 0.2s;
-  display: inline-block;
-}
-.branch-note-toggle.open { transform: rotate(90deg); }
-.branch-note-summary {
-  font-weight: 400;
-  color: var(--muted);
-  font-size: 10px;
-  margin-left: auto;
-}
-.branch-note-list {
-  display: none;
-  font-size: 10px;
-  line-height: 1.6;
-  padding: 4px 0 4px 16px;
-  color: var(--fg);
-  border-left: 1px solid var(--border);
-  margin-left: 6px;
-}
-.branch-note-list.open { display: block; }
-.branch-note-item { padding: 1px 0; }
-.branch-note-item .verdict-promote { font-weight: 700; }
-.branch-note-item .verdict-reject { text-decoration: line-through; color: var(--muted); }
-.branch-note-item .verdict-marginal { color: var(--muted); }
-.agent-running-bar {
-  height: 2px;
-  margin-top: 2px;
-  background: #eeeeee;
-  position: relative;
-  overflow: hidden;
-  border-radius: 1px;
-}
-.agent-running-bar .bar-sweep {
-  position: absolute;
-  top: 0; left: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, var(--fg), transparent);
-  animation: barSweep 2s ease-in-out infinite;
-}
-@keyframes barSweep {
-  0% { left: -40%; }
-  100% { left: 100%; }
-}
-.budget-bar-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 120px;
-}
-.budget-bar {
-  flex: 1;
-  height: 4px;
-  background: #eeeeee;
-  position: relative;
-}
-.budget-bar-fill {
-  position: absolute;
-  top: 0; left: 0;
-  height: 100%;
-  background: var(--fg);
-  transition: width 0.3s ease;
-}
-.budget-bar-text {
-  font-size: 10px;
-  color: var(--muted);
-  white-space: nowrap;
-  min-width: 32px;
-  text-align: right;
-}
-.verdict-promote { font-weight: 700; }
-.verdict-marginal { color: var(--muted); }
-.verdict-reject { text-decoration: line-through; color: var(--fg); }
-.num { font-variant-numeric: tabular-nums; text-align: right; }
-.handoff-content {
-  font-size: 11px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  padding: 12px 0;
-  max-height: 400px;
-  overflow-y: auto;
-}
-.handoff-content h1, .handoff-content h2, .handoff-content h3 {
-  font-size: 12px;
-  font-weight: 700;
-  margin: 12px 0 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.handoff-content h1:first-child, .handoff-content h2:first-child { margin-top: 0; }
-.handoff-content p { margin-bottom: 8px; }
-.handoff-content ul, .handoff-content ol { margin: 4px 0 8px 16px; }
-.axis-list { display: flex; flex-wrap: wrap; gap: 4px 12px; }
-.axis-item { font-size: 10px; padding: 2px 0; }
-.axis-flat { color: var(--faint); }
-.axis-meaningful { font-weight: 600; }
-.status-bar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  padding: 4px 24px;
-  font-size: 10px;
-  color: var(--muted);
-  display: flex;
-  justify-content: space-between;
-}
-.waiting { color: var(--faint); font-style: italic; padding: 8px 0; }
-.refresh-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border: 1px solid var(--border);
-  margin-right: 4px;
-  vertical-align: middle;
-}
-.refresh-dot.active { background: var(--fg); border-color: var(--fg); }
-.chart-tooltip {
-  position: fixed;
-  pointer-events: none;
-  background: var(--bg);
-  border: 1px solid var(--border-dark);
-  padding: 6px 10px;
-  font-family: var(--font);
-  font-size: 10px;
-  line-height: 1.5;
-  z-index: 100;
-  display: none;
-  white-space: nowrap;
-}
-.chart-tooltip.visible { display: block; }
-@keyframes barGrow { from { width: 0; } }
-.leaderboard-bar { animation: barGrow 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-@media (max-width: 640px) {
-  .container { padding: 16px 12px 48px; }
-  .lab-meta { gap: 12px; }
-  table { font-size: 10px; }
-  thead th, tbody td { padding: 3px 4px; }
-}
+  :root {
+    --bg: #f4f2ea;
+    --panel: #fbfaf6;
+    --text: #1f1d1a;
+    --muted: #6f6a61;
+    --line: #dbd6cb;
+    --accent: #9d5d2b;
+    --good: #2d7a4a;
+    --bad: #b24a3f;
+    --warn: #8d6a12;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    color: var(--text);
+    background: linear-gradient(180deg, #f8f6ef 0%, var(--bg) 100%);
+  }
+  .wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 18px 20px;
+    box-shadow: 0 10px 30px rgba(31, 29, 26, 0.05);
+  }
+  h1, h2, h3, p { margin: 0; }
+  h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+  }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .stat {
+    background: #f6f3ec;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+  }
+  .stat .value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat .label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #efe8db;
+    color: var(--accent);
+  }
+  .good { color: var(--good); }
+  .bad { color: var(--bad); }
+  .warn { color: var(--warn); }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .stack {
+    display: grid;
+    gap: 20px;
+  }
+  .list {
+    display: grid;
+    gap: 10px;
+  }
+  .item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: #f7f4ec;
+  }
+  .item strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    font-size: 12px;
+    background: #faf7ef;
+  }
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  @media (max-width: 980px) {
+    .hero, .grid { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="ticker-wrap" id="ticker-wrap">
-    <div class="ticker-item active" id="ticker-0"><span class="ticker-label">feed</span>waiting for experiments</div>
-    <div class="ticker-item" id="ticker-1"></div>
-    <div class="ticker-item" id="ticker-2"></div>
-    <div class="ticker-item" id="ticker-3"></div>
-    <div class="ticker-item" id="ticker-4"></div>
-  </div>
-  <div class="lab-header">
-<pre class="lab-monolith">&#9619;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9619;
-&#9608;          &#9608;
-&#9608; &#9617;&#9618;&#9619;&#9608;&#9608;&#9619;&#9618;&#9617; &#9608;
-&#9608; &#9608; &#9608;&#9608;&#9608;&#9608; &#9608; &#9608;
-&#9608; &#9608; &#9608;&#9608;&#9608;&#9608; &#9608; &#9608;
-&#9608; &#9617;&#9618;&#9619;&#9608;&#9608;&#9619;&#9618;&#9617; &#9608;
-&#9608;          &#9608;
-&#9608;          &#9608;
-&#9608;          &#9608;
-&#9619;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9619;</pre>
-    <div class="lab-header-right">
-      <div class="lab-name-row">
-        <div class="lab-name" id="lab-name">LABRAT</div>
-        <div class="progress-ring-wrap" id="progress-ring-wrap" style="display:none">
-          <svg class="progress-ring" viewBox="0 0 24 24">
-            <circle class="progress-ring-bg" cx="12" cy="12" r="10"/>
-            <circle class="progress-ring-fill" id="progress-ring-fill" cx="12" cy="12" r="10"/>
-          </svg>
-          <span class="progress-ring-text" id="progress-ring-text">--</span>
+  <div class="wrap">
+    <section class="hero">
+      <div class="panel">
+        <div class="badge">Async Population Runtime</div>
+        <h1 id="mission">Loading mission...</h1>
+        <p class="muted" id="baseline">Loading baseline...</p>
+        <div class="stat-grid">
+          <div class="stat"><div class="value" id="stepCount">0</div><div class="label">Step Count</div></div>
+          <div class="stat"><div class="value" id="queuedJobs">0</div><div class="label">Queued Jobs</div></div>
+          <div class="stat"><div class="value" id="leasedJobs">0</div><div class="label">Leased Jobs</div></div>
+          <div class="stat"><div class="value" id="totalCandidates">0</div><div class="label">Candidates</div></div>
         </div>
       </div>
-      <div class="lab-subtitle">labrats at work</div>
-      <div class="lab-meta">
-        <div class="meta-item"><span class="meta-label">cycle</span><span class="meta-value" id="cycle-count">--</span></div>
-        <div class="meta-item"><span class="meta-label">experiments</span><span class="meta-value" id="total-experiments">--</span></div>
-        <div class="meta-item"><span class="meta-label">started</span><span class="meta-value" id="started-at">--</span></div>
-        <div class="meta-item"><span class="meta-label">last run</span><span class="meta-value" id="last-run" data-iso="">--</span></div>
-        <div class="meta-item"><span class="meta-label">runtime</span><span class="meta-value" id="runtime">--</span></div>
-        <div class="meta-item"><span class="meta-label">agents</span><span class="meta-value" id="active-agents">none</span></div>
+      <div class="panel stack">
+        <div>
+          <h2>Runtime Status</h2>
+          <p class="muted">Supervisor phase, champion, and evaluation posture.</p>
+        </div>
+        <div class="list">
+          <div class="item"><strong>Active Phase</strong><span id="activePhase" class="mono">idle</span></div>
+          <div class="item"><strong>Global Champion</strong><span id="globalChampion" class="mono">none</span></div>
+          <div class="item"><strong>Pending Expansion</strong><span id="pendingExpansion" class="mono">none</span></div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <div class="panel">
+          <h2>Worker Pool</h2>
+          <table id="workerTable">
+            <thead><tr><th>Worker</th><th>Class</th><th>Status</th><th>Lease</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Family Funding</h2>
+          <table id="fundingTable">
+            <thead><tr><th>Family</th><th>Credits</th><th>Spent</th><th>Minted</th><th>Plateau</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Audit + Expansion</h2>
+          <div class="pill-row" id="auditQueue"></div>
+          <div style="height:10px"></div>
+          <div class="pill-row" id="invalidFast"></div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="panel">
+          <h2>Frontier</h2>
+          <table id="frontierTable">
+            <thead><tr><th>Candidate</th><th>Family</th><th>Selection</th><th>Status</th><th>Parents</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Recent Evaluations</h2>
+          <table id="evalTable">
+            <thead><tr><th>Candidate</th><th>Attempt</th><th>Search</th><th>Selection</th><th>Valid</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Handoff</h2>
+          <pre id="handoff">Loading handoff...</pre>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="section">
-    <div class="section-title">mission</div>
-    <div id="mission-summary" style="font-size:11px;line-height:1.7;padding:4px 0"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">branches</div>
-    <div id="branches-content">
-      <table>
-        <thead><tr><th>branch</th><th>labrat</th><th>status</th><th class="num">n</th><th class="num">wins</th><th class="num">ev</th><th>budget</th><th class="num">champion</th><th class="num">last cycle</th></tr></thead>
-        <tbody id="branches-body"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-title">progress</div>
-    <div id="score-timeline" style="position:relative"></div>
-    <div id="branch-leaderboard" style="margin-top:16px"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">branch notes</div>
-    <div id="branch-notes"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">scoring formula</div>
-    <div style="font-size:10px;line-height:1.6;color:var(--muted)">
-      <strong style="color:var(--fg)">composite = 0.40&times;D + 0.25&times;R + 0.20&times;G + 0.10&times;C &minus; 0.05&times;K</strong><br>
-      D = F1 / 0.50 (deployment) &middot; R = CV folds above baseline (robustness) &middot; G = 1 &minus; fold variance (generalization) &middot; C = calibration (0.5 default) &middot; K = features/50K (complexity penalty)
-      <br>
-      <strong style="color:var(--fg)">verdict:</strong> PROMOTE if score &ge; champion &middot; MARGINAL if within 0.03 &middot; REJECT otherwise
-    </div>
-  </div>
-  <div class="section">
-    <div class="section-title">experiment log (last 10)</div>
-    <div id="log-content">
-      <table>
-        <thead><tr><th class="num">cycle</th><th>branch</th><th>experiment</th><th class="num">metric</th><th class="num">score</th><th>verdict</th></tr></thead>
-        <tbody id="log-body"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="section" id="scaling-section" style="display:none">
-    <div class="section-title">scaling axes</div>
-    <div class="axis-list" id="scaling-axes"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">current handoff</div>
-    <div id="handoff-content" class="handoff-content"></div>
-  </div>
-</div>
-<div class="status-bar">
-  <span id="status-bar-left">all rats idle</span>
-  <span><span class="refresh-dot" id="refresh-dot"></span>auto-refresh 10s</span>
-  <span id="last-refresh" data-ts="">--</span>
-</div>
-<div class="chart-tooltip" id="chart-tooltip"></div>
+
 <script>
-(function(){
-'use strict';
-var REFRESH_MS=10000;
-var STATE='./state/';
-var LOGS='./logs/';
-var RAT='\u1699\u2050\u1550\u1437';
-var _prevExperimentCount=-1;
-var _tickerEntries=[];
-var _tickerIndex=0;
-var _tickerTimer=null;
-var _lastRunISO=null;
-var _lastRefreshTS=null;
-var _startedISO=null;
-var _totalExperiments=0;
-var _tooltip=null;
-function getTooltip(){if(!_tooltip)_tooltip=document.getElementById('chart-tooltip');return _tooltip;}
-function loadJSON(path,cb){
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',path,true);
-  xhr.onreadystatechange=function(){
-    if(xhr.readyState===4){
-      if(xhr.status===200||xhr.status===0){try{cb(null,JSON.parse(xhr.responseText));}catch(e){cb(e,null);}}
-      else{cb(new Error('HTTP '+xhr.status),null);}
-    }
-  };
-  xhr.onerror=function(){cb(new Error('network'),null);};
-  try{xhr.send();}catch(e){cb(e,null);}
-}
-function loadJSONL(path,cb){
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',path,true);
-  xhr.onreadystatechange=function(){
-    if(xhr.readyState===4){
-      if(xhr.status===200||xhr.status===0){
-        var text=(xhr.responseText||'').trim();
-        if(!text){cb(null,[]);return;}
-        var lines=text.split('\n');var results=[];
-        for(var i=0;i<lines.length;i++){if(lines[i].trim()){try{results.push(JSON.parse(lines[i]));}catch(e){}}}
-        cb(null,results);
-      }else{cb(new Error('HTTP '+xhr.status),null);}
-    }
-  };
-  xhr.onerror=function(){cb(new Error('network'),null);};
-  try{xhr.send();}catch(e){cb(e,null);}
-}
-function loadText(path,cb){
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',path,true);
-  xhr.onreadystatechange=function(){
-    if(xhr.readyState===4){
-      if(xhr.status===200||xhr.status===0){cb(null,xhr.responseText||'');}
-      else{cb(new Error('HTTP '+xhr.status),null);}
-    }
-  };
-  xhr.onerror=function(){cb(new Error('network'),null);};
-  try{xhr.send();}catch(e){cb(e,null);}
-}
-function esc(s){if(s==null)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
-function fmt(n,decimals){if(n==null||isNaN(n))return '--';return Number(n).toFixed(decimals!=null?decimals:4);}
-function fmtDate(iso){
-  if(!iso)return '--';
-  try{var d=new Date(iso);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}catch(e){return '--';}
-}
-function fmtAgo(iso){
-  if(!iso)return '--';
-  try{
-    var diff=Math.max(0,Date.now()-new Date(iso).getTime());
-    var secs=Math.floor(diff/1000);
-    if(secs<5)return 'just now';if(secs<60)return secs+'s ago';
-    var mins=Math.floor(secs/60);if(mins<60)return mins+'m ago';
-    var hours=Math.floor(mins/60);if(hours<24)return hours+'h '+(mins%60)+'m ago';
-    var days=Math.floor(hours/24);return days+'d '+(hours%24)+'h ago';
-  }catch(e){return '--';}
-}
-function fmtDuration(startISO){
-  if(!startISO)return '--';
-  try{
-    var diff=Math.max(0,Date.now()-new Date(startISO).getTime());
-    var hours=Math.floor(diff/3600000);var mins=Math.floor((diff%3600000)/60000);
-    if(hours>24){var days=Math.floor(hours/24);hours=hours%24;return days+'d '+hours+'h '+mins+'m';}
-    return hours+'h '+mins+'m';
-  }catch(e){return '--';}
-}
-function waiting(msg){return '<div class="waiting">'+esc(msg||'waiting for data')+'</div>';}
-
-function updateTickerEntries(entries){
-  if(!entries||entries.length===0)return;
-  var exps=[];
-  for(var j=0;j<entries.length;j++){if(entries[j].branch&&entries[j].experiment_id)exps.push(entries[j]);}
-  var last5=exps.slice(-5);_tickerEntries=[];
-  for(var i=last5.length-1;i>=0;i--){
-    var e=last5[i];var branch=e.branch||'?';var expId=e.experiment_id||'?';
-    var verdict=(e.verdict||'?').toUpperCase();var score='--';
-    if(e.scores&&e.scores.composite_score!=null){score=fmt(e.scores.composite_score,4);}
-    else if(e.composite_score!=null){score=fmt(e.composite_score,4);}
-    var f1=e.f1!=null?' F1='+fmt(e.f1,4):'';
-    _tickerEntries.push(RAT+' '+branch+': '+expId+f1+' \u2192 '+verdict+' ('+score+')');
-  }
-}
-function tickerCycle(){
-  if(_tickerEntries.length===0)return;
-  for(var i=0;i<5;i++){var el=document.getElementById('ticker-'+i);if(el)el.className='ticker-item';}
-  var idx=_tickerIndex%_tickerEntries.length;var slot=_tickerIndex%5;
-  var el=document.getElementById('ticker-'+slot);
-  if(el){el.innerHTML='<span class="ticker-label">feed</span>'+esc(_tickerEntries[idx]);el.className='ticker-item active';}
-  _tickerIndex++;
-}
-function startTicker(){if(_tickerTimer)clearInterval(_tickerTimer);tickerCycle();_tickerTimer=setInterval(tickerCycle,3000);}
-
-function updateProgressRing(totalExperiments,totalBudget){
-  var wrap=document.getElementById('progress-ring-wrap');
-  var fill=document.getElementById('progress-ring-fill');
-  var text=document.getElementById('progress-ring-text');
-  if(totalBudget<=0&&totalExperiments<=0){wrap.style.display='none';return;}
-  wrap.style.display='';
-  var total=totalExperiments+totalBudget;if(total<=0)total=1;
-  var pct=totalExperiments/total;var circumference=2*Math.PI*10;
-  var offset=circumference*(1-pct);
-  fill.style.transition='none';fill.style.strokeDashoffset=circumference;
-  fill.getBoundingClientRect();
-  fill.style.transition='stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
-  fill.style.strokeDashoffset=offset;text.textContent=totalExperiments+'/'+total;
-}
-
-function updateAgoDisplays(){
-  var lastRunEl=document.getElementById('last-run');
-  if(_lastRunISO){lastRunEl.textContent=fmtAgo(_lastRunISO);lastRunEl.title=fmtDate(_lastRunISO);}
-  var lastRefreshEl=document.getElementById('last-refresh');
-  if(_lastRefreshTS){lastRefreshEl.textContent=fmtAgo(new Date(_lastRefreshTS).toISOString());}
-  var runtimeEl=document.getElementById('runtime');
-  if(_startedISO){runtimeEl.textContent=fmtDuration(_startedISO);}
-}
-
-function renderHeader(cycle){
-  document.getElementById('cycle-count').textContent=cycle.cycle!=null?cycle.cycle:'--';
-  var totalExp=cycle.total_experiments!=null?cycle.total_experiments:0;
-  document.getElementById('total-experiments').textContent=totalExp||'--';
-  document.getElementById('started-at').textContent=fmtDate(cycle.started_at);
-  _startedISO=cycle.started_at||null;_lastRunISO=cycle.last_run_at||null;_totalExperiments=totalExp;
-  document.getElementById('last-run').textContent=fmtAgo(_lastRunISO);
-  document.getElementById('last-run').title=fmtDate(_lastRunISO);
-  document.getElementById('runtime').textContent=fmtDuration(cycle.started_at);
-}
-
-var _activeAgents={};
-
-function renderBranches(beliefs,budget,champions){
-  var body=document.getElementById('branches-body');
-  if(!beliefs||!beliefs.branches){body.innerHTML='<tr><td colspan="9">'+waiting()+'</td></tr>';return;}
-  var branches=beliefs.branches;var names=Object.keys(branches);var html='';var totalBudgetRemaining=0;
-  for(var i=0;i<names.length;i++){
-    var name=names[i];var b=branches[name];
-    var budgetVal=(budget&&budget[name]!=null)?budget[name]:0;
-    totalBudgetRemaining+=budgetVal;
-    var initialBudget=budgetVal+(b.n_experiments||0);if(initialBudget<=0)initialBudget=1;
-    var pct=Math.round((budgetVal/initialBudget)*100);
-    var bStatus=b.status||'active';
-    var isInactive=bStatus==='exhausted'||bStatus==='blocked'||budgetVal<=0;
-    var champScore='--';
-    if(champions&&champions.branches&&champions.branches[name]){
-      var cs=champions.branches[name];
-      if(cs.scores&&cs.scores.composite_score!=null){champScore=fmt(cs.scores.composite_score,4);}
-    }
-    var statusClass=isInactive?'status-exhausted':(bStatus==='converged'?'status-exhausted':'status-active');
-    var agentInfo=_activeAgents[name];
-    var agentRunning=agentInfo&&agentInfo.status==='running';
-    var agentStuck=agentInfo&&agentInfo.status==='stuck';
-    var ratIconClass='labrat-icon idle';var ratContent=RAT;
-    var labratLabelClass='labrat-label';var labelText='idle';
-    if(agentRunning){
-      ratIconClass='labrat-icon running';
-      ratContent=RAT+'<span class="rat-tail">~</span>';
-      labratLabelClass='labrat-label running';
-      var aName=agentInfo.agent_name||agentInfo.experiment_id||'working';
-      labelText=esc(aName);
-      if(agentInfo.note)labelText+=' <span style="color:var(--muted);font-weight:400">- '+esc(agentInfo.note)+'</span>';
-    }else if(agentStuck){
-      ratIconClass='labrat-icon stuck';ratContent=RAT+'?';labelText='stuck';
-    }
-    var runningBar='';
-    if(agentRunning){runningBar='<div class="agent-running-bar"><div class="bar-sweep"></div></div>';}
-    html+='<tr>'
-      +'<td>'+esc(name)+runningBar+'</td>'
-      +'<td><span class="labrat-indicator">'
-      +'<span class="'+ratIconClass+'">'+ratContent+'</span>'
-      +'<span class="'+labratLabelClass+'">'+labelText+'</span>'
-      +'</span></td>'
-      +'<td class="'+statusClass+'">'+bStatus+'</td>'
-      +'<td class="num">'+(b.n_experiments||0)+'</td>'
-      +'<td class="num">'+(b.n_improvements||0)+'</td>'
-      +'<td class="num">'+fmt(b.current_ev,3)+'</td>'
-      +'<td><div class="budget-bar-wrap"><div class="budget-bar"><div class="budget-bar-fill" style="width:'+pct+'%"></div></div><span class="budget-bar-text">'+budgetVal+'</span></div></td>'
-      +'<td class="num">'+champScore+'</td>'
-      +'<td class="num">'+(b.last_explored_cycle||'--')+'</td>'
-      +'</tr>';
-  }
-  body.innerHTML=html;
-  updateProgressRing(_totalExperiments,totalBudgetRemaining);
-  var nActive=Object.keys(_activeAgents).filter(function(k){return _activeAgents[k]&&_activeAgents[k].status==='running';}).length;
-  var agentMeta=document.getElementById('active-agents');
-  if(agentMeta)agentMeta.textContent=nActive>0?nActive+' running':'none';
-  var statusLeft=document.getElementById('status-bar-left');
-  if(statusLeft)statusLeft.textContent=nActive>0?RAT+' \u00d7 '+nActive+' running':'all rats idle';
-}
-
-function renderLog(entries){
-  var body=document.getElementById('log-body');
-  if(!entries||entries.length===0){body.innerHTML='<tr><td colspan="6">'+waiting('no experiments yet')+'</td></tr>';_prevExperimentCount=0;return;}
-  var currentCount=entries.length;var newCount=0;
-  if(_prevExperimentCount>=0&&currentCount>_prevExperimentCount){newCount=currentCount-_prevExperimentCount;}
-  _prevExperimentCount=currentCount;
-  updateTickerEntries(entries);
-  var experiments=[];
-  for(var j=0;j<entries.length;j++){if(entries[j].branch&&entries[j].experiment_id){experiments.push(entries[j]);}}
-  var recent=experiments.slice(-10).reverse();var html='';
-  for(var i=0;i<recent.length;i++){
-    var e=recent[i];var verdict=(e.verdict||'').toUpperCase();
-    var verdictClass='verdict-reject';
-    if(verdict==='PROMOTE')verdictClass='verdict-promote';
-    else if(verdict==='MARGINAL')verdictClass='verdict-marginal';
-    var metric='--';
-    if(e.metrics&&e.metrics.test){var m=e.metrics.test;var val=m.primary_metric||m.IC||m.ic||m.f1_macro||m.accuracy;if(val!=null)metric=fmt(val,4);}
-    else if(e.f1!=null){metric=fmt(e.f1,4);}
-    else if(e.primary_metric!=null){metric=fmt(e.primary_metric,4);}
-    var score='--';
-    if(e.scores&&e.scores.composite_score!=null){score=fmt(e.scores.composite_score,4);}
-    else if(e.composite_score!=null){score=fmt(e.composite_score,4);}
-    var rowClass=(newCount>0&&i<newCount)?' class="row-new"':'';
-    var verdictPrefix='';
-    if(verdict==='PROMOTE')verdictPrefix=RAT+'\u2713 ';
-    else if(verdict==='REJECT')verdictPrefix=RAT+'\u2717 ';
-    else if(verdict==='MARGINAL')verdictPrefix=RAT+' ';
-    html+='<tr'+rowClass+'>'
-      +'<td class="num">'+(e.cycle!=null?e.cycle:'--')+'</td>'
-      +'<td>'+esc(e.branch||'--')+'</td>'
-      +'<td>'+esc(e.experiment_id||'--')+'</td>'
-      +'<td class="num">'+metric+'</td>'
-      +'<td class="num">'+score+'</td>'
-      +'<td class="'+verdictClass+'">'+verdictPrefix+esc(verdict||'--')+'</td>'
-      +'</tr>';
-  }
-  body.innerHTML=html;
-}
-
-function renderScaling(beliefs){
-  var section=document.getElementById('scaling-section');
-  var container=document.getElementById('scaling-axes');
-  if(!beliefs||!beliefs.branches){section.style.display='none';return;}
-  var axes=[];var branches=beliefs.branches;var names=Object.keys(branches);
-  for(var i=0;i<names.length;i++){
-    var b=branches[names[i]];
-    if(b.flat_axes&&b.flat_axes.length>0){for(var j=0;j<b.flat_axes.length;j++){axes.push({branch:names[i],axis:b.flat_axes[j],type:'flat'});}}
-    if(b.meaningful_axes&&b.meaningful_axes.length>0){for(var j=0;j<b.meaningful_axes.length;j++){axes.push({branch:names[i],axis:b.meaningful_axes[j],type:'meaningful'});}}
-  }
-  if(axes.length===0){section.style.display='none';return;}
-  section.style.display='';var html='';
-  for(var i=0;i<axes.length;i++){
-    var a=axes[i];var cls=a.type==='flat'?'axis-flat':'axis-meaningful';
-    html+='<span class="axis-item '+cls+'">'+esc(a.branch)+'/'+esc(a.axis)+(a.type==='flat'?' (flat)':'')+'</span>';
-  }
-  container.innerHTML=html;
-}
-
-function renderHandoff(text){
-  var el=document.getElementById('handoff-content');
-  if(!text||!text.trim()){el.innerHTML=waiting('no handoff written yet');return;}
-  var html=esc(text)
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^- (.+)$/gm,'<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g,function(m){return '<ul>'+m+'</ul>';})
-    .replace(/\n\n/g,'</p><p>');
-  el.innerHTML='<p>'+html+'</p>';
-}
-
-function renderBranchNotes(entries,beliefs){
-  var el=document.getElementById('branch-notes');
-  if(!entries||!beliefs||!beliefs.branches){el.innerHTML='<div class="waiting">no branch data</div>';return;}
-  var byBranch={};
-  for(var i=0;i<entries.length;i++){var e=entries[i];if(!e.branch||!e.experiment_id)continue;if(!byBranch[e.branch])byBranch[e.branch]=[];byBranch[e.branch].push(e);}
-  var branchNames=Object.keys(beliefs.branches);var html='';
-  for(var bi=0;bi<branchNames.length;bi++){
-    var name=branchNames[bi];var b=beliefs.branches[name];var exps=byBranch[name]||[];
-    var nExps=exps.length;var nWins=0;
-    for(var j=0;j<exps.length;j++){if(exps[j].verdict==='PROMOTE')nWins++;}
-    var summary=nExps+' experiments, '+nWins+' promotions';
-    if(b.status==='converged')summary+=' (converged)';
-    if(b.status==='blocked')summary+=' (blocked)';
-    var noteId='branch-notes-'+name;
-    html+='<div class="branch-note-group">';
-    html+='<div class="branch-note-header" onclick="toggleBranchNote(\''+noteId+'\')">';
-    html+='<span class="branch-note-toggle" id="toggle-'+noteId+'">&#9654;</span>';
-    html+=esc(name);
-    html+='<span class="branch-note-summary">'+summary+'</span>';
-    html+='</div>';
-    html+='<div class="branch-note-list" id="'+noteId+'">';
-    for(var k=0;k<exps.length;k++){
-      var exp=exps[k];var v=(exp.verdict||'').toUpperCase();
-      var vClass=v==='PROMOTE'?'verdict-promote':(v==='MARGINAL'?'verdict-marginal':'verdict-reject');
-      var f1=exp.f1!=null?' F1='+fmt(exp.f1,4):'';
-      var score=exp.composite_score!=null?' score='+fmt(exp.composite_score,4):'';
-      var delta=exp.delta?' ['+esc(exp.delta)+']':'';
-      html+='<div class="branch-note-item">c'+(exp.cycle||'?')+': <span class="'+vClass+'">'+esc(exp.experiment_id)+'</span>'+f1+score+delta+'</div>';
-    }
-    if(exps.length===0){html+='<div class="branch-note-item" style="color:var(--faint)">no experiments yet</div>';}
-    html+='</div></div>';
-  }
-  el.innerHTML=html;
-}
-
-window.toggleBranchNote=function(id){
-  var el=document.getElementById(id);var toggle=document.getElementById('toggle-'+id);
-  if(el){el.classList.toggle('open');if(toggle)toggle.classList.toggle('open');}
-};
-
-function showTooltip(evt,html){
-  var tip=getTooltip();tip.innerHTML=html;tip.className='chart-tooltip visible';
-  var x=evt.clientX+12;var y=evt.clientY-10;
-  var tipRect=tip.getBoundingClientRect();
-  if(x+tipRect.width>window.innerWidth-8)x=evt.clientX-tipRect.width-12;
-  if(y+tipRect.height>window.innerHeight-8)y=evt.clientY-tipRect.height-10;
-  if(y<4)y=4;
-  tip.style.left=x+'px';tip.style.top=y+'px';
-}
-function hideTooltip(){getTooltip().className='chart-tooltip';}
-
-function renderScoreTimeline(entries,champions){
-  var el=document.getElementById('score-timeline');
-  if(!entries||entries.length===0){el.innerHTML='';return;}
-
-  // Split into plottable (score>0) and hard rejects (score=0)
-  var exps=[]; var rejectCount=0;
-  for(var i=0;i<entries.length;i++){
-    var e=entries[i];
-    if(!e.branch||!e.experiment_id) continue;
-    var s=0;
-    if(e.scores&&e.scores.composite_score!=null) s=e.scores.composite_score;
-    else if(e.composite_score!=null) s=e.composite_score;
-    if(s>0.01){ exps.push({entry:e, score:s}); }
-    else { rejectCount++; }
-  }
-  if(exps.length===0){el.innerHTML='';return;}
-
-  var champScore=0;
-  if(champions&&champions.production_champion&&champions.production_champion.scores){
-    champScore=champions.production_champion.scores.composite_score||0;
-  }
-
-  // Tight Y bounds from actual data
-  var yMin=1, yMax=0;
-  for(var si=0;si<exps.length;si++){
-    if(exps[si].score<yMin) yMin=exps[si].score;
-    if(exps[si].score>yMax) yMax=exps[si].score;
-  }
-  if(champScore>0){ yMin=Math.min(yMin,champScore); yMax=Math.max(yMax,champScore); }
-  var yRange=yMax-yMin;
-  var yPad=Math.max(yRange*0.15, 0.01);
-  yMin=Math.floor((yMin-yPad)*100)/100;
-  yMax=Math.ceil((yMax+yPad)*100)/100;
-  if(yMin<0) yMin=0; if(yMax>1) yMax=1;
-  if(yMax-yMin<0.04){ yMin-=0.02; yMax+=0.02; }
-
-  var W=960, H=250;
-  var pad={top:20, right:75, bottom:40, left:60};
-  var plotW=W-pad.left-pad.right;
-  var plotH=H-pad.top-pad.bottom;
-  var n=exps.length;
-
-  function xPos(idx){ return pad.left+(n===1?plotW/2:(idx/(n-1))*plotW); }
-  function yPos(val){ return pad.top+((yMax-val)/(yMax-yMin))*plotH; }
-
-  var svg='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit;display:block">';
-
-  // Y gridlines (5 evenly spaced)
-  var yStep=(yMax-yMin)/4;
-  for(var g=0;g<=4;g++){
-    var yv=yMin+g*yStep;
-    var gy=yPos(yv);
-    svg+='<line x1="'+pad.left+'" y1="'+gy+'" x2="'+(W-pad.right)+'" y2="'+gy+'" stroke="#eeeeee" stroke-width="1"/>';
-    svg+='<text x="'+(pad.left-8)+'" y="'+(gy+3)+'" text-anchor="end" font-size="9" fill="#888888">'+yv.toFixed(3)+'</text>';
-  }
-
-  // Y axis label
-  svg+='<text x="14" y="'+(pad.top+plotH/2)+'" text-anchor="middle" font-size="9" fill="#888888" transform="rotate(-90,14,'+(pad.top+plotH/2)+')">composite score</text>';
-
-  // X axis labels
-  var xLabelStep=Math.max(1,Math.floor(n/8));
-  for(var xi=0;xi<n;xi++){
-    if(xi===0||xi===n-1||xi%xLabelStep===0){
-      svg+='<text x="'+xPos(xi)+'" y="'+(H-pad.bottom+16)+'" text-anchor="middle" font-size="9" fill="#888888">'+(xi+1)+'</text>';
-    }
-  }
-  svg+='<text x="'+(pad.left+plotW/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="#888888">experiment # ('+rejectCount+' hard rejects not shown)</text>';
-
-  // Champion line
-  if(champScore>0 && champScore>=yMin && champScore<=yMax){
-    var cy=yPos(champScore);
-    svg+='<line x1="'+pad.left+'" y1="'+cy+'" x2="'+(W-pad.right)+'" y2="'+cy+'" stroke="#111111" stroke-width="1.5" stroke-dasharray="6,4"/>';
-    svg+='<text x="'+(W-pad.right+4)+'" y="'+(cy-5)+'" font-size="9" fill="#111111" font-weight="700">champion</text>';
-    svg+='<text x="'+(W-pad.right+4)+'" y="'+(cy+9)+'" font-size="11" fill="#111111" font-weight="700">'+champScore.toFixed(4)+'</text>';
-  }
-
-  // Per-branch trajectory lines (only between non-zero-score experiments)
-  var branchOrder={};
-  for(var bi=0;bi<n;bi++){
-    var br=exps[bi].entry.branch||'?';
-    if(!branchOrder[br]) branchOrder[br]=[];
-    branchOrder[br].push({idx:bi, score:exps[bi].score});
-  }
-  var branchNames=Object.keys(branchOrder);
-  for(var bni=0;bni<branchNames.length;bni++){
-    var pts=branchOrder[branchNames[bni]];
-    if(pts.length<2) continue;
-    for(var pi=1;pi<pts.length;pi++){
-      svg+='<line x1="'+xPos(pts[pi-1].idx)+'" y1="'+yPos(pts[pi-1].score)+'" x2="'+xPos(pts[pi].idx)+'" y2="'+yPos(pts[pi].score)+'" stroke="#dddddd" stroke-width="1" stroke-dasharray="2,3"/>';
-    }
-  }
-
-  // Plot dots: filled black circle for PROMOTE, gray ring for MARGINAL, X for REJECT
-  for(var di=0;di<n;di++){
-    var exp=exps[di].entry;
-    var score=exps[di].score;
-    var cx=xPos(di); var cyDot=yPos(score);
-    var verdict=(exp.verdict||'').toUpperCase();
-
-    if(verdict==='PROMOTE'){
-      svg+='<circle cx="'+cx+'" cy="'+cyDot+'" r="4.5" fill="#111111" stroke="none"/>';
-    } else if(verdict==='MARGINAL'){
-      svg+='<circle cx="'+cx+'" cy="'+cyDot+'" r="3.5" fill="none" stroke="#999999" stroke-width="1.5"/>';
-    } else {
-      svg+='<line x1="'+(cx-3)+'" y1="'+(cyDot-3)+'" x2="'+(cx+3)+'" y2="'+(cyDot+3)+'" stroke="#888888" stroke-width="1.5"/>';
-      svg+='<line x1="'+(cx+3)+'" y1="'+(cyDot-3)+'" x2="'+(cx-3)+'" y2="'+(cyDot+3)+'" stroke="#888888" stroke-width="1.5"/>';
-    }
-    // Invisible hit target for hover
-    svg+='<circle cx="'+cx+'" cy="'+cyDot+'" r="10" fill="transparent" stroke="none" class="timeline-dot" data-idx="'+di+'" style="cursor:pointer"/>';
-  }
-
-  // Legend
-  svg+='<circle cx="'+(pad.left+10)+'" cy="'+(H-8)+'" r="3.5" fill="#111111"/>';
-  svg+='<text x="'+(pad.left+18)+'" y="'+(H-5)+'" font-size="8" fill="#888888">promote</text>';
-  svg+='<circle cx="'+(pad.left+65)+'" cy="'+(H-8)+'" r="3" fill="none" stroke="#999999" stroke-width="1"/>';
-  svg+='<text x="'+(pad.left+73)+'" y="'+(H-5)+'" font-size="8" fill="#888888">marginal</text>';
-  svg+='<text x="'+(pad.left+120)+'" y="'+(H-5)+'" font-size="8" fill="#888888">\u00d7 reject (in range)</text>';
-
-  svg+='</svg>';
-  el.innerHTML=svg;
-
-  // Attach hover tooltips
-  el._exps=exps;
-  var dots=el.querySelectorAll('.timeline-dot');
-  for(var dj=0;dj<dots.length;dj++){
-    (function(dotEl){
-      function buildTip(evt){
-        var idx=parseInt(dotEl.getAttribute('data-idx'),10);
-        var d=el._exps[idx]; if(!d) return;
-        var e=d.entry;
-        var f1val=e.f1!=null?fmt(e.f1,4):'--';
-        var accval=e.accuracy!=null?fmt(e.accuracy,4):'--';
-        var pval=e.p_value!=null?fmt(e.p_value,4):'--';
-        showTooltip(evt,
-          '<strong>'+esc(e.experiment_id||'?')+'</strong>'
-          +'<br>branch: '+esc(e.branch||'?')
-          +'<br>delta: '+esc(e.delta||'--')
-          +'<br>F1: '+f1val+' &bull; acc: '+accval
-          +'<br>score: '+fmt(d.score,4)+' &bull; p: '+pval
-          +'<br>verdict: <strong>'+esc((e.verdict||'?').toUpperCase())+'</strong>');
-      }
-      dotEl.addEventListener('mouseenter',buildTip);
-      dotEl.addEventListener('mousemove',buildTip);
-      dotEl.addEventListener('mouseleave',hideTooltip);
-    })(dots[dj]);
+async function loadJson(path, fallback) {
+  try {
+    const res = await fetch(path + '?t=' + Date.now());
+    if (!res.ok) return fallback;
+    return await res.json();
+  } catch {
+    return fallback;
   }
 }
 
-function renderBranchLeaderboard(beliefs,champions){
-  var el=document.getElementById('branch-leaderboard');
-  if(!beliefs||!beliefs.branches){el.innerHTML='';return;}
-  var branches=beliefs.branches;var names=Object.keys(branches);
-  var items=[];
-  for(var i=0;i<names.length;i++){
-    var score=branches[names[i]].best_composite_score;
-    if(score!=null&&score>0){items.push({name:names[i],score:score});}
-  }
-  items.sort(function(a,b){return b.score-a.score;});
-  if(items.length===0){el.innerHTML='';return;}
-  var champScore=0;
-  if(champions&&champions.production_champion&&champions.production_champion.scores){champScore=champions.production_champion.scores.composite_score||0;}
-  var W=960,barH=20,gap=4;
-  var pad={top:10,right:80,bottom:10,left:100};
-  var H=pad.top+items.length*(barH+gap)-gap+pad.bottom;
-  var plotW=W-pad.left-pad.right;
-  var svg='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="font-family:inherit;display:block">';
-  if(champScore>0){
-    var cx=pad.left+champScore*plotW;
-    svg+='<line x1="'+cx+'" y1="0" x2="'+cx+'" y2="'+H+'" stroke="#111111" stroke-width="1" stroke-dasharray="4,3"/>';
-  }
-  for(var bi=0;bi<items.length;bi++){
-    var item=items[bi];var y=pad.top+bi*(barH+gap);var barW=item.score*plotW;
-    svg+='<text x="'+(pad.left-6)+'" y="'+(y+barH/2+4)+'" text-anchor="end" font-size="10" fill="#111111">'+esc(item.name)+'</text>';
-    svg+='<rect class="leaderboard-bar" x="'+pad.left+'" y="'+y+'" width="'+barW+'" height="'+barH+'" fill="#cccccc" style="animation-duration:'+(0.4+bi*0.1).toFixed(1)+'s"/>';
-    svg+='<text x="'+(pad.left+barW+6)+'" y="'+(y+barH/2+4)+'" font-size="10" fill="#111111" font-weight="600">'+item.score.toFixed(4)+' '+RAT+'</text>';
-  }
-  svg+='</svg>';el.innerHTML=svg;
-}
-
-var refreshTimer=null;
-var _chartBeliefs=null;var _chartChampions=null;var _chartEntries=null;var _chartBudget=null;
-var _missionText=null;
-
-function renderMissionSummary(beliefs,champions,budget,entries){
-  var el=document.getElementById('mission-summary');
-  if(!el) return;
-  var goalLine=_missionText||'loading...';
-  var champName='--',champScore='--';
-  if(champions&&champions.production_champion){
-    champName=champions.production_champion.experiment_id||'--';
-    if(champions.production_champion.scores){
-      var cs=champions.production_champion.scores.composite_score;
-      champScore=cs!=null?cs.toFixed(4):'--';
-    }
-  }
-  var names=beliefs&&beliefs.branches?Object.keys(beliefs.branches):[];
-  var convergedCount=0,activeCount=0;
-  for(var i=0;i<names.length;i++){
-    var st=(beliefs.branches[names[i]].status||'');
-    if(st==='converged')convergedCount++;
-    else if(st==='active')activeCount++;
-  }
-  var totalBudget=0;
-  if(budget){for(var k in budget)totalBudget+=budget[k];}
-  var expCount=0,promoteCount=0,rejectCount=0;
-  if(entries){
-    for(var j=0;j<entries.length;j++){
-      if(entries[j].branch&&entries[j].experiment_id){
-        expCount++;
-        var v=(entries[j].verdict||'').toUpperCase();
-        if(v==='PROMOTE')promoteCount++;
-        else if(v==='REJECT')rejectCount++;
-      }
-    }
-  }
-  el.innerHTML='<div style="margin-bottom:6px">'+esc(goalLine)+'</div>'
-    +'<div style="font-size:10px;color:var(--muted)">'
-    +'champion: <strong style="color:var(--fg)">'+esc(champName)+'</strong> ('+champScore+')'
-    +' &bull; '+names.length+' branches ('+convergedCount+' converged, '+activeCount+' active)'
-    +' &bull; '+expCount+' experiments ('+promoteCount+' promoted, '+rejectCount+' rejected)'
-    +' &bull; '+totalBudget+' budget remaining'
-    +'</div>';
-}
-
-function tryRenderCharts(){
-  if(_chartEntries!==null&&_chartChampions!==null){renderScoreTimeline(_chartEntries,_chartChampions);}
-  if(_chartBeliefs!==null&&_chartChampions!==null){renderBranchLeaderboard(_chartBeliefs,_chartChampions);}
-  if(_chartEntries!==null&&_chartBeliefs!==null){renderBranchNotes(_chartEntries,_chartBeliefs);}
-  if(_chartBeliefs!==null&&_chartChampions!==null&&_chartEntries!==null){
-    renderMissionSummary(_chartBeliefs,_chartChampions,_chartBudget,_chartEntries);
+async function loadJsonl(path) {
+  try {
+    const res = await fetch(path + '?t=' + Date.now());
+    if (!res.ok) return [];
+    const text = await res.text();
+    return text.split('\n').filter(Boolean).map(line => JSON.parse(line));
+  } catch {
+    return [];
   }
 }
 
-function refresh(){
-  var dot=document.getElementById('refresh-dot');
-  dot.className='refresh-dot active';
-  setTimeout(function(){dot.className='refresh-dot';},800);
-  _lastRefreshTS=Date.now();
-  document.getElementById('last-refresh').textContent='just now';
-  _chartBeliefs=null;_chartChampions=null;_chartEntries=null;
-  loadJSON(STATE+'cycle_counter.json',function(err,cycle){
-    if(err||!cycle){
-      document.getElementById('cycle-count').textContent='--';
-      document.getElementById('total-experiments').textContent='--';
-      document.getElementById('started-at').textContent='--';
-      document.getElementById('last-run').textContent='--';
-      document.getElementById('runtime').textContent='--';
-    }else{renderHeader(cycle);}
+async function loadText(path, fallback='') {
+  try {
+    const res = await fetch(path + '?t=' + Date.now());
+    if (!res.ok) return fallback;
+    return await res.text();
+  } catch {
+    return fallback;
+  }
+}
+
+function latestBy(items, key) {
+  const map = new Map();
+  items.forEach(item => {
+    if (item && item[key]) map.set(item[key], item);
   });
-  loadJSON(STATE+'active_agents.json',function(err,agents){
-    _activeAgents=(agents&&agents.agents)?agents.agents:{};
-    loadJSON(STATE+'branch_beliefs.json',function(err,beliefs){
-      if(err)beliefs=null;_chartBeliefs=beliefs;
-      loadJSON(STATE+'budget.json',function(err2,budget){
-        if(err2)budget=null;_chartBudget=budget;
-        loadJSON(STATE+'champions.json',function(err3,champions){
-          if(err3)champions=null;_chartChampions=champions;
-          renderBranches(beliefs,budget,champions);renderScaling(beliefs);tryRenderCharts();
-        });
-      });
-    });
-  });
-  loadJSONL(STATE+'experiment_log.jsonl',function(err,entries){
-    _chartEntries=err?[]:entries;renderLog(err?null:entries);tryRenderCharts();
-  });
-  loadText(LOGS+'handoff.md',function(err,text){renderHandoff(err?null:text);});
-  if(_missionText===null){
-    loadText('./branches.yaml',function(err,text){
-      if(!err&&text){
-        var match=text.match(/^mission:\s*["'](.+?)["']/m);
-        _missionText=match?match[1]:'(no mission defined in branches.yaml)';
-        tryRenderCharts();
-      }
-    });
+  return Array.from(map.values());
+}
+
+function setText(id, value) {
+  const node = document.getElementById(id);
+  if (node) node.textContent = value;
+}
+
+function renderRows(tableId, rows, render) {
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = rows.map(render).join('');
+}
+
+function renderPills(id, values, emptyLabel) {
+  const node = document.getElementById(id);
+  if (!values.length) {
+    node.innerHTML = `<span class="pill">${emptyLabel}</span>`;
+    return;
   }
+  node.innerHTML = values.map(value => `<span class="pill mono">${value}</span>`).join('');
+}
+
+async function refresh() {
+  const [branches, runtime, jobs, workers, frontier, candidates, evals, handoff] = await Promise.all([
+    loadJson('branches.yaml', {}),
+    loadJson('state/runtime.json', {}),
+    loadJson('state/jobs.json', {queued: [], leased: [], finished: []}),
+    loadJson('state/workers.json', {workers: {}}),
+    loadJson('state/frontier.json', {}),
+    loadJsonl('state/candidates.jsonl'),
+    loadJsonl('state/evaluations.jsonl'),
+    loadText('logs/handoff.md', 'No handoff yet.')
+  ]);
+
+  const latestCandidates = latestBy(candidates, 'candidate_id')
+    .sort((a, b) => (b.selection_eval ?? -999) - (a.selection_eval ?? -999));
+
+  setText('mission', branches.mission || 'No mission defined yet');
+  setText('baseline', branches.production_baseline?.description || 'No baseline description');
+  setText('stepCount', runtime.step_count ?? 0);
+  setText('queuedJobs', jobs.queued?.length ?? 0);
+  setText('leasedJobs', jobs.leased?.length ?? 0);
+  setText('totalCandidates', latestCandidates.length);
+  setText('activePhase', runtime.active_phase || 'idle');
+  setText(
+    'globalChampion',
+    frontier.global_champion
+      ? `${frontier.global_champion.candidate_id} (${(frontier.global_champion.selection_eval ?? 0).toFixed(4)})`
+      : 'none'
+  );
+  setText(
+    'pendingExpansion',
+    frontier.pending_expansion
+      ? JSON.stringify(frontier.pending_expansion)
+      : 'none'
+  );
+  setText('handoff', handoff);
+
+  renderRows(
+    'workerTable',
+    Object.values(workers.workers || {}),
+    worker => `<tr>
+      <td class="mono">${worker.worker_id}</td>
+      <td>${worker.resource_class}</td>
+      <td>${worker.status}</td>
+      <td class="mono">${worker.current_candidate_id || '—'}</td>
+    </tr>`
+  );
+
+  renderRows(
+    'fundingTable',
+    Object.entries(frontier.family_funding || {}),
+    ([family, info]) => `<tr>
+      <td>${family}</td>
+      <td class="mono">${info.credits ?? 0}</td>
+      <td class="mono">${info.spent ?? 0}</td>
+      <td class="mono">${info.minted ?? 0}</td>
+      <td class="mono">${info.plateau_counter ?? 0}</td>
+    </tr>`
+  );
+
+  renderPills('auditQueue', frontier.audit_queue || [], 'Audit queue empty');
+  renderPills('invalidFast', frontier.invalid_fast_candidates || [], 'No invalid-fast candidates');
+
+  renderRows(
+    'frontierTable',
+    latestCandidates.slice(0, 12),
+    candidate => `<tr>
+      <td class="mono">${candidate.candidate_id}</td>
+      <td>${candidate.family}</td>
+      <td class="mono">${candidate.selection_eval == null ? '—' : candidate.selection_eval.toFixed(4)}</td>
+      <td>${candidate.status}</td>
+      <td class="mono">${(candidate.parent_ids || []).join(', ') || '—'}</td>
+    </tr>`
+  );
+
+  renderRows(
+    'evalTable',
+    evals.slice(-12).reverse(),
+    row => `<tr>
+      <td class="mono">${row.candidate_id}</td>
+      <td class="mono">${row.attempt}</td>
+      <td class="mono">${row.search_eval == null ? '—' : row.search_eval.toFixed(4)}</td>
+      <td class="mono">${row.selection_eval == null ? '—' : row.selection_eval.toFixed(4)}</td>
+      <td class="${row.valid ? 'good' : 'bad'}">${row.valid ? 'valid' : 'invalid'}</td>
+    </tr>`
+  );
 }
 
 refresh();
-refreshTimer=setInterval(refresh,REFRESH_MS);
-startTicker();
-setInterval(updateAgoDisplays,1000);
-window.refreshDashboard=refresh;
-})();
+setInterval(refresh, 5000);
 </script>
 </body>
 </html>

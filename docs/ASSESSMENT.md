@@ -1,5 +1,9 @@
 # Labrat Deep Assessment: Failure Points, Gaps, and Opportunities
 
+> Historical note: this document analyzes the pre-vNext cycle-based runtime.
+> It is preserved as background context, not as the current architecture.
+> For the current operating model, start with [README.md](/Users/punkyrest/infiniteagentworks/labrat/README.md), [program.md](/Users/punkyrest/infiniteagentworks/labrat/program.md), and [ARCHITECTURE.md](/Users/punkyrest/infiniteagentworks/labrat/docs/ARCHITECTURE.md).
+
 **Date**: 2026-03-31
 **Scope**: Full architecture review of labrat, informed by the BTC microstructure research program (55 cycles, 47 experiments across v1-v3), the NLP-sentiment example (43 cycles, 147 experiments), and patterns from the Claude Code harness (nirholas/claude-code, ~512K lines TypeScript).
 

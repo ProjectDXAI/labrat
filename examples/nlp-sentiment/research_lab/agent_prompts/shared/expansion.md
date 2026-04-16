@@ -1,10 +1,7 @@
-# Phase: Expansion Scout
+Read:
 
-Read `expansion_scout.md`, `research_brief.md`, `research_sources.md`, and `logs/handoff.md`.
+1. `expansion_scout.md`
+2. latest `logs/expansions/*memo.md`
+3. current scout requests under `experiments/*/scout_requests/`
 
-Look for orthogonal, source-backed directions that explain what the current sparse baseline cannot express.
-
-Prefer a branch ladder when it is justified:
-
-- cheap orthogonal probes first
-- then formulation changes
+Propose one or two runnable family changes and leave a patch YAML.

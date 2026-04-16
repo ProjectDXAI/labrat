@@ -1,9 +1,6 @@
-# Claude Code Runner Wrapper
+Use Claude Code as a stateful runtime operator.
 
-Operate this example as a real lab, not a toy walkthrough.
-
-- keep the run readable
-- update state and handoff files directly
-- use the local helper to choose the next phase
-- respect the search ladder: probe, exploit, audit, then frame-break
-- treat the example's reduced constraints as real
+- Prefer short command/result loops.
+- Use local files as the source of truth.
+- Keep worker runs narrow and artifact-oriented.
+- Let the runtime decide promotion.

@@ -1,30 +1,21 @@
 # labrat
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
+`labrat` is a local-first research runtime for Claude Code and Codex.
 
-Multi-branch autoresearch with funding as the control loop. `labrat` helps an agent explore competing research branches, reallocate budget to what works, and leave behind a state trail you can audit.
+It treats research as a shared candidate population with family funding, asynchronous workers, and external consistent evaluation.
 
 ![labrat dashboard](docs/dash-sample.png)
 
-`labrat` is the broad version of the idea behind `autoresearch`.
+## Core ideas
 
-- `autoresearch` is one research thread against one fixed target.
-- `labrat` is a research program with competing branches, shared budget, and an explicit exploration/exploitation loop.
+- **Async population search**: no global cycle barrier; workers keep evaluating descendants as soon as slots free up.
+- **Funding over families**: credits are minted by stable, reproducible progress and spent on new descendants.
+- **Consistent external evaluation**: workers produce artifacts, not authoritative verdicts.
+- **Supervisor + worker model**: the agent supervises the runtime, while probe / mutation / crossover / audit workers execute bounded tasks.
 
-The repo is built first for **Claude Code** and **Codex**.
+## Quick evaluation path
 
-## Why labrat
-
-- **Multi-branch search**: run several lines of attack instead of one long thread.
-- **Funding as control loop**: branches earn future compute from results, not vibes.
-- **Agent-native workflow**: markdown prompts, YAML search spaces, JSON state, local scripts.
-- **Readable state**: budgets, beliefs, champions, scouts, and handoffs are plain files.
-
-## Two ways to start
-
-### 1. Evaluate the repo quickly
-
-Run the flagship example if you want to understand the framework before you build on it.
+Start with the flagship example:
 
 ```bash
 python -m venv .venv
@@ -33,14 +24,15 @@ pip install -r examples/nlp-sentiment/requirements.txt
 cd examples/nlp-sentiment/research_lab
 python scripts/bootstrap.py
 python -m http.server 8787
+python scripts/operator_helper.py status
 python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
 Use `--runner codex` for Codex.
 
-### 2. Create a real lab
+## Create a new lab
 
-For a new lab, the default path is **deep research first**, not “run one cycle and hope.”
+The default path is deep research first.
 
 ```bash
 python scripts/new_lab.py my_lab
@@ -52,132 +44,86 @@ python -m http.server 8787
 python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
-That flow is:
+Phase 0 must produce:
 
-1. scaffold the lab
-2. survey the landscape
-3. define the search ladder:
-   - cheap probes
-   - normal exploitation
-   - implementation audit
-   - formulation change
-4. finalize `branches.yaml`, `dead_ends.md`, `research_brief.md`, and `research_sources.md`
-5. bootstrap
-6. start autonomous cycles
+- `branches.yaml`
+- `dead_ends.md`
+- `research_brief.md`
+- `research_sources.md`
+- `evaluation.yaml`
+- `runtime.yaml`
 
-## How it differs from autoresearch
+## Runtime model
 
-| | `autoresearch` | `labrat` |
-| --- | --- | --- |
-| Search unit | one line of attack | multiple competing branches |
-| Control loop | keep or revert | reallocate budget across branches |
-| Operator surface | one research thread | tree design, branch loop, scouts, expansion |
-| State | lightweight history | branch beliefs, budgets, champions, memos |
-| Best fit | one tight optimization problem | broader research programs with several plausible axes |
+The authoritative runtime state is:
 
-The design goal is still simplicity. The difference is where the simplicity lives:
+- `state/runtime.json`
+- `state/candidates.jsonl`
+- `state/jobs.json`
+- `state/workers.json`
+- `state/evaluations.jsonl`
+- `state/frontier.json`
+- `state/checkpoints.jsonl`
 
-- `autoresearch` keeps the code surface tiny.
-- `labrat` keeps the **operator workflow** coherent while exposing a broader search model.
+The runtime uses:
 
-## Deep-research-first scaffold
+- temperature-scaled steady-state dispatch
+- family credits instead of isolated branch budgets
+- rerun / stability checks before promotion
+- audit routing for invalid-fast or unstable near-miss candidates
+- frame break only after cheap probes and audits no longer justify more local search
 
-A new lab now generates:
+## Required scaffold files
 
-- Phase 0 prompt assets:
-  - `tree_designer.md`
-  - `research_scout.md`
-  - `expansion_scout.md`
-  - `consolidation_agent.md`
-  - `implementation_audit.md`
-  - `frame_break.md`
-  - `agent_prompts/`
-- Phase 0 outputs:
-  - `branches.yaml`
-  - `dead_ends.md`
-  - `research_brief.md`
-  - `research_sources.md`
-- support scripts:
-  - `scripts/bootstrap.py`
-  - `scripts/operator_helper.py`
-  - `scripts/research_scout.py`
-  - `scripts/judge.py`
-  - `scripts/run_experiment.py`
+Every new lab now includes:
 
-`bootstrap.py` now enforces the Phase 0 gate by default. If the scaffold still contains `LABRAT_PLACEHOLDER` values or the brief/source files are incomplete, bootstrap fails with a clear message.
+- `evaluation.yaml`
+- `runtime.yaml`
+- `orchestrator.md`
+- `probe_worker.md`
+- `mutation_worker.md`
+- `crossover_worker.md`
+- `implementation_audit.md`
+- `frame_break.md`
+- `expansion_scout.md`
+- `agent_prompts/`
 
-Phase 0 should not just list branches. It should also define how the lab escapes shallow search:
+`run_experiment.py` produces artifacts and metrics.
 
-- what the cheap screening or proxy stage is
-- which orthogonal probes should be tried before a full frame break
-- when a suspicious family should go to implementation audit
-- what contradiction would force a formulation-change branch
+`evaluator.py` is the only canonical source of:
 
-## Funding loop
+- `search_eval`
+- `selection_eval`
+- `final_eval`
 
-The core idea is simple:
+## UI
 
-![funding loop](docs/funding-loop.svg)
+The tracked UI is the static dashboard at `templates/dashboard.html`.
 
-1. start with a baseline and a few candidate branches
-2. spend one credit per experiment
-3. score the results mechanically
-4. refill productive branches and let weak ones run out of budget
-5. use cheap probes and implementation audits before declaring a family dead
-6. use scouts and expansion when the frontier flattens for real
-7. repeat until the tree is genuinely mapped
+It is now runtime-centric:
 
-The novel part is the funding loop. The deep-research-first scaffold exists to keep that loop honest, and the probe/audit/frame-break ladder exists to keep it from converging too early on the wrong story.
+- worker pool health
+- queue depth
+- family funding
+- candidate frontier
+- audit queue
+- expansion state
 
-## Dashboard
+## Clean break
 
-`labrat` ships with two dashboard surfaces:
+This is a runtime overhaul.
 
-- `templates/dashboard.html` for the zero-dependency path
-- `dashboard-app/` for the cleaner React view
-
-The static dashboard is the baseline. The React app is the polished monitoring surface.
-
-## Example and origin
-
-### Flagship example
-
-`examples/nlp-sentiment` is the first-run example.
-
-- CPU only
-- fast to reproduce on a laptop
-- includes a completed Phase 0 trail and a runnable reduced lab
-- now acts as the reference lab for the helper-driven workflow
-
-### Real origin
-
-The framework was pressure-tested in real iterative research programs before this repo refresh.
-
-- repeated branch competition forced the allocator, scoring, and dead-end tracking to stay honest
-- that history is why `labrat` is opinionated about budgets, handoffs, and readable state
-
-Those validation runs informed the framework, but they are not the onboarding path.
+- old cycle-based labs are not supported without re-scaffolding
+- the static dashboard is the required UI surface
+- no hosted control plane or database is required
 
 ## Repo map
 
-- `program.md`: repo-level agent entrypoint
-- `docs/getting-started.md`: starter flow
+- `program.md`: repo-level entrypoint
+- `docs/getting-started.md`: practical startup flow
 - `docs/runners.md`: Claude Code and Codex usage
-- `docs/DEEP_RESEARCH.md`: longer research-program playbook
-- `templates/`: scaffold source files
-- `scripts/`: bootstrap, helper, scout, judge, and scaffold utilities
-- `examples/nlp-sentiment`: flagship example
-
-## Constraints
-
-`labrat` is not a hosted platform. No database. No control plane. No mandatory SDK.
-
-The loop is built from:
-
-- markdown instructions
-- YAML branch definitions
-- JSON state files
-- Python support scripts
-- an agent that can read, run commands, and write files
-
-That keeps the repo easy to fork, easy to audit, and easy to bend to a specific domain.
+- `docs/DEEP_RESEARCH.md`: design guidance for real labs
+- `docs/ARCHITECTURE.md`: runtime model
+- `scripts/runtime.py`: queue, lease, complete, reap, summary
+- `scripts/evaluator.py`: external consistent evaluator
+- `examples/nlp-sentiment/research_lab`: canonical example lab

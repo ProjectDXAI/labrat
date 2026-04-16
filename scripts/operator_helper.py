@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Helper for deep-research-first lab operation."""
+"""Helper for operating a labrat vNext lab."""
 
 from __future__ import annotations
 
@@ -14,27 +14,24 @@ from lab_core import determine_next_phase, summarize_lab
 SCRIPT_ROOT = Path(__file__).resolve().parent.parent
 
 
-def _resolve_lab_root(lab_dir: str | None) -> Path:
-    if lab_dir:
-        return Path(lab_dir).resolve()
-    return SCRIPT_ROOT
+def resolve_lab_root(lab_dir: str | None) -> Path:
+    return Path(lab_dir).resolve() if lab_dir else SCRIPT_ROOT
 
 
-def cmd_check_readiness(lab_root: Path) -> int:
+def check_readiness(lab_root: Path) -> int:
     summary = summarize_lab(lab_root)
     if summary["readiness_issues"]:
         print("PHASE0_INCOMPLETE")
         for issue in summary["readiness_issues"]:
             print(f"- {issue}")
         return 1
-
     print("PHASE0_READY")
     print(f"- Lab root: {lab_root}")
-    print("- branches.yaml, research_brief.md, and research_sources.md look complete.")
+    print("- branches.yaml, dead_ends.md, research_brief.md, research_sources.md, evaluation.yaml, and runtime.yaml look complete.")
     return 0
 
 
-def cmd_status(lab_root: Path) -> int:
+def status(lab_root: Path) -> int:
     summary = summarize_lab(lab_root)
     print(f"Lab root: {summary['lab_root']}")
     print(f"Phase 0 ready: {'yes' if summary['ready'] else 'no'}")
@@ -42,27 +39,36 @@ def cmd_status(lab_root: Path) -> int:
         print("Readiness issues:")
         for issue in summary["readiness_issues"]:
             print(f"  - {issue}")
-    print(f"Bootstrapped: {'yes' if summary['bootstrapped'] else 'no'}")
-    print(f"Cycle: {summary['cycle'] if summary['cycle'] is not None else 'not started'}")
+    print(f"Runtime initialized: {'yes' if summary.get('runtime_initialized') else 'no'}")
     print(f"Next phase: {summary['next_phase']}")
-    print("Active branches:", ", ".join(summary["active_branches"]) or "none")
-    print("Stuck branches:", ", ".join(summary["stuck_branches"]) or "none")
-    print("Audit branches:", ", ".join(summary["audit_branches"]) or "none")
-    print("Invalid-fast branches:", ", ".join(summary["invalid_fast_branches"]) or "none")
-    print("Exhausted branches:", ", ".join(summary["exhausted_branches"]) or "none")
-    print("Active agents:", ", ".join(summary["active_agents"]) or "none")
+    if summary.get("runtime_initialized"):
+        print(f"Step count: {summary.get('step_count', 0)}")
+        print(f"Active phase: {summary.get('active_phase')}")
+        print(f"Queued jobs: {summary.get('queued_jobs', 0)}")
+        print(f"Leased jobs: {summary.get('leased_jobs', 0)}")
+        print(f"Workers leased: {summary.get('worker_leases', 0)}/{summary.get('total_workers', 0)}")
+        print(f"Total candidates: {summary.get('total_candidates', 0)}")
+        print(f"Families: {', '.join(summary.get('families', [])) or 'none'}")
+        print(f"Audit queue: {', '.join(summary.get('audit_queue', [])) or 'none'}")
+        print(f"Invalid-fast candidates: {', '.join(summary.get('invalid_fast_candidates', [])) or 'none'}")
+        print(f"Pending expansion: {summary.get('pending_expansion') or 'none'}")
+        print(f"Remaining cheap probes: {summary.get('remaining_cheap_probes', 0)}")
     return 0
 
 
-def _prompt_for_phase(lab_root: Path, runner: str, phase: str) -> str:
+def runtime_summary(lab_root: Path) -> int:
+    cmd = [sys.executable, str(SCRIPT_ROOT / "scripts" / "runtime.py"), "--lab-dir", str(lab_root), "summary"]
+    return subprocess.run(cmd, check=False).returncode
+
+
+def prompt_for_phase(lab_root: Path, runner: str, phase: str) -> str:
     summary = summarize_lab(lab_root)
     phase = determine_next_phase(lab_root) if phase == "auto" else phase
     runner_file = "claude_code.md" if runner == "claude" else "codex.md"
     phase_file = {
         "design": "design.md",
-        "cycle": "cycle.md",
+        "supervisor": "supervisor.md",
         "audit": "audit.md",
-        "scout": "scout.md",
         "frame_break": "frame_break.md",
         "expansion": "expansion.md",
         "checkpoint": "checkpoint.md",
@@ -72,125 +78,96 @@ def _prompt_for_phase(lab_root: Path, runner: str, phase: str) -> str:
         f"Read agent_prompts/{runner_file}.",
         f"Read agent_prompts/shared/{phase_file}.",
     ]
-
     if phase != "design":
         lines.append("Read orchestrator.md after the phase prompt.")
 
-    if phase in {"scout", "expansion"}:
-        lines.append(
-            "If no scout request files exist yet, run `python scripts/operator_helper.py "
-            f"prepare-scout {'--all-stuck' if phase == 'scout' else '--expansion'}` first."
-        )
+    if phase == "supervisor" and not summary.get("runtime_initialized"):
+        lines.append("Run `python scripts/bootstrap.py` before supervising the runtime.")
+    if phase == "audit":
+        lines.append("Read implementation_audit.md and focus on the highest-signal suspicious candidate.")
+    if phase == "frame_break":
+        lines.append("Read frame_break.md and leave a concrete patch file under `logs/expansions/`.")
     if phase == "expansion":
         lines.append(
-            "Expansion proposals should land in "
-            "`experiments/expansion_meta/scout_proposals/expansion_cycle_N.yaml`."
+            "If no fresh scout requests exist, run `python scripts/operator_helper.py prepare-scout --expansion` first."
         )
         lines.append(
-            "After approving proposals, merge them with "
-            "`python scripts/research_scout.py --merge-expansion --lab-dir <lab>`."
-        )
-    if phase == "frame_break":
-        lines.append(
-            "Frame-break should leave a patch file in `logs/expansions/frame_break_cycle_N_patch.yaml`."
-        )
-    if phase == "audit":
-        lines.append(
-            "Implementation audit should leave `logs/implementation_audit_cycle_N.md`"
-            " plus a short patch or follow-up memo if the family should stay alive."
-        )
-        lines.append(
-            "Treat suspicious invalid-fast or near-miss families as potentially broken implementations,"
-            " not automatically dead science."
-        )
-
-    if phase == "cycle" and not summary["bootstrapped"]:
-        lines.append("Run `python scripts/bootstrap.py` before executing the first cycle.")
-    if summary["invalid_fast_branches"]:
-        lines.append(
-            "Recent invalid-fast branches need an implementation audit before you call the family exhausted."
-        )
-        lines.append(
-            "For each suspicious branch: rerun the winning-looking config, run one nearby control or ablation,"
-            " and decide whether the anomaly is a real frontier jump or a branch-implementation bug."
+            "After approving a patch, merge it with `python scripts/research_scout.py --merge-expansion --lab-dir <lab>`."
         )
 
     lines.append("Use only this lab's local files as your operating context.")
     lines.append("Current lab status:")
-    lines.append(f"- cycle: {summary['cycle'] if summary['cycle'] is not None else 'not started'}")
-    lines.append(f"- active branches: {', '.join(summary['active_branches']) or 'none'}")
-    lines.append(f"- stuck branches: {', '.join(summary['stuck_branches']) or 'none'}")
-    lines.append(f"- audit branches: {', '.join(summary['audit_branches']) or 'none'}")
-    lines.append(f"- invalid-fast branches: {', '.join(summary['invalid_fast_branches']) or 'none'}")
-    lines.append(f"- exhausted branches: {', '.join(summary['exhausted_branches']) or 'none'}")
     lines.append(f"- next phase: {summary['next_phase']}")
+    lines.append(f"- runtime initialized: {'yes' if summary.get('runtime_initialized') else 'no'}")
+    if summary.get("runtime_initialized"):
+        lines.append(f"- active phase: {summary.get('active_phase')}")
+        lines.append(f"- queued jobs: {summary.get('queued_jobs')}")
+        lines.append(f"- leased jobs: {summary.get('leased_jobs')}")
+        lines.append(f"- audit queue: {', '.join(summary.get('audit_queue', [])) or 'none'}")
+        lines.append(f"- invalid-fast candidates: {', '.join(summary.get('invalid_fast_candidates', [])) or 'none'}")
+        lines.append(f"- global champion: {summary.get('global_champion')}")
+        lines.append(f"- family credits: {summary.get('family_credits')}")
     return "\n".join(lines)
 
 
-def cmd_next_prompt(lab_root: Path, runner: str, phase: str) -> int:
-    print(_prompt_for_phase(lab_root, runner, phase))
+def next_prompt(lab_root: Path, runner: str, phase: str) -> int:
+    print(prompt_for_phase(lab_root, runner, phase))
     return 0
 
 
-def cmd_prepare_scout(lab_root: Path, args: argparse.Namespace) -> int:
+def prepare_scout(lab_root: Path, args: argparse.Namespace) -> int:
     scout_script = lab_root / "scripts" / "research_scout.py"
     if not scout_script.exists():
         print(f"ERROR: {scout_script} not found.")
         return 1
 
     cmd = [sys.executable, str(scout_script), "--lab-dir", str(lab_root)]
-    if args.branch:
-        cmd.extend(["--branch", args.branch])
-    elif args.all_stuck:
-        cmd.append("--all-stuck")
+    if args.family:
+        cmd.extend(["--family", args.family])
     elif args.expansion:
         cmd.append("--expansion")
     else:
-        print("ERROR: choose --branch, --all-stuck, or --expansion")
+        print("ERROR: choose --family or --expansion")
         return 1
-
-    result = subprocess.run(cmd, check=False)
-    return result.returncode
+    return subprocess.run(cmd, check=False).returncode
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Helper for operating a labrat lab")
-    parser.add_argument(
-        "--lab-dir",
-        default=None,
-        help="Path to the lab root. Defaults to the parent of this scripts directory.",
-    )
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Helper for operating a labrat vNext lab")
+    parser.add_argument("--lab-dir", default=None)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("check-readiness", help="Verify that Phase 0 outputs are complete")
-    subparsers.add_parser("status", help="Summarize current lab state and next phase")
+    subparsers.add_parser("check-readiness")
+    subparsers.add_parser("status")
+    subparsers.add_parser("runtime-summary")
 
-    next_prompt = subparsers.add_parser("next-prompt", help="Print the exact next prompt to give the agent")
-    next_prompt.add_argument("--runner", choices=["claude", "codex"], required=True)
-    next_prompt.add_argument(
+    next_p = subparsers.add_parser("next-prompt")
+    next_p.add_argument("--runner", choices=["claude", "codex"], required=True)
+    next_p.add_argument(
         "--phase",
-        choices=["auto", "design", "cycle", "audit", "scout", "frame_break", "expansion", "checkpoint"],
+        choices=["auto", "design", "supervisor", "audit", "frame_break", "expansion", "checkpoint"],
         default="auto",
     )
 
-    prepare_scout = subparsers.add_parser("prepare-scout", help="Generate scout requests")
-    prepare_scout.add_argument("--branch", help="Generate a scout request for one branch")
-    prepare_scout.add_argument("--all-stuck", action="store_true", help="Generate scout requests for all stuck branches")
-    prepare_scout.add_argument("--expansion", action="store_true", help="Generate expansion scout requests")
+    scout = subparsers.add_parser("prepare-scout")
+    scout.add_argument("--family", help="Prepare a scout request for one family")
+    scout.add_argument("--expansion", action="store_true")
 
-    args = parser.parse_args()
-    lab_root = _resolve_lab_root(args.lab_dir)
+    args = parser.parse_args(argv)
+    lab_root = resolve_lab_root(args.lab_dir)
 
     if args.command == "check-readiness":
-        return cmd_check_readiness(lab_root)
+        return check_readiness(lab_root)
     if args.command == "status":
-        return cmd_status(lab_root)
+        return status(lab_root)
+    if args.command == "runtime-summary":
+        return runtime_summary(lab_root)
     if args.command == "next-prompt":
-        return cmd_next_prompt(lab_root, args.runner, args.phase)
+        return next_prompt(lab_root, args.runner, args.phase)
     if args.command == "prepare-scout":
-        return cmd_prepare_scout(lab_root, args)
+        return prepare_scout(lab_root, args)
     return 1
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

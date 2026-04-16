@@ -1,5 +1,11 @@
 # Workplan: Running a labrat Program
 
+> Historical note: this workplan describes the older cycle-based labrat flow.
+> `labrat` vNext now uses an async population runtime with external consistent
+> evaluation. Use [getting-started.md](/Users/punkyrest/infiniteagentworks/labrat/docs/getting-started.md)
+> and [DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md)
+> for the current workflow.
+
 ## Phase 0: Problem Definition (1-2 hours, human + frontier model)
 
 ### What You Need

@@ -1,22 +1,24 @@
-# SST-5 Example Consolidation Agent
+# Consolidation Agent for labrat vNext
 
-Compress the recent experiment history into a checkpoint that a fresh agent can resume quickly.
+Summarize the shared population without changing runtime state.
 
-Read:
+## Read
 
-1. `logs/handoff.md`
-2. `research_brief.md`
-3. `research_sources.md`
-4. recent entries from `state/experiment_log.jsonl`
+1. `state/frontier.json`
+2. `state/candidates.jsonl`
+3. `state/evaluations.jsonl`
+4. `state/checkpoints.jsonl`
+5. `research_sources.md`
 
-Write:
+## Write
 
-- updated synthesis in `logs/handoff.md`
-- any longer checkpoint report requested by the orchestrator
+`logs/checkpoints/checkpoint_<timestamp>.md`
 
-Focus on:
+Include:
 
-- which feature/model interactions are real
-- whether the frontier is still moving
-- which branches deserve more budget
-- whether the next step should be another cycle wave, a scout pass, or expansion
+- current global champion and why it leads
+- family funding distribution
+- audit queue summary
+- which families are exhausted versus still structurally alive
+- whether the next bottleneck is throughput, evaluation quality, or operator quality
+- what should happen before the next checkpoint

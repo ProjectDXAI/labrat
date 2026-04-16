@@ -1,0 +1,25 @@
+mode: "external_consistent"
+
+search_eval:
+  path: "metrics.search.primary_metric"
+  direction: "maximize"
+
+selection_eval:
+  path: "metrics.selection.primary_metric"
+  direction: "maximize"
+
+final_eval:
+  enabled: true
+  path: "metrics.final.primary_metric"
+  direction: "maximize"
+
+consistency:
+  fixed_seed: 1337
+  fixed_split_id: "LABRAT_PLACEHOLDER_split"
+  sealed_eval: null
+
+rerun_policy:
+  min_reruns_for_promotion: 2
+  max_relative_std: 0.05
+  suspicious_improvement_margin: 0.02
+  invalid_fast_margin: 0.02

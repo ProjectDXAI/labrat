@@ -1,0 +1,25 @@
+checkpoint_interval: 6
+
+workers:
+  pools:
+    - resource_class: "cpu"
+      slots: 2
+      lease_timeout_seconds: 900
+      heartbeat_timeout_seconds: 300
+
+selection:
+  crossover_probability: 0.2
+  max_concurrent_per_lineage: 3
+  elite_archive:
+    global_top_k: 8
+    family_top_k: 2
+
+funding:
+  dispatch_cost: 1
+  promote_credit: 3
+  stable_credit: 1
+  novelty_credit: 1
+
+plateau:
+  window: 3
+  min_delta: 0.003

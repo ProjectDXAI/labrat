@@ -1,23 +1,18 @@
 # Agent Prompts
 
-This example mirrors the generated prompt structure used by new labs.
+Use the helper instead of guessing the next step.
 
-`next-prompt --phase auto` may resolve to:
+1. `python scripts/operator_helper.py status`
+2. `python scripts/operator_helper.py runtime-summary`
+3. `python scripts/operator_helper.py next-prompt --runner claude --phase auto`
+   or
+   `python scripts/operator_helper.py next-prompt --runner codex --phase auto`
+
+Supported phases:
 
 - `design`
-- `cycle`
+- `supervisor`
 - `audit`
-- `scout`
 - `frame_break`
 - `expansion`
 - `checkpoint`
-
-Use:
-
-1. `python scripts/operator_helper.py status`
-2. `python scripts/operator_helper.py next-prompt --runner claude --phase auto`
-
-Or:
-
-1. `python scripts/operator_helper.py status`
-2. `python scripts/operator_helper.py next-prompt --runner codex --phase auto`

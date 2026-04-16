@@ -1,44 +1,41 @@
-# SST-5 Implementation Audit
+# Implementation Audit for labrat vNext
 
-You are auditing a suspicious frontier family in the flagship example lab.
+Use this for invalid-fast and unstable near-frontier candidates.
 
-This phase exists for a specific failure mode: a branch looks surprisingly close, oddly flaky, or invalid-fast, and the lab needs to know whether the problem is mechanical or scientific before discarding the family.
-
-## Read first
+## Read
 
 1. `logs/handoff.md`
-2. `state/champions.json`
-3. `state/experiment_log.jsonl`
-4. `branches.yaml`
-5. `research_brief.md`
-6. `research_sources.md`
-7. `dead_ends.md`
+2. `branches.yaml`
+3. `evaluation.yaml`
+4. `state/frontier.json`
+5. `state/candidates.jsonl`
+6. `state/evaluations.jsonl`
 
-## Your job
+## Job
 
-1. Pick one suspicious branch family.
-2. State why it still looks promising.
-3. Reproduce the anomaly.
-4. Run one or two cheap controls.
-5. Classify the failure:
+Pick the strongest suspicious candidate and answer:
+
+1. what family claim it was testing
+2. whether the anomaly reproduces
+3. the cheapest control that localizes the issue
+4. whether the problem is:
    - `implementation_bug`
    - `evaluation_mismatch`
    - `scheduler_or_lowering_issue`
    - `true_dead_end`
-   - `still_promising_needs_more_probes`
-6. Leave the exact next action.
+   - `still_promising`
+5. the exact next step
 
-## Output files
+## Outputs
 
 Write:
 
-1. `logs/implementation_audit_cycle_N.md`
-2. optionally `logs/implementation_audit_cycle_N_patch.yaml`
-3. update `logs/handoff.md`
+1. `logs/implementation_audit_<timestamp>.md`
+2. `logs/implementation_audit_<timestamp>_patch.yaml` when the family should stay alive
 
-## Rules
+The patch should either:
 
-1. Use the cheapest discriminating controls first.
-2. Be explicit about whether the issue is mechanical or scientific.
-3. If the family survives, leave a concrete next probe instead of prose only.
-4. If the family dies, say why it dies and what would need to change for it to revive.
+- add a follow-up cheap probe
+- add a focused mutation axis
+- revive the family after a bug fix
+- or state that the family should be defunded

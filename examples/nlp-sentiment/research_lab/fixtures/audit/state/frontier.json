@@ -1,0 +1,30 @@
+{
+  "updated_at": "2026-04-15T00:00:00+00:00",
+  "global_champion": {
+    "candidate_id": "baseline_logreg_unigram",
+    "family": "baseline",
+    "selection_eval": 0.46,
+    "search_eval": 0.48,
+    "operator_type": "baseline"
+  },
+  "family_champions": {
+    "text_representation": {
+      "candidate_id": "text_representation_probe_good",
+      "family": "text_representation",
+      "selection_eval": 0.52,
+      "search_eval": 0.54,
+      "operator_type": "probe"
+    }
+  },
+  "elite_archive": {"global": [], "families": {}},
+  "family_funding": {
+    "text_representation": {"credits": 3, "spent": 2, "minted": 1, "remaining_cheap_probes": 0, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 0, "last_promoted_at": null, "status": "active", "exhausted": false},
+    "classifier_search": {"credits": 4, "spent": 1, "minted": 0, "remaining_cheap_probes": 1, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 0, "last_promoted_at": null, "status": "active", "exhausted": false},
+    "fusion_frontier": {"credits": 4, "spent": 0, "minted": 0, "remaining_cheap_probes": 0, "tried_signatures": [], "queued_signatures": [], "plateau_counter": 0, "last_promoted_at": null, "status": "active", "exhausted": false}
+  },
+  "audit_queue": ["classifier_search_mutation_badfast"],
+  "invalid_fast_candidates": ["classifier_search_mutation_badfast"],
+  "unstable_candidates": [],
+  "pending_expansion": null,
+  "frame_break_required": false
+}
