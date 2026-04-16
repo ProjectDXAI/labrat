@@ -35,6 +35,18 @@ Every serious lab should encode:
 
 If a lab jumps directly from “plateau” to “invent a new family,” it usually wastes a lot of signal.
 
+## Lakatos as a heuristic
+
+This is not a strict implementation of Lakatos, but it is a good way to think about the runtime.
+
+A family behaves like a provisional research programme:
+
+- probes and mutations work inside the current programme
+- audit distinguishes a bad implementation from a bad direction
+- frame break and expansion are what you do when local repairs have become degenerating
+
+The useful threshold is not “did one run fail?” It is “is this family still paying for more attention?” Lakatos's shorthand for that distinction is that a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/).
+
 ## External consistent evaluation
 
 `evaluation.yaml` is the real replacement for the old constitution-style scoring file.

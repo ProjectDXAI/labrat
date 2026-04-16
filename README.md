@@ -13,6 +13,18 @@ It treats research as a shared candidate population with family funding, asynchr
 - **Consistent external evaluation**: workers produce artifacts, not authoritative verdicts.
 - **Supervisor + worker model**: the agent supervises the runtime, while probe / mutation / crossover / audit workers execute bounded tasks.
 
+## A useful framing
+
+`labrat` is not a philosophy-of-science engine, but Lakatos is a useful mental model for the runtime.
+
+Stay inside a family while it is still producing real signal. Escalate to audit or frame break when local repairs stop paying for themselves. In Lakatos's terms, a programme [“is progressive if it is both theoretically and empirically progressive, and degenerating if it is not”](https://plato.stanford.edu/archives/fall2020/entries/lakatos/).
+
+That is close to the `labrat` search ladder:
+
+- cheap probes and mutation test whether the current family is still progressive
+- implementation audit checks whether the failure is in execution rather than in the family itself
+- frame break and expansion happen when local search is no longer earning the right to continue
+
 ## Quick evaluation path
 
 Start with the flagship example:
