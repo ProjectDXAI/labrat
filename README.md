@@ -12,6 +12,8 @@ In plain English:
 
 ![labrat dashboard](docs/dash-sample.png)
 
+<sub>Live example run: the baseline still leads on the main selection metric, while `classifier_search` has already won two decisive held-out challenges and earned extra funding.</sub>
+
 ## Why it exists
 
 - **Async population search**: no global cycle barrier; workers keep evaluating descendants as soon as slots free up.
