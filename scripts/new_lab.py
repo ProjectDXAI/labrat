@@ -117,6 +117,8 @@ def main(argv: list[str] | None = None) -> int:
     copy_tree(TEMPLATES_DIR / "agent_prompts", target / "agent_prompts")
     if (TEMPLATES_DIR / ".claude").exists():
         copy_tree(TEMPLATES_DIR / ".claude", target / ".claude")
+    if (TEMPLATES_DIR / "coordination").exists():
+        copy_tree(TEMPLATES_DIR / "coordination", target / "coordination")
 
     profile_applied: list[str] = []
     if args.profile:

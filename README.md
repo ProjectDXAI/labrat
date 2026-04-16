@@ -145,6 +145,7 @@ Phase 0 must produce:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts
+- [docs/AUTONOMY.md](docs/AUTONOMY.md): permission allowlist, `/loop` cadence, stop criteria, cold-start recovery
 
 ## Background
 
