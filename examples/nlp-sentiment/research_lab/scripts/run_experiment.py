@@ -17,6 +17,8 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 
+from lab_core import write_json
+
 
 def load_candidate(path: Path) -> dict:
     with open(path) as f:
@@ -200,10 +202,7 @@ def main(argv: list[str] | None = None) -> int:
             "resource_floor": None,
         }
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, "w") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    write_json(args.output, payload)
     return 0
 
 

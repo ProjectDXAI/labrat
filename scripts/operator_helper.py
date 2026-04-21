@@ -4,11 +4,12 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
 
-from lab_core import determine_next_phase, summarize_lab
+from lab_core import determine_next_phase, diagnose_lab, summarize_lab
 
 
 SCRIPT_ROOT = Path(__file__).resolve().parent.parent
@@ -18,8 +19,20 @@ def resolve_lab_root(lab_dir: str | None) -> Path:
     return Path(lab_dir).resolve() if lab_dir else SCRIPT_ROOT
 
 
-def check_readiness(lab_root: Path) -> int:
+def check_readiness(lab_root: Path, as_json: bool = False) -> int:
     summary = summarize_lab(lab_root)
+    if as_json:
+        print(
+            json.dumps(
+                {
+                    "lab_root": summary["lab_root"],
+                    "ready": summary["ready"],
+                    "readiness_issues": summary["readiness_issues"],
+                },
+                indent=2,
+            )
+        )
+        return 0 if summary["ready"] else 1
     if summary["readiness_issues"]:
         print("PHASE0_INCOMPLETE")
         for issue in summary["readiness_issues"]:
@@ -31,8 +44,11 @@ def check_readiness(lab_root: Path) -> int:
     return 0
 
 
-def status(lab_root: Path) -> int:
+def status(lab_root: Path, as_json: bool = False) -> int:
     summary = summarize_lab(lab_root)
+    if as_json:
+        print(json.dumps(summary, indent=2))
+        return 0
     print(f"Lab root: {summary['lab_root']}")
     print(f"Phase 0 ready: {'yes' if summary['ready'] else 'no'}")
     if summary["readiness_issues"]:
@@ -54,6 +70,59 @@ def status(lab_root: Path) -> int:
         print(f"Pending expansion: {summary.get('pending_expansion') or 'none'}")
         print(f"Remaining cheap probes: {summary.get('remaining_cheap_probes', 0)}")
     return 0
+
+
+def doctor(lab_root: Path, as_json: bool = False) -> int:
+    diagnosis = diagnose_lab(lab_root)
+    if as_json:
+        print(json.dumps(diagnosis, indent=2))
+    else:
+        print(f"Status: {diagnosis['status']}")
+        print(f"Lab root: {diagnosis['lab_root']}")
+        python_info = diagnosis["python"]
+        python_status = "ok" if python_info["ok"] else f"requires >= {python_info['minimum']}"
+        print(f"Python: {python_info['version']} ({python_status})")
+        print(f"Phase 0 ready: {'yes' if diagnosis['phase0']['ready'] else 'no'}")
+        if diagnosis["phase0"]["issues"]:
+            print("Phase 0 issues:")
+            for issue in diagnosis["phase0"]["issues"]:
+                print(f"  - {issue}")
+        print(f"Runtime bootstrap state: {diagnosis['runtime']['bootstrap_state']}")
+        print(f"Runtime initialized: {'yes' if diagnosis['runtime']['initialized'] else 'no'}")
+        print(f"Dashboard present: {'yes' if diagnosis['files']['dashboard_present'] else 'no'}")
+        if diagnosis["files"]["missing_scripts"]:
+            print("Missing scripts:")
+            for name in diagnosis["files"]["missing_scripts"]:
+                print(f"  - {name}")
+        missing_requirements = diagnosis["dependencies"]["missing"]
+        if diagnosis["dependencies"]["requirements_file"]:
+            print(
+                f"Requirements checked: {len(diagnosis['dependencies']['checked'])} "
+                f"from {diagnosis['dependencies']['requirements_file']}"
+            )
+        if missing_requirements:
+            print("Missing dependencies:")
+            for record in missing_requirements:
+                print(f"  - {record['requirement']} (import: {record['import_name']})")
+        if diagnosis["runtime"]["initialized"]:
+            print(f"Queued jobs: {diagnosis['runtime'].get('queued_jobs', 0)}")
+            print(f"Leased jobs: {diagnosis['runtime'].get('leased_jobs', 0)}")
+            print(
+                f"Workers leased: "
+                f"{diagnosis['runtime'].get('worker_leases', 0)}/{diagnosis['runtime'].get('total_workers', 0)}"
+            )
+            stale_leases = diagnosis["runtime"].get("stale_leases", [])
+            print(f"Stale leases: {len(stale_leases)}")
+            for lease in stale_leases:
+                print(
+                    "  - "
+                    f"{lease['candidate_id']} on {lease['worker_id']} "
+                    f"({lease['age_seconds']}s > {lease['timeout_seconds']}s timeout)"
+                )
+        if diagnosis["runtime_error"]:
+            print(f"Runtime error: {diagnosis['runtime_error']}")
+        print(f"Next action: {diagnosis['next_action']}")
+    return 1 if diagnosis["status"] == "degraded" else 0
 
 
 def runtime_summary(lab_root: Path) -> int:
@@ -139,8 +208,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--lab-dir", default=None)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("check-readiness")
-    subparsers.add_parser("status")
+    readiness = subparsers.add_parser("check-readiness")
+    readiness.add_argument("--json", action="store_true")
+    status_parser = subparsers.add_parser("status")
+    status_parser.add_argument("--json", action="store_true")
+    doctor_parser = subparsers.add_parser("doctor")
+    doctor_parser.add_argument("--json", action="store_true")
     subparsers.add_parser("runtime-summary")
 
     next_p = subparsers.add_parser("next-prompt")
@@ -159,9 +232,11 @@ def main(argv: list[str] | None = None) -> int:
     lab_root = resolve_lab_root(args.lab_dir)
 
     if args.command == "check-readiness":
-        return check_readiness(lab_root)
+        return check_readiness(lab_root, as_json=args.json)
     if args.command == "status":
-        return status(lab_root)
+        return status(lab_root, as_json=args.json)
+    if args.command == "doctor":
+        return doctor(lab_root, as_json=args.json)
     if args.command == "runtime-summary":
         return runtime_summary(lab_root)
     if args.command == "next-prompt":

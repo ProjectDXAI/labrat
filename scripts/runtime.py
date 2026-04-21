@@ -15,6 +15,7 @@ import yaml
 
 from lab_core import (
     append_jsonl,
+    ensure_file,
     find_readiness_issues,
     has_pending_runtime_work,
     latest_records,
@@ -23,6 +24,7 @@ from lab_core import (
     load_yaml,
     now_iso,
     write_json,
+    write_text,
 )
 from evaluator import evaluate_result
 
@@ -188,7 +190,7 @@ def save_runtime_files(lab_root: Path, state: dict[str, Any]) -> None:
     write_json(sdir / "workspace_map.json", workspace_payload)
     coordination = lab_root / "coordination"
     coordination.mkdir(parents=True, exist_ok=True)
-    (coordination / "workspace_map.md").write_text(render_workspace_map(workspace_payload))
+    write_text(coordination / "workspace_map.md", render_workspace_map(workspace_payload))
 
 
 def append_candidate(lab_root: Path, candidate: dict[str, Any]) -> None:
@@ -292,8 +294,7 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
     }
     for name, body in placeholder_files.items():
         path = coordination / name
-        if not path.exists():
-            path.write_text(body)
+        ensure_file(path, body)
 
     runtime_state = {
         "version": "vnext",
@@ -373,13 +374,11 @@ def bootstrap_runtime(lab_root: Path) -> dict[str, Any]:
     write_json(sdir / "jobs.json", jobs)
     write_json(sdir / "workers.json", workers)
     write_json(sdir / "frontier.json", frontier)
-    if not (sdir / "candidates.jsonl").exists():
-        (sdir / "candidates.jsonl").write_text("")
-    if not (sdir / "evaluations.jsonl").exists():
-        (sdir / "evaluations.jsonl").write_text("")
-    if not (sdir / "checkpoints.jsonl").exists():
-        (sdir / "checkpoints.jsonl").write_text("")
-    (lab_root / "logs" / "handoff.md").write_text(
+    ensure_file(sdir / "candidates.jsonl")
+    ensure_file(sdir / "evaluations.jsonl")
+    ensure_file(sdir / "checkpoints.jsonl")
+    write_text(
+        lab_root / "logs" / "handoff.md",
         "# labrat vNext Handoff\n\n"
         "Runtime bootstrapped.\n\n"
         f"- families: {', '.join((config.get('families') or {}).keys())}\n"
@@ -563,9 +562,7 @@ def materialize_candidate(lab_root: Path, candidate: dict[str, Any], state: dict
         "config_patch": candidate["config_patch"],
         "resolved_config": resolved,
     }
-    with open(artifact_dir / "candidate.json", "w") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    write_json(artifact_dir / "candidate.json", payload)
     candidate["artifact_dir"] = str(artifact_dir.relative_to(lab_root))
 
 

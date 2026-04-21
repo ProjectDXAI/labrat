@@ -11,6 +11,8 @@ from typing import Any
 
 import yaml
 
+from lab_core import write_json
+
 
 # Canonical failure categories surfaced to the frontier + mutation workers.
 FAILURE_CLASSES = {"overfit", "nan", "oom", "unstable", "data", "arch", "other"}
@@ -257,10 +259,7 @@ def main(argv: list[str] | None = None) -> int:
     artifact_dir = args.artifact_dir or args.result.parent
     payload = evaluate_result(result, config, artifact_dir=artifact_dir)
     if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        with open(args.output, "w") as f:
-            json.dump(payload, f, indent=2)
-            f.write("\n")
+        write_json(args.output, payload)
     else:
         print(json.dumps(payload, indent=2))
     return 0

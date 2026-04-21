@@ -24,6 +24,8 @@ import argparse
 import json
 from pathlib import Path
 
+from lab_core import write_json
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Placeholder runner for labrat vNext.")
@@ -48,10 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         "resource_floor": None,
     }
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, "w") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    write_json(args.output, payload)
     return 0
 
 

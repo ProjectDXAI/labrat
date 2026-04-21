@@ -5,14 +5,16 @@
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r examples/nlp-sentiment/requirements.txt
-cd examples/nlp-sentiment/research_lab
-python scripts/bootstrap.py
-python -m http.server 8787
-python scripts/operator_helper.py status
-python scripts/operator_helper.py runtime-summary
-python scripts/operator_helper.py next-prompt --runner claude --phase auto
+pip install -e '.[nlp-sentiment]'
+labrat doctor --lab-dir examples/nlp-sentiment/research_lab
+labrat bootstrap --lab-dir examples/nlp-sentiment/research_lab
+python -m http.server 8787 --directory examples/nlp-sentiment/research_lab
+labrat status --lab-dir examples/nlp-sentiment/research_lab
+labrat runtime-summary --lab-dir examples/nlp-sentiment/research_lab
+labrat next-prompt --lab-dir examples/nlp-sentiment/research_lab --runner claude --phase auto
 ```
+
+Use `--runner codex` for Codex.
 
 The example includes:
 
@@ -23,17 +25,49 @@ The example includes:
 - decisive held-out challenge tests beyond the search metric
 - audit and frame-break fixtures
 
+The example lab also ships the full operator surface:
+
+- `AGENTS.md` for Codex
+- `CLAUDE.md` and `.claude/commands/` for Claude Code
+- `agent_prompts/` for the shared phase prompts
+
+No separate `SKILLS.md` file is required. Everything needed to operate the lab lives in the repository.
+
 ## 2. Start a real lab
 
 ```bash
-python scripts/new_lab.py my_lab
+labrat new my_lab
 cd my_lab
-python scripts/operator_helper.py next-prompt --runner claude --phase design
-python scripts/operator_helper.py check-readiness
-python scripts/bootstrap.py
+labrat doctor --lab-dir .
+labrat next-prompt --lab-dir . --runner claude --phase design
+labrat next-prompt --lab-dir . --runner codex --phase design
+labrat check-readiness --lab-dir .
+labrat bootstrap --lab-dir .
 python -m http.server 8787
+labrat next-prompt --lab-dir . --runner claude --phase auto
+```
+
+## 3. Pick the interface
+
+Codex:
+
+```bash
+cat AGENTS.md
+python scripts/operator_helper.py doctor
+python scripts/operator_helper.py status
+python scripts/operator_helper.py next-prompt --runner codex --phase auto
+```
+
+Claude Code:
+
+```bash
+cat CLAUDE.md
+python scripts/operator_helper.py doctor
+python scripts/operator_helper.py status
 python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
+
+Inside a lab, the `python scripts/...` commands and the `labrat ... --lab-dir .` commands are equivalent. Prefer `labrat ...` when you are working from the repo root, and prefer `python scripts/...` when you are already inside the lab directory.
 
 ## Phase 0 checklist
 

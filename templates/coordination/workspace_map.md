@@ -15,9 +15,11 @@ The supervisor updates this file as the lab evolves. This initial seed points at
 
 ## Operator surface
 
+- `AGENTS.md` — project-level instructions Codex reads first
 - `CLAUDE.md` — project-level instructions Claude Code auto-loads
 - `.claude/commands/` — `/next`, `/why-stuck`, `/synthesize`, `/audit-candidate`, `/frame-break`, `/consolidate`
 - `.claude/settings.json` — permission allowlist for the operator loop
+- `agent_prompts/` — shared phase prompts for both Codex and Claude Code
 - `orchestrator.md` — supervisor phase instructions
 - `coordination/prioritized_tasks.md` — the supervisor's current control intent (overwritten each synthesis cycle)
 - `coordination/experiment_log.md` — one-liner worker notes, carried forward

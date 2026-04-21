@@ -1,6 +1,8 @@
 # labrat program
 
-This is the repo-level entrypoint for Claude Code or Codex.
+This is the repo-level entrypoint for Codex or Claude Code.
+
+The repository root is not a runnable lab. Use the root `AGENTS.md` or `CLAUDE.md` for repo maintenance, and use a lab directory when you want to operate the runtime itself.
 
 ## Path 1: Evaluate the repo quickly
 
@@ -9,12 +11,12 @@ Use the flagship example.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r examples/nlp-sentiment/requirements.txt
-cd examples/nlp-sentiment/research_lab
-python scripts/bootstrap.py
-python -m http.server 8787
-python scripts/operator_helper.py status
-python scripts/operator_helper.py next-prompt --runner claude --phase auto
+pip install -e '.[nlp-sentiment]'
+labrat doctor --lab-dir examples/nlp-sentiment/research_lab
+labrat bootstrap --lab-dir examples/nlp-sentiment/research_lab
+python -m http.server 8787 --directory examples/nlp-sentiment/research_lab
+labrat status --lab-dir examples/nlp-sentiment/research_lab
+labrat next-prompt --lab-dir examples/nlp-sentiment/research_lab --runner claude --phase auto
 ```
 
 Codex uses the same flow with `--runner codex`.
@@ -24,20 +26,22 @@ Codex uses the same flow with `--runner codex`.
 Use this when the user arrives with a concrete research workload that matches an existing profile.
 
 ```bash
-python scripts/new_lab.py my_search --profile=transformer-arch
+labrat new my_search --profile=transformer-arch
 cd my_search
+python -m pip install -r requirements.txt
+python scripts/operator_helper.py doctor
 python scripts/operator_helper.py check-readiness
 python scripts/bootstrap.py
 python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
 
-Profiles ship with filled Phase 0 files, a working `run_experiment.py`, a `CLAUDE.md`, and `.claude/commands/` slash commands. `transformer-arch` is the first profile. See [docs/PROFILES.md](docs/PROFILES.md) for the full list and contract.
+Profiles ship with filled Phase 0 files, a working `run_experiment.py`, `AGENTS.md`, `CLAUDE.md`, `.claude/commands/`, and `agent_prompts/`. `transformer-arch` is the first profile. See [docs/PROFILES.md](docs/PROFILES.md) for the full list and contract.
 
 ## Path 3: Create a real lab from scratch
 
 Use this when no profile fits and the user wants a new runtime-backed research program.
 
-1. scaffold a new lab with `scripts/new_lab.py`
+1. scaffold a new lab with `labrat new`
 2. finish Phase 0:
    - `branches.yaml`
    - `dead_ends.md`
@@ -50,13 +54,25 @@ Use this when no profile fits and the user wants a new runtime-backed research p
 5. supervise the worker pool through the helper prompts
 
 ```bash
-python scripts/new_lab.py my_lab
+labrat new my_lab
 cd my_lab
 python scripts/operator_helper.py next-prompt --runner claude --phase design
 python scripts/operator_helper.py check-readiness
 python scripts/bootstrap.py
 python scripts/operator_helper.py next-prompt --runner claude --phase auto
 ```
+
+Use `--runner codex` if you are operating from Codex instead of Claude Code.
+
+## Interface contract
+
+Every generated lab carries the operator instructions in version control:
+
+- `AGENTS.md` for Codex
+- `CLAUDE.md` and `.claude/commands/` for Claude Code
+- `agent_prompts/` for the shared phase prompts
+
+There is no required `SKILLS.md` file. The goal is that a new user can open the lab in either interface and start from the files already present in the lab root.
 
 ## Defaults
 

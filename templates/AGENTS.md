@@ -22,11 +22,11 @@ If this is your first invocation in the lab (or you lost session state):
 2. Run `python scripts/operator_helper.py status` to orient. It prints Phase 0 readiness, runtime init status, queued / leased job counts, audit queue, and per-family credits in one call.
 3. Read `coordination/workspace_map.md` for the lab's file layout (authoritative state, operator surface, design files).
 4. Read `coordination/prioritized_tasks.md` for the current control intent from the previous supervisor cycle.
-5. Then invoke `/next` (or `python scripts/operator_helper.py next-prompt --runner claude --phase auto`) to get the current phase prompt.
+5. Then run `python scripts/operator_helper.py next-prompt --runner codex --phase auto` and execute the instructions it prints.
 
-## Autonomous operation within a single invocation
+## Operation within one Codex invocation
 
-One turn ≠ one candidate. Within a single Claude Code invocation, the supervisor should:
+One turn ≠ one candidate. Within a single Codex invocation, the supervisor should:
 
 1. Reap stale leases: `python scripts/runtime.py reap`.
 2. Summarise: `python scripts/runtime.py summary`.
@@ -39,15 +39,15 @@ One turn ≠ one candidate. Within a single Claude Code invocation, the supervis
 6. Optionally recompute Pareto: `python scripts/pareto.py --lab-dir .`.
 7. Return control to the user when the queue is empty AND there are no idle workers able to drain more work.
 
-## Multi-turn autonomy
+## Repeated operation
 
-For runs that span hours or days, use Claude Code's built-in loop: `/loop <interval> /next`. A 5- to 30-minute interval suits most workloads — shorter for synthetic runs, longer for candidates that actually train a model.
+For runs that span hours or days, revisit `python scripts/operator_helper.py next-prompt --runner codex --phase auto` on a 5- to 30-minute cadence. If your Codex host supports recurring runs or automations, use them; otherwise re-run manually.
 
-The `/loop` command keeps cache warm for intervals under 5 minutes (270s is a safe ceiling that stays inside the prompt-cache window); beyond that, one cache miss amortises over the longer wait.
+Shorter intervals fit synthetic runs. Longer intervals fit candidates that actually train models.
 
 ## When to stop and surface to the user
 
-Stop the loop and return control to the user when any of these fire:
+Stop and return control to the user when any of these fire:
 
 - `state/frontier.json.frame_break_required: true` AND `remaining_cheap_probes: 0` — the current frame is degenerate.
 - The same family has produced `failure_class` ∈ {`arch`, `data`} three times in a row — this is a structural bug, not a parameter sweep issue.
@@ -57,16 +57,12 @@ Stop the loop and return control to the user when any of these fire:
 
 Surfacing ≠ giving up. State the observation, point at the relevant state file rows, and propose one of: audit, frame break, expansion, or stop.
 
-## Slash commands
+## Interface notes
 
-- `/next` — print and execute the current phase prompt.
-- `/why-stuck` — diagnose a stalled frontier.
-- `/synthesize` — summarise recent evaluations before dispatching more work.
-- `/audit-candidate` — walk the highest-signal suspicious candidate through audit.
-- `/frame-break` — propose a structural pivot after cheap probes and audits are exhausted.
-- `/consolidate` — write a compact checkpoint note to `logs/checkpoints/`.
-
-Codex uses the peer `AGENTS.md` file plus `agent_prompts/codex.md`. No separate `SKILLS.md` file is required.
+- Codex uses this file plus `agent_prompts/codex.md`.
+- Claude Code uses `CLAUDE.md`, `.claude/commands/`, and `agent_prompts/claude_code.md`.
+- Both interfaces use the same runtime, evaluator, and state files.
+- No separate `SKILLS.md` file is required.
 
 ## Experiment contract
 
@@ -79,39 +75,6 @@ Each candidate writes `result.json` containing at minimum:
 - optional `finding` (one sentence), `resource_floor`, `proxy_metrics`
 
 The evaluator reads any interim `checkpoints.jsonl` and surfaces `checkpoint_summary.trend` (`improving`, `plateau`, `regressing`, `collapsed`, `no_signal`) alongside the scalar scores.
-
-## Permissions and autonomy
-
-Claude Code prompts for each bash invocation by default. For hands-off multi-turn operation, drop this exact file at `.claude/settings.json` in this lab's root — it allowlists the operator scripts and nothing else. Destructive operations (`rm`, `git push`, arbitrary shell) will still prompt.
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Bash(python scripts/runtime.py:*)",
-      "Bash(python scripts/operator_helper.py:*)",
-      "Bash(python scripts/evaluator.py:*)",
-      "Bash(python scripts/pareto.py:*)",
-      "Bash(python scripts/run_experiment.py:*)",
-      "Bash(python scripts/research_scout.py:*)",
-      "Bash(python scripts/bootstrap.py)",
-      "Bash(python -m http.server:*)",
-      "Bash(mkdir:experiments/*)",
-      "Bash(mkdir:logs/*)"
-    ]
-  }
-}
-```
-
-**If the user asks for hands-off / autonomous mode**, offer to create the file above. Writing this file counts as a permission change, so Claude Code will prompt the user to approve the write — that is the user's one explicit opt-in. After the file exists, kick off continuous operation with:
-
-```
-/loop 300s /next
-```
-
-Pick `270s` or `1800s+` rather than exactly 300s. Shorter intervals fit synthetic runs; longer intervals fit candidates that actually train.
-
-Without the allowlist the lab still works end-to-end; the user just has to click "allow" on each bash command. Surface the allowlist offer once and move on if they decline.
 
 See the repo docs for deeper reference:
 

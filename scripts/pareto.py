@@ -31,6 +31,8 @@ from typing import Any
 
 import yaml
 
+from lab_core import write_json
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -213,10 +215,7 @@ def main(argv: list[str] | None = None) -> int:
     output_path = args.output or (lab_root / "state" / "pareto.json")
 
     payload = compute_pareto(lab_root)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w") as f:
-        json.dump(payload, f, indent=2)
-        f.write("\n")
+    write_json(output_path, payload)
     if payload.get("enabled"):
         print(f"Wrote {output_path} ({payload['front_count']} fronts, {len(payload['candidates'])} candidates).")
     else:

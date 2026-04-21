@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 
-from lab_core import load_json, load_jsonl, load_yaml, now_iso, write_json
+from lab_core import load_json, load_jsonl, load_yaml, now_iso, write_json, write_yaml
 
 
 def load_state(lab_root: Path) -> dict[str, Any]:
@@ -66,9 +66,7 @@ def scout_request_for_family(lab_root: Path, family_name: str, state: dict[str, 
     out_dir = lab_root / "experiments" / family_name / "scout_requests"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{mode}_{family_name}.json"
-    with open(out_path, "w") as f:
-        json.dump(request, f, indent=2)
-        f.write("\n")
+    write_json(out_path, request)
     return out_path
 
 
@@ -94,8 +92,7 @@ def merge_expansion(lab_root: Path) -> int:
             merged += 1
 
     if merged:
-        with open(branches_path, "w") as f:
-            yaml.safe_dump(config, f, sort_keys=False)
+        write_yaml(branches_path, config)
 
         frontier_path = lab_root / "state" / "frontier.json"
         frontier = load_json(frontier_path, {})

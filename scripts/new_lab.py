@@ -36,24 +36,34 @@ def available_profiles() -> list[str]:
     return sorted(p.name for p in PROFILES_DIR.iterdir() if p.is_dir())
 
 
+def resolve_target(target_dir: str) -> Path:
+    raw_target = Path(target_dir).expanduser()
+    if raw_target.is_absolute():
+        return raw_target.resolve()
+    return (Path.cwd() / raw_target).resolve()
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Create a starter lab from the labrat vNext templates.",
         epilog=(
             "Profiles pre-fill Phase 0 (branches.yaml, evaluation.yaml, runtime.yaml, "
             "research_brief.md, research_sources.md, dead_ends.md), a working run_experiment.py, "
-            "CLAUDE.md, and .claude/commands for Claude Code users. "
+            "AGENTS.md, CLAUDE.md, and .claude/commands for Codex and Claude Code users. "
             f"Available profiles: {', '.join(available_profiles()) or 'none'}."
         ),
     )
-    parser.add_argument("target_dir", help="Directory to create inside this checked-out labrat repo.")
+    parser.add_argument(
+        "target_dir",
+        help="Directory to create. Relative paths are resolved from the current working directory.",
+    )
     parser.add_argument(
         "--profile",
         default=None,
         help=(
             "Optional profile to overlay on top of the base templates. "
             "Overlays Phase 0 files, a working run_experiment.py, "
-            "CLAUDE.md and .claude/commands/. Base templates remain the default if omitted."
+            "AGENTS.md, CLAUDE.md, and .claude/commands/. Base templates remain the default if omitted."
         ),
     )
     args = parser.parse_args(argv)
@@ -62,10 +72,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: unknown profile '{args.profile}'. Available: {', '.join(available_profiles()) or 'none'}.")
         return 1
 
-    target = (REPO_ROOT / args.target_dir).resolve()
-    if REPO_ROOT not in target.parents and target != REPO_ROOT:
-        print("ERROR: target_dir must stay inside this checked-out labrat repo.")
-        return 1
+    target = resolve_target(args.target_dir)
     if not target_is_safe(target):
         print(f"ERROR: target directory is not empty: {target}")
         return 1
@@ -91,6 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         "crossover_worker.md",
         "probe_worker.md",
         "dashboard.html",
+        "AGENTS.md",
         "CLAUDE.md",
     ]
     for name in root_files:
@@ -128,25 +136,32 @@ def main(argv: list[str] | None = None) -> int:
             str(p.relative_to(profile_src)) for p in profile_src.rglob("*") if p.is_file()
         )
 
-    rel_target = target.relative_to(REPO_ROOT)
-    print(f"Created starter lab at {rel_target}")
+    try:
+        display_target = str(target.relative_to(Path.cwd()))
+    except ValueError:
+        display_target = str(target)
+
+    print(f"Created starter lab at {display_target}")
     if args.profile:
         print(f"Applied profile '{args.profile}' ({len(profile_applied)} files overlaid).")
     print()
     print("Next steps:")
-    print(f"  1. cd {rel_target}")
+    print(f"  1. cd {display_target}")
     if args.profile:
         print("  2. Review the pre-filled Phase 0 files (branches.yaml, evaluation.yaml, runtime.yaml).")
         profile_req = PROFILES_DIR / args.profile / "requirements.txt"
         if profile_req.exists():
-            print(f"     The profile ships its own requirements.txt at {rel_target}/requirements.txt.")
+            print(f"     The profile ships its own requirements.txt at {display_target}/requirements.txt.")
         print("  3. Confirm readiness:")
+        print("     python scripts/operator_helper.py doctor")
         print("     python scripts/operator_helper.py check-readiness")
         print("  4. Bootstrap the runtime:")
         print("     python scripts/bootstrap.py")
         print("  5. Start the dashboard (optional):")
         print("     python -m http.server 8787")
         print()
+        print("This lab ships both AGENTS.md (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
+        print("No extra SKILLS.md file is required; the operator contract is already in the lab.")
         print("Then use Claude Code's slash commands from this directory:")
         print("  /next           — get the next operator prompt")
         print("  /why-stuck      — diagnose a stuck frontier")
@@ -155,18 +170,22 @@ def main(argv: list[str] | None = None) -> int:
         print()
         print("Or hand-run the operator helper:")
         print("  python scripts/operator_helper.py next-prompt --runner claude --phase auto")
+        print("  python scripts/operator_helper.py next-prompt --runner codex --phase auto")
     else:
         print("  2. Complete Phase 0 with the lab-local prompts:")
         print("     python scripts/operator_helper.py next-prompt --runner claude --phase design")
         print("     or")
         print("     python scripts/operator_helper.py next-prompt --runner codex --phase design")
         print("  3. Confirm readiness:")
+        print("     python scripts/operator_helper.py doctor")
         print("     python scripts/operator_helper.py check-readiness")
         print("  4. Bootstrap the runtime:")
         print("     python scripts/bootstrap.py")
         print("  5. Start the dashboard:")
         print("     python -m http.server 8787")
         print()
+        print("This lab ships both AGENTS.md (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
+        print("No extra SKILLS.md file is required; the operator contract is already in the lab.")
         print("Then use Claude Code's slash commands from this directory:")
         print("  /next           — get the next operator prompt")
         print("  /why-stuck /synthesize /audit-candidate /frame-break /consolidate")

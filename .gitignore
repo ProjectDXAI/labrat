@@ -2,12 +2,17 @@
 __pycache__/
 *.pyc
 .eggs/
+*.egg-info/
+.venv/
 
 # CatBoost artifacts
 catboost_info/
 
 # Experiment result directories (large, generated)
 **/research_lab/experiments/
+**/research_lab/state/
+**/research_lab/logs/
+**/research_lab/coordination/
 **/research_lab/logs/cycles/
 
 # Smoke test leftovers from `make smoke ...`

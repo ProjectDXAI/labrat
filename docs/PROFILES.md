@@ -9,10 +9,13 @@ Every lab — profile or not — gets:
 - the runtime scripts (`runtime.py`, `evaluator.py`, `operator_helper.py`, `bootstrap.py`, `lab_core.py`, `pareto.py`, `research_scout.py`)
 - the worker prompt files (`orchestrator.md`, `mutation_worker.md`, `crossover_worker.md`, `probe_worker.md`, `implementation_audit.md`, `frame_break.md`, `expansion_scout.md`, `tree_designer.md`, `consolidation_agent.md`)
 - the phase-prompt directory under `agent_prompts/`
+- a generic `AGENTS.md` at the lab root
 - a generic `CLAUDE.md` at the lab root
 - `.claude/commands/{next, why-stuck, audit-candidate, frame-break, consolidate, synthesize}.md` — Claude Code slash commands that wrap the common operator actions
 - the dashboard (`dashboard.html`)
 - placeholder Phase 0 files (`branches.yaml`, `evaluation.yaml`, etc.) that the user must fill in when no profile is selected
+
+The base scaffold is self-contained. A user should not need a hidden local `SKILLS.md` or private prompt bundle to operate the lab.
 
 A **profile** additionally overlays:
 
@@ -20,7 +23,7 @@ A **profile** additionally overlays:
 - a working `scripts/run_experiment.py` that honours the result contract
 - seed data under `data/` when the workload needs it
 - optional `requirements.txt` for domain-specific dependencies
-- optional overrides for `CLAUDE.md` or any `.claude/commands/*.md` when the profile wants workload-specific guidance
+- optional overrides for `AGENTS.md`, `CLAUDE.md`, or any `.claude/commands/*.md` when the profile wants workload-specific guidance
 
 The base files and the profile's files merge via `shutil.copytree(..., dirs_exist_ok=True)`. Profile files win when both exist. This lets a profile add workload context without re-stating everything the base already covers.
 
@@ -35,13 +38,14 @@ The base files and the profile's files merge via `shutil.copytree(..., dirs_exis
 ## Using a profile
 
 ```bash
-python scripts/new_lab.py my_transformer_search --profile=transformer-arch
+labrat new my_transformer_search --profile=transformer-arch
 cd my_transformer_search
+python scripts/operator_helper.py doctor
 python scripts/operator_helper.py check-readiness
 python scripts/bootstrap.py
 ```
 
-From there Claude Code users can type `/next` (the profile ships the slash commands) or manually invoke `python scripts/operator_helper.py next-prompt --runner claude --phase auto`.
+From there Claude Code users can type `/next` or manually invoke `python scripts/operator_helper.py next-prompt --runner claude --phase auto`. Codex users should read `AGENTS.md` and run `python scripts/operator_helper.py next-prompt --runner codex --phase auto`.
 
 ## Authoring a new profile
 
@@ -59,11 +63,12 @@ profiles/<name>/
   scripts/run_experiment.py  # working runner that honours the result.json contract
   data/                      # seed datasets, corpora, etc.
   coordination/              # optional seed workspace map
+  AGENTS.md                  # optional override of the base lab-root AGENTS.md
   CLAUDE.md                  # optional override of the base lab-root CLAUDE.md
   .claude/commands/          # optional overrides or additions to the base slash commands
 ```
 
-Minimum viable: the six Phase 0 files plus a `run_experiment.py`. `CLAUDE.md` and `.claude/commands/` are only needed when you want to *override* the generic base versions — every lab already ships with them.
+Minimum viable: the six Phase 0 files plus a `run_experiment.py`. `AGENTS.md`, `CLAUDE.md`, and `.claude/commands/` are only needed when you want to override the generic base versions; every lab already ships with working defaults.
 
 ### Contract for `run_experiment.py`
 

@@ -2,13 +2,13 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-`labrat` is a local-first runtime that puts Claude Code or Codex on a real research problem with a scoreboard and enough structure to run for hours. Population search, not single-thread — families of ideas compete for compute budget, and the ones that produce real signal earn more room to keep going.
+`labrat` is a local-first runtime that puts Claude Code or Codex on a real research problem with a scoreboard and enough structure to run for hours. Population search, not single-thread: families of ideas compete for compute budget, and the ones that produce real signal earn more room to keep going.
 
 ![labrat dashboard](docs/dash-sample.png)
 
 <sub>Live example run: the baseline still leads on the main selection metric, while `classifier_search` has already won two decisive held-out challenges and earned extra funding.</sub>
 
-Designed around Claude Opus 4.7 as the supervisor. The synthesis, audit, and consolidation steps are where a frontier-grade model pays off the most; Codex and other coding agents work too, but stronger models make the population search meaningfully sharper.
+`labrat` treats Claude Code and Codex as peer operator interfaces. Stronger reasoning models still help most on synthesis, audit, and consolidation, but the runtime contract and file layout stay the same across both.
 
 **Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
 
@@ -66,15 +66,17 @@ Start with the flagship example:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r examples/nlp-sentiment/requirements.txt
-cd examples/nlp-sentiment/research_lab
-python scripts/bootstrap.py
-python -m http.server 8787
-python scripts/operator_helper.py status
-python scripts/operator_helper.py next-prompt --runner claude --phase auto
+pip install -e '.[nlp-sentiment]'
+labrat doctor --lab-dir examples/nlp-sentiment/research_lab
+labrat bootstrap --lab-dir examples/nlp-sentiment/research_lab
+python -m http.server 8787 --directory examples/nlp-sentiment/research_lab
+labrat status --lab-dir examples/nlp-sentiment/research_lab
+labrat next-prompt --lab-dir examples/nlp-sentiment/research_lab --runner claude --phase auto
 ```
 
 Use `--runner codex` for Codex.
+
+The editable install is intentional: the `labrat` CLI keeps using the templates, profiles, and scripts from this checkout. If you prefer the original in-lab workflow, the copied `scripts/*.py` entrypoints still work unchanged inside each lab.
 
 What you get from the example:
 
@@ -83,20 +85,38 @@ What you get from the example:
 - held-out decisive challenges on top of search / selection metrics
 - a reference supervisor + worker flow that you can copy into a new lab
 
+## Agent interfaces
+
+`labrat` does not depend on hidden local skills, private prompts, or machine-specific setup. The operator contract ships in the repo and in every generated lab:
+
+- repo root: `AGENTS.md` for Codex, `CLAUDE.md` for Claude Code
+- each lab: `AGENTS.md`, `CLAUDE.md`, `.claude/commands/`, and `agent_prompts/`
+- shared runtime surface: `labrat ...` from the repo root or `python scripts/...` inside a lab
+
+That means a user can clone the repo, open either Codex or Claude Code, and operate the lab from files that are already present in version control. There is no required `SKILLS.md` convention to make the repo work.
+
 ## Start from a profile
 
 If you already know the shape of your research problem, a profile scaffolds a runnable lab in one command. No Phase 0 hand-editing, no `LABRAT_PLACEHOLDER` stubs.
 
 ```bash
-python scripts/new_lab.py my_search --profile=transformer-arch
-cd my_search
-python scripts/operator_helper.py check-readiness
-python scripts/bootstrap.py
+labrat new ~/labs/my_search --profile=transformer-arch
+cd ~/labs/my_search
+python -m pip install -r requirements.txt
+labrat doctor --lab-dir .
+labrat check-readiness --lab-dir .
+labrat bootstrap --lab-dir .
 ```
 
-### Slash commands
+### Operator surfaces
 
-Every lab — profile-scaffolded or hand-built — ships a `CLAUDE.md` and a `.claude/commands/` directory of Claude Code slash commands. These are short markdown files that Claude Code turns into commands you can type in-session; each one wraps a common operator action so you don't have to remember the CLI invocations:
+Every lab, whether profile-scaffolded or hand-built, ships both primary operator surfaces:
+
+- `AGENTS.md` for Codex
+- `CLAUDE.md` plus `.claude/commands/` for Claude Code
+- `agent_prompts/` for the shared phase prompts consumed by either interface
+
+The Claude Code slash commands are short markdown files that wrap common operator actions so you do not have to remember the CLI invocations:
 
 - `/next` — print the prompt for the current phase and execute it.
 - `/why-stuck` — diagnose a stalled frontier from `state/frontier.json` and recent evaluations.
@@ -105,7 +125,7 @@ Every lab — profile-scaffolded or hand-built — ships a `CLAUDE.md` and a `.c
 - `/frame-break` — propose a structural pivot once cheap probes and audits are exhausted.
 - `/consolidate` — write a compact checkpoint note to `logs/checkpoints/`.
 
-Open Claude Code in the lab directory and type `/next`, or hand-run `python scripts/operator_helper.py next-prompt --runner claude --phase auto` if you prefer raw CLI.
+Open Claude Code in the lab directory and type `/next`, or hand-run `python scripts/operator_helper.py next-prompt --runner claude --phase auto`. In Codex, read `AGENTS.md` and run `python scripts/operator_helper.py next-prompt --runner codex --phase auto`.
 
 ### Available profiles
 
@@ -118,14 +138,17 @@ More profiles (world-model, multi-dataset) land in follow-up PRs. See [docs/PROF
 If no profile fits your problem, scaffold an empty lab and finish Phase 0 by hand. The default path is deep research first.
 
 ```bash
-python scripts/new_lab.py my_lab
+labrat new my_lab
 cd my_lab
-python scripts/operator_helper.py next-prompt --runner claude --phase design
-python scripts/operator_helper.py check-readiness
-python scripts/bootstrap.py
+labrat doctor --lab-dir .
+labrat next-prompt --lab-dir . --runner claude --phase design
+labrat check-readiness --lab-dir .
+labrat bootstrap --lab-dir .
 python -m http.server 8787
-python scripts/operator_helper.py next-prompt --runner claude --phase auto
+labrat next-prompt --lab-dir . --runner claude --phase auto
 ```
+
+Use `--runner codex` if you are operating from Codex instead of Claude Code.
 
 Phase 0 must produce:
 
@@ -142,6 +165,7 @@ Phase 0 must produce:
 
 - [program.md](program.md): repo-level entrypoint
 - [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
+- [docs/runners.md](docs/runners.md): Codex and Claude Code operator contract
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts
