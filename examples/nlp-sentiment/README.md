@@ -7,10 +7,11 @@ The runnable lab lives in `research_lab/`.
 It ships the same operator surface expected from any real lab:
 
 - `research_lab/AGENTS.md` for Codex
+- `research_lab/.agents/skills/labrat-operator/SKILL.md` for Codex's optional lab-operation workflow
 - `research_lab/CLAUDE.md` and `research_lab/.claude/commands/` for Claude Code
 - `research_lab/agent_prompts/` for the shared phase prompts
 
-There is no extra `SKILLS.md` requirement.
+There is no hidden skill-file requirement.
 
 ## What it demonstrates
 

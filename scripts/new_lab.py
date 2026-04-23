@@ -49,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
         epilog=(
             "Profiles pre-fill Phase 0 (branches.yaml, evaluation.yaml, runtime.yaml, "
             "research_brief.md, research_sources.md, dead_ends.md), a working run_experiment.py, "
-            "AGENTS.md, CLAUDE.md, and .claude/commands for Codex and Claude Code users. "
+            "AGENTS.md, CLAUDE.md, .agents/skills, and .claude/commands for Codex and Claude Code users. "
             f"Available profiles: {', '.join(available_profiles()) or 'none'}."
         ),
     )
@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         help=(
             "Optional profile to overlay on top of the base templates. "
             "Overlays Phase 0 files, a working run_experiment.py, "
-            "AGENTS.md, CLAUDE.md, and .claude/commands/. Base templates remain the default if omitted."
+            "AGENTS.md, CLAUDE.md, .agents/skills, and .claude/commands/. Base templates remain the default if omitted."
         ),
     )
     args = parser.parse_args(argv)
@@ -123,6 +123,8 @@ def main(argv: list[str] | None = None) -> int:
         copy_file(src, target / "scripts" / name)
     copy_file(TEMPLATES_DIR / "run_experiment.py", target / "scripts" / "run_experiment.py")
     copy_tree(TEMPLATES_DIR / "agent_prompts", target / "agent_prompts")
+    if (TEMPLATES_DIR / ".agents").exists():
+        copy_tree(TEMPLATES_DIR / ".agents", target / ".agents")
     if (TEMPLATES_DIR / ".claude").exists():
         copy_tree(TEMPLATES_DIR / ".claude", target / ".claude")
     if (TEMPLATES_DIR / "coordination").exists():
@@ -160,8 +162,8 @@ def main(argv: list[str] | None = None) -> int:
         print("  5. Start the dashboard (optional):")
         print("     python -m http.server 8787")
         print()
-        print("This lab ships both AGENTS.md (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
-        print("No extra SKILLS.md file is required; the operator contract is already in the lab.")
+        print("This lab ships AGENTS.md + .agents/skills (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
+        print("No hidden local skill file is required; the operator contract is already in the lab.")
         print("Then use Claude Code's slash commands from this directory:")
         print("  /next           — get the next operator prompt")
         print("  /why-stuck      — diagnose a stuck frontier")
@@ -184,8 +186,8 @@ def main(argv: list[str] | None = None) -> int:
         print("  5. Start the dashboard:")
         print("     python -m http.server 8787")
         print()
-        print("This lab ships both AGENTS.md (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
-        print("No extra SKILLS.md file is required; the operator contract is already in the lab.")
+        print("This lab ships AGENTS.md + .agents/skills (Codex) and CLAUDE.md + .claude/commands (Claude Code).")
+        print("No hidden local skill file is required; the operator contract is already in the lab.")
         print("Then use Claude Code's slash commands from this directory:")
         print("  /next           — get the next operator prompt")
         print("  /why-stuck /synthesize /audit-candidate /frame-break /consolidate")

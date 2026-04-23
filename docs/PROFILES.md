@@ -10,12 +10,13 @@ Every lab — profile or not — gets:
 - the worker prompt files (`orchestrator.md`, `mutation_worker.md`, `crossover_worker.md`, `probe_worker.md`, `implementation_audit.md`, `frame_break.md`, `expansion_scout.md`, `tree_designer.md`, `consolidation_agent.md`)
 - the phase-prompt directory under `agent_prompts/`
 - a generic `AGENTS.md` at the lab root
+- the optional Codex skill under `.agents/skills/labrat-operator/`
 - a generic `CLAUDE.md` at the lab root
 - `.claude/commands/{next, why-stuck, audit-candidate, frame-break, consolidate, synthesize}.md` — Claude Code slash commands that wrap the common operator actions
 - the dashboard (`dashboard.html`)
 - placeholder Phase 0 files (`branches.yaml`, `evaluation.yaml`, etc.) that the user must fill in when no profile is selected
 
-The base scaffold is self-contained. A user should not need a hidden local `SKILLS.md` or private prompt bundle to operate the lab.
+The base scaffold is self-contained. A user should not need a hidden local skill file or private prompt bundle to operate the lab.
 
 A **profile** additionally overlays:
 
@@ -24,6 +25,7 @@ A **profile** additionally overlays:
 - seed data under `data/` when the workload needs it
 - optional `requirements.txt` for domain-specific dependencies
 - optional overrides for `AGENTS.md`, `CLAUDE.md`, or any `.claude/commands/*.md` when the profile wants workload-specific guidance
+- optional overrides or additions under `.agents/skills/` when the profile needs a specialized Codex workflow
 
 The base files and the profile's files merge via `shutil.copytree(..., dirs_exist_ok=True)`. Profile files win when both exist. This lets a profile add workload context without re-stating everything the base already covers.
 
@@ -64,11 +66,12 @@ profiles/<name>/
   data/                      # seed datasets, corpora, etc.
   coordination/              # optional seed workspace map
   AGENTS.md                  # optional override of the base lab-root AGENTS.md
+  .agents/skills/            # optional Codex skill overrides or additions
   CLAUDE.md                  # optional override of the base lab-root CLAUDE.md
   .claude/commands/          # optional overrides or additions to the base slash commands
 ```
 
-Minimum viable: the six Phase 0 files plus a `run_experiment.py`. `AGENTS.md`, `CLAUDE.md`, and `.claude/commands/` are only needed when you want to override the generic base versions; every lab already ships with working defaults.
+Minimum viable: the six Phase 0 files plus a `run_experiment.py`. `AGENTS.md`, `.agents/skills/`, `CLAUDE.md`, and `.claude/commands/` are only needed when you want to override the generic base versions; every lab already ships with working defaults.
 
 ### Contract for `run_experiment.py`
 

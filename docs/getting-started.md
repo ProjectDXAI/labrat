@@ -28,10 +28,11 @@ The example includes:
 The example lab also ships the full operator surface:
 
 - `AGENTS.md` for Codex
+- `.agents/skills/labrat-operator/SKILL.md` for Codex's optional lab-operation workflow
 - `CLAUDE.md` and `.claude/commands/` for Claude Code
 - `agent_prompts/` for the shared phase prompts
 
-No separate `SKILLS.md` file is required. Everything needed to operate the lab lives in the repository.
+No hidden skill file is required. Everything needed to operate the lab lives in the repository.
 
 ## 2. Start a real lab
 

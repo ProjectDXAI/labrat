@@ -69,10 +69,13 @@ Use `--runner codex` if you are operating from Codex instead of Claude Code.
 Every generated lab carries the operator instructions in version control:
 
 - `AGENTS.md` for Codex
+- `.agents/skills/labrat-operator/SKILL.md` for Codex's optional repeatable workflow
 - `CLAUDE.md` and `.claude/commands/` for Claude Code
 - `agent_prompts/` for the shared phase prompts
 
-There is no required `SKILLS.md` file. The goal is that a new user can open the lab in either interface and start from the files already present in the lab root.
+There is no hidden skill file. The goal is that a new user can open the lab in either interface and start from the files already present in the lab root.
+
+For current frontier-model operating guidance, see [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md).
 
 ## Defaults
 

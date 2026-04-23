@@ -16,6 +16,7 @@ The supervisor updates this file as the lab evolves. This initial seed points at
 ## Operator surface
 
 - `AGENTS.md` — project-level instructions Codex reads first
+- `.agents/skills/labrat-operator/SKILL.md` — optional Codex workflow for lab operation
 - `CLAUDE.md` — project-level instructions Claude Code auto-loads
 - `.claude/commands/` — `/next`, `/why-stuck`, `/synthesize`, `/audit-candidate`, `/frame-break`, `/consolidate`
 - `.claude/settings.json` — permission allowlist for the operator loop

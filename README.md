@@ -90,10 +90,10 @@ What you get from the example:
 `labrat` does not depend on hidden local skills, private prompts, or machine-specific setup. The operator contract ships in the repo and in every generated lab:
 
 - repo root: `AGENTS.md` for Codex, `CLAUDE.md` for Claude Code
-- each lab: `AGENTS.md`, `CLAUDE.md`, `.claude/commands/`, and `agent_prompts/`
+- each lab: `AGENTS.md`, `.agents/skills/`, `CLAUDE.md`, `.claude/commands/`, and `agent_prompts/`
 - shared runtime surface: `labrat ...` from the repo root or `python scripts/...` inside a lab
 
-That means a user can clone the repo, open either Codex or Claude Code, and operate the lab from files that are already present in version control. There is no required `SKILLS.md` convention to make the repo work.
+That means a user can clone the repo, open either Codex or Claude Code, and operate the lab from files that are already present in version control. Codex can optionally load the checked-in `labrat-operator` skill, but no hidden local skill file is required.
 
 ## Start from a profile
 
@@ -113,6 +113,7 @@ labrat bootstrap --lab-dir .
 Every lab, whether profile-scaffolded or hand-built, ships both primary operator surfaces:
 
 - `AGENTS.md` for Codex
+- `.agents/skills/labrat-operator/SKILL.md` for the optional Codex workflow
 - `CLAUDE.md` plus `.claude/commands/` for Claude Code
 - `agent_prompts/` for the shared phase prompts consumed by either interface
 
@@ -166,6 +167,7 @@ Phase 0 must produce:
 - [program.md](program.md): repo-level entrypoint
 - [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
 - [docs/runners.md](docs/runners.md): Codex and Claude Code operator contract
+- [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md): frontier-model prompting, reasoning-effort, and research guidance
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts

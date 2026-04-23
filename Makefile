@@ -63,11 +63,12 @@ smoke: clean-smoke
 	@echo ">>> Verifying Claude Code ergonomics shipped..."
 	@test -f $(SMOKE_LAB)/CLAUDE.md || (echo "ERROR: CLAUDE.md missing from lab root" && exit 1)
 	@test -f $(SMOKE_LAB)/AGENTS.md || (echo "ERROR: AGENTS.md missing from lab root" && exit 1)
+	@test -f $(SMOKE_LAB)/.agents/skills/labrat-operator/SKILL.md || (echo "ERROR: Codex labrat-operator skill missing from lab root" && exit 1)
 	@test -d $(SMOKE_LAB)/.claude/commands || (echo "ERROR: .claude/commands missing from lab root" && exit 1)
 	@test -d $(SMOKE_LAB)/agent_prompts || (echo "ERROR: agent_prompts missing from lab root" && exit 1)
 	@test -f $(SMOKE_LAB)/coordination/workspace_map.md || (echo "ERROR: coordination/workspace_map.md missing" && exit 1)
 	@test -f $(SMOKE_LAB)/coordination/prioritized_tasks.md || (echo "ERROR: coordination/prioritized_tasks.md missing" && exit 1)
-	@echo "  AGENTS.md + CLAUDE.md + .claude/commands + agent_prompts + coordination seeds OK"
+	@echo "  AGENTS.md + .agents/skills + CLAUDE.md + .claude/commands + agent_prompts + coordination seeds OK"
 	@echo ""
 	@echo ">>> smoke PROFILE=$(PROFILE) PASSED"
 	@echo "    (lab left at $(SMOKE_LAB)/ for inspection; run 'make clean-smoke' to remove)"

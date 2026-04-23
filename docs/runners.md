@@ -7,11 +7,12 @@ Both runners use the same runtime contract, state files, and prompts. The differ
 Every runnable lab should ship:
 
 - `AGENTS.md` for Codex
+- `.agents/skills/labrat-operator/SKILL.md` for Codex's optional repeatable workflow
 - `CLAUDE.md` for Claude Code
 - `.claude/commands/` for Claude Code slash commands
 - `agent_prompts/` for the shared phase prompts
 
-There is no required `SKILLS.md` file. A user should be able to clone the repo, open either interface, and operate from the files already committed to the lab.
+There is no hidden required skill file. A user should be able to clone the repo, open either interface, and operate from the files already committed to the lab.
 
 ## Claude Code
 
@@ -42,7 +43,7 @@ python scripts/operator_helper.py runtime-summary
 python scripts/operator_helper.py next-prompt --runner codex --phase auto
 ```
 
-Codex should read `AGENTS.md` first. `AGENTS.md` is the stable operator brief; `agent_prompts/codex.md` is the runner-specific supplement.
+Codex should read `AGENTS.md` first. `AGENTS.md` is the stable operator brief, `.agents/skills/labrat-operator/SKILL.md` is the optional repeatable workflow, and `agent_prompts/codex.md` is the runner-specific supplement.
 
 ## Shared rules
 
@@ -52,9 +53,12 @@ Codex should read `AGENTS.md` first. `AGENTS.md` is the stable operator brief; `
 - runtime state is the source of truth
 - use audit before killing suspicious families
 - use frame break only after cheap probes and audit are no longer the right move
+- use higher reasoning effort for design, audit, frame break, profile authoring, and release work
+- browse external sources only when the answer depends on current facts or user-requested references
 
 ## Repo root vs. lab root
 
 - From the repo root, prefer `labrat ... --lab-dir <path>`.
 - From inside a lab, prefer `python scripts/...` or Claude Code slash commands.
 - Keep docs and examples showing both runner flags so Codex and Claude Code remain first-class.
+- See `docs/MODEL_GUIDANCE.md` before changing model or prompting guidance.
