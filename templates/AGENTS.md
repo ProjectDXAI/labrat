@@ -6,6 +6,8 @@ You are the supervisor. The runtime is authoritative for scoring and promotion; 
 
 This lab ships both `AGENTS.md` for Codex and `CLAUDE.md` + `.claude/commands/` for Claude Code. The runtime contract is shared across both interfaces, and everything needed to operate the lab should already be in this directory.
 
+If this lab lives under a repo that also has a root `AGENTS.md`, this lab-local file governs runtime operation inside the lab. Parent `AGENTS.md` files are still useful for repo maintenance, but lab state and runtime commands are local.
+
 ## Operating model
 
 - The runtime (`scripts/runtime.py`) is authoritative. Do not hand-score candidates.
@@ -42,6 +44,7 @@ One turn ≠ one candidate. Within a single Codex invocation, the supervisor sho
 ## Frontier model operating rules
 
 - Treat `AGENTS.md` as the always-on contract and `.agents/skills/labrat-operator/SKILL.md` as the repeatable Codex workflow.
+- Prefer GPT-5.5 in Codex for design, audit, frame break, profile authoring, and release work when it is available in the user's Codex host.
 - Use normal reasoning for status checks, prompt retrieval, and routine dispatch.
 - Use higher reasoning for Phase 0 design, audit, frame break, profile authoring, or release preparation.
 - Finish one complete operator loop before returning unless a stop condition fires.

@@ -2,8 +2,8 @@
 
 > Historical note: this workplan describes the older cycle-based labrat flow.
 > `labrat` vNext now uses an async population runtime with external consistent
-> evaluation. Use [getting-started.md](/Users/punkyrest/infiniteagentworks/labrat/docs/getting-started.md)
-> and [DEEP_RESEARCH.md](/Users/punkyrest/infiniteagentworks/labrat/docs/DEEP_RESEARCH.md)
+> evaluation. Use [getting-started.md](getting-started.md)
+> and [DEEP_RESEARCH.md](DEEP_RESEARCH.md)
 > for the current workflow.
 
 ## Phase 0: Problem Definition (1-2 hours, human + frontier model)
@@ -16,7 +16,7 @@
 
 ### What to Do
 1. Collect 3-5 recent papers relevant to your problem
-2. Open a frontier model (GPT-5.4 Pro, Claude Opus, etc.)
+2. Open a frontier model in Codex or Claude Code (GPT-5.5 in Codex when available, Claude Opus, etc.)
 3. Give it your problem, baseline, constraints, and papers
 4. Ask for: branch taxonomy, search spaces, scoring formula, dead ends
 5. Iterate 2-3 times until the tree feels comprehensive but not bloated
@@ -109,7 +109,7 @@ When the lab converges:
 | Component | Cost |
 |-----------|------|
 | Frontier model for tree design | ~$5 (one conversation) |
-| Claude Code for 50 cycles | ~$20-50 (API usage) |
+| Agent interface for 50 cycles | Depends on the user's Codex or Claude Code plan |
 | Compute for experiments | Depends on your domain |
 | VPS for execution calibration | ~$15/month |
 

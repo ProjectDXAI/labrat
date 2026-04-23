@@ -4,6 +4,8 @@ This is the repository root, not a runnable lab directory.
 
 Use this file when working on `labrat` itself from Claude Code.
 
+If Claude Code is opened inside a nested lab that has its own `CLAUDE.md`, follow the lab-local file for runtime operation. This root file governs repo maintenance, scaffold consistency, releases, and docs.
+
 ## Source Of Truth
 
 - Product/setup docs: `README.md`, `program.md`, `docs/getting-started.md`, `docs/runners.md`, `docs/MODEL_GUIDANCE.md`
@@ -23,7 +25,7 @@ Use this file when working on `labrat` itself from Claude Code.
 ## Frontier Model Rules
 
 - Use `docs/MODEL_GUIDANCE.md` for model and prompt-process updates.
-- Do not hardcode a newer OpenAI model ID unless public docs or user configuration confirms it.
+- GPT-5.5 is a Codex host selection, not a lab runtime constant. Do not hardcode API model IDs into `labrat` for Codex usage.
 - Prefer explicit completion and verification contracts over broad encouragement.
 - Reserve high reasoning effort for design, audit, frame break, profile authoring, and release work.
 

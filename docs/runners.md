@@ -45,6 +45,10 @@ python scripts/operator_helper.py next-prompt --runner codex --phase auto
 
 Codex should read `AGENTS.md` first. `AGENTS.md` is the stable operator brief, `.agents/skills/labrat-operator/SKILL.md` is the optional repeatable workflow, and `agent_prompts/codex.md` is the runner-specific supplement.
 
+Codex loads `AGENTS.md` hierarchically, so a lab inside this repository may see both root and lab-local instructions. For runtime operation, the lab-local `AGENTS.md` is authoritative. For repo maintenance and releases, the root `AGENTS.md` is authoritative.
+
+When GPT-5.5 is available in Codex, use it for design, audit, frame break, profile authoring, release work, and review. Routine `doctor`, `status`, `next-prompt`, and dispatch loops mostly depend on clean state and command contracts.
+
 ## Shared rules
 
 - workers do not self-promote
@@ -54,6 +58,8 @@ Codex should read `AGENTS.md` first. `AGENTS.md` is the stable operator brief, `
 - use audit before killing suspicious families
 - use frame break only after cheap probes and audit are no longer the right move
 - use higher reasoning effort for design, audit, frame break, profile authoring, and release work
+- use Codex Plan mode before broad workflow, docs, or scaffold changes
+- use Codex review after runtime, scaffold, or prompt contract changes
 - browse external sources only when the answer depends on current facts or user-requested references
 
 ## Repo root vs. lab root
