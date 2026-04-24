@@ -60,7 +60,7 @@ smoke: clean-smoke
 	@echo ">>> Computing Pareto rank..."
 	@cd $(SMOKE_LAB) && $(PYTHON) scripts/pareto.py --lab-dir . > /dev/null && \
 		$(PYTHON) -c "import json; d=json.load(open('state/pareto.json')); assert d['enabled'], 'pareto should be enabled'; assert d['front_count']>=1, 'expected >= 1 front'; print(f'  pareto OK: {d[\"front_count\"]} fronts, {len(d[\"candidates\"])} candidates')"
-	@echo ">>> Verifying Claude Code ergonomics shipped..."
+	@echo ">>> Verifying agent ergonomics shipped..."
 	@test -f $(SMOKE_LAB)/CLAUDE.md || (echo "ERROR: CLAUDE.md missing from lab root" && exit 1)
 	@test -f $(SMOKE_LAB)/AGENTS.md || (echo "ERROR: AGENTS.md missing from lab root" && exit 1)
 	@test -f $(SMOKE_LAB)/.agents/skills/labrat-operator/SKILL.md || (echo "ERROR: Codex labrat-operator skill missing from lab root" && exit 1)

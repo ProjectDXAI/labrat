@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3 - 2026-04-23
+
+- Synced the Simplified Chinese README with the current CLI, profile, Codex skill, and runner guidance.
+- Cleaned up smoke-test wording so generated-lab checks describe both Codex and Claude Code surfaces.
+
 ## 0.2.2 - 2026-04-23
 
 - Updated Codex guidance for GPT-5.5 availability in Codex, without tying the lab runtime to API model strings.
