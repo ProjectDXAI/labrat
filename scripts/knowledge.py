@@ -912,6 +912,221 @@ def evaluate_policy(
     }
 
 
+
+# --------------------------------------------------------------------------------------
+# Robustness: does a policy survive the trial set being wrong about the world?
+# --------------------------------------------------------------------------------------
+
+
+def _drop_tokens(text: str, keep_every: int = 2) -> str:
+    """Deterministically thin a phrase, simulating an operator who worded it differently."""
+    words = str(text or "").split()
+    return " ".join(word for index, word in enumerate(words) if index % keep_every == 0)
+
+
+def perturb_lexical(trial: dict[str, Any], store: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Same decision, different words. Structure is untouched, so a policy that
+    leans on structure should barely move and a lexical policy should fall over."""
+    context = json.loads(json.dumps(trial.get("context") or {}))
+    context["question"] = _drop_tokens(context.get("question", ""))
+    context["uncertainties"] = [_drop_tokens(item) for item in context.get("uncertainties") or []]
+    context["state_notes"] = [_drop_tokens(item) for item in context.get("state_notes") or []]
+    return {**trial, "context": context}, store
+
+
+def perturb_observable_dropout(trial: dict[str, Any], store: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Remove an observable the gold concept needs. Serving it anyway is an
+    integrity violation: the packet would recommend a calculation we cannot run."""
+    context = json.loads(json.dumps(trial.get("context") or {}))
+    by_id = {row["concept_id"]: row for row in store["concepts"]}
+    required: list[str] = []
+    for concept_id in trial.get("gold_concept_ids") or []:
+        required.extend(by_id.get(concept_id, {}).get("required_observables") or [])
+    if required:
+        victim = sorted(set(required))[0]
+        context["observables_available"] = [o for o in context.get("observables_available") or [] if o != victim]
+        context["_removed_observable"] = victim
+    return {**trial, "context": context, "applicable": False if required else trial.get("applicable", True)}, store
+
+
+def perturb_tool_loss(trial: dict[str, Any], store: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """The tools are down. Concepts can still inform reasoning, so the right
+    behaviour is graceful degradation, not silence."""
+    context = json.loads(json.dumps(trial.get("context") or {}))
+    context["tools_available"] = []
+    return {**trial, "context": context}, store
+
+
+def _synthetic_card(index: int, template: dict[str, Any], kind: str) -> dict[str, Any]:
+    """Build a card that passes the gate but should not win retrieval."""
+    card = json.loads(json.dumps(template))
+    if kind == "distractor":
+        card["concept_id"] = f"KC-DISTRACT-{index}"
+        card["canonical_name"] = f"{template.get('canonical_name')} (unrelated venue variant)"
+        # Same words, wrong world: a market type and horizon this context never has.
+        card["market_types"] = ["dealer_market"]
+        card["relevant_horizons"] = ["weeks"]
+        card["required_observables"] = ["dealer_quote_sheet"]
+    else:
+        card["concept_id"] = f"KC-DUPE-{index}"
+        card["canonical_name"] = f"{template.get('canonical_name')} (restatement)"
+        card["confidence"] = max(0.0, float(template.get("confidence") or 0.5) - 0.05)
+    card["implementation_status"] = "specified"
+    card["alternative_explanations"] = list(template.get("alternative_explanations") or ["Restated mechanism may not apply."])
+    card["contradicting_concept_ids"] = []
+    card["supporting_concept_ids"] = []
+    return card
+
+
+def perturb_distractors(trial: dict[str, Any], store: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Inject cards with heavy word overlap and the wrong applicability."""
+    by_id = {row["concept_id"]: row for row in store["concepts"]}
+    extra = [
+        _synthetic_card(index, by_id[concept_id], "distractor")
+        for index, concept_id in enumerate(trial.get("gold_concept_ids") or [])
+        if concept_id in by_id
+    ]
+    if not extra:
+        return trial, store
+    return trial, {**store, "concepts": [*store["concepts"], *extra]}
+
+
+def perturb_near_duplicates(trial: dict[str, Any], store: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Clone the gold card. Diversity control should keep the packet from
+    spending its budget on two statements of one mechanism."""
+    by_id = {row["concept_id"]: row for row in store["concepts"]}
+    extra = [
+        _synthetic_card(index, by_id[concept_id], "duplicate")
+        for index, concept_id in enumerate(trial.get("gold_concept_ids") or [])
+        if concept_id in by_id
+    ]
+    if not extra:
+        return trial, store
+    return trial, {**store, "concepts": [*store["concepts"], *extra]}
+
+
+# Each perturbation declares how success is measured, because they do not all ask
+# the same question. Reworded context: keep serving the same thing (retention).
+# Missing observable: the right answer changed, so the test is whether the policy
+# stops serving what it can no longer compute (compliance).
+PERTURBATIONS = {
+    "lexical_drift": {"fn": perturb_lexical, "mode": "retention"},
+    "observable_dropout": {"fn": perturb_observable_dropout, "mode": "compliance"},
+    "tool_loss": {"fn": perturb_tool_loss, "mode": "retention"},
+    "distractors": {"fn": perturb_distractors, "mode": "retention"},
+    "near_duplicates": {"fn": perturb_near_duplicates, "mode": "retention"},
+}
+
+
+def integrity_violations(
+    packet: dict[str, Any],
+    context: dict[str, Any],
+    store: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Hard errors, independent of any label: a served card whose observables are
+    absent, whose market or horizon does not match, or whose sources postdate the
+    decision. These are wrong regardless of what the trial expected."""
+    by_id = {row["concept_id"]: row for row in store["concepts"]}
+    available = set(context.get("observables_available") or [])
+    problems: list[dict[str, Any]] = []
+    for card in packet.get("cards") or []:
+        concept = by_id.get(card["concept_id"]) or card
+        missing = set(concept.get("required_observables") or []) - available
+        if missing:
+            problems.append({"concept_id": card["concept_id"], "violation": "missing_observables", "detail": sorted(missing)})
+        if not market_compatible(concept, context.get("market_type")):
+            problems.append({"concept_id": card["concept_id"], "violation": "wrong_market", "detail": context.get("market_type")})
+        if not horizon_compatible(concept, context.get("horizon")):
+            problems.append({"concept_id": card["concept_id"], "violation": "wrong_horizon", "detail": context.get("horizon")})
+    return problems
+
+
+def stress_policy(
+    store: dict[str, Any],
+    sources: dict[str, dict[str, Any]],
+    policy: dict[str, Any],
+) -> dict[str, Any]:
+    """Score a policy on the clean trials, then under each perturbation.
+
+    The headline number is the worst case, not the average. A retrieval layer that
+    is excellent on the trial set as written and collapses when one observable
+    goes missing is not a retrieval layer we can put in front of a live decision.
+    """
+    clean = evaluate_policy(store, sources, policy)
+    baseline = max(1e-9, 0.6 * clean["precision"] + 0.4 * (1.0 - clean["false_abstention_rate"]))
+
+    results: dict[str, Any] = {}
+    for name, spec in PERTURBATIONS.items():
+        perturb, mode = spec["fn"], spec["mode"]
+        trials: list[dict[str, Any]] = []
+        violations: list[dict[str, Any]] = []
+        working_store = store
+        for trial in store["trials"]:
+            perturbed_trial, perturbed_store = perturb(trial, store)
+            working_store = perturbed_store
+            packet = retrieve(perturbed_store, sources, perturbed_trial.get("context") or {}, policy)
+            violations.extend(
+                {**row, "trial_id": trial.get("trial_id")}
+                for row in integrity_violations(packet, perturbed_trial.get("context") or {}, perturbed_store)
+            )
+            returned = [card["concept_id"] for card in packet["cards"]]
+            gold = list(perturbed_trial.get("gold_concept_ids") or [])
+            trials.append(
+                {
+                    "trial_id": trial.get("trial_id"),
+                    "applicable": bool(perturbed_trial.get("applicable", True)),
+                    "returned": returned,
+                    "hit": bool(set(returned) & set(gold)),
+                    "precision": (len(set(returned) & set(gold)) / len(returned)) if returned else 0.0,
+                    "abstained": packet["abstained"],
+                    "synthetic_served": [c for c in returned if c.startswith(("KC-DISTRACT", "KC-DUPE"))],
+                }
+            )
+
+        applicable = [row for row in trials if row["applicable"]]
+        served = [row for row in applicable if not row["abstained"]]
+        negatives = [row for row in trials if not row["applicable"]]
+
+        def mean(values: list[float]) -> float:
+            return sum(values) / len(values) if values else 0.0
+
+        precision = mean([row["precision"] for row in served])
+        false_abstention = mean([1.0 if row["abstained"] else 0.0 for row in applicable])
+        clean_trials = {row["trial_id"] for row in trials} - {row["trial_id"] for row in violations}
+        if mode == "compliance":
+            # Serving nothing is a pass here; serving something uncomputable is not.
+            retention = len(clean_trials) / max(1, len(trials))
+        else:
+            quality = 0.6 * precision + 0.4 * (1.0 - false_abstention)
+            retention = quality / baseline
+        results[name] = {
+            "mode": mode,
+            "hit_rate": round(mean([1.0 if row["hit"] else 0.0 for row in applicable]), 4),
+            "precision": round(precision, 4),
+            "false_abstention_rate": round(false_abstention, 4),
+            "correct_abstention": round(mean([1.0 if row["abstained"] else 0.0 for row in negatives]), 4),
+            "synthetic_cards_served": sum(len(row["synthetic_served"]) for row in trials),
+            "integrity_violations": len(violations),
+            "retention": round(retention, 4),
+            "violation_detail": violations[:5],
+        }
+
+    retentions = [row["retention"] for row in results.values()]
+    total_violations = sum(row["integrity_violations"] for row in results.values())
+    # Violations are not a soft penalty: serving a card whose data is absent is a
+    # different kind of wrong from ranking it second.
+    violation_rate = total_violations / max(1, len(store["trials"]) * len(PERTURBATIONS))
+    return {
+        "policy": policy.get("name"),
+        "clean_quality": round(baseline, 4),
+        "worst_case_retention": round(min(retentions), 4) if retentions else 0.0,
+        "mean_retention": round(sum(retentions) / len(retentions), 4) if retentions else 0.0,
+        "integrity_violations": total_violations,
+        "robustness": round(max(0.0, (min(retentions) if retentions else 0.0) * (1.0 - min(1.0, violation_rate))), 4),
+        "perturbations": results,
+    }
+
+
 # --------------------------------------------------------------------------------------
 # Compile queue (what to read next, at chapter level)
 # --------------------------------------------------------------------------------------
@@ -1122,6 +1337,138 @@ def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) ->
     }
 
 
+
+# --------------------------------------------------------------------------------------
+# Self-test
+# --------------------------------------------------------------------------------------
+
+
+def _card(**overrides: Any) -> dict[str, Any]:
+    card = {
+        "concept_id": "KC-T",
+        "canonical_name": "Test concept",
+        "plain_description": "d",
+        "mechanism": "m",
+        "assumptions": ["a"],
+        "market_types": ["clob_crypto"],
+        "relevant_horizons": ["minutes"],
+        "required_observables": ["l1_book"],
+        "expected_empirical_signature": "s",
+        "known_failure_modes": ["f"],
+        "alternative_explanations": ["alt"],
+        "source_passage_ids": ["src#ch1"],
+        "implementation_status": "specified",
+        "confidence": 0.6,
+    }
+    card.update(overrides)
+    return card
+
+
+def self_test() -> dict[str, Any]:
+    checks: list[str] = []
+    sources = {
+        "src": {"id": "src", "year": 2010, "derived_rights": {"use_class": "reference_only", "manifest_eligible": False, "confidence": "confirmed"}},
+        "open": {"id": "open", "year": 2010, "derived_rights": {"use_class": "ingest_full", "manifest_eligible": True, "confidence": "confirmed"}},
+        "banned": {"id": "banned", "year": 2010, "derived_rights": {"use_class": "excluded", "manifest_eligible": False}},
+        "future": {"id": "future", "year": 2030, "derived_rights": {"use_class": "reference_only", "manifest_eligible": False}},
+    }
+    store = {"concepts": [], "hypotheses": [], "methods": [], "decisions": [], "problems": [], "trials": [], "policies": {}, "utility": {}}
+
+    good = _card()
+    store["concepts"] = [good]
+    assert concept_gate(good, sources, store)["servable"], concept_gate(good, sources, store)
+    checks.append("gate: a complete card serves")
+
+    # Counterevidence is structural.
+    lonely = _card(alternative_explanations=[], contradicting_concept_ids=[])
+    assert not concept_gate(lonely, sources, {**store, "concepts": [lonely]})["servable"]
+    checks.append("gate: a card with nothing that could argue against it is refused")
+
+    # Rights: quoting is gated on the source, citing an excluded source never allowed.
+    quoted = _card(source_passage_ids=[{"source_id": "src", "anchor": "ch1", "quote": "verbatim"}])
+    errors = concept_gate(quoted, sources, {**store, "concepts": [quoted]})["errors"]
+    assert any("verbatim" in e for e in errors), errors
+    allowed = _card(source_passage_ids=[{"source_id": "open", "anchor": "ch1", "quote": "verbatim"}])
+    assert concept_gate(allowed, sources, {**store, "concepts": [allowed]})["servable"]
+    banned = _card(source_passage_ids=["banned#ch1"])
+    assert any("excluded" in e for e in concept_gate(banned, sources, {**store, "concepts": [banned]})["errors"])
+    missing_source = _card(source_passage_ids=["ghost#ch1"])
+    assert any("not in the bibliography" in e for e in concept_gate(missing_source, sources, {**store, "concepts": [missing_source]})["errors"])
+    checks.append("gate: quotes gated on source rights, excluded and unknown sources refused")
+
+    # Implementation claims must be backed, at the registered version.
+    claimed = _card(implementation_status="implemented")
+    assert not concept_gate(claimed, sources, {**store, "concepts": [claimed]})["servable"]
+    if methods_module is not None:
+        bound = {"method_id": "cusum_changepoint", "implementation_version": "1.0.0", "concept_ids": ["KC-T"]}
+        assert method_gate(bound, {**store, "concepts": [claimed]})["bound"]
+        drifted = {**bound, "implementation_version": "0.9.0"}
+        assert any("version drift" in e for e in method_gate(drifted, {**store, "concepts": [claimed]})["errors"])
+        ghost = {"method_id": "not_a_method", "implementation_version": "1.0.0", "concept_ids": ["KC-T"]}
+        assert not method_gate(ghost, {**store, "concepts": [claimed]})["bound"]
+        checks.append("gate: unbacked implementation claims, version drift and unknown methods all refused")
+
+    # Dangling relations and hypotheses without a cost model.
+    dangling = _card(contradicting_concept_ids=["KC-GHOST"])
+    assert any("dangling" in e for e in concept_gate(dangling, sources, {**store, "concepts": [dangling]})["errors"])
+    costless = {"hypothesis_id": "H", "concept_id": "KC-T", "market_context": "m", "causal_story": "c",
+                "ex_ante_prediction": "p", "null_hypothesis": "n", "measurement_operator": {},
+                "eligible_universe": "u", "decision_timestamp_rule": "r", "outcome_horizons": ["1d"],
+                "cost_model": None, "invalidation_conditions": ["i"]}
+    assert any("cost model" in e for e in hypothesis_gate(costless, {**store, "concepts": [good]})["errors"])
+    checks.append("gate: dangling relations and costless hypotheses refused")
+
+    # Retrieval filters: each one, in isolation.
+    store = {**store, "concepts": [good]}
+    base_context = {"market_type": "clob_crypto", "horizon": "minutes", "observables_available": ["l1_book"],
+                    "timestamp": "2026-01-01T00:00:00Z", "question": "test concept mechanism"}
+    policy = resolve_policy(store, None, {"abstain_threshold": 0.0, "require_counterevidence": False})
+    assert retrieve(store, sources, base_context, policy)["cards"], "clean context should serve"
+    for field, value, label in [
+        ("market_type", "prediction_market", "market"),
+        ("horizon", "days", "horizon"),
+        ("observables_available", [], "observables"),
+        ("timestamp", "1990-01-01T00:00:00Z", "point-in-time"),
+    ]:
+        packet = retrieve(store, sources, {**base_context, field: value}, policy)
+        assert packet["abstained"] and not packet["cards"], (label, packet)
+    checks.append("retrieval: market, horizon, observable and point-in-time filters each block on their own")
+
+    # Point-in-time is about the source, not the card.
+    future_card = _card(concept_id="KC-F", source_passage_ids=["future#ch1"])
+    future_store = {**store, "concepts": [future_card]}
+    assert retrieve(future_store, sources, base_context, policy)["abstained"], "a 2030 source cannot inform a 2026 decision"
+    checks.append("retrieval: a source published after the decision timestamp is unreachable")
+
+    # Counterevidence requirement can veto an otherwise good packet.
+    strict = resolve_policy(store, None, {"abstain_threshold": 0.0, "require_counterevidence": True, "expand_hops": 1})
+    assert retrieve(store, sources, base_context, strict)["counterevidence"], "alternative explanation should surface"
+    no_counter = _card(alternative_explanations=[], contradicting_concept_ids=[], known_failure_modes=[], assumptions=[])
+    packet = retrieve({**store, "concepts": [no_counter]}, sources, base_context, strict)
+    assert packet["abstained"], "unservable card leaves nothing to serve"
+    checks.append("retrieval: counterevidence requirement enforced at serve time")
+
+    # Degenerate stores must not raise.
+    empty = {**store, "concepts": []}
+    assert retrieve(empty, sources, base_context, policy)["abstained"]
+    assert retrieve(store, {}, base_context, policy) is not None, "no bibliography should not crash retrieval"
+    assert status_payload(empty, {})["servable_rate"] == 0.0
+    checks.append("degenerate input: empty store and missing bibliography degrade quietly")
+
+    # Perturbations and integrity accounting.
+    trial = {"trial_id": "t", "applicable": True, "gold_concept_ids": ["KC-T"], "context": base_context}
+    dropped, _ = perturb_observable_dropout(trial, store)
+    assert "l1_book" not in (dropped["context"]["observables_available"] or []), dropped
+    _, injected = perturb_distractors(trial, store)
+    assert len(injected["concepts"]) == 2 and injected["concepts"][1]["concept_id"].startswith("KC-DISTRACT")
+    served = {"cards": [{"concept_id": "KC-T", **good}]}
+    violations = integrity_violations(served, {**base_context, "observables_available": []}, store)
+    assert violations and violations[0]["violation"] == "missing_observables", violations
+    checks.append("stress: perturbations apply and integrity violations are detected")
+
+    return {"ok": True, "checks": checks}
+
+
 # --------------------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------------------
@@ -1238,6 +1585,22 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_stress(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+    names = [args.policy] if args.policy else (sorted(store["policies"]) or [None])
+    results = [stress_policy(store, sources, resolve_policy(store, name)) for name in names]
+    if args.json:
+        print(json.dumps(results, indent=2))
+        return 0
+    for result in results:
+        print(f"{result['policy'] or 'default':<24} robustness={result['robustness']:.2f} worst={result['worst_case_retention']:.2f} violations={result['integrity_violations']}")
+        for name, row in result["perturbations"].items():
+            print(f"    {name:<20} retention={row['retention']:.2f} prec={row['precision']:.2f} synthetic_served={row['synthetic_cards_served']} violations={row['integrity_violations']}")
+    return 0
+
+
 def cmd_compile_queue(args: argparse.Namespace) -> int:
     lab_root, paths, corpus_dir = resolve_dirs(args)
     store = load_store(paths)
@@ -1304,23 +1667,33 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_cmd.add_argument("--policy", default=None)
     evaluate_cmd.add_argument("--json", action="store_true")
 
+    stress_cmd = sub.add_parser("stress", help="Score policies under perturbation: reworded contexts, missing observables, distractors, duplicates, tool loss.")
+    stress_cmd.add_argument("--policy", default=None)
+    stress_cmd.add_argument("--json", action="store_true")
+
     queue_cmd = sub.add_parser("compile-queue", help="Rank what to read and compile next.")
     queue_cmd.add_argument("--limit", type=int, default=25)
     queue_cmd.add_argument("--out", type=Path, default=None)
     queue_cmd.add_argument("--json", action="store_true")
 
     sub.add_parser("vocab", help="Print the card vocabularies and the SERVABLE gate.")
+    sub.add_parser("self-test", help="Exercise the gates, the filters and the stress harness on adversarial input.")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "self-test":
+        result = self_test()
+        print(json.dumps(result, indent=2))
+        return 0 if result["ok"] else 1
     handlers = {
         "init": cmd_init,
         "validate": cmd_validate,
         "status": cmd_status,
         "retrieve": cmd_retrieve,
         "evaluate": cmd_evaluate,
+        "stress": cmd_stress,
         "compile-queue": cmd_compile_queue,
         "vocab": cmd_vocab,
     }

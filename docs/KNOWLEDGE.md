@@ -117,6 +117,36 @@ Plain similarity retrieval has a perfect hit rate and answers *every* inapplicab
 
 The other half of Gate 1 — mathematical interpretation, assumption identification, diagnostic selection, recognizing non-applicability, transfer to a real trace, counterexample detection — needs a model in the loop and lives outside this repo.
 
+### Robustness: does the policy survive the trial set being wrong?
+
+A policy tuned to fourteen hand-written contexts can score perfectly and still be useless, because the trial set is a description of the world rather than the world. `knowledge.py stress` re-runs every trial under five perturbations:
+
+| Perturbation | Question | Scored as |
+|---|---|---|
+| `lexical_drift` | The same decision, worded differently | retention |
+| `observable_dropout` | An observable the gold concept needs is gone | **compliance** — serving it anyway is a violation |
+| `tool_loss` | The methods are unavailable | retention (degrade, don't switch off) |
+| `distractors` | Cards with heavy word overlap and the wrong market and horizon | retention |
+| `near_duplicates` | A restatement of the gold card | retention (diversity should suppress it) |
+
+Two of these do not ask the same question as the others: after `observable_dropout` the correct answer *changed*, so abstaining is a pass and serving is a fail. Scoring it as retention would penalize the right behaviour.
+
+`integrity_violations` are label-independent hard errors: a served card whose observables are absent, whose market does not match, or whose horizon does not match. These are wrong whatever the trial expected.
+
+On the shipped seed:
+
+| Policy | robustness | worst case | violations | note |
+|---|---|---|---|---|
+| `decision_value` | **0.92** | 0.92 (near-duplicates) | 0 | |
+| `filtered_only` | 0.75 | 0.75 | 0 | serves 12 duplicate restatements — no diversity control |
+| `decision_value_wide` | 0.70 | 0.70 | 0 | serves 9 duplicates |
+| `raw_similarity` | 0.00 | — | **388** | recommends calculations on data that is not there |
+| `conservative_abstain` | 0.00 | 0.00 (tool loss) | 0 | silently switches itself off when tools vanish |
+
+The last row is the finding worth having: an over-cautious threshold looks safe on clean trials and removes the knowledge layer entirely the moment the environment degrades — indistinguishable, from the outside, from having no corpus at all.
+
+`robustness` is the lab's third decisive challenge, so the population search selects for policies that hold up rather than policies that fit the labels.
+
 ### Gate 2 — does it change behaviour, for defensible reasons?
 
 Exact production contexts from real decision traces, with real tool outputs. Arms: baseline, **sham retrieval** (plausible but unrelated cards, matched for length and style), raw passages, compiled cards, compiled cards plus tools.
@@ -195,11 +225,13 @@ Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-secon
 | `knowledge.py status` | Problem coverage, missing methods, missing hypotheses |
 | `knowledge.py retrieve --context c.json [--policy p] [--markdown]` | Build an evidence packet |
 | `knowledge.py evaluate [--policy p]` | Score policies against the labelled trials |
+| `knowledge.py stress [--policy p]` | Re-score under five perturbations, with integrity violations |
 | `knowledge.py compile-queue [--limit n]` | Rank what to read and compile next |
 | `knowledge.py vocab` | Card vocabularies and the gate's conditions |
 | `methods.py list / show / run / self-test` | The deterministic method registry |
 | `ledger.py record / ladder / analyze / utility / assign` | Attribution and randomized analysis |
 | `graphops.py self-test` | PageRank, betweenness, co-citation, coupling, communities, MMR, coverage |
+| `corpus.py self-test` / `knowledge.py self-test` | Gates, filters and merge logic on adversarial input |
 
 ## What this repo deliberately does not do
 

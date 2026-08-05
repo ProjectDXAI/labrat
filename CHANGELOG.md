@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0 - 2026-08-05
+
+- Corpus sources can now be decomposed into `units` — targeted parts of a source ("the chapter about dealer inventory") with their own page estimate, priority, read status and expected concepts. Reading and compiling happen at unit granularity; `labrat corpus reading` ranks the chapter-level queue and distinguishes units that are located from those still needing to be found, and from sources not yet decomposed at all. 15 high-value sources seeded with 41 units.
+- Added `knowledge.py stress`: five deterministic perturbations (reworded context, missing observable, tools unavailable, distractor cards, near-duplicate restatements) with per-perturbation scoring modes, plus label-independent integrity violations for serving a card whose data is absent or whose market or horizon does not match.
+- `robustness` is now a third decisive challenge in the `dxap-knowledge` profile, so policies are selected for holding up under perturbation rather than for fitting the labelled trial set.
+- Added `corpus.py self-test` and `knowledge.py self-test` covering adversarial input: unevidenced confirmations, hollow licence grants, excluded and unknown sources, verbatim quotes from restricted material, unbacked implementation claims, version drift, dangling relations, costless hypotheses, each retrieval filter in isolation, unicode and CJK titles, and degenerate empty stores. `make selftest` runs all five engines; both smoke paths depend on it.
+
 ## 0.4.0 - 2026-08-05
 
 - Added the executable-bibliography layer: `scripts/knowledge.py` compiles sources into concept, hypothesis, method-binding and decision-relevance cards behind a SERVABLE gate that requires a mechanism, assumptions, observables, an expected signature, counterevidence, and resolvable source anchors — and refuses a verbatim quote from a source whose rights do not permit it.

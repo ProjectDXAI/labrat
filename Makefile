@@ -42,6 +42,8 @@ selftest:
 	@$(PYTHON) scripts/graphops.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  graphops OK: {len(d[\"checks\"])} checks')"
 	@$(PYTHON) scripts/methods.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  methods OK: {d[\"methods\"]} methods, {len(d[\"checks\"])} closed-form checks')"
 	@$(PYTHON) scripts/ledger.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  ledger OK: {len(d[\"checks\"])} checks')"
+	@$(PYTHON) scripts/corpus.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  corpus engine OK: {len(d[\"checks\"])} checks')"
+	@$(PYTHON) scripts/knowledge.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  knowledge engine OK: {len(d[\"checks\"])} checks')"
 
 smoke-knowledge: clean-smoke-knowledge selftest
 	@echo ">>> Scaffolding stacked corpus + knowledge lab at $(KNOWLEDGE_LAB)..."
@@ -58,6 +60,8 @@ smoke-knowledge: clean-smoke-knowledge selftest
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py evaluate --json | $(PYTHON) -c "import json,sys; rows={r['policy']:r for r in json.load(sys.stdin)}; raw=rows['raw_similarity']; dv=rows['decision_value']; assert raw['non_applicability_accuracy']==0.0, raw; assert dv['non_applicability_accuracy']==1.0, dv; assert dv['precision']>raw['precision'], (dv['precision'],raw['precision']); assert dv['counterevidence_coverage']>raw['counterevidence_coverage'], (dv,raw); assert dv['mean_context_kilotokens']<raw['mean_context_kilotokens'], (dv,raw); print(f'  retrieval OK: raw similarity prec={raw[\"precision\"]:.2f} abstains={raw[\"non_applicability_accuracy\"]:.2f}; decision value prec={dv[\"precision\"]:.2f} abstains={dv[\"non_applicability_accuracy\"]:.2f} counter={dv[\"counterevidence_coverage\"]:.2f}')"
 	@echo ">>> Checking point-in-time retrieval refuses sources published after the decision..."
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py evaluate --policy decision_value --json | $(PYTHON) -c "import json,sys; rows=json.load(sys.stdin)[0]['rows']; r=[x for x in rows if x['trial_id']=='T-NEG-BEFORE-SOURCES'][0]; assert r['abstained'], r; print('  point-in-time OK: a 1975 decision retrieves nothing from sources written later')"
+	@echo ">>> Stress-testing the policies under perturbation..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py stress --json | $(PYTHON) -c "import json,sys; rows={r['policy']:r for r in json.load(sys.stdin)}; raw=rows['raw_similarity']; dv=rows['decision_value']; assert raw['integrity_violations']>0, 'unfiltered retrieval should serve cards it cannot compute'; assert dv['integrity_violations']==0, dv; assert dv['robustness']>raw['robustness'], (dv['robustness'],raw['robustness']); assert rows['conservative_abstain']['perturbations']['tool_loss']['retention']<0.5, 'over-cautious policy should switch itself off when tools vanish'; print(f'  stress OK: decision value robustness={dv[\"robustness\"]:.2f} with 0 violations; raw similarity={raw[\"robustness\"]:.2f} with {raw[\"integrity_violations\"]} violations')"
 	@echo ">>> Ranking what to compile next..."
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py compile-queue --limit 10 --json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ranked'], d; assert d['queues']['human_foundation_spine'], 'spine queue empty'; assert d['minimum_problem_cover']['selected'], 'no problem cover'; print(f'  compile queue OK: {len(d[\"ranked\"])} ranked, minimum cover of {len(d[\"minimum_problem_cover\"][\"covered\"])} problems from {len(d[\"minimum_problem_cover\"][\"selected\"])} sources')"
 	@echo ">>> Bootstrapping and running one policy candidate end-to-end..."
@@ -80,7 +84,7 @@ smoke-knowledge: clean-smoke-knowledge selftest
 	@echo ">>> smoke-knowledge PASSED"
 	@echo "    (lab left at $(KNOWLEDGE_LAB)/ for inspection; run 'make clean-smoke-knowledge' to remove)"
 
-smoke-corpus: clean-smoke-corpus
+smoke-corpus: clean-smoke-corpus selftest
 	@echo ">>> Scaffolding quant-finance-corpus lab at $(CORPUS_LAB)..."
 	@$(PYTHON) scripts/new_lab.py $(CORPUS_LAB) --profile=quant-finance-corpus > /dev/null
 	@echo ">>> Running doctor preflight and Phase 0 readiness..."
@@ -100,6 +104,9 @@ smoke-corpus: clean-smoke-corpus
 	@cd $(CORPUS_LAB) && $(PYTHON) scripts/corpus.py manifest | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['include']==1, f'expected exactly the CC-licensed entry, got {d[\"include\"]}'; assert d['hold']>100, 'hold list looks wrong'; print(f'  manifest OK: {d[\"include\"]} included, {d[\"hold\"]} held')"
 	@cd $(CORPUS_LAB) && $(PYTHON) -c "import json; d=json.load(open('corpus/manifest.json')); row=[r for r in d['hold'] if r['id']=='harris-2003-trading-exchanges'][0]; assert row['use_class']=='reference_only', row; print('  reference_only path OK: commercial textbook held out of the manifest')"
 	@cd $(CORPUS_LAB) && $(PYTHON) scripts/corpus.py report > /dev/null && $(PYTHON) scripts/corpus.py graph > /dev/null && test -f corpus/REPORT.md && test -f corpus/graph.json
+	@echo ">>> Checking the chapter-level reading queue..."
+	@cd $(CORPUS_LAB) && $(PYTHON) scripts/corpus.py reading --limit 5 --json | $(PYTHON) -c "import json,sys; rows=json.load(sys.stdin); assert rows, 'reading queue empty'; assert all(r['unit_id']!='whole' for r in rows), 'queue should be at unit granularity'; print(f'  reading queue OK: {len(rows)} units, top target {rows[0][\"entry_id\"]}/{rows[0][\"unit_id\"]}')"
+	@cd $(CORPUS_LAB) && $(PYTHON) scripts/corpus.py status --json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['units_declared']>=40, d['units_declared']; assert d['sources_not_decomposed']>0, 'expected undecomposed sources to be visible'; print(f'  decomposition OK: {d[\"sources_decomposed\"]} sources into {d[\"units_declared\"]} units, {d[\"sources_not_decomposed\"]} still whole-book')"
 	@echo ">>> Bootstrapping the runtime..."
 	@cd $(CORPUS_LAB) && $(PYTHON) scripts/bootstrap.py > /dev/null
 	@echo ">>> Running one candidate through both phases (awaiting_findings, then scored)..."

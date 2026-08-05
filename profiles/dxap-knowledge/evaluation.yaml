@@ -35,6 +35,17 @@ prediction_tests:
     direction: "maximize"
     decisive: true
 
+  - name: "robustness"
+    description: >
+      Worst-case retention across five perturbations — a reworded context, a missing observable,
+      distractor cards, near-duplicate restatements, and tools unavailable — discounted by
+      integrity violations, where a violation means serving a card whose data is not present.
+      A policy tuned to the labelled trial set cannot win this; only structure survives being
+      wrong about the world.
+    path: "metrics.challenges.robustness.primary_metric"
+    direction: "maximize"
+    decisive: true
+
 pareto_metrics:
   - path: "metrics.selection.primary_metric"
     direction: "maximize"
@@ -48,6 +59,9 @@ pareto_metrics:
   - path: "proxy_metrics.mean_latency_seconds"
     direction: "minimize"
     label: "latency"
+  - path: "proxy_metrics.integrity_violations"
+    direction: "minimize"
+    label: "violations"
 
 consistency:
   fixed_seed: 1337

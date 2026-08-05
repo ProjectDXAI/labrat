@@ -193,6 +193,12 @@ RIGHTS_STATUS: dict[str, dict[str, Any]] = {
 RIGHTS_CONFIDENCE = ["confirmed", "inferred", "unknown"]
 ACQUISITION_STATES = ["not_acquired", "open_url", "library", "purchasable", "owned", "unavailable"]
 ENTRY_STATUS = ["candidate", "reviewed", "accepted", "rejected", "acquired", "ingested"]
+# A unit is a targeted part of a source: "the chapter about dealer inventory".
+# It starts as a topic with no locator and becomes precise once someone opens the
+# book. Reading, and therefore compiling, happens at this granularity — not at
+# the granularity of a 656-page textbook.
+UNIT_KINDS = ["chapter", "section", "appendix", "lecture", "module", "paper_section", "whole"]
+READ_STATUS = ["unread", "located", "skimmed", "read", "compiled", "abandoned"]
 ROUND_MODES = ["expand", "verify", "acquire"]
 
 INGEST_CLASSES = {
@@ -319,6 +325,7 @@ def default_entry() -> dict[str, Any]:
             "notes": None,
         },
         "acquisition": {"state": "not_acquired", "copy_path": None},
+        "units": [],
         "refs": [],
         "discovered": {"round": 0, "method": "seed", "source": None},
         "status": "candidate",
@@ -340,8 +347,110 @@ def merge_defaults(entry: dict[str, Any]) -> dict[str, Any]:
         base["id"] = suggest_id(base)
     base["authors"] = list(base.get("authors") or [])
     base["refs"] = list(base.get("refs") or [])
+    base["units"] = [normalize_unit(unit) for unit in (base.get("units") or [])]
     base["tags"] = list(base.get("tags") or [])
     return base
+
+
+def normalize_unit(unit: dict[str, Any]) -> dict[str, Any]:
+    base = {
+        "unit_id": None,
+        "topic": None,
+        "title": None,      # filled in once the unit is located in the physical source
+        "locator": None,    # "ch 13", "pp. 288-320", "lecture 4"
+        "kind": "chapter",
+        "pages": None,
+        "priority": 3,
+        "read_status": "unread",
+        "concepts_expected": [],
+        "notes": None,
+    }
+    base.update({k: v for k, v in (unit or {}).items()})
+    if not base["unit_id"]:
+        base["unit_id"] = slugify(base.get("topic") or base.get("title") or "unit")
+    base["concepts_expected"] = list(base.get("concepts_expected") or [])
+    return base
+
+
+def entry_units(entry: dict[str, Any]) -> list[dict[str, Any]]:
+    """Units of a source, falling back to one implicit whole-source unit."""
+    units = entry.get("units") or []
+    if units:
+        return units
+    return [
+        normalize_unit(
+            {
+                "unit_id": "whole",
+                "topic": entry.get("title"),
+                "kind": "whole",
+                "pages": entry.get("pages"),
+                "priority": entry.get("priority", 3),
+                "read_status": "unread",
+            }
+        )
+    ]
+
+
+def unit_pages(unit: dict[str, Any], entry: dict[str, Any]) -> int:
+    if unit.get("pages"):
+        return int(unit["pages"])
+    return 0
+
+
+def reading_queue(
+    entries: list[dict[str, Any]],
+    taxonomy: dict[str, Any],
+    state: dict[str, Any],
+    bucket: str | None = None,
+    limit: int = 25,
+    include_unmapped: bool = False,
+) -> list[dict[str, Any]]:
+    """What to read next, at chapter granularity rather than by the book.
+
+    A 656-page textbook is not a task. The unit that covers dealer inventory is.
+    Sources with no declared units surface as a single `map_first` row: the next
+    action there is to decompose the source, not to read it end to end.
+    """
+    cover = coverage(entries, taxonomy, state)["buckets"]
+    rows: list[dict[str, Any]] = []
+    for entry in entries:
+        if bucket and entry.get("bucket") != bucket:
+            continue
+        rights = derive_rights(entry)
+        if rights["use_class"] == "excluded" or entry.get("status") == "rejected":
+            continue
+        declared = bool(entry.get("units"))
+        if not declared and not include_unmapped:
+            continue
+        bucket_row = cover.get(entry.get("bucket") or "", {})
+        target = bucket_row.get("target_pages") or 0
+        gap = (bucket_row.get("pages_remaining") or 0) / target if target else 0.5
+        for unit in entry_units(entry):
+            if unit.get("read_status") in {"compiled", "abandoned"}:
+                continue
+            score = (
+                0.4 * (int(unit.get("priority") or 3) / 5.0)
+                + 0.3 * (int(entry.get("priority") or 3) / 5.0)
+                + 0.2 * gap
+                + 0.1 * (1.0 if unit.get("locator") else 0.0)
+            )
+            rows.append(
+                {
+                    "entry_id": entry["id"],
+                    "unit_id": unit["unit_id"],
+                    "topic": unit.get("topic"),
+                    "locator": unit.get("locator"),
+                    "bucket": entry.get("bucket"),
+                    "pages": unit_pages(unit, entry),
+                    "read_status": unit.get("read_status"),
+                    "action": "read" if unit.get("locator") else ("map_first" if declared else "decompose_source"),
+                    "use_class": rights["use_class"],
+                    "concepts_expected": unit.get("concepts_expected"),
+                    "score": round(score, 4),
+                }
+            )
+    rows.sort(key=lambda row: (-row["score"], row["entry_id"], row["unit_id"]))
+    return rows[:limit]
 
 
 def load_taxonomy(paths: dict[str, Path]) -> dict[str, Any]:
@@ -865,6 +974,27 @@ def validate(entries: list[dict[str, Any]], taxonomy: dict[str, Any]) -> dict[st
         if entry.get("pages") is not None and int(entry.get("pages") or 0) < 0:
             errors.append(f"{entry_id}: negative page count")
 
+        seen_units: set[str] = set()
+        unit_pages_total = 0
+        for unit in entry.get("units") or []:
+            unit_id = unit.get("unit_id")
+            if unit_id in seen_units:
+                errors.append(f"{entry_id}: duplicate unit '{unit_id}'")
+            seen_units.add(unit_id)
+            if not unit.get("topic") and not unit.get("title"):
+                errors.append(f"{entry_id}/{unit_id}: unit needs a topic or a title")
+            if unit.get("kind") not in UNIT_KINDS:
+                errors.append(f"{entry_id}/{unit_id}: unknown unit kind '{unit.get('kind')}'")
+            if unit.get("read_status") not in READ_STATUS:
+                errors.append(f"{entry_id}/{unit_id}: unknown read_status '{unit.get('read_status')}'")
+            if unit.get("read_status") in {"skimmed", "read", "compiled"} and not unit.get("locator"):
+                warnings.append(f"{entry_id}/{unit_id}: marked {unit.get('read_status')} but never located")
+            unit_pages_total += int(unit.get("pages") or 0)
+        if entry.get("pages") and unit_pages_total > int(entry["pages"]) * 1.05:
+            warnings.append(
+                f"{entry_id}: units total {unit_pages_total} pages against a {entry['pages']}-page source"
+            )
+
     index = index_entries(entries)
     for entry in entries:
         for raw_ref in entry.get("refs") or []:
@@ -1309,6 +1439,15 @@ def status_payload(entries: list[dict[str, Any]], taxonomy: dict[str, Any], stat
 
     manifest = build_manifest(entries, taxonomy)
 
+    units_declared = sum(len(entry.get("units") or []) for entry in entries)
+    unit_states: dict[str, int] = {}
+    unit_pages_mapped = 0
+    for entry in entries:
+        for unit in entry.get("units") or []:
+            unit_states[unit.get("read_status")] = unit_states.get(unit.get("read_status"), 0) + 1
+            unit_pages_mapped += int(unit.get("pages") or 0)
+    sources_decomposed = sum(1 for entry in entries if entry.get("units"))
+
     return {
         "generated_at": now_iso(),
         "entries": len(entries),
@@ -1328,6 +1467,11 @@ def status_payload(entries: list[dict[str, Any]], taxonomy: dict[str, Any], stat
         "use_classes": dict(sorted(use_classes.items(), key=lambda kv: -kv[1])),
         "buckets": cover["buckets"],
         "unbucketed": cover["unbucketed"],
+        "units_declared": units_declared,
+        "unit_states": dict(sorted(unit_states.items(), key=lambda kv: -kv[1])),
+        "unit_pages_mapped": unit_pages_mapped,
+        "sources_decomposed": sources_decomposed,
+        "sources_not_decomposed": len(entries) - sources_decomposed,
         "corpus_saturated": all(row["saturation"] == "saturated" for row in cover["buckets"].values()) if cover["buckets"] else False,
     }
 
@@ -1423,6 +1567,135 @@ def render_report(
     return "\n".join(lines)
 
 
+
+# --------------------------------------------------------------------------------------
+# Self-test
+# --------------------------------------------------------------------------------------
+
+
+def self_test() -> dict[str, Any]:
+    """Exercise the gates and the merge on adversarial input.
+
+    Everything here is in-memory; nothing touches a corpus on disk.
+    """
+    checks: list[str] = []
+
+    # Rights derivation: the two gates, in both directions.
+    open_confirmed = merge_defaults(
+        {
+            "id": "x",
+            "title": "T",
+            "rights": {"status": "cc_by", "confidence": "confirmed", "evidence": "https://e", "checked_at": "2026-01-01"},
+        }
+    )
+    assert derive_rights(open_confirmed)["manifest_eligible"], derive_rights(open_confirmed)
+    no_evidence = merge_defaults({"id": "x", "title": "T", "rights": {"status": "cc_by", "confidence": "confirmed"}})
+    assert derive_rights(no_evidence)["use_class"] == "needs_review", derive_rights(no_evidence)
+    inferred = merge_defaults({"id": "x", "title": "T", "rights": {"status": "public_domain", "confidence": "inferred"}})
+    assert derive_rights(inferred)["use_class"] == "needs_review", derive_rights(inferred)
+    free_to_read = merge_defaults(
+        {"id": "x", "title": "T", "rights": {"status": "author_hosted_free", "confidence": "confirmed", "evidence": "https://e", "checked_at": "2026-01-01"}}
+    )
+    assert derive_rights(free_to_read)["use_class"] == "reference_only", "free to read is not licensed"
+    granted = merge_defaults(
+        {
+            "id": "x",
+            "title": "T",
+            "rights": {
+                "status": "all_rights_reserved",
+                "confidence": "confirmed",
+                "evidence": "https://e",
+                "checked_at": "2026-01-01",
+                "grant": {"type": "written_permission", "evidence": "https://mail"},
+            },
+        }
+    )
+    assert derive_rights(granted)["use_class"] == "ingest_licensed", derive_rights(granted)
+    hollow_grant = merge_defaults(
+        {"id": "x", "title": "T", "rights": {"status": "all_rights_reserved", "confidence": "confirmed", "evidence": "https://e", "checked_at": "2026-01-01", "grant": {"type": "claimed"}}}
+    )
+    assert derive_rights(hollow_grant)["use_class"] == "reference_only", "a grant without evidence must not upgrade"
+    excluded = merge_defaults({"id": "x", "title": "T", "rights": {"status": "proprietary_confidential", "confidence": "confirmed", "evidence": "https://e", "checked_at": "2026-01-01"}})
+    assert derive_rights(excluded)["use_class"] == "excluded" and not derive_rights(excluded)["study_ok"]
+    checks.append("rights: evidence gate, grant upgrade, hollow grant, free-to-read and exclusion all hold")
+
+    # Dedupe: fuzzy enough to match a short-form citation, strict enough to keep volumes apart.
+    assert compatible_titles("Trading and Exchanges", "Trading and Exchanges: Market Microstructure for Practitioners")
+    assert not compatible_titles("Probabilistic Machine Learning: An Introduction", "Probabilistic Machine Learning: Advanced Topics")
+    assert dedupe_key({"title": "The Theory of X", "authors": ["Jane Q. Doe"]}) == dedupe_key({"title": "Theory of X", "authors": ["Doe, Jane"]})
+    checks.append("dedupe: short-form citations match, sibling volumes stay distinct")
+
+    # Unicode and punctuation must not crash normalization.
+    weird = merge_defaults({"title": "Étude — Прогноз, 第一版: A Study", "authors": ["Émile Borel"]})
+    assert weird["id"] and slugify(weird["title"]), weird["id"]
+    checks.append("normalization: unicode, em dashes and CJK survive id generation")
+
+    # Graph: self-refs dropped, unresolved refs become frontier, bridges detected.
+    entries = [
+        merge_defaults({"id": "a", "title": "A", "bucket": "b1", "priority": 5, "refs": [{"target": "a"}, {"target": "b"}, {"target": "Unmapped Work On Queues", "bucket": "b2"}]}),
+        merge_defaults({"id": "b", "title": "B", "bucket": "b2", "refs": [{"target": "Unmapped Work On Queues", "bucket": "b2"}]}),
+    ]
+    graph = build_graph(entries)
+    assert [e["target"] for e in graph["edges"]] == ["b"], graph["edges"]
+    assert len(graph["unresolved"]) == 1, graph["unresolved"]
+    assert list(graph["unresolved"].values())[0]["supported_by"] == ["a", "b"], "co-citation support must aggregate"
+    assert set(graph["bridges"]) == {"a", "b"}, graph["bridges"]
+    checks.append("graph: self-references dropped, frontier support aggregates, bridges found")
+
+    taxonomy = {"defaults": {"saturation_dry_rounds": 2}, "buckets": {"b1": {"tier": 1, "target_pages": 100}, "b2": {"tier": 1, "target_pages": 100}}}
+    targets = frontier(entries, taxonomy, {"buckets": {}}, limit=5)
+    assert targets and targets[0]["support"] == 2, targets
+    checks.append("frontier: ranks a doubly-supported target first")
+
+    # Validation must catch the vocabulary and structural errors.
+    broken = [
+        merge_defaults({"id": "dup", "title": "One", "bucket": "b1", "form": "not_a_form"}),
+        merge_defaults({"id": "dup", "title": "Two", "bucket": "nope", "rights": {"status": "invented", "confidence": "confirmed"}}),
+        merge_defaults({"id": "u", "title": "Three", "bucket": "b1", "units": [{"unit_id": "z", "topic": "t", "read_status": "invented"}]}),
+    ]
+    result = validate(broken, taxonomy)
+    joined = " | ".join(result["errors"])
+    assert not result["ok"]
+    for expected in ["duplicate id", "unknown form", "unknown bucket", "unknown rights status", "confirmed without evidence", "unknown read_status"]:
+        assert expected in joined, (expected, joined)
+    checks.append("validate: duplicate ids, unknown vocabulary and unevidenced confirmations all rejected")
+
+    # Findings merge: dedupe by title, reject untitled, respect the evidence rule.
+    store = [merge_defaults({"id": "harris", "title": "Trading and Exchanges: Market Microstructure", "authors": ["Larry Harris"], "bucket": "b1", "pages": 656})]
+    incoming = merge_defaults({"title": "Trading and Exchanges", "authors": ["Harris, Larry"], "bucket": "b1", "rights": {"status": "all_rights_reserved", "confidence": "confirmed"}})
+    merged, changes = apply_findings_entry(store[0], incoming)
+    assert "rights.rejected_no_evidence" in changes, changes
+    assert merged["rights"]["confidence"] != "confirmed", merged["rights"]
+    checks.append("merge: a confirmation without evidence is refused at the merge boundary")
+
+    # Manifest gate: only confirmed-with-evidence gets in, with a reason for every hold.
+    manifest = build_manifest([open_confirmed, free_to_read, inferred, excluded], taxonomy)
+    assert manifest["include_count"] == 1 and manifest["hold_count"] == 3, manifest
+    assert all(row["reasons"] for row in manifest["hold"]), manifest["hold"]
+    checks.append("manifest: one eligible entry, every hold carries a reason")
+
+    # Units and the reading queue.
+    with_units = merge_defaults(
+        {
+            "id": "w",
+            "title": "W",
+            "bucket": "b1",
+            "pages": 300,
+            "units": [
+                {"unit_id": "u1", "topic": "the useful chapter", "pages": 40, "priority": 5},
+                {"unit_id": "u2", "topic": "already done", "pages": 40, "read_status": "compiled"},
+            ],
+        }
+    )
+    queue = reading_queue([with_units], taxonomy, {"buckets": {}}, limit=10)
+    assert [row["unit_id"] for row in queue] == ["u1"], queue
+    assert queue[0]["action"] == "map_first", queue
+    assert entry_units(merge_defaults({"id": "n", "title": "N", "pages": 10}))[0]["unit_id"] == "whole"
+    checks.append("units: compiled units leave the queue, undecomposed sources fall back to one whole unit")
+
+    return {"ok": True, "checks": checks}
+
+
 # --------------------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------------------
@@ -1485,6 +1758,11 @@ def cmd_status(paths: dict[str, Path], args: argparse.Namespace) -> int:
         f"bridges={payload['bridges']} isolated={payload['isolated']} frontier={payload['frontier_open']}"
     )
     print(f"  rounds_run={payload['rounds_run']} open={len(payload['open_rounds'])}")
+    print(
+        f"  reading: {payload['sources_decomposed']}/{payload['entries']} sources decomposed into "
+        f"{payload['units_declared']} units ({payload['unit_pages_mapped']} pages targeted) "
+        + (", ".join(f"{k}={v}" for k, v in payload["unit_states"].items()) or "none read")
+    )
     print("  buckets:")
     for name, row in payload["buckets"].items():
         print(
@@ -1492,6 +1770,28 @@ def cmd_status(paths: dict[str, Path], args: argparse.Namespace) -> int:
             f"eligible={row['pages_manifest_eligible']:>6} frontier={row['frontier_open']:>3} {row['saturation']}"
         )
     print("  use classes: " + ", ".join(f"{k}={v}" for k, v in payload["use_classes"].items()))
+    return 0
+
+
+def cmd_reading(paths: dict[str, Path], args: argparse.Namespace) -> int:
+    entries = load_bibliography(paths)
+    rows = reading_queue(
+        entries,
+        load_taxonomy(paths),
+        load_state(paths),
+        bucket=args.bucket,
+        limit=args.limit,
+        include_unmapped=args.include_unmapped,
+    )
+    if args.json:
+        print(json.dumps(rows, indent=2))
+        return 0
+    for row in rows:
+        locator = row["locator"] or "not located"
+        print(f"{row['score']:>6}  [{row['action']:<17}] {row['entry_id']}/{row['unit_id']}  ({locator}, {row['read_status']})")
+        print(f"          {row['topic']}")
+    if not rows:
+        print("no reading units; decompose a source first (add `units:` to its entry)")
     return 0
 
 
@@ -1713,6 +2013,12 @@ def build_parser() -> argparse.ArgumentParser:
     round_close.add_argument("--findings", type=Path, default=None)
     round_sub.add_parser("list")
 
+    reading_cmd = sub.add_parser("reading", help="Chapter-level reading queue across decomposed sources.")
+    reading_cmd.add_argument("--bucket", default=None)
+    reading_cmd.add_argument("--limit", type=int, default=25)
+    reading_cmd.add_argument("--include-unmapped", action="store_true", help="Also surface sources that have not been decomposed yet.")
+    reading_cmd.add_argument("--json", action="store_true")
+
     rights_cmd = sub.add_parser("rights", help="Rights report and verification queue.")
     rights_cmd.add_argument("--verify-queue", action="store_true")
     rights_cmd.add_argument("--bucket", default=None)
@@ -1730,12 +2036,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     vocab_cmd = sub.add_parser("vocab", help="Print the form and rights vocabularies.")
     vocab_cmd.add_argument("--json", action="store_true")
+
+    sub.add_parser("self-test", help="Exercise the rights, dedupe, graph, merge and unit logic on adversarial input.")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command == "self-test":
+        result = self_test()
+        print(json.dumps(result, indent=2))
+        return 0 if result["ok"] else 1
+
     paths = corpus_paths(resolve_corpus_dir(args))
 
     if args.command != "init" and not paths["bibliography"].exists():
@@ -1746,6 +2059,7 @@ def main(argv: list[str] | None = None) -> int:
         "validate": cmd_validate,
         "status": cmd_status,
         "frontier": cmd_frontier,
+        "reading": cmd_reading,
         "round": cmd_round,
         "rights": cmd_rights,
         "manifest": cmd_manifest,

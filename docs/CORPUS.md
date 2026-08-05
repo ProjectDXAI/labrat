@@ -90,6 +90,38 @@ Two gates then apply:
 
 `reference_only` is not a dead end. You may read it, learn from it, and write your own explanations — catalogue those as `notes_own` / `owned_by_us`, which are manifest-eligible on their own terms.
 
+## Books, units, and cards
+
+Three different things, easy to conflate:
+
+| | what it is | where it lives | do we hold it? |
+|---|---|---|---|
+| **Source record** | Bibliographic metadata: a work exists, in this form, under these rights | `corpus/bibliography.yaml` | No. `pages` counts pages that exist in the world, not pages we have. |
+| **Unit** | A target *inside* a source — "the chapter about dealer inventory" | `units:` on an entry | No. A unit has no locator until someone opens the source and fills it in. |
+| **Card** | Our own written account of a mechanism, anchored to a unit | `knowledge/concepts.yaml` | **Yes. This is the only content we own.** |
+
+The corpus contains zero bytes of source text and always will. Reading and compiling happen at unit granularity, because a 656-page textbook is not a task:
+
+```yaml
+- id: harris-2003-trading-exchanges
+  pages: 656                      # exists in the world
+  units:
+    - unit_id: dealers-and-market-making
+      topic: "dealer economics, inventory and the sources of the spread"
+      locator: null               # filled in when someone opens the book
+      pages: 50
+      priority: 5
+      read_status: unread         # unread | located | skimmed | read | compiled | abandoned
+      concepts_expected: [KC-MM-INVENTORY]
+```
+
+```bash
+labrat corpus reading --limit 15                    # chapter-level queue, ranked
+labrat corpus reading --include-unmapped            # also: sources not yet decomposed
+```
+
+Each row carries an `action`: `read` when the unit is located, `map_first` when it is still a topic without a locator, `decompose_source` for a source with no units at all. `status` reports how many sources are decomposed and how many units sit in each read state, so "we have mapped 105,000 pages" never gets mistaken for "we have read them".
+
 ## The iterative loop
 
 ```bash
@@ -188,6 +220,7 @@ The highest-yield clearance channels, in order: openly licensed courseware, auth
 | `labrat corpus validate` | check entries against the vocabularies; exits non-zero on error |
 | `labrat corpus status [--json]` | coverage, rights posture, network shape, saturation |
 | `labrat corpus frontier [--bucket B] [--limit N]` | ranked next targets with score components |
+| `labrat corpus reading [--bucket B] [--include-unmapped]` | chapter-level reading queue across decomposed sources |
 | `labrat corpus round open --mode M [--bucket B] [--limit N]` | open a round and write the brief |
 | `labrat corpus round close [--round N] [--findings PATH]` | merge findings, score the round, append the log |
 | `labrat corpus round list` | closed and open rounds |
@@ -196,6 +229,7 @@ The highest-yield clearance channels, in order: openly licensed courseware, auth
 | `labrat corpus graph [--out PATH]` | nodes, edges, unresolved frontier, components |
 | `labrat corpus report [--out PATH]` | the markdown report |
 | `labrat corpus vocab [--json]` | form and rights vocabularies with use-class mapping |
+| `labrat corpus self-test` | rights gates, dedupe, graph, merge and unit logic on adversarial input |
 
 All commands take `--lab-dir` (the corpus is `<lab>/corpus`) or `--corpus-dir` to point somewhere else. Inside a scaffolded lab, `python scripts/corpus.py <command>` is the same tool.
 

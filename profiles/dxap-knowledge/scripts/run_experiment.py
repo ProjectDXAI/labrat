@@ -106,6 +106,11 @@ def main(argv: list[str] | None = None) -> int:
     result = knowledge.evaluate_policy(store, sources, policy)
     coverage = problem_coverage(store, result["rows"])
 
+    # Clean-trial scores say whether a policy fits the labelled set. Stress says
+    # whether it survives the set being wrong about the world: reworded contexts,
+    # a missing observable, distractor cards, restatements, tools down.
+    stress = knowledge.stress_policy(store, sources, policy)
+
     # Tool health is part of the contract: a method whose self-test fails would
     # feed wrong numbers into every packet that cites it.
     tools = methods_module.self_test()
@@ -127,6 +132,10 @@ def main(argv: list[str] | None = None) -> int:
                 "mean_context_kilotokens": round(result["mean_context_kilotokens"], 4),
                 "mean_latency_seconds": round(result["mean_latency_seconds"], 4),
                 "problems_uncovered": coverage["uncovered"],
+                "worst_case_retention": stress["worst_case_retention"],
+                "integrity_violations": stress["integrity_violations"],
+                "weakest_perturbation": min(stress["perturbations"], key=lambda k: stress["perturbations"][k]["retention"]),
+                "synthetic_cards_served": sum(row["synthetic_cards_served"] for row in stress["perturbations"].values()),
                 "methods_self_test_ok": bool(tools.get("ok")),
                 "methods_registered": tools.get("methods"),
                 "elapsed_seconds": round(time.time() - started, 3),
@@ -138,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
                 "challenges": {
                     "non_applicability": {"primary_metric": round(clamp(result["non_applicability_accuracy"]), 4)},
                     "counterevidence_coverage": {"primary_metric": round(clamp(result["counterevidence_coverage"]), 4)},
+                    "robustness": {"primary_metric": round(clamp(stress["robustness"]), 4)},
                 },
             },
             "failure_class": None if tools.get("ok") else "arch",
@@ -145,7 +155,9 @@ def main(argv: list[str] | None = None) -> int:
                 f"hit {result['hit_rate']:.2f}, precision {result['precision']:.2f}, "
                 f"abstains correctly on {result['non_applicability_accuracy']:.2f} of inapplicable contexts, "
                 f"counterevidence on {result['counterevidence_coverage']:.2f} of served packets, "
-                f"{result['mean_context_kilotokens']:.2f}k tokens per packet"
+                f"{result['mean_context_kilotokens']:.2f}k tokens per packet; "
+                f"robustness {stress['robustness']:.2f} (worst: {min(stress['perturbations'], key=lambda k: stress['perturbations'][k]['retention'])}, "
+                f"{stress['integrity_violations']} integrity violations)"
             ),
             "resource_floor": None,
         },
