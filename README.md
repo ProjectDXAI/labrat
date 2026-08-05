@@ -10,7 +10,7 @@
 
 `labrat` treats Claude Code and Codex as peer operator interfaces. Stronger reasoning models still help most on synthesis, audit, and consolidation, but the runtime contract and file layout stay the same across both.
 
-**Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Build a corpus](#build-a-corpus) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
+**Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Build a corpus](#build-a-corpus) · [Compile it](#compile-it-into-something-executable) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
 
 In plain English:
 
@@ -132,6 +132,7 @@ Open Claude Code in the lab directory and type `/next`, or hand-run `python scri
 
 - `transformer-arch` — tiny character-level transformer architecture search with held-out-distribution decisive challenges. Ships a synthetic runner so you can exercise the full runtime loop without a training framework; replace `scripts/run_experiment.py` with your own trainer when you want real training.
 - `quant-finance-corpus` — bibliography network mapping and rights-tagged corpus assembly. Candidates are scouting policies rather than models, and the decisive challenges are cross-domain bridge discovery and rights clearance. See [Build a corpus](#build-a-corpus).
+- `dxap-knowledge` — the executable bibliography: compiled concept, hypothesis, method and decision-relevance cards, plus filtered retrieval. Candidates are retrieval policies; decisive challenges are correct abstention and counterevidence coverage. Stacks on `quant-finance-corpus`. See [Compile it into something executable](#compile-it-into-something-executable).
 
 More profiles (world-model, multi-dataset) land in follow-up PRs. See [docs/PROFILES.md](docs/PROFILES.md) for the profile contract and [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md) for interim-checkpoint and long-running-job conventions.
 
@@ -159,6 +160,36 @@ Three things make it more than a reading list:
 The bundled profile seeds 173 works across market microstructure, quantitative finance, information economics, signal processing, detection and tracking, control, operations research, queueing, information theory, Bayesian statistics, sequential decision theory, dynamical systems, network science, exchange documentation, open courseware and practitioner training. Every seed rights tag is `inferred`, so the seed clears nothing until someone reads a licence.
 
 See [docs/CORPUS.md](docs/CORPUS.md) for the data model, the tagging vocabularies, and how to point the engine at another domain.
+
+## Compile it into something executable
+
+A corpus is a means, not the goal. `labrat` also ships the layer that turns sources into objects an agent can act on and check:
+
+```
+source -> mechanism -> assumptions -> observable signature
+       -> deterministic test -> decision relevance -> realized outcome
+```
+
+```bash
+labrat new ~/labs/my_dxap --profile=quant-finance-corpus --profile=dxap-knowledge
+cd ~/labs/my_dxap
+python scripts/knowledge.py validate                 # the SERVABLE gate over every card
+python scripts/knowledge.py evaluate                 # score retrieval policies against labelled trials
+python scripts/knowledge.py retrieve --context ctx.json --policy decision_value --markdown
+python scripts/methods.py self-test                  # every method's closed-form checks
+```
+
+A passage tells an agent that order flow may contain information. A concept card tells it under what assumptions that holds, which observables separate informed from mechanical flow, which tested function to run on the data actually available, what would falsify it, and whether it bears on entry, sizing, exit or abstention.
+
+Three things make this more than a vector database:
+
+- **The SERVABLE gate.** A card is retrievable only with a mechanism, its assumptions, required observables, an expected signature, failure modes, counterevidence, and resolvable source anchors. No contradicting concept and no alternative explanation means the card does not serve — a retrieval layer that can only confirm is worse than none.
+- **Structural filters before similarity.** Market type, horizon, observables actually available, decision type, and point-in-time source availability, so a 2025 book cannot inform a 2024 decision. Then a decision-value re-rank, diversity control, explicit abstention, and a one-hop expansion that must carry counterevidence.
+- **Deterministic tools, not recalled arithmetic.** Eight versioned methods with as-of contracts and closed-form self-tests. Method bindings pin the implementation version, so a numerical change fails validation until someone re-verifies the card.
+
+On the shipped seed, plain similarity retrieval scores a perfect hit rate — with precision 0.24, zero counterevidence, and an answer for *every* inapplicable context including one dated before its sources existed. It stays in the lab as the control arm.
+
+See [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md) for the object model, the retrieval pipeline, and the three gates that separate "the retrieval layer works" from "this makes money".
 
 ## Create your own lab from scratch
 
@@ -195,6 +226,7 @@ Phase 0 must produce:
 - [docs/runners.md](docs/runners.md): Codex and Claude Code operator contract
 - [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md): frontier-model prompting, reasoning-effort, and research guidance
 - [docs/CORPUS.md](docs/CORPUS.md): bibliography network mapping, iterative scouting rounds, and rights tagging
+- [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md): the executable bibliography — concept compilation, filtered retrieval, deterministic methods, and the attribution ledger
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts

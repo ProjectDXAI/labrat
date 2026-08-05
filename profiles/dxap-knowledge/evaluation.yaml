@@ -1,0 +1,63 @@
+mode: "external_consistent"
+
+# Did the policy surface the concept a competent analyst would have reached for?
+search_eval:
+  path: "metrics.search.primary_metric"
+  direction: "maximize"
+
+# Did it serve mostly the right things, without going quiet on contexts where a
+# concept genuinely applied? 0.6 * precision + 0.4 * (1 - false abstention rate).
+selection_eval:
+  path: "metrics.selection.primary_metric"
+  direction: "maximize"
+
+# Across the trial set, what share of the diagnosed problem map did the policy
+# actually put a concept in front of?
+final_eval:
+  enabled: true
+  path: "metrics.final.primary_metric"
+  direction: "maximize"
+
+prediction_tests:
+  - name: "non_applicability"
+    description: >
+      Share of inapplicable contexts where the policy correctly returned nothing. Similarity
+      scoring cannot win this: a nearest-neighbour is always available, so a policy without
+      structural filters and a threshold will answer every question it is asked.
+    path: "metrics.challenges.non_applicability.primary_metric"
+    direction: "maximize"
+    decisive: true
+  - name: "counterevidence_coverage"
+    description: >
+      Share of served packets that carried a contradicting concept, a load-bearing assumption or
+      a known failure mode. Retrieval that can only confirm is worse than none.
+    path: "metrics.challenges.counterevidence_coverage.primary_metric"
+    direction: "maximize"
+    decisive: true
+
+pareto_metrics:
+  - path: "metrics.selection.primary_metric"
+    direction: "maximize"
+    label: "serve_quality"
+  - path: "metrics.challenges.non_applicability.primary_metric"
+    direction: "maximize"
+    label: "abstention"
+  - path: "proxy_metrics.mean_context_kilotokens"
+    direction: "minimize"
+    label: "context_cost"
+  - path: "proxy_metrics.mean_latency_seconds"
+    direction: "minimize"
+    label: "latency"
+
+consistency:
+  fixed_seed: 1337
+  fixed_split_id: "dxap_knowledge_trials_v1"
+  sealed_eval: null
+
+rerun_policy:
+  # Retrieval scoring is fully deterministic: the same policy over the same trial
+  # set gives the same numbers. One run is the whole distribution.
+  min_reruns_for_promotion: 1
+  max_relative_std: 0.01
+  suspicious_improvement_margin: 0.05
+  invalid_fast_margin: 0.02

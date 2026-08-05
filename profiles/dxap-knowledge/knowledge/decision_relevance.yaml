@@ -1,0 +1,246 @@
+# Decision-relevance cards.
+#
+# These connect a mechanism to a decision without turning a theoretical claim into
+# a mandatory strategy. Each card states what evidence would support the action and
+# what would argue against it, plus the confidence below which the concept should
+# not move the decision at all.
+#
+# A card that only lists supporting evidence is a prompt rule with a citation
+# attached. The validator lints for unconditional directive language for the same
+# reason.
+
+decision_relevance:
+  - decision_relevance_id: DR-OFI-ENTRY
+    concept_id: KC-MICRO-OFI
+    decision_type: entry
+    evidence_that_would_support_action: >
+      Trailing-window OFI agrees in sign with the intended entry direction, its magnitude is large
+      relative to displayed depth, and the imbalance has persisted across several updates rather
+      than appearing in one.
+    evidence_that_would_argue_against_action: >
+      The imbalance is one snapshot deep, coincides with a scheduled mechanical flow, or sits on a
+      venue whose book is a partial view of consolidated liquidity.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Encourages aggressive entries; check the cost floor before acting on a short-horizon signal."
+
+  - decision_relevance_id: DR-COST-ENTRY
+    concept_id: KC-COST-FLOOR
+    decision_type: entry
+    evidence_that_would_support_action: >
+      Estimated gross edge exceeds the decision-time round-trip floor with margin for estimation
+      error, using the live fee tier and funding rate rather than averages.
+    evidence_that_would_argue_against_action: >
+      The spread at decision time is wide relative to the recent distribution, funding carry over
+      the intended hold is material, or the edge estimate rests on a mark-out sample too small to
+      separate from zero.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Applied strictly, it reduces turnover; confirm that the surviving trades are not simply the slowest ones."
+
+  - decision_relevance_id: DR-COST-ABSTAIN
+    concept_id: KC-COST-FLOOR
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The floor exceeds the estimated edge, and the same has held across the recent comparable
+      decisions rather than for this one instrument.
+    evidence_that_would_argue_against_action: >
+      The floor estimate is dominated by an adverse-selection term with wide error bars, or the
+      position would have been entered for a reason other than the modelled edge.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Abstention has an opportunity cost that is invisible in the ledger unless it is recorded."
+
+  - decision_relevance_id: DR-MECHANICAL-ABSTAIN
+    concept_id: KC-MICRO-MECHANICAL-FLOW
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The imbalance coincides with a known mechanical event — funding settlement, index rebalance,
+      liquidation cascade — and prior instances of the same event reverted within the horizon.
+    evidence_that_would_argue_against_action: >
+      The flow continues past the mechanical window, or related instruments move in the same
+      direction without the same constraint.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Classifying flow as mechanical after the move is trivial and predicts nothing; the call must be made ex ante."
+
+  - decision_relevance_id: DR-QUEUE-ENTRY
+    concept_id: KC-MICRO-QUEUE
+    decision_type: entry
+    evidence_that_would_support_action: >
+      Estimated queue position is near the front, the level has depth behind it, and cancellation
+      intensity at the level has been stable.
+    evidence_that_would_argue_against_action: >
+      Position is deep in the queue, the level is thinning, or the venue uses pro-rata allocation
+      so queue position carries little information.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Front-of-queue orders fill more often, which raises turnover as well as fill quality."
+
+  - decision_relevance_id: DR-KYLE-SIZING
+    concept_id: KC-INFO-KYLE
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      A recently estimated lambda with acceptable fit lets expected impact be priced into the size,
+      and the intended size sits in the range where the linear fit was estimated.
+    evidence_that_would_argue_against_action: >
+      Fit quality is poor, the estimation window crosses a volatility regime break, or the intended
+      size is far outside the estimated range where concave impact would dominate.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "A lambda fitted in a concave regime understates the cost of large orders."
+
+  - decision_relevance_id: DR-SQRT-SIZING
+    concept_id: KC-IMPACT-SQRT
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      Intended participation is high enough that concave scaling dominates, and recent parent-order
+      records support the exponent used.
+    evidence_that_would_argue_against_action: >
+      The order is small relative to displayed depth, or the impact records come from a different
+      venue type than the one being traded.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Concave scaling makes large orders look cheaper; pair it with a decay model or transient impact is booked as permanent."
+
+  - decision_relevance_id: DR-AC-EXIT
+    concept_id: KC-EXEC-AC
+    decision_type: exit
+    evidence_that_would_support_action: >
+      The exit is large relative to displayed depth, volatility over the horizon is estimable, and
+      no catalyst is expected inside the schedule.
+    evidence_that_would_argue_against_action: >
+      Information is arriving during the exit, impact looks concave in this instrument, or the
+      horizon is short enough that scheduling adds little over immediate execution.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "A schedule keeps trading after the thesis decays unless a stopping check runs alongside it."
+
+  - decision_relevance_id: DR-MM-SIZING
+    concept_id: KC-MM-INVENTORY
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      Inventory is material relative to risk limits, volatility is estimable on the quoting clock,
+      and two-sided arrival intensity is roughly symmetric.
+    evidence_that_would_argue_against_action: >
+      The book is one-sided, funding carry dominates the inventory term, or the model's optimal
+      spread is narrower than the venue tick.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Skewing quotes to shed inventory increases fill rate on the side you least want filled during a trend."
+
+  - decision_relevance_id: DR-STOP-HOLD
+    concept_id: KC-STOP-CONTINUATION
+    decision_type: hold
+    evidence_that_would_support_action: >
+      Estimated continuation value exceeds exit value at decision-time exit cost, with enough
+      comparable matured episodes behind the estimate to distinguish it from the base rate.
+    evidence_that_would_argue_against_action: >
+      Support in the conditioning bucket is thin, the exit cost estimate uses average rather than
+      current depth, or the regime differs from the episodes the estimate came from.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "The comparison is only as good as the episode history; a policy change invalidates the history it was measured under."
+
+  - decision_relevance_id: DR-STOP-EXIT
+    concept_id: KC-STOP-CONTINUATION
+    decision_type: exit
+    evidence_that_would_support_action: >
+      Continuation value has fallen below exit value including cost, and the state variables driving
+      it were available before the current bar rather than reconstructed.
+    evidence_that_would_argue_against_action: >
+      A persistence regime is in force, in which case the truncated tail is where the return lives.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Exiting on the crossing raises turnover and therefore the cost floor the strategy must clear."
+
+  - decision_relevance_id: DR-PERSIST-HOLD
+    concept_id: KC-REGIME-PERSISTENCE
+    decision_type: hold
+    evidence_that_would_support_action: >
+      A persistence estimate computed out of sample is in force, and position sizing can survive the
+      giveback that holding implies.
+    evidence_that_would_argue_against_action: >
+      Persistence was estimated in sample, or the position is a loser being justified by an argument
+      built for winners.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "This concept can rationalise holding almost anything; require the regime test to be pre-registered."
+
+  - decision_relevance_id: DR-FILTER-HOLD
+    concept_id: KC-FILTER-STATE
+    decision_type: hold
+    evidence_that_would_support_action: >
+      Normalized innovations are near their expected magnitude, so the state estimate the thesis
+      depends on is still consistent with the data.
+    evidence_that_would_argue_against_action: >
+      A run of large normalized innovations, or a noise variance that has been tuned until the
+      diagnostic looked acceptable.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Filtered estimates lag by construction; at short horizons the lag can exceed the decision window."
+
+  - decision_relevance_id: DR-CUSUM-EXIT
+    concept_id: KC-DETECT-CUSUM
+    decision_type: exit
+    evidence_that_would_support_action: >
+      The detector alarms against the position direction with parameters tuned on a disjoint period,
+      and the alarm is not explained by a scheduled event.
+    evidence_that_would_argue_against_action: >
+      Alarm rate is high enough that most alarms are noise, or the reference window already contained
+      the shift, making the alarm late and uninformative.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Acting on every alarm converts a detection statistic into a high-turnover exit policy."
+
+  - decision_relevance_id: DR-ABSORB-ENTRY
+    concept_id: KC-INFO-ABSORPTION
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The catalyst timestamp is reliable, the estimated absorbed fraction is well below one, and the
+      instrument's historical absorption profile is slow enough to leave room.
+    evidence_that_would_argue_against_action: >
+      Overlapping catalysts make the response non-identifiable, or the move has already matched the
+      instrument's typical full response.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Entering into an absorbing move competes with informed flow that is already working."
+
+  - decision_relevance_id: DR-LMSR-SIZING
+    concept_id: KC-PRED-LMSR
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      The venue runs a scoring-rule maker, the implied liquidity parameter is stable across recent
+      trades, and the cost of moving the price to the target probability is affordable.
+    evidence_that_would_argue_against_action: >
+      The venue is an order book rather than a scoring-rule maker, or the liquidity parameter was
+      estimated across a resolution-relevant event.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Sizing to the cost curve concentrates risk in the markets that are cheapest to move, which are also the thinnest."
+
+  - decision_relevance_id: DR-STALE-ENTRY
+    concept_id: KC-PRED-LIQUIDITY-MOVE
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The price move consumed most of the visible depth and has not been confirmed by replenished
+      flow, and related markets have not moved.
+    evidence_that_would_argue_against_action: >
+      Depth has replenished at the new level, or the single participant plausibly held information
+      the thin book made cheap to express.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Fading a liquidity move means standing in front of whoever caused it, if they were right."
+
+  - decision_relevance_id: DR-XMKT-ENTRY
+    concept_id: KC-XMKT-CONSISTENCY
+    decision_type: entry
+    evidence_that_would_support_action: >
+      Both venues' resolution rules have been read and agree, quotes are synchronized, and the gap
+      survives fees, funding carry to resolution, and execution cost on both legs.
+    evidence_that_would_argue_against_action: >
+      One leg's quote is stale, the resolution sources differ, or margin requirements prevent holding
+      both legs to resolution.
+    minimum_required_confidence: 0.65
+    important_side_effects:
+      - "A one-legged fill converts a hedged position into an outright one, which is the usual way this loses money."

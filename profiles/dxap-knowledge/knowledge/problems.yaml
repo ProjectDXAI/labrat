@@ -1,0 +1,127 @@
+# The problem map.
+#
+# Compilation starts from diagnosed agent failure modes, not from "quant finance"
+# as an undifferentiated topic. Every concept card must name at least one problem
+# it addresses, and the compile queue seeds its personalized PageRank here — so a
+# work is ranked by proximity to a problem we actually have, not by prestige.
+#
+# `buckets` and `tags` connect a problem to the corpus bibliography.
+
+verticals:
+  execution_cost:
+    name: "Execution, adverse selection and fee drag"
+    expected_artifacts:
+      - entry adverse-selection diagnostics
+      - execution-quality decomposition
+      - conditions under which apparent alpha sits below expected cost
+      - fill- and spread-aware abstention evidence
+  stopping:
+    name: "Optimal stopping, exits and giveback"
+    expected_artifacts:
+      - continuation-value estimates
+      - probability of a new favourable excursion
+      - evidence that a position's original thesis has decayed
+      - path-dependent exit diagnostics rather than fixed trailing stops
+  information_arrival:
+    name: "Information arrival and structural change"
+    expected_artifacts:
+      - separation of transient flow from state change
+      - catalyst-to-price absorption estimates
+      - posterior updating across source types
+      - regime-sensitive interpretation of momentum and reversal
+  probability_formation:
+    name: "Prediction-market and cross-market probability formation"
+    expected_artifacts:
+      - decomposition of fundamental probability change versus liquidity movement
+      - stale-probability detection
+      - participant and order-flow informativeness hypotheses
+      - cross-market consistency tests
+
+problems:
+  - problem_id: PB-COST-DRAG
+    vertical: execution_cost
+    statement: "Turnover is high enough that fees, funding and spread consume the edge the agent believes it has."
+    observed_signature: "Positive gross edge, negative net after fees; short holding periods clustered around low-conviction entries."
+    weight: 1.0
+    buckets: [market_microstructure, quant_finance_core]
+    tags: [execution, impact, adverse-selection, fee-drag]
+
+  - problem_id: PB-ADVERSE-ENTRY
+    vertical: execution_cost
+    statement: "Entries are systematically filled just before the price moves against them."
+    observed_signature: "Negative mark-out at 1-30s after fill; worse on aggressive orders into thin books."
+    weight: 1.0
+    buckets: [market_microstructure, queueing_networks]
+    tags: [adverse-selection, order-book, queueing, impact]
+
+  - problem_id: PB-IMPACT-TIMING
+    vertical: execution_cost
+    statement: "Large orders are worked without a model of how impact decays, so the schedule is either too fast or too slow."
+    observed_signature: "Realized shortfall dominated by temporary impact; price reverts after completion."
+    weight: 0.9
+    buckets: [market_microstructure, optimal_control, operations_research]
+    tags: [execution, impact, resiliency]
+
+  - problem_id: PB-GIVEBACK
+    vertical: stopping
+    statement: "Winning positions give back most of their maximum favourable excursion before the agent exits."
+    observed_signature: "High MFE, low realized capture; exits triggered by drawdown rather than by thesis decay."
+    weight: 1.0
+    buckets: [decision_sequential, optimal_control]
+    tags: [optimal-stopping, exit, hazard]
+
+  - problem_id: PB-THESIS-DECAY
+    vertical: stopping
+    statement: "The agent holds after the conditions that justified entry have stopped holding."
+    observed_signature: "Position rationale references a catalyst whose effect has already been absorbed."
+    weight: 0.9
+    buckets: [decision_sequential, signal_processing]
+    tags: [changepoint, regime, exit]
+
+  - problem_id: PB-REGIME-BREAK
+    vertical: information_arrival
+    statement: "Transient flow is read as a state change, and genuine state changes are read as noise."
+    observed_signature: "Reversals taken during trending regimes; trend-following entries at regime ends."
+    weight: 1.0
+    buckets: [signal_processing, detection_tracking, dynamical_systems]
+    tags: [changepoint, regime, filtering, detection]
+
+  - problem_id: PB-ABSORPTION
+    vertical: information_arrival
+    statement: "The agent cannot tell whether a catalyst is already in the price."
+    observed_signature: "Entries after the move has been absorbed; no estimate of absorption speed by venue or instrument."
+    weight: 0.9
+    buckets: [economics_information, market_microstructure]
+    tags: [information, absorption, catalyst, price-discovery]
+
+  - problem_id: PB-STALE-PROBABILITY
+    vertical: probability_formation
+    statement: "Prediction-market prices are treated as current beliefs when they may simply be unrefreshed."
+    observed_signature: "Trades against a price that has not updated since the last relevant news, with thin recent flow."
+    weight: 1.0
+    buckets: [economics_information, exchange_documentation]
+    tags: [prediction-market, polymarket-relevant, information, liquidity]
+
+  - problem_id: PB-XMARKET
+    vertical: probability_formation
+    statement: "Related instruments across venues are priced inconsistently and the agent has no consistency test."
+    observed_signature: "Simultaneous positions implying contradictory probabilities; no funding- or fee-adjusted comparison."
+    weight: 0.8
+    buckets: [economics_information, exchange_documentation, network_science]
+    tags: [cross-market, arbitrage, prediction-market, funding]
+
+  - problem_id: PB-FILL-UNCERTAINTY
+    vertical: execution_cost
+    statement: "Passive orders are assumed to fill; queue position and cancellation dynamics are ignored."
+    observed_signature: "Planned passive entries that never fill, followed by aggressive chases at worse prices."
+    weight: 0.8
+    buckets: [queueing_networks, market_microstructure]
+    tags: [queueing, order-book, fill-probability]
+
+  - problem_id: PB-INVENTORY-FUNDING
+    vertical: execution_cost
+    statement: "Inventory and funding costs are not priced into quoting or holding decisions on perpetuals."
+    observed_signature: "Positions held through adverse funding; no inventory skew in quoting."
+    weight: 0.8
+    buckets: [market_microstructure, operations_research]
+    tags: [inventory, funding, market-making]

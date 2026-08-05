@@ -54,7 +54,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     new_cmd = subparsers.add_parser("new", help="Create a new lab from the bundled templates.")
     new_cmd.add_argument("target_dir", help="Target directory for the new lab. Relative paths are resolved from the current directory.")
-    new_cmd.add_argument("--profile", default=None, help="Optional profile to overlay on top of the base templates.")
+    new_cmd.add_argument(
+        "--profile",
+        action="append",
+        default=None,
+        help="Optional profile to overlay on top of the base templates. Repeat to stack profiles; later profiles win.",
+    )
 
     bootstrap_cmd = subparsers.add_parser("bootstrap", help="Bootstrap a lab runtime.")
     bootstrap_cmd.add_argument("--lab-dir", type=Path, default=Path.cwd(), help="Lab root. Defaults to the current directory.")
@@ -166,8 +171,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "new":
         delegated = [args.target_dir]
-        if args.profile:
-            delegated.extend(["--profile", args.profile])
+        for profile in args.profile or []:
+            delegated.extend(["--profile", profile])
         return _call("new_lab", delegated)
 
     if args.command == "bootstrap":

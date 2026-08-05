@@ -1,0 +1,103 @@
+# Method objects: bindings from concepts to versioned implementations.
+#
+# The implementation, its inputs/outputs, its as-of contract and its unit tests
+# live in `scripts/methods.py`. This file records which concept a method is
+# evidence for, the parameters we default to, and the data the caller must have.
+#
+# `implementation_version` is pinned deliberately. If the implementation changes
+# version, validation fails until someone re-verifies the card against the new
+# behaviour — a silent numerical change is exactly the kind of drift that makes a
+# knowledge base untrustworthy.
+
+methods:
+  - method_id: order_flow_imbalance
+    implementation_version: "1.0.0"
+    concept_ids: [KC-MICRO-OFI]
+    default_params: {window: 50}
+    data_requirements: [l1_book]
+    status: implemented
+    synthetic_tests:
+      - "Bid queue growth at a constant best bid reads positive."
+      - "Ask queue depletion at a constant best ask reads positive."
+      - "A single snapshot yields zero rather than an error."
+    notes: "Normalize by displayed depth before comparing across instruments."
+
+  - method_id: kyle_lambda
+    implementation_version: "1.0.0"
+    concept_ids: [KC-INFO-KYLE]
+    default_params: {}
+    data_requirements: [signed_volume, mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "Recovers a known slope on noiseless synthetic data."
+      - "Refuses when signed volume has no variance."
+    notes: "Always read r_squared alongside lambda; a fitted slope in a concave-impact regime is the classic misuse."
+
+  - method_id: avellaneda_stoikov_quotes
+    implementation_version: "1.0.0"
+    concept_ids: [KC-MM-INVENTORY]
+    default_params: {gamma: 0.1, kappa: 1.5}
+    data_requirements: [l1_book, position_state, volatility_estimate]
+    status: implemented
+    synthetic_tests:
+      - "Flat inventory quotes symmetrically around mid."
+      - "Long inventory leans the reservation price down, short leans it up."
+      - "Half-spread is independent of inventory sign."
+    notes: "Clamp to venue tick and quote limits before use. Funding carry is not in the model."
+
+  - method_id: almgren_chriss_schedule
+    implementation_version: "1.0.0"
+    concept_ids: [KC-EXEC-AC]
+    default_params: {intervals: 10}
+    data_requirements: [mid_price_series, volatility_estimate, position_state]
+    status: implemented
+    synthetic_tests:
+      - "Zero risk aversion reproduces the uniform (TWAP) trajectory."
+      - "Higher risk aversion front-loads, lowering variance and raising expected cost."
+      - "Refuses when the effective temporary impact is non-positive."
+    notes: "The schedule has no stopping rule; pair it with KC-STOP-CONTINUATION when the thesis can decay mid-execution."
+
+  - method_id: kalman_local_level
+    implementation_version: "1.0.0"
+    concept_ids: [KC-FILTER-STATE]
+    default_params: {observation_variance: 1.0, state_variance: 0.01}
+    data_requirements: [mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "Converges to the level on a constant series with vanishing innovations."
+      - "Normalized innovation squared spikes at an injected level break."
+    notes: "Filtered, never smoothed. Smoothing would leak future observations into a live decision."
+
+  - method_id: cusum_changepoint
+    implementation_version: "1.0.0"
+    concept_ids: [KC-DETECT-CUSUM]
+    default_params: {drift: 0.5, threshold: 5.0, burn_in: 10}
+    data_requirements: [mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "Silent on a stationary series."
+      - "Alarms within a few observations of an injected shift, with the correct direction."
+    notes: "Tune drift and threshold on a period disjoint from the one being evaluated, or the delay curve is meaningless."
+
+  - method_id: continuation_hazard
+    implementation_version: "1.0.0"
+    concept_ids: [KC-STOP-CONTINUATION]
+    default_params: {bandwidth: 0.1, prior_strength: 4.0}
+    data_requirements: [position_state, mfe_history, episode_history]
+    status: implemented
+    synthetic_tests:
+      - "Deeper giveback lowers the continuation probability."
+      - "A bucket with no comparable episodes falls back to the base rate."
+    notes: "Returns support explicitly. A probability on three episodes is a prior, and the card says so."
+
+  - method_id: lmsr_binary
+    implementation_version: "1.0.0"
+    concept_ids: [KC-PRED-LMSR]
+    default_params: {}
+    data_requirements: [market_probability, orderbook_depth]
+    status: implemented
+    synthetic_tests:
+      - "Prices sum to one and start at 0.5 with zero inventory."
+      - "Moving the price costs a positive amount bounded by the subsidy."
+      - "Extreme inventory does not overflow the exponential."
+    notes: "Only applies to scoring-rule venues. On a CLOB prediction market this misprices the cost of moving the market."

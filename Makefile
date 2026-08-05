@@ -1,9 +1,10 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus clean-smoke clean-smoke-corpus test help
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
 SMOKE_LAB := _smoke_$(PROFILE)
 CORPUS_LAB := _smoke_quant-finance-corpus
+KNOWLEDGE_LAB := _smoke_dxap-knowledge
 
 help:
 	@echo "labrat Makefile targets:"
@@ -12,8 +13,9 @@ help:
 	@echo "  make smoke [PROFILE=<name>]   end-to-end smoke test for a profile (default: transformer-arch)"
 	@echo "  make smoke-transformer        alias for 'make smoke PROFILE=transformer-arch'"
 	@echo "  make smoke-corpus             end-to-end smoke test for the quant-finance-corpus profile"
+	@echo "  make smoke-knowledge          end-to-end smoke test for the dxap-knowledge profile"
 	@echo "  make clean-smoke              remove the temporary smoke lab"
-	@echo "  make test                     alias for 'make smoke' + 'make smoke-corpus'"
+	@echo "  make test                     runs every smoke path and self-test"
 
 install:
 	@$(PYTHON) -m pip install -e .
@@ -21,7 +23,7 @@ install:
 install-nlp-sentiment:
 	@$(PYTHON) -m pip install -e '.[nlp-sentiment]'
 
-test: smoke smoke-corpus
+test: selftest smoke smoke-corpus smoke-knowledge
 
 smoke-transformer:
 	@$(MAKE) smoke PROFILE=transformer-arch
@@ -31,6 +33,52 @@ clean-smoke:
 
 clean-smoke-corpus:
 	@rm -rf $(CORPUS_LAB)
+
+clean-smoke-knowledge:
+	@rm -rf $(KNOWLEDGE_LAB)
+
+selftest:
+	@echo ">>> Engine self-tests (graph algorithms, deterministic methods, attribution ledger)..."
+	@$(PYTHON) scripts/graphops.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  graphops OK: {len(d[\"checks\"])} checks')"
+	@$(PYTHON) scripts/methods.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  methods OK: {d[\"methods\"]} methods, {len(d[\"checks\"])} closed-form checks')"
+	@$(PYTHON) scripts/ledger.py self-test | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok']; print(f'  ledger OK: {len(d[\"checks\"])} checks')"
+
+smoke-knowledge: clean-smoke-knowledge selftest
+	@echo ">>> Scaffolding stacked corpus + knowledge lab at $(KNOWLEDGE_LAB)..."
+	@$(PYTHON) scripts/new_lab.py $(KNOWLEDGE_LAB) --profile=quant-finance-corpus --profile=dxap-knowledge > /dev/null
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/operator_helper.py doctor > /dev/null
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/operator_helper.py check-readiness > /dev/null
+	@echo ">>> Running the SERVABLE gate over every card..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py validate --json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ok'], [r for r in d['concepts'] if not r['servable']]; c=d['counts']; assert c['servable_concepts']==c['concepts'], c; assert c['testable_hypotheses']==c['hypotheses'], c; print(f'  gate OK: {c[\"concepts\"]} concepts servable, {c[\"hypotheses\"]} hypotheses testable, {c[\"methods\"]} method bindings at pinned versions')"
+	@echo ">>> Checking a card cannot claim an implementation that is not bound..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) -c "import sys; sys.path.insert(0,'scripts'); import yaml, knowledge; p=knowledge.knowledge_paths(__import__('pathlib').Path('knowledge')); s=knowledge.load_store(p); src=knowledge.load_corpus_sources(__import__('pathlib').Path('.')); s['methods']=[]; bad=[r for r in (knowledge.concept_gate(c,src,s) for c in s['concepts']) if not r['servable']]; assert bad, 'removing every method binding should unservable the implemented cards'; print(f'  version/binding gate OK: {len(bad)} cards refuse to serve without their bound method')"
+	@echo ">>> Checking the rights gate blocks a quote from a reference-only source..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) -c "import sys, pathlib; sys.path.insert(0,'scripts'); import knowledge; p=knowledge.knowledge_paths(pathlib.Path('knowledge')); s=knowledge.load_store(p); src=knowledge.load_corpus_sources(pathlib.Path('.')); c=dict(s['concepts'][0]); c['source_passage_ids']=[{'source_id':'harris-2003-trading-exchanges','anchor':'ch5','quote':'verbatim text'}]; r=knowledge.concept_gate(c,src,s); assert not r['servable'] and any('verbatim' in e for e in r['errors']), r; print('  rights gate OK: verbatim quote from a reference-only source is refused')"
+	@echo ">>> Scoring the retrieval policies against the labelled trials..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py evaluate --json | $(PYTHON) -c "import json,sys; rows={r['policy']:r for r in json.load(sys.stdin)}; raw=rows['raw_similarity']; dv=rows['decision_value']; assert raw['non_applicability_accuracy']==0.0, raw; assert dv['non_applicability_accuracy']==1.0, dv; assert dv['precision']>raw['precision'], (dv['precision'],raw['precision']); assert dv['counterevidence_coverage']>raw['counterevidence_coverage'], (dv,raw); assert dv['mean_context_kilotokens']<raw['mean_context_kilotokens'], (dv,raw); print(f'  retrieval OK: raw similarity prec={raw[\"precision\"]:.2f} abstains={raw[\"non_applicability_accuracy\"]:.2f}; decision value prec={dv[\"precision\"]:.2f} abstains={dv[\"non_applicability_accuracy\"]:.2f} counter={dv[\"counterevidence_coverage\"]:.2f}')"
+	@echo ">>> Checking point-in-time retrieval refuses sources published after the decision..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py evaluate --policy decision_value --json | $(PYTHON) -c "import json,sys; rows=json.load(sys.stdin)[0]['rows']; r=[x for x in rows if x['trial_id']=='T-NEG-BEFORE-SOURCES'][0]; assert r['abstained'], r; print('  point-in-time OK: a 1975 decision retrieves nothing from sources written later')"
+	@echo ">>> Ranking what to compile next..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py compile-queue --limit 10 --json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert d['ranked'], d; assert d['queues']['human_foundation_spine'], 'spine queue empty'; assert d['minimum_problem_cover']['selected'], 'no problem cover'; print(f'  compile queue OK: {len(d[\"ranked\"])} ranked, minimum cover of {len(d[\"minimum_problem_cover\"][\"covered\"])} problems from {len(d[\"minimum_problem_cover\"][\"selected\"])} sources')"
+	@echo ">>> Bootstrapping and running one policy candidate end-to-end..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/bootstrap.py > /dev/null
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/runtime.py lease --worker-id cpu-1 > /tmp/_smoke_knowledge_lease.json && \
+		CID=$$($(PYTHON) -c "import json; print(json.load(open('/tmp/_smoke_knowledge_lease.json'))['candidate_id'])") && \
+		DIR=$$($(PYTHON) -c "import json; print(json.load(open('/tmp/_smoke_knowledge_lease.json'))['artifact_dir'])") && \
+		$(PYTHON) scripts/run_experiment.py --candidate "$$DIR/candidate.json" --output "$$DIR/result.json" && \
+		$(PYTHON) -c "import json; d=json.load(open('$$DIR/result.json')); assert d['valid'], d; assert d['proxy_metrics']['methods_self_test_ok'], d; assert d['metrics']['search']['primary_metric']>0, d; print('  candidate OK: policy scored on the trial set')" && \
+		$(PYTHON) scripts/runtime.py complete --candidate-id "$$CID" --result "$$DIR/result.json" --worker-id cpu-1 > /dev/null && \
+		echo "  complete OK"
+	@echo ">>> Checking the ledger refuses an effect estimate on an unfrozen batch..."
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) -c "import sys; sys.path.insert(0,'scripts'); import ledger; e=[dict(x, frozen_batch=False) if x['event_type']=='outcome' else x for x in ledger._synthetic_events()]; r=ledger.analyze(e); assert r.get('refused'), r; ok=ledger.analyze(ledger._synthetic_events()); assert not ok.get('refused') and ok['comparisons']['treatment']['difference']==16.0, ok; print('  ledger OK: refuses unfrozen batches, computes clustered effects on matured ones')"
+	@echo ">>> Verifying knowledge operator surfaces shipped..."
+	@for f in scripts/knowledge.py scripts/methods.py scripts/graphops.py scripts/ledger.py knowledge/concepts.yaml knowledge/trials.yaml .claude/commands/compile-concept.md .claude/commands/evidence-packet.md .agents/skills/knowledge-compiler/SKILL.md agent_prompts/shared/knowledge_compile.md; do \
+		test -f $(KNOWLEDGE_LAB)/$$f || (echo "ERROR: $$f missing from lab" && exit 1); \
+	done
+	@echo "  Claude commands + Codex skill + shared compile prompt + engines OK"
+	@echo ""
+	@echo ">>> smoke-knowledge PASSED"
+	@echo "    (lab left at $(KNOWLEDGE_LAB)/ for inspection; run 'make clean-smoke-knowledge' to remove)"
 
 smoke-corpus: clean-smoke-corpus
 	@echo ">>> Scaffolding quant-finance-corpus lab at $(CORPUS_LAB)..."

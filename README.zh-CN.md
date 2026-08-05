@@ -10,7 +10,7 @@
 
 `labrat` 把 Claude Code 和 Codex 视为同等的一线操作界面。更强的推理模型在 synthesis、audit、consolidation 这些步骤上最有价值，但运行时契约和文件布局对两个界面保持一致。
 
-**快速跳转** → [5 分钟跑起来](#5-分钟跑起来) · [从 profile 开始](#从-profile-开始) · [构建语料库](#构建语料库) · [从零创建 lab](#从零创建-lab) · [为什么需要它](#为什么需要它)
+**快速跳转** → [5 分钟跑起来](#5-分钟跑起来) · [从 profile 开始](#从-profile-开始) · [构建语料库](#构建语料库) · [编译成可执行知识](#编译成可执行知识) · [从零创建 lab](#从零创建-lab) · [为什么需要它](#为什么需要它)
 
 用更直白的话说：
 
@@ -132,6 +132,7 @@ Claude Code slash commands 是短小的 markdown 文件，会变成会话中的�
 
 - `transformer-arch`：一个小型字符级 transformer 架构搜索 profile，包含 held-out-distribution decisive challenges。它默认使用 synthetic runner，因此不需要训练框架也能跑通完整 runtime loop；如果你要做真实训练，替换 `scripts/run_experiment.py` 即可。
 - `quant-finance-corpus`：文献网络测绘与带权利标签的语料构建 profile。这里的 candidate 是「检索策略」而不是模型，decisive challenges 是跨领域桥接发现（bridge discovery）和权利澄清（rights clearance）。见 [构建语料库](#构建语料库)。
+- `dxap-knowledge`：可执行文献层 —— 编译出的 concept / hypothesis / method / decision-relevance 卡片，加上带硬过滤的检索。candidate 是检索策略，decisive challenges 是「正确弃权」和「反证覆盖率」。需要叠加在 `quant-finance-corpus` 之上。见 [编译成可执行知识](#编译成可执行知识)。
 
 更多 profiles（world-model、multi-dataset）会在后续 PR 中加入。profile 契约见 [docs/PROFILES.md](docs/PROFILES.md)，长任务和中间 checkpoint 约定见 [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md)。
 
@@ -159,6 +160,36 @@ python scripts/corpus.py manifest                    # 通过权利闸门的构�
 内置 profile 预置了 173 条文献，覆盖市场微观结构、量化金融、信息经济学、统计信号处理、检测与跟踪、控制论、运筹学、排队论、信息论、贝叶斯统计、序贯决策、动力系统、网络科学、交易所文档、开放课程材料和从业者培训材料。所有种子条目的权利标签都是 `inferred`，因此在有人真正读过许可条款之前，种子本身不会放行任何内容。
 
 数据模型、标签词表，以及如何把这套引擎用到别的领域，见 [docs/CORPUS.md](docs/CORPUS.md)。
+
+## 编译成可执行知识
+
+语料库只是手段。`labrat` 还提供把文献变成「智能体可以执行、也可以被检验的对象」的那一层：
+
+```
+来源 -> 机制 -> 假设 -> 可观测特征
+     -> 确定性检验 -> 决策相关性 -> 已实现结果
+```
+
+```bash
+labrat new ~/labs/my_dxap --profile=quant-finance-corpus --profile=dxap-knowledge
+cd ~/labs/my_dxap
+python scripts/knowledge.py validate                 # 对每张卡片执行 SERVABLE 闸门
+python scripts/knowledge.py evaluate                 # 用带标注的 trial 集给检索策略打分
+python scripts/knowledge.py retrieve --context ctx.json --policy decision_value --markdown
+python scripts/methods.py self-test                  # 每个方法的闭式自检
+```
+
+一段书里的原文只能告诉智能体「订单流可能含有信息」。一张 concept 卡片会告诉它：这条结论在什么假设下成立、用哪些可观测量区分知情流与机械流、在当前可得数据上该运行哪个已测试过的函数、什么证据会证伪它，以及它影响的是入场、加仓、离场还是弃权。
+
+它与向量数据库的区别有三点：
+
+- **SERVABLE 闸门。** 一张卡片只有在具备机制、假设、所需可观测量、预期特征、失效模式、反证以及可解析的来源锚点时才可被检索。没有对立概念也没有替代解释，卡片就不服务 —— 只会确认的检索层比没有检索层更糟。
+- **先结构过滤，再相似度。** 市场类型、时间尺度、当前真实可得的可观测量、决策类型，以及「按决策时间点」的来源可得性 —— 2025 年出版的书不能影响 2024 年的决策。之后才是决策价值重排序、多样性控制、显式弃权，以及必须携带反证的一跳扩展。
+- **确定性工具，而不是凭记忆算数。** 八个带版本、带 as-of 契约和闭式自检的方法。method 绑定会钉住实现版本，实现一旦变更，验证就会失败，直到有人重新核对卡片。
+
+在内置种子上，纯相似度检索的命中率是满分 —— 但精确率只有 0.24、零反证，并且对**每一个**不适用的上下文都给出答案，包括一个早于其来源出版时间的历史情境。它作为对照臂保留在 lab 中。
+
+对象模型、检索流程，以及区分「检索层能用」与「这能赚钱」的三道 gate，见 [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md)。
 
 ## 从零创建 lab
 
@@ -195,6 +226,7 @@ Phase 0 必须产出：
 - [docs/runners.md](docs/runners.md)：Codex 和 Claude Code 的操作契约
 - [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md)：frontier model prompting、reasoning effort 和 research guidance
 - [docs/CORPUS.md](docs/CORPUS.md)：文献网络测绘、迭代检索轮次和权利标签
+- [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md)：可执行文献层 —— 概念编译、过滤式检索、确定性方法与归因账本
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)：运行时、状态和评估细节
 - [docs/PROFILES.md](docs/PROFILES.md)：profile 机制和新 profile 编写方式
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md)：`checkpoints.jsonl`、`failure_class`、per-pool timeouts 的约定

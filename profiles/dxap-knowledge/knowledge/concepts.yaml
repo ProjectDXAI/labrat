@@ -1,0 +1,630 @@
+# Concept cards.
+#
+# Each card is our own account of a mechanism, anchored to a source rather than
+# copied from it. `source_passage_ids` are `entry-id#anchor` references into the
+# corpus bibliography; verbatim quotes are only permitted from manifest-eligible
+# sources, and the SERVABLE gate enforces that.
+#
+# A card without counterevidence — a contradicting concept or an alternative
+# explanation — does not pass the gate. A retrieval layer that can only confirm
+# is worse than no retrieval layer.
+
+concepts:
+
+  # ----------------------------------------------------------------------------
+  # Vertical: execution, adverse selection and fee drag
+  # ----------------------------------------------------------------------------
+  - concept_id: KC-MICRO-OFI
+    canonical_name: "Order flow imbalance as a short-horizon price predictor"
+    plain_description: >
+      Changes in the size resting at the best bid and ask predict short-horizon mid-price
+      moves better than trade volume does, because they capture cancellations and additions,
+      not only executions.
+    mechanism: >
+      Price at the top of book moves when one side's queue is depleted relative to the other.
+      Net queue change — additions minus cancellations minus executions, signed by side — is
+      the direct measure of that depletion pressure. Trade volume alone misses the large share
+      of book dynamics carried by cancellation.
+    formal_equations: "e_n = 1{P_b,n >= P_b,n-1} q_b,n - 1{P_b,n <= P_b,n-1} q_b,n-1 - (ask-side mirror); OFI = sum e_n over the interval"
+    assumptions:
+      - "Top-of-book updates are observed without material gaps or sequencing errors."
+      - "Queue changes reflect the intentions of traders who will not immediately reverse them."
+      - "The relationship is estimated over an interval short enough that the impact coefficient is stable."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [tick, seconds, minutes]
+    required_observables: [l1_book]
+    required_data_resolution: "Event-level or sub-second top-of-book snapshots."
+    expected_empirical_signature: >
+      A roughly linear relationship between interval OFI and contemporaneous mid-price change,
+      with a coefficient that scales inversely with displayed depth.
+    alternative_explanations:
+      - "Mechanical or hedging flow produces the same imbalance with no information content."
+      - "A single large participant splitting an order creates imbalance that predicts only its own remaining schedule."
+    known_failure_modes:
+      - "Spoofed or fleeting quotes inflate queue changes without genuine intent."
+      - "In fragmented markets the imbalance on one venue is a partial view and mean-reverts on consolidation."
+      - "Breaks down across auction boundaries and after venue-level halts."
+    source_passage_ids:
+      - "cont-2014-price-impact-order-book-events#s2-3"
+      - "bouchaud-2018-trades-quotes-prices#ch11"
+    contradicting_concept_ids: [KC-MICRO-MECHANICAL-FLOW]
+    supporting_concept_ids: [KC-MICRO-QUEUE]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-ADVERSE-ENTRY, PB-COST-DRAG]
+    tags: [order-book, adverse-selection, flow, impact]
+
+  - concept_id: KC-MICRO-MECHANICAL-FLOW
+    canonical_name: "Mechanical flow imitates informed flow"
+    plain_description: >
+      A large fraction of order flow is hedging, rebalancing, liquidation or index-driven, and
+      carries no information about value. It produces the same order-book signature as informed
+      flow while predicting reversion rather than continuation.
+    mechanism: >
+      A hedger or liquidator trades because of an exogenous constraint, not a belief about value.
+      The resulting price pressure is temporary: once the constraint is satisfied, liquidity
+      returns and the price reverts toward its prior level.
+    formal_equations: "Decompose impact into permanent (information) and transient (liquidity) components; mechanical flow loads on the transient term."
+    assumptions:
+      - "Some observable distinguishes constrained flow — timing, periodicity, venue, or a known event."
+      - "Reversion happens within the horizon being traded."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [l1_book, trade_prints]
+    required_data_resolution: "Trade prints with timestamps; ideally a calendar of scheduled flows."
+    expected_empirical_signature: >
+      Impact that decays materially within the reversion window, clustered at predictable times
+      such as funding settlements, index rebalances and liquidation cascades.
+    alternative_explanations:
+      - "The flow was informed and the reversion is unrelated market noise."
+    known_failure_modes:
+      - "Mechanical and informed flow can coincide; a liquidation can also reveal information."
+      - "Classifying flow as mechanical after the fact is trivially easy and predicts nothing."
+    source_passage_ids:
+      - "bouchaud-2009-how-markets-slowly-digest#s4"
+      - "obizhaeva-2013-optimal-trading-strategy#s2"
+    contradicting_concept_ids: [KC-MICRO-OFI]
+    supporting_concept_ids: []
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-ADVERSE-ENTRY, PB-REGIME-BREAK]
+    tags: [flow, impact, reversion, liquidity]
+
+  - concept_id: KC-MICRO-QUEUE
+    canonical_name: "Queue position determines fill quality, not just fill probability"
+    plain_description: >
+      A passive order's expected outcome depends on where it sits in the queue: orders that fill
+      from the back of a depleting queue are selected against, because the queue depletes fastest
+      when the price is about to move through it.
+    mechanism: >
+      The book is a priority queue. An order at the back fills only when the queue ahead of it is
+      consumed, which is precisely the state in which the price is most likely to continue through
+      the level. Fill and adverse selection are therefore correlated by construction.
+    formal_equations: "P(fill before move) from a birth-death queue with arrival and cancellation intensities; expected mark-out conditional on fill."
+    assumptions:
+      - "Price-time priority, so queue position is meaningful."
+      - "Arrival and cancellation intensities are stable over the order's lifetime."
+      - "Our own order does not change the behaviour of the queue behind it."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [tick, seconds, minutes]
+    required_observables: [l2_book, queue_position]
+    required_data_resolution: "Depth-of-book with per-level sizes; own-order queue position if the venue exposes it."
+    expected_empirical_signature: >
+      Mark-out after passive fills that worsens monotonically with initial queue position, and
+      fill rates that rise exactly where mark-outs deteriorate.
+    alternative_explanations:
+      - "Poor mark-outs reflect the instrument's volatility rather than queue position."
+    known_failure_modes:
+      - "Pro-rata and size-priority venues break the whole argument."
+      - "Hidden and iceberg liquidity make the visible queue a poor estimate of true position."
+      - "In crypto venues with frequent self-trade prevention and cancel storms, intensity estimates are unstable."
+    source_passage_ids:
+      - "cont-2010-stochastic-model-order-book#s3"
+      - "cont-2013-price-dynamics-markovian-lob#s2"
+      - "harris-2003-trading-exchanges#ch5"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-MICRO-OFI]
+    implementation_status: specified
+    confidence: 0.65
+    problem_ids: [PB-FILL-UNCERTAINTY, PB-ADVERSE-ENTRY]
+    tags: [queueing, order-book, adverse-selection, fill-probability]
+
+  - concept_id: KC-INFO-KYLE
+    canonical_name: "Linear price impact of informed order flow (Kyle's lambda)"
+    plain_description: >
+      In a market with an informed trader, noise traders and a competitive market maker, price
+      moves linearly in net order flow, and the slope measures how much information the market
+      maker infers from a unit of flow.
+    mechanism: >
+      The market maker cannot distinguish informed from noise flow, so they set a price schedule
+      that breaks even in expectation. The equilibrium slope, lambda, rises with the informed
+      trader's precision and falls with the volume of noise trading.
+    formal_equations: "P = mu + lambda * (x + u); lambda = sigma_v / (2 * sigma_u) in the single-period equilibrium"
+    assumptions:
+      - "The market maker is competitive and risk neutral."
+      - "Noise trading volume is roughly stable over the estimation window."
+      - "Order flow is measured with a correct trade-sign classification."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex, dealer_market]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [signed_volume, mid_price_series]
+    required_data_resolution: "Interval-aggregated signed volume and price changes over a consistent clock."
+    expected_empirical_signature: >
+      A positive, stable regression slope of price change on signed volume, rising when noise
+      volume falls (overnight, holidays, illiquid instruments).
+    alternative_explanations:
+      - "Both price change and signed volume respond to a third factor such as a public news release."
+      - "The slope is a mechanical artifact of trade-sign misclassification near the spread."
+    known_failure_modes:
+      - "A fitted lambda in a non-linear (square-root) impact regime overstates the cost of small orders and understates large ones."
+      - "Estimated on aggregated intervals, it absorbs intraday seasonality unless the clock is volume-based."
+      - "Unstable across regime boundaries; a single lambda across a volatility break is meaningless."
+    source_passage_ids:
+      - "kyle-1985-continuous-auctions#s2"
+      - "ohara-1995-market-microstructure-theory#ch4"
+    contradicting_concept_ids: [KC-IMPACT-SQRT]
+    supporting_concept_ids: [KC-MICRO-OFI]
+    implementation_status: implemented
+    confidence: 0.75
+    problem_ids: [PB-COST-DRAG, PB-IMPACT-TIMING, PB-ABSORPTION]
+    tags: [impact, information, adverse-selection]
+
+  - concept_id: KC-IMPACT-SQRT
+    canonical_name: "Concave (square-root) impact of metaorders"
+    plain_description: >
+      The impact of a large parent order grows roughly with the square root of its size relative
+      to traded volume, not linearly, and a substantial part of that impact decays after the order
+      finishes.
+    mechanism: >
+      Displayed liquidity is a small fraction of true latent liquidity. As an order consumes the
+      book, new liquidity arrives in response, so each additional unit costs less than the last.
+      When execution stops, the latent book refills and part of the impact reverts.
+    formal_equations: "Impact ~ Y * sigma * sqrt(Q / V); transient component decays with a power-law kernel."
+    assumptions:
+      - "The order is worked over a horizon long enough for liquidity to respond."
+      - "Participation rate stays within the range where the scaling was estimated."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [signed_volume, mid_price_series, volatility_estimate]
+    required_data_resolution: "Parent-order level execution records with participation rates."
+    expected_empirical_signature: >
+      Impact scaling with an exponent near one half across several orders of magnitude of size,
+      and partial reversion after completion.
+    alternative_explanations:
+      - "Selection: large orders are worked when liquidity is unusually good, flattening measured impact."
+    known_failure_modes:
+      - "Estimated without a decay model, it double-counts transient impact as permanent."
+      - "The exponent is not universal across venue types; crypto perp books differ from equities."
+    source_passage_ids:
+      - "bouchaud-2018-trades-quotes-prices#ch12"
+      - "gatheral-2010-no-dynamic-arbitrage#s3"
+    contradicting_concept_ids: [KC-INFO-KYLE]
+    supporting_concept_ids: [KC-EXEC-AC]
+    implementation_status: specified
+    confidence: 0.7
+    problem_ids: [PB-IMPACT-TIMING, PB-COST-DRAG]
+    tags: [impact, execution, resiliency]
+
+  - concept_id: KC-EXEC-AC
+    canonical_name: "Optimal execution as a cost-variance trade-off"
+    plain_description: >
+      Liquidating a position quickly costs more in impact but exposes less to price risk. The
+      optimal schedule depends on risk aversion, volatility and the impact coefficients, and with
+      zero risk aversion it is simply uniform in time.
+    mechanism: >
+      Expected shortfall rises with trading speed through temporary impact; shortfall variance
+      rises with holding time through volatility. Minimizing a mean-variance objective yields an
+      exponential-like trajectory whose urgency is set by the ratio of risk aversion times
+      variance to effective temporary impact.
+    formal_equations: "x_j = X * sinh(kappa (T - t_j)) / sinh(kappa T); cosh(kappa tau) = 1 + kappa~^2 tau^2 / 2"
+    assumptions:
+      - "Impact is linear in trading rate and separable into permanent and temporary parts."
+      - "Volatility is constant over the execution horizon."
+      - "No information arrives during execution that should change the target position."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [minutes, hours]
+    required_observables: [mid_price_series, volatility_estimate, position_state]
+    required_data_resolution: "Interval prices at the schedule's granularity plus a volatility estimate on the same clock."
+    expected_empirical_signature: >
+      Realized shortfall that falls as the schedule lengthens until volatility risk dominates,
+      producing a U-shaped cost curve in horizon.
+    alternative_explanations:
+      - "Observed shortfall differences across horizons reflect when orders were sent, not how they were scheduled."
+    known_failure_modes:
+      - "Linear impact assumption breaks for large participation; the schedule then trades too aggressively."
+      - "Ignores the option to stop: a schedule keeps trading after the thesis has decayed."
+      - "Constant volatility over the horizon is wrong exactly when it matters, during regime breaks."
+    source_passage_ids:
+      - "almgren-2000-optimal-execution#s2-4"
+      - "cartea-2015-algorithmic-high-frequency-trading#ch6"
+    contradicting_concept_ids: [KC-IMPACT-SQRT]
+    supporting_concept_ids: [KC-STOP-CONTINUATION]
+    implementation_status: implemented
+    confidence: 0.75
+    problem_ids: [PB-IMPACT-TIMING, PB-COST-DRAG]
+    tags: [execution, impact, control, cost]
+
+  - concept_id: KC-MM-INVENTORY
+    canonical_name: "Inventory risk skews the quoting decision"
+    plain_description: >
+      A market maker holding inventory should not quote symmetrically around the mid. The
+      indifference price shifts away from the inventory, and the optimal spread widens with risk
+      aversion, volatility and time remaining.
+    mechanism: >
+      Inventory exposes the maker to price risk that grows with the holding horizon. The
+      reservation price is the price at which they are indifferent to holding versus not, which
+      moves down when long and up when short; the spread around it prices order arrival intensity
+      against that risk.
+    formal_equations: "r = s - q * gamma * sigma^2 * (T - t); delta = gamma sigma^2 (T-t) + (2/gamma) ln(1 + gamma/k)"
+    assumptions:
+      - "Order arrival intensity decays exponentially in quoted distance from mid."
+      - "Inventory can be held to the horizon without a funding or margin constraint binding."
+      - "Mid price follows a driftless diffusion over the quoting horizon."
+    market_types: [clob_crypto, perp_dex, clob_futures, dealer_market]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [l1_book, position_state, volatility_estimate]
+    required_data_resolution: "Top of book plus current inventory, on the same clock as the volatility estimate."
+    expected_empirical_signature: >
+      Quotes that lean against inventory, and a spread that widens with volatility and narrows as
+      arrival intensity rises.
+    alternative_explanations:
+      - "Observed quote skew reflects a directional view rather than inventory management."
+    known_failure_modes:
+      - "On perpetuals, funding cost can dominate the inventory term and is absent from the model."
+      - "The symmetric-intensity assumption fails in a one-sided market, exactly when inventory hurts most."
+      - "Optimal spread can be narrower than the venue tick, at which point the formula says nothing useful."
+    source_passage_ids:
+      - "avellaneda-2008-hft-limit-order-book#s3"
+      - "gueant-2016-financial-mathematics-market-liquidity#ch4"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-MICRO-QUEUE]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-INVENTORY-FUNDING, PB-ADVERSE-ENTRY]
+    tags: [market-making, inventory, funding, quoting]
+
+  # ----------------------------------------------------------------------------
+  # Vertical: optimal stopping, exits and giveback
+  # ----------------------------------------------------------------------------
+  - concept_id: KC-STOP-CONTINUATION
+    canonical_name: "Exit as an optimal stopping problem, not a drawdown rule"
+    plain_description: >
+      Whether to hold a winning position is a comparison between the value of continuing and the
+      value of stopping now, net of costs — not a fixed fraction of the maximum favourable
+      excursion.
+    mechanism: >
+      Continuing has option value: the position may make a new favourable excursion. That value
+      depends on the conditional probability of a further excursion given the state — drawdown from
+      MFE, flow innovation, spread, time since catalyst, regime — and on the cost of exiting now
+      versus later. The stopping boundary is where continuation value falls below exit value.
+    formal_equations: "V(state) = max(exit_value(state), E[V(next state) | state] - holding_cost); stop where the first term wins."
+    assumptions:
+      - "Historical episodes used to estimate the continuation probability come from a comparable regime."
+      - "Exit cost can be estimated from the current book rather than assumed."
+      - "The state variables conditioned on are available at decision time."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex, prediction_market]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [position_state, mfe_history, episode_history]
+    required_data_resolution: "Per-episode MFE and outcome history at the horizon being traded."
+    expected_empirical_signature: >
+      Continuation probability that declines with giveback from MFE, and exits at the crossing
+      point outperforming any fixed-fraction trailing rule on the same episodes.
+    alternative_explanations:
+      - "Apparent giveback is the cost of holding through the noise that a genuinely trending position requires."
+      - "The episode history is too thin to condition on, and the estimate is really the base rate."
+    known_failure_modes:
+      - "Conditioning on a state that is itself the result of the exit policy creates a self-fulfilling boundary."
+      - "Thin buckets collapse to the base rate; the method reports its support for exactly this reason."
+      - "Ignores position sizing: a small position's option value may not justify the attention cost."
+    source_passage_ids:
+      - "peskir-2006-optimal-stopping#ch1"
+      - "kochenderfer-2022-algorithms-decision-making#ch7"
+    contradicting_concept_ids: [KC-REGIME-PERSISTENCE]
+    supporting_concept_ids: [KC-EXEC-AC]
+    implementation_status: implemented
+    confidence: 0.65
+    problem_ids: [PB-GIVEBACK, PB-THESIS-DECAY]
+    tags: [optimal-stopping, exit, hazard, continuation]
+
+  - concept_id: KC-REGIME-PERSISTENCE
+    canonical_name: "Trend persistence makes early stopping expensive"
+    plain_description: >
+      In a persistent regime, the distribution of future excursions is fat-tailed enough that
+      most of the return comes from a small number of positions held far past their first
+      significant giveback.
+    mechanism: >
+      When order flow autocorrelation and slow information absorption keep pushing a price in
+      one direction, the conditional distribution of the next excursion is right-skewed. Exiting
+      at the median outcome truncates precisely the tail that pays for the strategy.
+    formal_equations: "E[return | hold] dominated by the upper tail; truncating at a fixed drawdown removes the tail while keeping the losses."
+    assumptions:
+      - "The regime is identifiable at decision time, not only in hindsight."
+      - "Position sizing can survive the drawdown the persistence requires."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [mid_price_series, episode_history, volatility_estimate]
+    required_data_resolution: "Return series long enough to estimate persistence at the trading horizon."
+    expected_empirical_signature: >
+      Return concentration: a small share of episodes contributing most of the profit, with those
+      episodes showing large intermediate givebacks.
+    alternative_explanations:
+      - "The concentration is survivorship in the episode sample rather than genuine persistence."
+    known_failure_modes:
+      - "Persistence estimated in-sample is the classic overfit; it evaporates out of sample."
+      - "Justifies holding losers as easily as winners if the regime test is weak."
+    source_passage_ids:
+      - "bouchaud-2009-how-markets-slowly-digest#s3"
+      - "hamilton-1994-time-series-analysis#ch22"
+    contradicting_concept_ids: [KC-STOP-CONTINUATION]
+    supporting_concept_ids: []
+    implementation_status: specified
+    confidence: 0.55
+    problem_ids: [PB-GIVEBACK, PB-REGIME-BREAK]
+    tags: [regime, persistence, exit, tails]
+
+  # ----------------------------------------------------------------------------
+  # Vertical: information arrival and structural change
+  # ----------------------------------------------------------------------------
+  - concept_id: KC-FILTER-STATE
+    canonical_name: "Separating state from noise with a recursive filter"
+    plain_description: >
+      A recursive filter maintains an estimate of an unobserved state and its uncertainty, and
+      its innovations — the surprise in each observation — are the natural test of whether the
+      world has changed or the observation was just noisy.
+    mechanism: >
+      Each observation is compared against the model's prediction. The gain determines how much
+      of the surprise is absorbed into the state. Normalized innovations should be order one; a
+      run of large normalized innovations means the model, not the data, is wrong.
+    formal_equations: "x_t|t = x_t|t-1 + K_t (y_t - x_t|t-1); NIS_t = (y_t - x_t|t-1)^2 / S_t"
+    assumptions:
+      - "The observation noise variance is roughly known, or at least stable."
+      - "The state evolves smoothly relative to the sampling rate."
+      - "Strictly causal use: no smoothing with future observations."
+    market_types: [any]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [mid_price_series]
+    required_data_resolution: "A regularly sampled series at the horizon of interest."
+    expected_empirical_signature: >
+      Normalized innovation squared hovering near one in a stable regime and spiking at genuine
+      level breaks.
+    alternative_explanations:
+      - "A misspecified noise variance produces persistent NIS deviations that look like regime change."
+    known_failure_modes:
+      - "Smoothed rather than filtered estimates leak future data; the result is a beautiful, useless backtest."
+      - "A scalar local-level model cannot represent a genuinely multivariate state."
+      - "Tuning process noise to make NIS look right fits the diagnostic instead of the data."
+    source_passage_ids:
+      - "sarkka-2013-bayesian-filtering-smoothing#ch4"
+      - "anderson-1979-optimal-filtering#ch3"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-DETECT-CUSUM]
+    implementation_status: implemented
+    confidence: 0.8
+    problem_ids: [PB-REGIME-BREAK, PB-THESIS-DECAY]
+    tags: [filtering, kalman, state-estimation, innovation]
+
+  - concept_id: KC-DETECT-CUSUM
+    canonical_name: "Sequential change detection with an explicit delay-versus-false-alarm trade"
+    plain_description: >
+      Detecting that a series has changed level is a sequential decision with two costs: how long
+      detection takes, and how often it fires when nothing happened. A cumulative sum statistic
+      makes that trade-off explicit through its slack and threshold.
+    mechanism: >
+      Accumulate deviations from a reference, subtracting a slack term so that pure noise does not
+      accumulate. When the running sum crosses a threshold, declare a change. Slack sets the
+      smallest shift worth detecting; threshold sets the average run length to false alarm.
+    formal_equations: "S_t = max(0, S_{t-1} + (y_t - mu_0) - k); alarm when S_t > h"
+    assumptions:
+      - "The reference level is estimated from a window that does not already contain the change."
+      - "Observations are roughly independent given the level, or the slack is inflated to compensate."
+    market_types: [any]
+    relevant_horizons: [seconds, minutes, hours, days]
+    required_observables: [mid_price_series]
+    required_data_resolution: "A series sampled fast enough that the detection delay is tolerable at the trading horizon."
+    expected_empirical_signature: >
+      Silence on stationary stretches and an alarm shortly after a genuine level shift, with the
+      delay shrinking as the shift size grows.
+    alternative_explanations:
+      - "An alarm at a scheduled event is a calendar effect, not a discovered regime change."
+    known_failure_modes:
+      - "Zero slack turns the statistic into a random walk that alarms eventually on any series."
+      - "A reference contaminated by the change biases detection late."
+      - "Tuned on the same data it is evaluated on, the delay-versus-false-alarm curve is meaningless."
+    source_passage_ids:
+      - "basseville-1993-detection-abrupt-changes#ch2"
+      - "tartakovsky-2014-sequential-analysis#ch6"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-FILTER-STATE]
+    implementation_status: implemented
+    confidence: 0.75
+    problem_ids: [PB-REGIME-BREAK, PB-THESIS-DECAY]
+    tags: [changepoint, detection, sequential, regime]
+
+  - concept_id: KC-INFO-ABSORPTION
+    canonical_name: "Information is absorbed over time, not at the instant of release"
+    plain_description: >
+      Prices incorporate a catalyst over a period whose length depends on the instrument's
+      liquidity and the participants' attention, so the tradable question is how much of the move
+      is already in the price, not whether the news is real.
+    mechanism: >
+      Informed participants trade gradually to avoid revealing themselves and to limit impact, so
+      the price path after a catalyst reflects the pace of informed execution rather than an
+      instantaneous jump to the new value. Absorption speed is therefore an execution property of
+      the venue, not a property of the news.
+    formal_equations: "Cumulative response R(t) rising toward the permanent level; absorbed fraction = R(t)/R(inf)."
+    assumptions:
+      - "The catalyst time is known precisely enough to align the response window."
+      - "No second catalyst arrives inside the absorption window."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex, prediction_market]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [mid_price_series, catalyst_timeline, time_since_catalyst]
+    required_data_resolution: "Timestamped catalysts aligned to the price series clock."
+    expected_empirical_signature: >
+      A concave cumulative response after the catalyst, with a slower profile in less liquid
+      instruments and on venues with fewer informed participants.
+    alternative_explanations:
+      - "The gradual move is unrelated drift that happens to follow the catalyst."
+      - "The catalyst was leaked and absorption began before the timestamp."
+    known_failure_modes:
+      - "Requires a clean catalyst timeline; a sloppy one manufactures absorption curves out of noise."
+      - "Overlapping catalysts make the response non-identifiable."
+    source_passage_ids:
+      - "glosten-1985-bid-ask#s3"
+      - "hasbrouck-2007-empirical-market-microstructure#ch8"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-INFO-KYLE]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-ABSORPTION, PB-THESIS-DECAY]
+    tags: [information, absorption, catalyst, price-discovery]
+
+  # ----------------------------------------------------------------------------
+  # Vertical: prediction-market and cross-market probability formation
+  # ----------------------------------------------------------------------------
+  - concept_id: KC-PRED-LMSR
+    canonical_name: "Scoring-rule market makers price beliefs at a known subsidy"
+    plain_description: >
+      An automated market maker built on a logarithmic scoring rule quotes a probability that
+      moves predictably with inventory, at a bounded worst-case loss to the operator — so the
+      cost of moving the price is computable in advance.
+    mechanism: >
+      The cost function is convex in outstanding shares and its gradient is the price. Moving the
+      price from one probability to another therefore has a closed-form cost, and the operator's
+      worst-case subsidy is bounded by the liquidity parameter times log of the number of outcomes.
+    formal_equations: "C(q) = b log sum exp(q_i / b); p_i = exp(q_i/b) / sum exp(q_j/b); worst-case loss = b ln(n)"
+    assumptions:
+      - "The venue actually runs a scoring-rule maker rather than a matched order book."
+      - "The liquidity parameter is known or inferable from observed price response."
+    market_types: [prediction_market, amm]
+    relevant_horizons: [minutes, hours, days, weeks]
+    required_observables: [market_probability, orderbook_depth]
+    required_data_resolution: "Current outstanding quantities or an implied liquidity parameter."
+    expected_empirical_signature: >
+      Price response to size that matches the logistic form, with a stable implied liquidity
+      parameter across trades.
+    alternative_explanations:
+      - "A limit-order-book prediction market can mimic the same response curve without any scoring rule behind it."
+    known_failure_modes:
+      - "Applying it to a CLOB venue such as Polymarket's order book misprices the cost of moving the market."
+      - "Implied liquidity estimated across a resolution-relevant news event is not a constant."
+    source_passage_ids:
+      - "hanson-2007-logarithmic-market-scoring#s2"
+      - "wolfers-2004-prediction-markets#s3"
+    contradicting_concept_ids: [KC-PRED-LIQUIDITY-MOVE]
+    supporting_concept_ids: []
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-STALE-PROBABILITY, PB-XMARKET]
+    tags: [prediction-market, lmsr, market-design, polymarket-relevant]
+
+  - concept_id: KC-PRED-LIQUIDITY-MOVE
+    canonical_name: "A probability move can be liquidity, not belief"
+    plain_description: >
+      In a thin prediction market, a price change often reflects one participant's size against a
+      shallow book rather than any revision of collective belief.
+    mechanism: >
+      With few resting orders, a single order walks the book and resets the last price. Absent
+      fresh flow, that price persists as a stale quote, and reads as a belief update to anyone
+      sampling only the price.
+    formal_equations: "Decompose the move into depth-consumed and post-move replenishment; a belief move should survive replenishment."
+    assumptions:
+      - "Depth and recent flow are observable, not just the last price."
+      - "The market is not subject to a resolution-relevant catalyst inside the window."
+    market_types: [prediction_market, clob_crypto, amm]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [market_probability, orderbook_depth, trade_prints]
+    required_data_resolution: "Depth snapshots and trade prints around the move."
+    expected_empirical_signature: >
+      Price moves that revert once liquidity replenishes, with no accompanying change in related
+      markets or in the underlying news flow.
+    alternative_explanations:
+      - "The single participant was informed, and the thin book merely made their information cheap to express."
+    known_failure_modes:
+      - "Assumes the observed book is the whole book; hidden or off-venue liquidity breaks it."
+      - "In genuinely low-attention markets, staleness and correctness are indistinguishable for long periods."
+    source_passage_ids:
+      - "wolfers-2004-prediction-markets#s4"
+      - "harris-2003-trading-exchanges#ch19"
+    contradicting_concept_ids: [KC-PRED-LMSR]
+    supporting_concept_ids: [KC-MICRO-MECHANICAL-FLOW]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-STALE-PROBABILITY, PB-XMARKET]
+    tags: [prediction-market, liquidity, staleness, polymarket-relevant]
+
+  - concept_id: KC-XMKT-CONSISTENCY
+    canonical_name: "Cross-market probability consistency after costs"
+    plain_description: >
+      Related contracts across venues imply probabilities that must be consistent once fees,
+      funding, resolution rules and settlement timing are accounted for; an apparent inconsistency
+      is usually a rules difference rather than an edge.
+    mechanism: >
+      Two contracts on the same event are only comparable when their resolution criteria, sources
+      and timing agree. After adjusting for fees, funding carry to resolution, and the probability
+      mass assigned to ambiguous resolutions, the remaining gap is the tradable inconsistency.
+    formal_equations: "gap = p_A - p_B - fees - funding_carry - resolution_basis; trade only when gap exceeds execution cost on both legs."
+    assumptions:
+      - "Both venues' resolution rules have been read, not assumed equivalent."
+      - "Both legs can actually be executed at the observed prices."
+      - "Capital and margin constraints allow holding both legs to resolution."
+    market_types: [prediction_market, clob_crypto, perp_dex]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [cross_market_quotes, market_probability, fee_schedule, funding_rate]
+    required_data_resolution: "Synchronized quotes across venues plus the current fee and funding schedules."
+    expected_empirical_signature: >
+      A gap that persists after cost adjustment and closes toward resolution, rather than one that
+      appears and disappears with quote staleness on one leg.
+    alternative_explanations:
+      - "The gap is a resolution-criteria difference, correctly priced by both venues."
+      - "One leg's quote is stale and the gap is not executable."
+    known_failure_modes:
+      - "Ignoring funding carry on a perp leg turns a positive-carry arbitrage into a loss."
+      - "Assuming both legs fill: the cheap leg is often the one that disappears."
+      - "Resolution-source differences are the most common cause of a gap that never closes."
+    source_passage_ids:
+      - "wolfers-2004-prediction-markets#s5"
+      - "polymarket-clob-docs#resolution"
+      - "hyperliquid-api-docs#funding"
+    contradicting_concept_ids: [KC-PRED-LIQUIDITY-MOVE]
+    supporting_concept_ids: [KC-PRED-LMSR]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-XMARKET, PB-STALE-PROBABILITY]
+    tags: [cross-market, prediction-market, funding, arbitrage, polymarket-relevant]
+
+  - concept_id: KC-COST-FLOOR
+    canonical_name: "The cost floor a signal must clear"
+    plain_description: >
+      A strategy's expected gross edge per trade must exceed the full round-trip cost — spread
+      paid, fees, funding carry and expected adverse selection — before turnover is worth taking,
+      and that floor rises with trade frequency.
+    mechanism: >
+      Each round trip pays half-spread twice in expectation, plus explicit fees, plus the mark-out
+      loss from being selected against. Expected net edge is gross edge minus that floor. As
+      holding period shrinks, gross edge typically shrinks faster than the floor does.
+    formal_equations: "net = gross_edge - (spread_cost + fees + funding_carry + E[adverse_selection]); require net > 0 with margin for estimation error."
+    assumptions:
+      - "The fee schedule and funding rate applicable to this account are known, not assumed."
+      - "Adverse selection is estimated from realized mark-outs rather than ignored."
+    market_types: [any]
+    relevant_horizons: [seconds, minutes, hours, days]
+    required_observables: [fee_schedule, l1_book, position_state]
+    required_data_resolution: "Current fee tier, funding rate and top-of-book spread at decision time."
+    expected_empirical_signature: >
+      Net-of-cost edge that turns negative below a characteristic holding period, visible as a
+      cost-dominated regime in a holding-period sweep.
+    alternative_explanations:
+      - "Negative net results come from execution quality rather than from the signal being too weak."
+    known_failure_modes:
+      - "Maker rebates encourage passive strategies whose adverse selection exceeds the rebate."
+      - "Funding carry on perpetuals is often omitted and can exceed the entire gross edge."
+      - "Using average rather than decision-time spread understates the floor precisely on the trades that matter."
+    source_passage_ids:
+      - "harris-2003-trading-exchanges#ch21"
+      - "lopezdeprado-2018-advances-financial-ml#ch14"
+      - "hyperliquid-api-docs#fees"
+    contradicting_concept_ids: []
+    supporting_concept_ids: [KC-INFO-KYLE, KC-MICRO-QUEUE]
+    implementation_status: specified
+    confidence: 0.8
+    problem_ids: [PB-COST-DRAG, PB-ADVERSE-ENTRY]
+    tags: [cost, fees, funding, abstention, turnover]

@@ -59,17 +59,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--profile",
+        action="append",
         default=None,
         help=(
             "Optional profile to overlay on top of the base templates. "
             "Overlays Phase 0 files, a working run_experiment.py, "
-            "AGENTS.md, CLAUDE.md, .agents/skills, and .claude/commands/. Base templates remain the default if omitted."
+            "AGENTS.md, CLAUDE.md, .agents/skills, and .claude/commands/. Base templates remain the default if omitted. "
+            "Repeat the flag to stack profiles; later profiles win on conflicting files."
         ),
     )
     args = parser.parse_args(argv)
 
-    if args.profile and args.profile not in available_profiles():
-        print(f"ERROR: unknown profile '{args.profile}'. Available: {', '.join(available_profiles()) or 'none'}.")
+    profiles = list(args.profile or [])
+    unknown = [name for name in profiles if name not in available_profiles()]
+    if unknown:
+        print(f"ERROR: unknown profile '{unknown[0]}'. Available: {', '.join(available_profiles()) or 'none'}.")
         return 1
 
     target = resolve_target(args.target_dir)
@@ -116,6 +120,10 @@ def main(argv: list[str] | None = None) -> int:
         "pareto.py",
         "research_scout.py",
         "corpus.py",
+        "graphops.py",
+        "methods.py",
+        "knowledge.py",
+        "ledger.py",
     ]
     for name in script_files:
         src = SCRIPTS_DIR / name
@@ -132,10 +140,10 @@ def main(argv: list[str] | None = None) -> int:
         copy_tree(TEMPLATES_DIR / "coordination", target / "coordination")
 
     profile_applied: list[str] = []
-    if args.profile:
-        profile_src = PROFILES_DIR / args.profile
+    for name in profiles:
+        profile_src = PROFILES_DIR / name
         copy_tree(profile_src, target)
-        profile_applied = sorted(
+        profile_applied.extend(
             str(p.relative_to(profile_src)) for p in profile_src.rglob("*") if p.is_file()
         )
 
@@ -145,15 +153,18 @@ def main(argv: list[str] | None = None) -> int:
         display_target = str(target)
 
     print(f"Created starter lab at {display_target}")
-    if args.profile:
-        print(f"Applied profile '{args.profile}' ({len(profile_applied)} files overlaid).")
+    if profiles:
+        print(f"Applied profile{'s' if len(profiles) > 1 else ''} {', '.join(repr(name) for name in profiles)} ({len(profile_applied)} files overlaid).")
     print()
     print("Next steps:")
     print(f"  1. cd {display_target}")
-    if args.profile:
+    if profiles:
         print("  2. Review the pre-filled Phase 0 files (branches.yaml, evaluation.yaml, runtime.yaml).")
-        profile_req = PROFILES_DIR / args.profile / "requirements.txt"
-        if profile_req.exists():
+        profile_req = next(
+            (PROFILES_DIR / name / "requirements.txt" for name in reversed(profiles) if (PROFILES_DIR / name / "requirements.txt").exists()),
+            None,
+        )
+        if profile_req is not None:
             print(f"     The profile ships its own requirements.txt at {display_target}/requirements.txt.")
         print("  3. Confirm readiness:")
         print("     python scripts/operator_helper.py doctor")

@@ -1,0 +1,185 @@
+# Hypothesis cards.
+#
+# A concept is general. A hypothesis is what makes it testable in this system:
+# a market context, an ex-ante prediction, a null, the operator that measures it,
+# the eligible universe, the timestamp rule that keeps it point-in-time, the
+# horizons at which the outcome matures, a cost model, and what would kill it.
+#
+# The cost model is required. An ex-ante prediction without costs is not a
+# testable trading claim.
+
+hypotheses:
+  - hypothesis_id: HY-OFI-ENTRY
+    concept_id: KC-MICRO-OFI
+    market_context: "Perpetual futures on a liquid crypto venue, normal volatility regime, continuous trading."
+    causal_story: >
+      Net top-of-book queue change reflects pressure that has not yet been expressed in the price,
+      so entries aligned with contemporaneous OFI should suffer less immediate adverse selection.
+    ex_ante_prediction: >
+      Entries taken with the sign of the trailing-50-update OFI have mean 30-second mark-out at
+      least 0.5 basis points better than entries taken against it.
+    null_hypothesis: "Mark-out is independent of the sign agreement between entry and trailing OFI."
+    measurement_operator:
+      method_id: order_flow_imbalance
+      params: {window: 50}
+      derived: "sign agreement between entry direction and OFI; mark-out at 30s"
+    eligible_universe: "Instruments with continuous top-of-book data and at least 200 updates in the trailing window."
+    decision_timestamp_rule: "OFI computed strictly from updates timestamped before the order is sent; no snapshot at or after the fill."
+    outcome_horizons: [30s, 5m]
+    cost_model: "Taker fee plus half-spread paid on entry; mark-out measured against arrival mid, not fill price."
+    invalidation_conditions:
+      - "No mark-out difference after controlling for spread and displayed depth."
+      - "The effect exists only on the venue where the data is cleanest, and vanishes elsewhere."
+      - "Effect size is smaller than the taker fee it would have to pay for."
+
+  - hypothesis_id: HY-COST-FLOOR-ABSTAIN
+    concept_id: KC-COST-FLOOR
+    market_context: "Any venue, any instrument, decisions where the intended holding period is under one hour."
+    causal_story: >
+      Short-horizon gross edge shrinks faster than the round-trip cost floor, so a large share of
+      short-hold entries are negative in expectation before they are placed.
+    ex_ante_prediction: >
+      Entries whose estimated gross edge is below the decision-time cost floor realize negative
+      mean net return, and abstaining on them raises net return without materially lowering gross.
+    null_hypothesis: "Net return is independent of whether estimated gross edge exceeded the decision-time cost floor."
+    measurement_operator:
+      description: "Decision-time floor = half-spread x 2 + fee tier + funding carry over intended hold + realized mark-out estimate."
+      params: {}
+    eligible_universe: "All entry decisions with an intended holding period and a live fee schedule."
+    decision_timestamp_rule: "Spread, fee tier and funding rate as observed at the decision timestamp; no post-fill revision."
+    outcome_horizons: [1h, 1d]
+    cost_model: "Full round trip: both half-spreads, both fees, funding carry, and estimated adverse selection."
+    invalidation_conditions:
+      - "Abstaining on below-floor entries lowers net return, meaning the floor estimate is systematically too high."
+      - "The floor is dominated by an adverse-selection estimate too noisy to act on."
+
+  - hypothesis_id: HY-STOP-CONTINUATION
+    concept_id: KC-STOP-CONTINUATION
+    market_context: "Open winning positions past their first 20% giveback from MFE, any venue."
+    causal_story: >
+      Continuation value depends on the conditional probability of a further favourable excursion,
+      which declines with giveback; exiting where that value falls below exit value should beat any
+      fixed-fraction trailing rule.
+    ex_ante_prediction: >
+      Exits triggered by the continuation-value crossing capture at least 10% more of MFE than a
+      fixed 30% giveback rule on the same episodes, net of exit cost.
+    null_hypothesis: "MFE capture is the same under the continuation-value rule and the fixed-fraction rule."
+    measurement_operator:
+      method_id: continuation_hazard
+      params: {bandwidth: 0.1, prior_strength: 4.0}
+      derived: "continuation value vs. exit value including estimated exit cost"
+    eligible_universe: "Episodes with at least 20 comparable matured predecessors in the same regime bucket."
+    decision_timestamp_rule: "Episode history restricted to episodes matured strictly before the decision timestamp."
+    outcome_horizons: [position_close, 1d]
+    cost_model: "Exit half-spread and fee at decision-time depth; opportunity cost of capital until the horizon."
+    invalidation_conditions:
+      - "Support per bucket stays below 20 episodes, so the estimate is a base rate wearing a conditional's clothes."
+      - "The advantage disappears once the persistence regime is controlled for — see KC-REGIME-PERSISTENCE."
+      - "Capture improves but net return does not, meaning exit costs eat the difference."
+
+  - hypothesis_id: HY-CUSUM-THESIS-DECAY
+    concept_id: KC-DETECT-CUSUM
+    market_context: "Positions entered on an identified catalyst, held into a possible regime change."
+    causal_story: >
+      When the process that justified entry has changed level, the entry thesis no longer holds,
+      and a sequential detector should flag it earlier than a discretionary review would.
+    ex_ante_prediction: >
+      Positions where the detector alarms against the thesis direction have worse forward returns
+      than those where it stays silent, measured from the alarm timestamp.
+    null_hypothesis: "Forward return from the alarm timestamp is independent of whether the detector alarmed."
+    measurement_operator:
+      method_id: cusum_changepoint
+      params: {drift: 0.5, threshold: 5.0, burn_in: 30}
+      derived: "alarm timestamp and direction relative to position direction"
+    eligible_universe: "Positions with at least 30 pre-entry observations for the reference estimate."
+    decision_timestamp_rule: "Reference mean from the pre-entry window only; the statistic is causal by construction."
+    outcome_horizons: [1h, 1d]
+    cost_model: "Exit cost if the alarm is acted on; no cost if it is only recorded."
+    invalidation_conditions:
+      - "Alarm rate exceeds one per position on average — the parameters are detecting noise."
+      - "Forward-return difference is not robust to the threshold within a factor of two."
+
+  - hypothesis_id: HY-QUEUE-ADVERSE
+    concept_id: KC-MICRO-QUEUE
+    market_context: "Passive entries on price-time priority venues."
+    causal_story: >
+      Orders filled from deep in the queue fill precisely when the level is being consumed, so
+      their mark-outs should be systematically worse.
+    ex_ante_prediction: >
+      Mean 30-second mark-out on passive fills degrades monotonically across queue-position
+      quartiles at entry.
+    null_hypothesis: "Mark-out is independent of initial queue position."
+    measurement_operator:
+      description: "Queue position at order placement; realized mark-out at 30s from arrival mid."
+      params: {}
+    eligible_universe: "Price-time priority venues where queue position is observable or estimable from depth."
+    decision_timestamp_rule: "Queue position estimated from the book state at placement, not reconstructed after the fill."
+    outcome_horizons: [30s, 5m]
+    cost_model: "Maker rebate credited; adverse selection measured against arrival mid."
+    invalidation_conditions:
+      - "Monotonicity fails once instrument volatility is controlled for."
+      - "The venue is pro-rata, in which case queue position is not the relevant state."
+
+  - hypothesis_id: HY-STALE-PROBABILITY
+    concept_id: KC-PRED-LIQUIDITY-MOVE
+    market_context: "Prediction markets with thin books and intermittent flow."
+    causal_story: >
+      A price that has not traded since before a relevant news item is a stale quote rather than a
+      belief, and should revert or re-rate once attention returns.
+    ex_ante_prediction: >
+      Markets whose last trade predates the most recent relevant catalyst show larger subsequent
+      absolute price changes than markets that have traded since it, controlling for depth.
+    null_hypothesis: "Subsequent absolute price change is independent of staleness relative to the catalyst."
+    measurement_operator:
+      description: "Time since last trade versus catalyst timestamp; depth-weighted price change over the following window."
+      params: {}
+    eligible_universe: "Markets with an observable catalyst timeline and depth snapshots."
+    decision_timestamp_rule: "Catalyst and last-trade timestamps both strictly before the decision time."
+    outcome_horizons: [1h, 1d, to_resolution]
+    cost_model: "Both legs of the round trip at observed depth; capital held to resolution where applicable."
+    invalidation_conditions:
+      - "Staleness predicts change but not direction, so it is not tradable after costs."
+      - "The catalyst timeline is not reliable enough to define staleness."
+
+  - hypothesis_id: HY-XMKT-GAP
+    concept_id: KC-XMKT-CONSISTENCY
+    market_context: "The same event tradable on a prediction market and expressible on a perpetual venue."
+    causal_story: >
+      After fees, funding carry and resolution-basis adjustment, a persistent gap between implied
+      probabilities is either an executable inconsistency or an unread rules difference.
+    ex_ante_prediction: >
+      Cost-adjusted gaps above the round-trip execution cost on both legs close by at least half
+      before resolution.
+    null_hypothesis: "Cost-adjusted gap size does not predict subsequent convergence."
+    measurement_operator:
+      description: "Cost-adjusted gap using both venues' fee schedules and the perp funding rate; convergence measured to resolution."
+      params: {}
+    eligible_universe: "Event pairs whose resolution criteria have been read and recorded as equivalent."
+    decision_timestamp_rule: "Synchronized quotes within one second of the decision timestamp; funding rate as published at that time."
+    outcome_horizons: [1d, to_resolution]
+    cost_model: "Execution cost on both legs, funding carry to resolution, and margin capital cost."
+    invalidation_conditions:
+      - "Most gaps trace to resolution-criteria differences, which means the universe definition is wrong."
+      - "The cheap leg is not executable at the observed price often enough to matter."
+
+  - hypothesis_id: HY-AC-SCHEDULE
+    concept_id: KC-EXEC-AC
+    market_context: "Position exits large enough to move the book, worked over minutes."
+    causal_story: >
+      Scheduling the exit against a cost-variance trade-off should beat sending the whole order at
+      once or working it uniformly when volatility and impact are jointly considered.
+    ex_ante_prediction: >
+      Realized shortfall under the scheduled exit is lower than under immediate execution by more
+      than the added variance justifies, at the risk aversion implied by our sizing policy.
+    null_hypothesis: "Realized shortfall is the same under scheduled and immediate execution."
+    measurement_operator:
+      method_id: almgren_chriss_schedule
+      params: {intervals: 10}
+      derived: "realized shortfall versus arrival price; realized variance across the schedule"
+    eligible_universe: "Exits whose size exceeds one times displayed top-of-book depth."
+    decision_timestamp_rule: "Impact and volatility parameters estimated from data strictly before the schedule starts."
+    outcome_horizons: [execution_complete, 1h]
+    cost_model: "Fees per child order, plus permanent and temporary impact against arrival mid."
+    invalidation_conditions:
+      - "Impact is concave in this instrument, so the linear schedule trades too fast."
+      - "Information arriving mid-schedule dominates, meaning the stopping problem matters more than the schedule."

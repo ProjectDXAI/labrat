@@ -1,0 +1,270 @@
+# Labelled retrieval trials.
+#
+# Each trial is a decision context plus the concepts a competent analyst would
+# reach for. Negative trials (`applicable: false`) are the important half: they
+# are contexts where the honest answer is *nothing applies*, either because the
+# observables are not available, the market type is wrong, or the sources
+# postdate the decision. A similarity-only retriever will happily return
+# something for every one of them.
+#
+# This is the offline half of Gate 1. It measures whether a policy surfaces the
+# right mechanism and whether it knows when to stay quiet. It does not measure
+# whether the mechanism makes money — that needs Gates 2 and 3.
+
+trials:
+  - trial_id: T-ENTRY-OFI
+    applicable: true
+    gold_concept_ids: [KC-MICRO-OFI]
+    counterevidence_concept_ids: [KC-MICRO-MECHANICAL-FLOW]
+    note: "Classic short-horizon entry with a book. Counterevidence must raise mechanical flow."
+    context:
+      context_id: ctx-entry-ofi
+      timestamp: "2026-03-04T14:02:11Z"
+      market_type: perp_dex
+      instrument: "ETH-PERP"
+      decision_type: entry
+      horizon: minutes
+      observables_available: [l1_book, trade_prints, mid_price_series, fee_schedule, position_state]
+      tools_available: [order_flow_imbalance]
+      latency_budget_seconds: 2.0
+      uncertainties: ["is the bid queue building because someone is informed or because of scheduled hedging flow"]
+      state_notes: ["flat position", "spread one tick", "book has thinned over the last minute"]
+      question: "Should I take the long entry into this order book imbalance?"
+
+  - trial_id: T-ENTRY-COST
+    applicable: true
+    gold_concept_ids: [KC-COST-FLOOR]
+    note: "Short intended hold with a wide spread. The cost floor is the governing consideration."
+    context:
+      context_id: ctx-entry-cost
+      timestamp: "2026-03-04T15:20:00Z"
+      market_type: clob_crypto
+      instrument: "SOL-USD"
+      decision_type: entry
+      horizon: minutes
+      observables_available: [fee_schedule, l1_book, position_state, mid_price_series]
+      tools_available: []
+      latency_budget_seconds: 1.0
+      uncertainties: ["the edge estimate is small and the spread is wide right now", "funding carry over the intended hold"]
+      state_notes: ["intended hold under thirty minutes", "taker fee tier", "spread wide versus the recent distribution"]
+      question: "Is this entry worth the round-trip cost?"
+
+  - trial_id: T-EXIT-GIVEBACK
+    applicable: true
+    gold_concept_ids: [KC-STOP-CONTINUATION]
+    counterevidence_concept_ids: [KC-REGIME-PERSISTENCE]
+    note: "The giveback case. Counterevidence must be the persistence argument, not more stopping theory."
+    context:
+      context_id: ctx-exit-giveback
+      timestamp: "2026-03-05T09:40:00Z"
+      market_type: perp_dex
+      instrument: "BTC-PERP"
+      decision_type: exit
+      horizon: hours
+      observables_available: [position_state, mfe_history, episode_history, mid_price_series, fee_schedule]
+      tools_available: [continuation_hazard]
+      latency_budget_seconds: 5.0
+      uncertainties: ["the position has given back a third of its maximum favourable excursion", "whether a further excursion is likely"]
+      state_notes: ["long, in profit", "no fresh catalyst since entry"]
+      question: "Do I close here or keep holding?"
+
+  - trial_id: T-HOLD-REGIME
+    applicable: true
+    gold_concept_ids: [KC-FILTER-STATE, KC-REGIME-PERSISTENCE]
+    note: "Hold decision where the question is whether the state has changed."
+    context:
+      context_id: ctx-hold-regime
+      timestamp: "2026-03-05T11:05:00Z"
+      market_type: clob_futures
+      instrument: "ES"
+      decision_type: hold
+      horizon: hours
+      observables_available: [mid_price_series, volatility_estimate, episode_history, position_state]
+      tools_available: [kalman_local_level]
+      latency_budget_seconds: 3.0
+      uncertainties: ["is the level break real or is this noise", "has the entry thesis decayed"]
+      state_notes: ["position held four hours", "volatility rising"]
+      question: "Has the state changed enough that the thesis no longer holds?"
+
+  - trial_id: T-EXIT-CHANGEPOINT
+    applicable: true
+    gold_concept_ids: [KC-DETECT-CUSUM]
+    note: "Sequential detection framing: the cost of a late exit versus a false alarm."
+    context:
+      context_id: ctx-exit-changepoint
+      timestamp: "2026-03-05T13:15:00Z"
+      market_type: clob_crypto
+      instrument: "ETH-USD"
+      decision_type: exit
+      horizon: minutes
+      observables_available: [mid_price_series, position_state, fee_schedule]
+      tools_available: [cusum_changepoint]
+      latency_budget_seconds: 2.0
+      uncertainties: ["the series looks like it has shifted level but the move is small", "detection delay versus false alarm cost"]
+      state_notes: ["short position", "entered on a catalyst two hours ago"]
+      question: "Has the process shifted against the position?"
+
+  - trial_id: T-SIZING-IMPACT
+    applicable: true
+    gold_concept_ids: [KC-INFO-KYLE, KC-IMPACT-SQRT]
+    note: "Sizing against expected impact; both the linear and the concave account should be reachable."
+    context:
+      context_id: ctx-sizing-impact
+      timestamp: "2026-03-06T10:00:00Z"
+      market_type: clob_futures
+      instrument: "CL"
+      decision_type: sizing
+      horizon: hours
+      observables_available: [signed_volume, mid_price_series, volatility_estimate, position_state]
+      tools_available: [kyle_lambda]
+      latency_budget_seconds: 4.0
+      uncertainties: ["how much the intended size will move the price", "whether impact is linear at this participation rate"]
+      state_notes: ["intended size is several times displayed depth"]
+      question: "How large can this position be before impact eats the edge?"
+
+  - trial_id: T-EXIT-SCHEDULE
+    applicable: true
+    gold_concept_ids: [KC-EXEC-AC]
+    note: "Working a large exit; the cost-variance trade-off is the mechanism."
+    context:
+      context_id: ctx-exit-schedule
+      timestamp: "2026-03-06T14:30:00Z"
+      market_type: clob_equities
+      instrument: "MSFT"
+      decision_type: exit
+      horizon: minutes
+      observables_available: [mid_price_series, volatility_estimate, position_state, fee_schedule]
+      tools_available: [almgren_chriss_schedule]
+      latency_budget_seconds: 5.0
+      uncertainties: ["how fast to work the exit given volatility", "whether to send it at once"]
+      state_notes: ["exit size is many times displayed depth", "no scheduled catalyst in the next hour"]
+      question: "Over what horizon should this exit be worked?"
+
+  - trial_id: T-MM-INVENTORY
+    applicable: true
+    gold_concept_ids: [KC-MM-INVENTORY]
+    note: "Quoting with inventory on a perp venue; funding is the known gap in the model."
+    context:
+      context_id: ctx-mm-inventory
+      timestamp: "2026-03-06T16:00:00Z"
+      market_type: perp_dex
+      instrument: "ETH-PERP"
+      decision_type: sizing
+      horizon: minutes
+      observables_available: [l1_book, position_state, volatility_estimate, funding_rate]
+      tools_available: [avellaneda_stoikov_quotes]
+      latency_budget_seconds: 1.0
+      uncertainties: ["how far to skew quotes with the inventory currently held", "how wide to quote given volatility"]
+      state_notes: ["long inventory near half the risk limit", "two-sided flow"]
+      question: "Where should I quote given this inventory?"
+
+  - trial_id: T-PRED-STALE
+    applicable: true
+    gold_concept_ids: [KC-PRED-LIQUIDITY-MOVE]
+    note: "Thin prediction market that has moved without flow."
+    context:
+      context_id: ctx-pred-stale
+      timestamp: "2026-03-07T18:45:00Z"
+      market_type: prediction_market
+      instrument: "election-outcome-x"
+      decision_type: entry
+      horizon: days
+      observables_available: [market_probability, orderbook_depth, trade_prints]
+      tools_available: []
+      latency_budget_seconds: 10.0
+      uncertainties: ["did the probability move because beliefs changed or because one order walked a thin book"]
+      state_notes: ["last trade predates the most recent relevant news", "depth is thin on both sides"]
+      question: "Is this probability a belief or a stale quote?"
+
+  - trial_id: T-XMKT-GAP
+    applicable: true
+    gold_concept_ids: [KC-XMKT-CONSISTENCY]
+    note: "Cross-venue gap where funding carry and resolution basis decide whether it is real."
+    context:
+      context_id: ctx-xmkt-gap
+      timestamp: "2026-03-07T20:10:00Z"
+      market_type: prediction_market
+      instrument: "event-y (prediction market vs perp proxy)"
+      decision_type: entry
+      horizon: days
+      observables_available: [cross_market_quotes, market_probability, fee_schedule, funding_rate]
+      tools_available: []
+      latency_budget_seconds: 10.0
+      uncertainties: ["is the gap between the two venues executable after fees and funding", "do the resolution criteria match"]
+      state_notes: ["both venues quoting the same event", "gap has persisted for hours"]
+      question: "Is this cross-venue probability gap tradable?"
+
+  # ------------------------------------------------------------------
+  # Negatives: the honest answer is that nothing applies.
+  # ------------------------------------------------------------------
+  - trial_id: T-NEG-NO-BOOK
+    applicable: false
+    gold_concept_ids: []
+    note: "Daily bars only. Every microstructure concept needs book data that does not exist here."
+    context:
+      context_id: ctx-neg-no-book
+      timestamp: "2026-03-08T00:00:00Z"
+      market_type: clob_equities
+      instrument: "small-cap-z"
+      decision_type: entry
+      horizon: days
+      observables_available: [mid_price_series]
+      tools_available: []
+      latency_budget_seconds: 30.0
+      uncertainties: ["whether the order book is imbalanced", "queue position for a passive entry"]
+      state_notes: ["only end-of-day bars are available for this name"]
+      question: "Is the order book imbalanced enough to justify a passive entry at the front of the queue?"
+
+  - trial_id: T-NEG-NO-OBSERVABLES
+    applicable: false
+    gold_concept_ids: []
+    note: "No observables at all. Nothing can be computed, so nothing should be served."
+    context:
+      context_id: ctx-neg-no-observables
+      timestamp: "2026-03-08T01:00:00Z"
+      market_type: clob_crypto
+      instrument: "unknown"
+      decision_type: abstain
+      horizon: hours
+      observables_available: []
+      tools_available: []
+      latency_budget_seconds: 5.0
+      uncertainties: ["everything"]
+      state_notes: ["market data feed is down"]
+      question: "Should I be trading right now?"
+
+  - trial_id: T-NEG-BEFORE-SOURCES
+    applicable: false
+    gold_concept_ids: []
+    note: "Point-in-time discipline: a 1975 decision cannot be informed by sources published later."
+    context:
+      context_id: ctx-neg-before-sources
+      timestamp: "1975-06-01T00:00:00Z"
+      market_type: clob_equities
+      instrument: "historical-replay"
+      decision_type: entry
+      horizon: minutes
+      observables_available: [l1_book, trade_prints, mid_price_series]
+      tools_available: [order_flow_imbalance]
+      latency_budget_seconds: 5.0
+      uncertainties: ["order book imbalance and adverse selection"]
+      state_notes: ["historical replay before any of the mapped sources existed"]
+      question: "Does order flow imbalance predict the next move?"
+
+  - trial_id: T-NEG-WRONG-MARKET
+    applicable: false
+    gold_concept_ids: []
+    note: "Scoring-rule mechanics asked about a venue type where no compiled concept applies without the required observables."
+    context:
+      context_id: ctx-neg-wrong-market
+      timestamp: "2026-03-08T02:00:00Z"
+      market_type: dealer_market
+      instrument: "otc-forward"
+      decision_type: sizing
+      horizon: weeks
+      observables_available: [market_probability]
+      tools_available: [lmsr_binary]
+      latency_budget_seconds: 20.0
+      uncertainties: ["cost of moving an automated market maker's quoted probability"]
+      state_notes: ["bilateral dealer quote, no automated maker behind it"]
+      question: "What does it cost to move the scoring-rule price to 0.75?"

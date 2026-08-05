@@ -1,0 +1,244 @@
+mission: >
+  Find the retrieval policy that puts the right mechanism, its assumptions and its counterevidence
+  in front of a decision — and stays quiet when nothing applies — at the smallest context cost.
+  Beat plain passage-similarity retrieval on precision, abstention and counterevidence, not on hit rate.
+
+production_baseline:
+  experiment_id: "baseline_raw_similarity"
+  description: >
+    Passage-similarity retrieval with no structural filters, no counterevidence requirement and no
+    abstention: return the top five most textually similar cards for every context. This is what a
+    plain RAG layer over the same material would serve.
+  resource_class: "cpu"
+  config:
+    knowledge:
+      dir: "knowledge"
+    policy:
+      base: "raw_similarity"
+  seed_metrics:
+    search_eval: 0.0
+    selection_eval: 0.0
+    final_eval: 0.0
+
+families:
+
+  structural_filtering:
+    description: "Hard filters before scoring: market type, horizon, observables actually available, source availability as of the decision timestamp, decision type."
+    scientific_rationale: >
+      A nearest-neighbour match is selected because words resemble the query, not because the
+      mechanism applies to this market, this horizon, this data or this position state. Filtering
+      first should raise precision far more than it costs in hit rate.
+    decisive_challenge_claim: >
+      Filtering should win non_applicability outright: a policy that cannot see that the required
+      observables are missing has no way to abstain for the right reason.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "filters_on"
+        description: "Hard filters on, everything else as the baseline."
+        config_patch:
+          policy:
+            base: "filtered_only"
+      - name: "filters_off_tight_k"
+        description: "No filters but a tighter k, to separate filtering from simply returning less."
+        config_patch:
+          policy:
+            base: "raw_similarity"
+            k: 2
+    mutation_policy:
+      axes:
+        - path: "policy.filters"
+          values: [true, false]
+        - path: "policy.k"
+          values: [2, 3, 5]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["decision_value_rerank", "abstention_calibration"]
+      config_patch:
+        policy:
+          filters: true
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  decision_value_rerank:
+    description: "Re-rank surviving candidates by estimated decision value rather than textual similarity alone."
+    scientific_rationale: >
+      Relevance is only one term. A concept we cannot compute evidence for, that nothing would
+      falsify, or that has never changed a decision, is worth less than its word overlap suggests.
+      The multiplicative form means any near-zero term kills the card, which is the intent.
+    decisive_challenge_claim: >
+      Re-ranking should raise precision without lowering hit rate, because it demotes cards that
+      match the words while failing on availability or falsifiability.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "full_decision_value"
+        description: "All four value terms at full weight."
+        config_patch:
+          policy:
+            base: "decision_value"
+      - name: "availability_only"
+        description: "Relevance and evidence availability only, to isolate the computability term."
+        config_patch:
+          policy:
+            base: "decision_value"
+            weights:
+              falsifiability: 0.0
+              historical_utility: 0.0
+    mutation_policy:
+      axes:
+        - path: "policy.weights.evidence_availability"
+          values: [0.0, 0.5, 1.0]
+        - path: "policy.weights.falsifiability"
+          values: [0.0, 0.5, 1.0]
+        - path: "policy.weights.historical_utility"
+          values: [0.0, 0.5, 1.0]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["structural_filtering"]
+      config_patch:
+        policy:
+          filters: true
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  counterevidence_expansion:
+    description: "One-hop expansion into contradicting concepts, load-bearing assumptions and failure modes."
+    scientific_rationale: >
+      Retrieval that only returns support is a confirmation engine. Expanding one hop into the
+      concept graph is where a graph earns its place — not as the default live retrieval mechanism,
+      but as the source of the argument against.
+    decisive_challenge_claim: >
+      This family should own counterevidence_coverage, and it should hold that lead even when
+      the packet is trimmed to two cards.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "require_counterevidence"
+        description: "Refuse to serve a packet with no counterevidence in it."
+        config_patch:
+          policy:
+            base: "decision_value"
+            expand_hops: 1
+            require_counterevidence: true
+      - name: "expansion_without_requirement"
+        description: "Expand, but serve even when the expansion comes back empty."
+        config_patch:
+          policy:
+            base: "decision_value"
+            expand_hops: 1
+            require_counterevidence: false
+    mutation_policy:
+      axes:
+        - path: "policy.expand_hops"
+          values: [0, 1]
+        - path: "policy.require_counterevidence"
+          values: [true, false]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["decision_value_rerank"]
+      config_patch:
+        policy:
+          expand_hops: 1
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0
+
+  abstention_calibration:
+    description: "Where to put the applicability threshold: the cost of serving a marginal card against the cost of staying quiet."
+    scientific_rationale: >
+      Abstention is a result, not a failure. But an over-cautious threshold silently removes the
+      knowledge layer from most decisions, which looks identical to having no corpus at all.
+      The trial set contains both applicable and inapplicable contexts so the trade-off is visible.
+    decisive_challenge_claim: >
+      A well-placed threshold should hold non_applicability at one while keeping the false
+      abstention rate near zero. Any policy that buys the first by sacrificing the second is
+      cheating on the challenge, and selection_eval will show it.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "conservative"
+        description: "High threshold, small packet."
+        config_patch:
+          policy:
+            base: "conservative_abstain"
+      - name: "permissive"
+        description: "Low threshold, wider packet."
+        config_patch:
+          policy:
+            base: "decision_value_wide"
+    mutation_policy:
+      axes:
+        - path: "policy.abstain_threshold"
+          values: [0.05, 0.15, 0.25, 0.35]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0
+
+  context_economy:
+    description: "Packet size and diversity: how much context the knowledge layer is allowed to spend per decision."
+    scientific_rationale: >
+      Every card served costs context the agent needs for the decision itself. Redundant cards cost
+      the same as informative ones, so diversity control should buy precision per token rather than
+      per card.
+    decisive_challenge_claim: >
+      This family should match the wider policies' hit rate at materially lower context cost. If it
+      cannot, packet size was never the binding constraint and the family should be defunded.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "diverse_small"
+        description: "Two cards with strong diversity pressure."
+        config_patch:
+          policy:
+            base: "decision_value"
+            k: 2
+            mmr_lambda: 0.5
+      - name: "redundant_small"
+        description: "Two cards with no diversity pressure, to isolate the effect of MMR."
+        config_patch:
+          policy:
+            base: "decision_value"
+            k: 2
+            mmr_lambda: 1.0
+    mutation_policy:
+      axes:
+        - path: "policy.mmr_lambda"
+          values: [0.5, 0.75, 1.0]
+        - path: "policy.context_budget_cards"
+          values: [2, 3, 5]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["decision_value_rerank"]
+      config_patch:
+        policy:
+          mmr_lambda: 0.75
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 - 2026-08-05
+
+- Added the executable-bibliography layer: `scripts/knowledge.py` compiles sources into concept, hypothesis, method-binding and decision-relevance cards behind a SERVABLE gate that requires a mechanism, assumptions, observables, an expected signature, counterevidence, and resolvable source anchors — and refuses a verbatim quote from a source whose rights do not permit it.
+- Added `scripts/methods.py`: eight deterministic, versioned market methods (order flow imbalance, Kyle's lambda, Avellaneda-Stoikov quotes, Almgren-Chriss schedule, local-level Kalman filter, CUSUM change detection, continuation hazard, binary LMSR), each declaring its as-of contract and numerical failure modes, each with closed-form self-tests. Method bindings pin the implementation version, so a numerical change fails validation until the card is re-verified.
+- Added structured retrieval: hard structural filters (market, horizon, available observables, point-in-time source availability, decision type) before scoring, a decision-value re-rank, MMR diversity, explicit abstention, and a one-hop expansion that must carry counterevidence.
+- Added `scripts/ledger.py`: the offered-to-beneficial attribution ladder, deterministic arm assignment, cluster-level bootstrap comparison, and utility posteriors — refusing to estimate an effect on unmatured outcomes or an unfrozen batch.
+- Added `scripts/graphops.py`: personalized PageRank, Brandes betweenness, co-citation, bibliographic coupling, deterministic communities, MMR and greedy submodular coverage, all self-tested on hand-computable graphs.
+- Added the `dxap-knowledge` profile: 16 concept cards, 8 hypotheses, 8 method bindings, 18 decision-relevance cards and 14 labelled retrieval trials across four verticals. Candidates are retrieval policies; decisive challenges are correct abstention on inapplicable contexts and counterevidence coverage.
+- Profiles now stack: repeat `--profile` to overlay several, later profiles winning on conflicting files.
+- Added `docs/KNOWLEDGE.md`, `make smoke-knowledge` and `make selftest`; `make test` now runs every smoke path.
+
 ## 0.3.0 - 2026-08-05
 
 - Added `labrat corpus`: bibliography network mapping, iterative scouting rounds, and form/rights tagging, with a rights-gated build manifest that only admits entries carrying confirmed rights, an evidence URL, and a check date.

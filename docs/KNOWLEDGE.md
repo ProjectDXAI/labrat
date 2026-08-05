@@ -1,0 +1,209 @@
+# Executable bibliography
+
+The corpus engine ([docs/CORPUS.md](CORPUS.md)) answers *what exists and what may we use*. This layer answers *what does it claim, how would we test it, what would falsify it, and which of it applies to the decision in front of us right now*.
+
+```
+source -> mechanism -> assumptions -> observable signature
+       -> deterministic test -> decision relevance -> realized outcome
+```
+
+That chain is materially different from putting books in a vector database. A passage tells an agent that order flow may contain information. A compiled concept card tells it under what assumptions that holds, which observables separate informed from mechanical flow, which tested function to run on the data actually available, over what horizon the prediction applies, what would falsify it, whether it bears on entry, sizing, exit or abstention, and which source anchors support it.
+
+## The architecture in one line
+
+**Graph for discovering material → compiler for turning it into falsifiable concepts → filtered retrieval for selecting relevant ones → deterministic tools for calculating evidence → an attribution ledger for learning whether it paid.**
+
+Retrieval is one component, not the approach:
+
+| Layer | Role | Where it lives |
+|---|---|---|
+| Bibliographic graph | Discover sources, traverse relationships | `corpus.py`, `graphops.py` — offline |
+| Concept compiler | Mechanisms, assumptions, tests, failure modes | `knowledge.py` — offline |
+| Structured concept retrieval | Deliver mechanisms with counterevidence | `knowledge.py retrieve` — online |
+| Deterministic methods | Apply the mathematics to current data | `methods.py` — online, called not re-derived |
+| Attribution ledger | Learn what actually changed a decision, and whether it paid | `ledger.py` — offline, post-maturity |
+| Raw passage retrieval | Quote source material | the `raw_similarity` arm — experimental control only |
+
+The graph is the research control plane. The live data plane is metadata-filtered retrieval with a one-hop expansion for counterevidence — not graph traversal, which pulls in irrelevant neighbourhoods and costs latency a decision context rarely recovers.
+
+## The object model
+
+### Concept card
+
+What a mechanism claims, in our own words, anchored to a source.
+
+```yaml
+concept_id: KC-MICRO-OFI
+canonical_name: "Order flow imbalance as a short-horizon price predictor"
+mechanism: "Price at the top of book moves when one side's queue is depleted relative to the other…"
+assumptions: ["Top-of-book updates observed without material gaps", …]
+market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+relevant_horizons: [tick, seconds, minutes]
+required_observables: [l1_book]              # becomes a hard retrieval filter
+expected_empirical_signature: "Roughly linear relation between interval OFI and mid-price change…"
+alternative_explanations: ["Mechanical or hedging flow produces the same imbalance with no information"]
+known_failure_modes: ["Spoofed quotes inflate queue changes", …]
+contradicting_concept_ids: [KC-MICRO-MECHANICAL-FLOW]
+source_passage_ids: ["cont-2014-price-impact-order-book-events#s2-3"]
+implementation_status: implemented
+confidence: 0.7
+problem_ids: [PB-ADVERSE-ENTRY, PB-COST-DRAG]
+```
+
+### Hypothesis card
+
+What makes the concept testable here: market context, causal story, ex-ante prediction, null, measurement operator, eligible universe, decision-timestamp rule, outcome horizons, **cost model**, invalidation conditions. A prediction without a cost model is rejected — it is not a testable trading claim.
+
+### Method object
+
+A binding from a concept to a versioned, tested implementation in `methods.py`. The version is pinned: if the implementation changes version, validation fails until someone re-verifies the card. A silent numerical change under a stable card is how a knowledge base quietly becomes wrong.
+
+Shipped implementations, each with a closed-form self-test: `order_flow_imbalance`, `kyle_lambda`, `avellaneda_stoikov_quotes`, `almgren_chriss_schedule`, `kalman_local_level`, `cusum_changepoint`, `continuation_hazard`, `lmsr_binary`. Every one declares its as-of contract — what it is allowed to see relative to the decision timestamp — and its known numerical failure modes.
+
+### Decision-relevance card
+
+Connects a concept to a decision type without turning a claim into a strategy. Both halves required: what would support the action, and what would argue against it.
+
+> **Wrong:** "Close the position after it gives back a third of its maximum favourable excursion."
+>
+> **Right:** "Estimate the conditional probability of a further favourable excursion given drawdown from MFE, flow innovation, spread, time since catalyst and regime. Compare continuation value against execution and opportunity cost."
+
+The source generates a question and an operator, not an unearned rule. The validator lints for unconditional directive language.
+
+### The SERVABLE gate
+
+A card is retrievable only when it has every required field, at least one contradicting concept or alternative explanation, source anchors that resolve to non-excluded bibliography entries, no verbatim quote from a source whose rights forbid it, and — if it claims an implementation — a method binding at the registered version.
+
+The counterevidence requirement is structural, not stylistic. A retrieval layer that can only confirm will confirm whatever the agent already wanted to do, with citations attached.
+
+## Retrieval
+
+```bash
+python scripts/knowledge.py retrieve --context ctx.json --policy decision_value --markdown
+```
+
+1. **Hard filters first.** Market type, horizon, required observables actually available, source published as of the decision timestamp, decision type, retirement status, latency budget. This is where a 2025 book is kept out of a 2024 decision.
+2. **Lexical scoring** (BM25 over card fields, name and observables boosted) — one term, not the ranking.
+3. **Decision-value re-rank.**
+
+   ```
+   R(c|x) = relevance × evidence availability × falsifiability × historical utility
+            − latency − context cost
+   ```
+
+   Multiplicative, so a near-zero term kills the card: a concept nothing would falsify, or one we cannot compute evidence for with the tools on hand, is worth less than its word overlap suggests. `historical utility` reads a posterior the ledger wrote from matured outcomes; with no evidence it returns the author's confidence shrunk toward 0.5, so prestige cannot masquerade as track record.
+4. **Diversity** via MMR, because five restatements of one mechanism cost the same context as five different ones.
+5. **Abstain** below threshold. Abstention is a result.
+6. **One-hop counterevidence**: a contradicting concept, an alternative explanation, a failure mode, a load-bearing assumption. With `require_counterevidence`, a packet that cannot carry any is not served at all.
+
+The output is an evidence packet — a few hundred tokens of mechanism, assumptions, signature, methods to run, decision relevance and counterevidence — not forty pages of textbook.
+
+## Measuring whether it works: three gates
+
+### Gate 1 — does the corpus add capability?
+
+Not a trading test. Arms: closed-book, raw passage retrieval, compiled cards, compiled cards plus tools. Hold out complete authors or books, never random passages, or near-duplicate leakage inflates every number.
+
+The **offline half runs in this repo**: `knowledge.py evaluate` scores retrieval policies against a labelled trial set of decision contexts, including contexts where the honest answer is that nothing applies. On the shipped seed:
+
+| Policy | hit | precision | correct abstention | counterevidence | tokens |
+|---|---|---|---|---|---|
+| `raw_similarity` | 1.00 | 0.24 | 0.00 | 0.00 | 3.14k |
+| `filtered_only` | 1.00 | 0.80 | 1.00 | 0.00 | 0.99k |
+| `decision_value` | 0.90 | 1.00 | 1.00 | 1.00 | 0.63k |
+| `conservative_abstain` | 0.40 | 1.00 | 1.00 | 1.00 | 0.66k |
+
+Plain similarity retrieval has a perfect hit rate and answers *every* inapplicable context, including one timestamped before its sources were written. It looks like it is working. That is the point of the control arm.
+
+The other half of Gate 1 — mathematical interpretation, assumption identification, diagnostic selection, recognizing non-applicability, transfer to a real trace, counterexample detection — needs a model in the loop and lives outside this repo.
+
+### Gate 2 — does it change behaviour, for defensible reasons?
+
+Exact production contexts from real decision traces, with real tool outputs. Arms: baseline, **sham retrieval** (plausible but unrelated cards, matched for length and style), raw passages, compiled cards, compiled cards plus tools.
+
+The sham arm is not optional. Without it, any measured change may be the generic effect of making the model deliberate longer.
+
+Measure tool calls, evidence quality, factual and source errors, unsupported assumptions, action differences, sizing differences, turnover, calibration, and whether the retrieved concept was actually applicable. This is a behavioural intervention, not economic causality — fixed historical contexts cannot reproduce path-dependent consequences of orders, fills, memory and subsequent states.
+
+### Gate 3 — does it improve prospective ROI?
+
+A randomized native trial: same prompt template, same model, same research children and tools, branch-isolated paper accounts, independent memory and triggers, strict as-of availability, positions marked to market at horizon, **no policy or retrieval update before the batch matures**.
+
+Randomize at the rollout or branch-day level. Decisions within an account path are not independent, and inference must be clustered at the unit of randomization — thousands of wakes are not thousands of observations.
+
+`ledger.py` implements this side:
+
+```bash
+python scripts/ledger.py assign --units branches.json --arm baseline --arm treatment --seed dxap-2026
+python scripts/ledger.py ladder                 # offered -> ... -> economically beneficial
+python scripts/ledger.py analyze --cluster-field branch_id --control-arm baseline
+python scripts/ledger.py utility                # writes the retrieval re-ranking posterior
+```
+
+`analyze` **refuses** to compute an effect on unmatured outcomes or an unfrozen batch. That refusal is the module's main job: an effect estimated mid-batch, then fed back into retrieval, is exactly the artifact the ledger exists to prevent.
+
+## The attribution ladder
+
+Self-reported "I used the source" is not evidence. The ledger counts each rung separately:
+
+```
+offered -> served -> inspected -> semantically used -> tool-changing
+        -> behaviour-changing -> economically beneficial
+```
+
+Only the last rung requires matured outcomes, and only a randomized comparison licenses the word "beneficial". A card that is offered a thousand times, opened twice and never changes a decision is not knowledge the agent has — it is context the agent pays for.
+
+## Ranking what to compile next
+
+```bash
+python scripts/knowledge.py compile-queue --limit 25
+```
+
+```
+V(s) = P(new capability) × P(behaviour change | capability) × P(net gain | change)
+       − processing cost − redundancy − misapplication risk
+```
+
+Before outcomes exist these are component priors: **problem proximity** (personalized PageRank seeded on the problem map, so a source ranks by closeness to a problem we actually have rather than by citation count), mechanistic density, analyst priority, likely pretraining scarcity, cross-bucket bridge value (betweenness — structural holes are where transfer lives), accessibility, minus processing cost and redundancy with what is already compiled.
+
+Likely pretraining scarcity is an **access-friction proxy, never an observation**. No one can see a closed model's training set. Paywalled, library-only and out-of-print material is more likely to be thin in pretraining — and a rare bad book is still a bad book, which is why scarcity carries a small weight.
+
+Output is chapter-level and comes in six queues: human foundation spine, machine reading, rare source, contradiction, implementation, and experiment — plus the minimum set of sources covering the whole problem map, chosen by greedy submodular coverage rather than by rank.
+
+## Running it as a lab
+
+```bash
+labrat new my_dxap --profile=quant-finance-corpus --profile=dxap-knowledge
+cd my_dxap
+python scripts/knowledge.py validate      # the SERVABLE gate
+python scripts/knowledge.py status        # problem coverage and gaps
+python scripts/methods.py self-test       # every method's closed-form checks
+python scripts/bootstrap.py               # candidates are retrieval policies
+```
+
+Profiles stack; later profiles win on conflicting files. The knowledge profile needs the corpus profile underneath it, because source anchors resolve against `corpus/bibliography.yaml`.
+
+Candidates are retrieval policies. Families are the structural disciplines competing to explain the improvement: `structural_filtering`, `decision_value_rerank`, `counterevidence_expansion`, `abstention_calibration`, `context_economy`. The decisive challenges are `non_applicability` and `counterevidence_coverage` — both things similarity scoring cannot win, since a nearest neighbour is always available.
+
+Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-second deterministic evaluation.
+
+## Command reference
+
+| Command | Does |
+|---|---|
+| `knowledge.py validate` | SERVABLE gate over every card; non-zero exit on failure |
+| `knowledge.py status` | Problem coverage, missing methods, missing hypotheses |
+| `knowledge.py retrieve --context c.json [--policy p] [--markdown]` | Build an evidence packet |
+| `knowledge.py evaluate [--policy p]` | Score policies against the labelled trials |
+| `knowledge.py compile-queue [--limit n]` | Rank what to read and compile next |
+| `knowledge.py vocab` | Card vocabularies and the gate's conditions |
+| `methods.py list / show / run / self-test` | The deterministic method registry |
+| `ledger.py record / ladder / analyze / utility / assign` | Attribution and randomized analysis |
+| `graphops.py self-test` | PageRank, betweenness, co-citation, coupling, communities, MMR, coverage |
+
+## What this repo deliberately does not do
+
+- **No fine-tuning.** Structured external memory first; weight adaptation only after the gates identify which knowledge families change behaviour and improve outcomes.
+- **No live self-modifying retrieval.** `historical_utility` reads a frozen posterior, never results from inside the current batch.
+- **No trading claims from Gate 1.** Retrieval quality against expert labels is a precondition, not a result.
+- **No vector index or database.** The retrieval layer is deliberately small and dependency-free so it can be read and audited. A hybrid lexical/vector index slots in behind the same interface when the card count justifies it; the filters and the re-rank do not change.
