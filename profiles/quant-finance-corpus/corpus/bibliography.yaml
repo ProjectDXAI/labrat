@@ -2633,3 +2633,1293 @@ entries:
     rights: {status: proprietary_confidential, confidence: inferred, notes: "Confidential internal material. Excluded by policy: do not acquire, do not cite, do not ingest. Kept as an entry so the exclusion is recorded rather than rediscovered each round."}
     acquisition: {state: unavailable}
     tags: [excluded, policy-example]
+
+  # ------------------------------------------------------------------
+  # mathematical_foundations
+  # ------------------------------------------------------------------
+  - id: daley-2003-point-processes-vol1
+    title: "An Introduction to the Theory of Point Processes, Volume I: Elementary Theory and Methods"
+    authors: [D. J. Daley, David Vere-Jones]
+    year: 2003
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Springer
+    pages: 469
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [point-processes, intensity, foundations, order-flow-relevant]
+    refs:
+      - {target: bremaud-1981-point-processes-queues, relation: cites}
+      - {target: "Daley & Vere-Jones — An Introduction to the Theory of Point Processes, Volume II", relation: builds_on, bucket: mathematical_foundations}
+
+  - id: bremaud-1981-point-processes-queues
+    title: "Point Processes and Queues: Martingale Dynamics"
+    authors: [Pierre Brémaud]
+    year: 1981
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 354
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [point-processes, martingales, queueing, bridge]
+    refs:
+      - {target: kleinrock-1975-queueing-systems-vol1, relation: syllabus_with}
+
+  - id: hawkes-1971-spectra-self-exciting
+    title: "Spectra of Some Self-Exciting and Mutually Exciting Point Processes"
+    authors: [Alan G. Hawkes]
+    year: 1971
+    bucket: mathematical_foundations
+    form: paper
+    venue: Biometrika
+    pages: 9
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [hawkes, self-excitation, foundational]
+
+  - id: bacry-2015-hawkes-processes-finance
+    title: "Hawkes Processes in Finance"
+    authors: [Emmanuel Bacry, Iacopo Mastromatteo, Jean-François Muzy]
+    year: 2015
+    bucket: mathematical_foundations
+    form: survey
+    venue: "Market Microstructure and Liquidity"
+    pages: 46
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv preprint exists; check its licence."}
+    acquisition: {state: open_url}
+    tags: [hawkes, order-flow, clustering, high-value-target]
+    refs:
+      - {target: hawkes-1971-spectra-self-exciting, relation: builds_on}
+      - {target: cont-2010-stochastic-model-order-book, relation: cites}
+      - {target: jaisson-2015-nearly-unstable-hawkes, relation: cites}
+      - {target: "Bowsher — Modelling security market events in continuous time", relation: cites, bucket: mathematical_foundations}
+
+  - id: jaisson-2015-nearly-unstable-hawkes
+    title: "Limit Theorems for Nearly Unstable Hawkes Processes"
+    authors: [Thibault Jaisson, Mathieu Rosenbaum]
+    year: 2015
+    bucket: mathematical_foundations
+    form: paper
+    venue: Annals of Applied Probability
+    pages: 34
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [hawkes, scaling-limits, rough-volatility-bridge]
+    refs:
+      - {target: gatheral-2018-volatility-is-rough, relation: cites}
+
+  - id: friz-2020-course-rough-paths
+    title: "A Course on Rough Paths: With an Introduction to Regularity Structures"
+    authors: [Peter K. Friz, Martin Hairer]
+    year: 2020
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Springer
+    pages: 346
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author-hosted drafts have circulated; check terms."}
+    acquisition: {state: purchasable}
+    tags: [rough-paths, path-dependence, signatures]
+    refs:
+      - {target: lyons-2007-differential-equations-rough-paths, relation: builds_on}
+
+  - id: lyons-2007-differential-equations-rough-paths
+    title: "Differential Equations Driven by Rough Paths"
+    authors: [Terry Lyons, Michael Caruana, Thierry Lévy]
+    year: 2007
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 109
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [rough-paths, foundations]
+
+  - id: chevyrev-2016-signature-method-primer
+    title: "A Primer on the Signature Method in Machine Learning"
+    authors: [Ilya Chevyrev, Andrey Kormilitzin]
+    year: 2016
+    bucket: mathematical_foundations
+    form: working_paper
+    venue: arXiv
+    pages: 45
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv; the per-paper licence decides reuse, not the platform."}
+    acquisition: {state: open_url}
+    tags: [signatures, path-features, machine-learning, high-value-target]
+    refs:
+      - {target: lyons-2007-differential-equations-rough-paths, relation: builds_on}
+      - {target: "Levin, Lyons & Ni — Learning from the past, predicting the statistics for the future", relation: cites, bucket: machine_learning_frontier}
+
+  - id: villani-2009-optimal-transport
+    title: "Optimal Transport: Old and New"
+    authors: [Cédric Villani]
+    year: 2009
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 973
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "A widely circulated author PDF exists; verify the permission."}
+    acquisition: {state: purchasable}
+    tags: [optimal-transport, wasserstein, foundations]
+
+  - id: peyre-2019-computational-optimal-transport
+    title: "Computational Optimal Transport"
+    authors: [Gabriel Peyré, Marco Cuturi]
+    year: 2019
+    bucket: mathematical_foundations
+    form: monograph
+    venue: "Foundations and Trends in Machine Learning"
+    pages: 257
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors host the full text; check whether an open licence is stated."}
+    acquisition: {state: open_url}
+    tags: [optimal-transport, sinkhorn, distribution-comparison, high-value-target]
+    refs:
+      - {target: villani-2009-optimal-transport, relation: builds_on}
+      - {target: "Mohajerin Esfahani & Kuhn — Data-driven distributionally robust optimization using the Wasserstein metric", relation: cites, bucket: operations_research}
+
+  - id: carmona-2018-mean-field-games-i
+    title: "Probabilistic Theory of Mean Field Games with Applications I"
+    authors: [René Carmona, François Delarue]
+    year: 2018
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 713
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [mean-field-games, many-agent, crowded-trades, bridge]
+    refs:
+      - {target: cardaliaguet-2013-mean-field-games-notes, relation: syllabus_with}
+      - {target: "Cardaliaguet & Lehalle — Mean field game of controls and an application to trade crowding", relation: cites, bucket: market_microstructure}
+
+  - id: cardaliaguet-2013-mean-field-games-notes
+    title: "Notes on Mean Field Games (from P.-L. Lions' lectures at Collège de France)"
+    authors: [Pierre Cardaliaguet]
+    year: 2013
+    bucket: open_courseware
+    form: lecture_notes
+    venue: Université Paris-Dauphine
+    pages: 59
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Posted lecture notes; a direct permission request is plausible."}
+    acquisition: {state: open_url}
+    tags: [mean-field-games, lecture-notes, high-value-target]
+
+  - id: nualart-2006-malliavin-calculus
+    title: "The Malliavin Calculus and Related Topics"
+    authors: [David Nualart]
+    year: 2006
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 382
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [malliavin, sensitivities, greeks]
+
+  - id: zhang-2017-bsde
+    title: "Backward Stochastic Differential Equations: From Linear to Fully Nonlinear PDEs"
+    authors: [Jianfeng Zhang]
+    year: 2017
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Springer
+    pages: 388
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [bsde, nonlinear-pricing, deep-hedging-bridge]
+    refs:
+      - {target: "Pardoux & Peng — Adapted solution of a backward stochastic differential equation", relation: builds_on, bucket: mathematical_foundations}
+      - {target: buehler-2019-deep-hedging, relation: syllabus_with}
+
+  - id: meyn-2009-markov-chains-stochastic-stability
+    title: "Markov Chains and Stochastic Stability"
+    authors: [Sean Meyn, Richard L. Tweedie]
+    year: 2009
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Cambridge University Press
+    pages: 594
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "An author-hosted edition has been available; confirm the stated permission."}
+    acquisition: {state: open_url}
+    tags: [ergodicity, stability, drift-conditions, high-value-target]
+    refs:
+      - {target: borkar-2008-stochastic-approximation, relation: syllabus_with}
+
+  - id: borkar-2008-stochastic-approximation
+    title: "Stochastic Approximation: A Dynamical Systems Viewpoint"
+    authors: [Vivek S. Borkar]
+    year: 2008
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Cambridge University Press / Hindustan Book Agency
+    pages: 164
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [stochastic-approximation, ode-method, rl-theory, bridge]
+    refs:
+      - {target: kushner-2003-stochastic-approximation, relation: cites}
+      - {target: bertsekas-1996-neuro-dynamic-programming, relation: syllabus_with}
+
+  - id: kushner-2003-stochastic-approximation
+    title: "Stochastic Approximation and Recursive Algorithms and Applications"
+    authors: [Harold J. Kushner, G. George Yin]
+    year: 2003
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 474
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [stochastic-approximation, convergence, adaptive-algorithms]
+
+  - id: benveniste-1990-adaptive-algorithms
+    title: "Adaptive Algorithms and Stochastic Approximations"
+    authors: [Albert Benveniste, Michel Métivier, Pierre Priouret]
+    year: 1990
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 365
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [adaptive-algorithms, tracking, stochastic-approximation]
+    refs:
+      - {target: haykin-2013-adaptive-filter-theory, relation: syllabus_with}
+
+  - id: revuz-1999-continuous-martingales
+    title: "Continuous Martingales and Brownian Motion"
+    authors: [Daniel Revuz, Marc Yor]
+    year: 1999
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Springer
+    pages: 602
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [martingales, brownian-motion, foundations]
+
+  - id: protter-2005-stochastic-integration
+    title: "Stochastic Integration and Differential Equations"
+    authors: [Philip E. Protter]
+    year: 2005
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Springer
+    pages: 415
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [semimartingales, stochastic-integration, jumps]
+    refs:
+      - {target: jacod-2003-limit-theorems-stochastic-processes, relation: cites}
+
+  - id: jacod-2003-limit-theorems-stochastic-processes
+    title: "Limit Theorems for Stochastic Processes"
+    authors: [Jean Jacod, Albert N. Shiryaev]
+    year: 2003
+    bucket: mathematical_foundations
+    form: monograph
+    venue: Springer
+    pages: 661
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [limit-theorems, weak-convergence, foundations]
+
+  - id: aitsahalia-2014-high-frequency-econometrics
+    title: "High-Frequency Financial Econometrics"
+    authors: [Yacine Aït-Sahalia, Jean Jacod]
+    year: 2014
+    bucket: mathematical_foundations
+    form: textbook
+    venue: Princeton University Press
+    pages: 659
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [realized-volatility, microstructure-noise, jumps, high-value-target]
+    refs:
+      - {target: jacod-2003-limit-theorems-stochastic-processes, relation: builds_on}
+      - {target: hasbrouck-2007-empirical-market-microstructure, relation: syllabus_with}
+      - {target: "Zhang, Mykland & Aït-Sahalia — A tale of two time scales", relation: cites, bucket: mathematical_foundations}
+
+  # ------------------------------------------------------------------
+  # high_dim_statistics
+  # ------------------------------------------------------------------
+  - id: potters-2020-first-course-random-matrix-theory
+    title: "A First Course in Random Matrix Theory for Physicists, Engineers and Data Scientists"
+    authors: [Marc Potters, Jean-Philippe Bouchaud]
+    year: 2020
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Cambridge University Press
+    pages: 368
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [random-matrix-theory, covariance-cleaning, portfolio, high-value-target]
+    refs:
+      - {target: bai-2010-spectral-analysis-random-matrices, relation: cites}
+      - {target: ledoit-2004-well-conditioned-covariance, relation: cites}
+      - {target: bouchaud-2018-trades-quotes-prices, relation: syllabus_with}
+
+  - id: bai-2010-spectral-analysis-random-matrices
+    title: "Spectral Analysis of Large Dimensional Random Matrices"
+    authors: [Zhidong Bai, Jack W. Silverstein]
+    year: 2010
+    bucket: high_dim_statistics
+    form: monograph
+    venue: Springer
+    pages: 551
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [random-matrix-theory, marchenko-pastur, asymptotics]
+
+  - id: ledoit-2004-well-conditioned-covariance
+    title: "A Well-Conditioned Estimator for Large-Dimensional Covariance Matrices"
+    authors: [Olivier Ledoit, Michael Wolf]
+    year: 2004
+    bucket: high_dim_statistics
+    form: paper
+    venue: Journal of Multivariate Analysis
+    pages: 30
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [shrinkage, covariance, portfolio-construction]
+
+  - id: vershynin-2018-high-dimensional-probability
+    title: "High-Dimensional Probability: An Introduction with Applications in Data Science"
+    authors: [Roman Vershynin]
+    year: 2018
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Cambridge University Press
+    pages: 296
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author hosts a full PDF; read the stated terms."}
+    acquisition: {state: open_url}
+    tags: [concentration, sub-gaussian, high-value-target]
+    refs:
+      - {target: boucheron-2013-concentration-inequalities, relation: cites}
+
+  - id: wainwright-2019-high-dimensional-statistics
+    title: "High-Dimensional Statistics: A Non-Asymptotic Viewpoint"
+    authors: [Martin J. Wainwright]
+    year: 2019
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Cambridge University Press
+    pages: 552
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [non-asymptotic, minimax, sparsity]
+    refs:
+      - {target: vershynin-2018-high-dimensional-probability, relation: syllabus_with}
+      - {target: buhlmann-2011-statistics-high-dimensional-data, relation: cites}
+
+  - id: buhlmann-2011-statistics-high-dimensional-data
+    title: "Statistics for High-Dimensional Data: Methods, Theory and Applications"
+    authors: [Peter Bühlmann, Sara van de Geer]
+    year: 2011
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Springer
+    pages: 556
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [lasso, sparsity, inference]
+
+  - id: boucheron-2013-concentration-inequalities
+    title: "Concentration Inequalities: A Nonasymptotic Theory of Independence"
+    authors: [Stéphane Boucheron, Gábor Lugosi, Pascal Massart]
+    year: 2013
+    bucket: high_dim_statistics
+    form: monograph
+    venue: Oxford University Press
+    pages: 481
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [concentration, finite-sample, foundations]
+
+  - id: embrechts-1997-modelling-extremal-events
+    title: "Modelling Extremal Events for Insurance and Finance"
+    authors: [Paul Embrechts, Claudia Klüppelberg, Thomas Mikosch]
+    year: 1997
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Springer
+    pages: 648
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [extreme-value-theory, tails, liquidation-relevant]
+    refs:
+      - {target: dehaan-2006-extreme-value-theory, relation: cites}
+      - {target: mcneil-2015-quantitative-risk-management, relation: syllabus_with}
+
+  - id: dehaan-2006-extreme-value-theory
+    title: "Extreme Value Theory: An Introduction"
+    authors: [Laurens de Haan, Ana Ferreira]
+    year: 2006
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Springer
+    pages: 417
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [extreme-value-theory, tail-index]
+
+  - id: resnick-2007-heavy-tail-phenomena
+    title: "Heavy-Tail Phenomena: Probabilistic and Statistical Modeling"
+    authors: [Sidney I. Resnick]
+    year: 2007
+    bucket: high_dim_statistics
+    form: monograph
+    venue: Springer
+    pages: 404
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [heavy-tails, regular-variation]
+
+  - id: hastie-2009-elements-statistical-learning
+    title: "The Elements of Statistical Learning"
+    authors: [Trevor Hastie, Robert Tibshirani, Jerome Friedman]
+    year: 2009
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Springer
+    pages: 745
+    density: medium
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Long-standing free author-hosted PDF; confirm the permission wording."}
+    acquisition: {state: open_url}
+    tags: [statistical-learning, orientation, high-value-target]
+
+  - id: vandervaart-1998-asymptotic-statistics
+    title: "Asymptotic Statistics"
+    authors: [A. W. van der Vaart]
+    year: 1998
+    bucket: high_dim_statistics
+    form: textbook
+    venue: Cambridge University Press
+    pages: 443
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [asymptotics, empirical-processes, foundations]
+
+  # ------------------------------------------------------------------
+  # inference_causality
+  # ------------------------------------------------------------------
+  - id: imbens-2015-causal-inference
+    title: "Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction"
+    authors: [Guido W. Imbens, Donald B. Rubin]
+    year: 2015
+    bucket: inference_causality
+    form: textbook
+    venue: Cambridge University Press
+    pages: 625
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [potential-outcomes, randomization, attribution, gate-relevant]
+    refs:
+      - {target: pearl-2009-causality, relation: cites}
+      - {target: hernan-2020-causal-inference-what-if, relation: syllabus_with}
+
+  - id: pearl-2009-causality
+    title: "Causality: Models, Reasoning, and Inference"
+    authors: [Judea Pearl]
+    year: 2009
+    bucket: inference_causality
+    form: textbook
+    venue: Cambridge University Press
+    pages: 464
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [structural-causal-models, dags, identification]
+
+  - id: hernan-2020-causal-inference-what-if
+    title: "Causal Inference: What If"
+    authors: [Miguel A. Hernán, James M. Robins]
+    year: 2020
+    bucket: inference_causality
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 312
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors have hosted a free PDF for years; read the stated terms — this is a strong candidate for a direct permission request."}
+    acquisition: {state: open_url}
+    tags: [causal-inference, confounding, high-value-target, gate-relevant]
+
+  - id: chernozhukov-2018-double-debiased-ml
+    title: "Double/Debiased Machine Learning for Treatment and Structural Parameters"
+    authors: [Victor Chernozhukov, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, James Robins]
+    year: 2018
+    bucket: inference_causality
+    form: paper
+    venue: The Econometrics Journal
+    pages: 68
+    density: high
+    priority: 5
+    rights: {status: open_license_other, confidence: inferred, notes: "Published open access; confirm which licence."}
+    acquisition: {state: open_url}
+    tags: [debiased-ml, orthogonalization, high-value-target, gate-relevant]
+    refs:
+      - {target: wager-2018-heterogeneous-treatment-effects, relation: syllabus_with}
+
+  - id: wager-2018-heterogeneous-treatment-effects
+    title: "Estimation and Inference of Heterogeneous Treatment Effects using Random Forests"
+    authors: [Stefan Wager, Susan Athey]
+    year: 2018
+    bucket: inference_causality
+    form: paper
+    venue: Journal of the American Statistical Association
+    pages: 15
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [causal-forests, heterogeneous-effects, gate-relevant]
+
+  - id: athey-2017-state-applied-econometrics
+    title: "The State of Applied Econometrics: Causality and Policy Evaluation"
+    authors: [Susan Athey, Guido W. Imbens]
+    year: 2017
+    bucket: inference_causality
+    form: survey
+    venue: Journal of Economic Perspectives
+    pages: 32
+    density: high
+    priority: 4
+    rights: {status: open_license_other, confidence: inferred, notes: "JEP is free to read; that is not automatically a reuse licence."}
+    acquisition: {state: open_url}
+    tags: [policy-evaluation, survey, orientation]
+
+  - id: howard-2021-confidence-sequences
+    title: "Time-Uniform, Nonparametric, Nonasymptotic Confidence Sequences"
+    authors: [Steven R. Howard, Aaditya Ramdas, Jon McAuliffe, Jasjeet Sekhon]
+    year: 2021
+    bucket: inference_causality
+    form: paper
+    venue: Annals of Statistics
+    pages: 40
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [anytime-valid, sequential-inference, peeking, high-value-target, gate-relevant]
+    refs:
+      - {target: ramdas-2023-game-theoretic-statistics, relation: builds_on}
+      - {target: wald-1947-sequential-analysis, relation: cites}
+
+  - id: ramdas-2023-game-theoretic-statistics
+    title: "Game-Theoretic Statistics and Safe Anytime-Valid Inference"
+    authors: [Aaditya Ramdas, Peter Grünwald, Vladimir Vovk, Glenn Shafer]
+    year: 2023
+    bucket: inference_causality
+    form: survey
+    venue: Statistical Science
+    pages: 40
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [e-values, martingale-testing, continuous-monitoring, high-value-target, gate-relevant]
+    refs:
+      - {target: grunwald-2007-mdl-principle, relation: cites}
+
+  - id: vovk-2005-algorithmic-learning-random-world
+    title: "Algorithmic Learning in a Random World"
+    authors: [Vladimir Vovk, Alexander Gammerman, Glenn Shafer]
+    year: 2005
+    bucket: inference_causality
+    form: monograph
+    venue: Springer
+    pages: 324
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [conformal-prediction, distribution-free, calibration]
+
+  - id: angelopoulos-2023-conformal-prediction-intro
+    title: "Conformal Prediction: A Gentle Introduction"
+    authors: [Anastasios N. Angelopoulos, Stephen Bates]
+    year: 2023
+    bucket: inference_causality
+    form: survey
+    venue: "Foundations and Trends in Machine Learning"
+    pages: 100
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv version widely circulated; check its licence tag."}
+    acquisition: {state: open_url}
+    tags: [conformal, uncertainty-quantification, calibration, high-value-target]
+    refs:
+      - {target: vovk-2005-algorithmic-learning-random-world, relation: builds_on}
+      - {target: "Tibshirani et al — Conformal prediction under covariate shift", relation: cites, bucket: inference_causality}
+
+  - id: white-2000-reality-check
+    title: "A Reality Check for Data Snooping"
+    authors: [Halbert White]
+    year: 2000
+    bucket: inference_causality
+    form: paper
+    venue: Econometrica
+    pages: 30
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [data-snooping, multiple-testing, backtest-overfitting]
+    refs:
+      - {target: hansen-2005-superior-predictive-ability, relation: cites}
+      - {target: romano-2005-stepwise-multiple-testing, relation: cites}
+
+  - id: hansen-2005-superior-predictive-ability
+    title: "A Test for Superior Predictive Ability"
+    authors: [Peter Reinhard Hansen]
+    year: 2005
+    bucket: inference_causality
+    form: paper
+    venue: "Journal of Business and Economic Statistics"
+    pages: 15
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [multiple-testing, forecast-comparison]
+
+  - id: romano-2005-stepwise-multiple-testing
+    title: "Stepwise Multiple Testing as Formalized Data Snooping"
+    authors: [Joseph P. Romano, Michael Wolf]
+    year: 2005
+    bucket: inference_causality
+    form: paper
+    venue: Econometrica
+    pages: 25
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [familywise-error, stepwise, strategy-selection]
+
+  - id: harvey-2016-cross-section-expected-returns
+    title: "…and the Cross-Section of Expected Returns"
+    authors: [Campbell R. Harvey, Yan Liu, Heqing Zhu]
+    year: 2016
+    bucket: inference_causality
+    form: paper
+    venue: Review of Financial Studies
+    pages: 63
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [factor-zoo, multiple-testing, replication-crisis, high-value-target]
+    refs:
+      - {target: lopezdeprado-2018-advances-financial-ml, relation: syllabus_with}
+      - {target: bailey-2014-deflated-sharpe-ratio, relation: cites}
+
+  - id: bailey-2014-deflated-sharpe-ratio
+    title: "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality"
+    authors: [David H. Bailey, Marcos López de Prado]
+    year: 2014
+    bucket: inference_causality
+    form: paper
+    venue: Journal of Portfolio Management
+    pages: 13
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [backtest-overfitting, selection-bias, sharpe]
+
+  - id: dudik-2011-doubly-robust-policy-evaluation
+    title: "Doubly Robust Policy Evaluation and Learning"
+    authors: [Miroslav Dudík, John Langford, Lihong Li]
+    year: 2011
+    bucket: inference_causality
+    form: proceedings
+    venue: ICML
+    pages: 8
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [off-policy-evaluation, doubly-robust, retrieval-policy-relevant, high-value-target]
+    refs:
+      - {target: swaminathan-2015-counterfactual-risk-minimization, relation: cites}
+      - {target: lattimore-2020-bandit-algorithms, relation: syllabus_with}
+
+  - id: swaminathan-2015-counterfactual-risk-minimization
+    title: "Counterfactual Risk Minimization: Learning from Logged Bandit Feedback"
+    authors: [Adith Swaminathan, Thorsten Joachims]
+    year: 2015
+    bucket: inference_causality
+    form: paper
+    venue: "Journal of Machine Learning Research / ICML"
+    pages: 30
+    density: high
+    priority: 4
+    rights: {status: open_license_other, confidence: inferred, notes: "JMLR papers carry an explicit licence; read it — this bucket may be genuinely ingestable."}
+    acquisition: {state: open_url}
+    tags: [logged-bandit-feedback, off-policy-learning, retrieval-policy-relevant]
+
+  - id: thomas-2016-data-efficient-ope
+    title: "Data-Efficient Off-Policy Policy Evaluation for Reinforcement Learning"
+    authors: [Philip S. Thomas, Emma Brunskill]
+    year: 2016
+    bucket: inference_causality
+    form: proceedings
+    venue: ICML
+    pages: 10
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [off-policy-evaluation, variance-reduction, rl]
+
+  # ------------------------------------------------------------------
+  # machine_learning_frontier
+  # ------------------------------------------------------------------
+  - id: buehler-2019-deep-hedging
+    title: "Deep Hedging"
+    authors: [Hans Bühler, Lukas Gonon, Josef Teichmann, Ben Wood]
+    year: 2019
+    bucket: machine_learning_frontier
+    form: paper
+    venue: Quantitative Finance
+    pages: 21
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv preprint exists; check its licence."}
+    acquisition: {state: open_url}
+    tags: [deep-hedging, transaction-costs, market-frictions, high-value-target]
+    refs:
+      - {target: zhang-2017-bsde, relation: builds_on}
+      - {target: cartea-2015-algorithmic-high-frequency-trading, relation: cites}
+
+  - id: kidger-2022-neural-differential-equations
+    title: "On Neural Differential Equations"
+    authors: [Patrick Kidger]
+    year: 2022
+    bucket: machine_learning_frontier
+    form: thesis
+    venue: University of Oxford
+    pages: 231
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "University theses are often deposited under an explicit repository licence — check it."}
+    acquisition: {state: open_url}
+    tags: [neural-sde, continuous-time-models, signatures, high-value-target]
+    refs:
+      - {target: chevyrev-2016-signature-method-primer, relation: cites}
+
+  - id: sirignano-2019-universal-features-price-formation
+    title: "Universal Features of Price Formation in Financial Markets: Perspectives from Deep Learning"
+    authors: [Justin Sirignano, Rama Cont]
+    year: 2019
+    bucket: machine_learning_frontier
+    form: paper
+    venue: Quantitative Finance
+    pages: 15
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [deep-learning, order-book, universality, high-value-target]
+    refs:
+      - {target: cont-2014-price-impact-order-book-events, relation: builds_on}
+      - {target: zhang-2019-deeplob, relation: syllabus_with}
+
+  - id: zhang-2019-deeplob
+    title: "DeepLOB: Deep Convolutional Neural Networks for Limit Order Books"
+    authors: [Zihao Zhang, Stefan Zohren, Stephen Roberts]
+    year: 2019
+    bucket: machine_learning_frontier
+    form: paper
+    venue: IEEE Transactions on Signal Processing
+    pages: 12
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [order-book, deep-learning, prediction]
+
+  - id: gu-2020-empirical-asset-pricing-ml
+    title: "Empirical Asset Pricing via Machine Learning"
+    authors: [Shihao Gu, Bryan Kelly, Dacheng Xiu]
+    year: 2020
+    bucket: machine_learning_frontier
+    form: paper
+    venue: Review of Financial Studies
+    pages: 62
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [ml-asset-pricing, factors, out-of-sample]
+    refs:
+      - {target: kelly-2023-financial-machine-learning, relation: syllabus_with}
+      - {target: harvey-2016-cross-section-expected-returns, relation: cites}
+
+  - id: kelly-2023-financial-machine-learning
+    title: "Financial Machine Learning"
+    authors: [Bryan Kelly, Dacheng Xiu]
+    year: 2023
+    bucket: machine_learning_frontier
+    form: survey
+    venue: "Foundations and Trends in Finance"
+    pages: 150
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "An NBER working paper version exists with its own terms."}
+    acquisition: {state: open_url}
+    tags: [survey, ml-finance, orientation, high-value-target]
+
+  - id: levine-2020-offline-rl-tutorial
+    title: "Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems"
+    authors: [Sergey Levine, Aviral Kumar, George Tucker, Justin Fu]
+    year: 2020
+    bucket: machine_learning_frontier
+    form: survey
+    venue: arXiv
+    pages: 43
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [offline-rl, distribution-shift, no-live-exploration, high-value-target]
+    refs:
+      - {target: kumar-2020-conservative-q-learning, relation: cites}
+      - {target: sutton-2018-reinforcement-learning, relation: builds_on}
+      - {target: thomas-2016-data-efficient-ope, relation: cites}
+
+  - id: kumar-2020-conservative-q-learning
+    title: "Conservative Q-Learning for Offline Reinforcement Learning"
+    authors: [Aviral Kumar, Aurick Zhou, George Tucker, Sergey Levine]
+    year: 2020
+    bucket: machine_learning_frontier
+    form: proceedings
+    venue: NeurIPS
+    pages: 13
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [offline-rl, conservatism, value-overestimation]
+
+  - id: nevmyvaka-2006-rl-optimized-execution
+    title: "Reinforcement Learning for Optimized Trade Execution"
+    authors: [Yuriy Nevmyvaka, Yi Feng, Michael Kearns]
+    year: 2006
+    bucket: machine_learning_frontier
+    form: proceedings
+    venue: ICML
+    pages: 8
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [rl-execution, order-placement, historical]
+    refs:
+      - {target: almgren-2000-optimal-execution, relation: cites}
+
+  - id: lim-2021-time-series-deep-learning-survey
+    title: "Time-Series Forecasting with Deep Learning: A Survey"
+    authors: [Bryan Lim, Stefan Zohren]
+    year: 2021
+    bucket: machine_learning_frontier
+    form: survey
+    venue: "Philosophical Transactions of the Royal Society A"
+    pages: 15
+    density: medium
+    priority: 3
+    rights: {status: open_license_other, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [forecasting, sequence-models, survey]
+
+  - id: goodfellow-2016-deep-learning
+    title: "Deep Learning"
+    authors: [Ian Goodfellow, Yoshua Bengio, Aaron Courville]
+    year: 2016
+    bucket: machine_learning_frontier
+    form: textbook
+    venue: MIT Press
+    pages: 775
+    density: medium
+    priority: 3
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Free-to-read online edition; reuse terms are narrower than the reading access."}
+    acquisition: {state: open_url}
+    tags: [deep-learning, foundations]
+
+  - id: prince-2023-understanding-deep-learning
+    title: "Understanding Deep Learning"
+    authors: [Simon J. D. Prince]
+    year: 2023
+    bucket: machine_learning_frontier
+    form: textbook
+    venue: MIT Press
+    pages: 541
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author distributes a free PDF plus notebooks; check whether a CC licence is attached."}
+    acquisition: {state: open_url}
+    tags: [deep-learning, modern-architectures, high-value-target]
+
+  - id: murphy-2022-probabilistic-ml-introduction
+    title: "Probabilistic Machine Learning: An Introduction"
+    authors: [Kevin P. Murphy]
+    year: 2022
+    bucket: machine_learning_frontier
+    form: textbook
+    venue: MIT Press
+    pages: 864
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [probabilistic-ml, foundations]
+    refs:
+      - {target: murphy-2023-probabilistic-ml-advanced, relation: builds_on}
+
+  # ------------------------------------------------------------------
+  # defi_mechanics
+  # ------------------------------------------------------------------
+  - id: adams-2021-uniswap-v3-core
+    title: "Uniswap v3 Core"
+    authors: [Hayden Adams, Noah Zinsmeister, Moody Salem, River Keefer, Dan Robinson]
+    year: 2021
+    bucket: defi_mechanics
+    form: working_paper
+    venue: Uniswap Labs
+    pages: 10
+    density: high
+    priority: 5
+    rights: {status: unknown, confidence: unknown, notes: "Check the whitepaper repository for an explicit licence; protocol repos sometimes carry one."}
+    acquisition: {state: open_url}
+    tags: [amm, concentrated-liquidity, onchain, rights-upside]
+    refs:
+      - {target: angeris-2020-improved-price-oracles-cfmm, relation: cites}
+      - {target: milionis-2022-loss-versus-rebalancing, relation: syllabus_with}
+
+  - id: angeris-2020-improved-price-oracles-cfmm
+    title: "Improved Price Oracles: Constant Function Market Makers"
+    authors: [Guillermo Angeris, Tarun Chitra]
+    year: 2020
+    bucket: defi_mechanics
+    form: proceedings
+    venue: "ACM Advances in Financial Technologies"
+    pages: 12
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [cfmm, amm, oracle, high-value-target]
+    refs:
+      - {target: boyd-2004-convex-optimization, relation: builds_on}
+      - {target: "Angeris, Agrawal, Evans, Chitra & Boyd — Constant function market makers: multi-asset trades via convex optimization", relation: cites, bucket: defi_mechanics}
+
+  - id: milionis-2022-loss-versus-rebalancing
+    title: "Automated Market Making and Loss-Versus-Rebalancing"
+    authors: [Jason Milionis, Ciamac C. Moallemi, Tim Roughgarden, Anthony Lee Zhang]
+    year: 2022
+    bucket: defi_mechanics
+    form: working_paper
+    venue: arXiv
+    pages: 40
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [lvr, adverse-selection, amm, high-value-target]
+    refs:
+      - {target: glosten-1985-bid-ask, relation: builds_on}
+      - {target: adams-2021-uniswap-v3-core, relation: cites}
+
+  - id: daian-2020-flash-boys-2
+    title: "Flash Boys 2.0: Frontrunning, Transaction Reordering, and Consensus Instability in Decentralized Exchanges"
+    authors: [Philip Daian, Steven Goldfeder, Tyler Kell, Yunqi Li, Xueyuan Zhao, Iddo Bentov, Lorenz Breidenbach, Ari Juels]
+    year: 2020
+    bucket: defi_mechanics
+    form: proceedings
+    venue: "IEEE Symposium on Security and Privacy"
+    pages: 18
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [mev, frontrunning, sequencing, high-value-target]
+    refs:
+      - {target: "Proposer-builder separation and block auction design references", relation: cites, bucket: defi_mechanics}
+      - {target: budish-2015-hft-arms-race, relation: syllabus_with}
+
+  # ------------------------------------------------------------------
+  # market_microstructure — post-2010 layer the seed was missing
+  # ------------------------------------------------------------------
+  - id: kyle-2016-market-microstructure-invariance
+    title: "Market Microstructure Invariance: Empirical Hypotheses"
+    authors: [Albert S. Kyle, Anna A. Obizhaeva]
+    year: 2016
+    bucket: market_microstructure
+    form: paper
+    venue: Econometrica
+    pages: 40
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [invariance, bet-size, impact-scaling, high-value-target]
+    refs:
+      - {target: kyle-1985-continuous-auctions, relation: builds_on}
+      - {target: "Tóth et al — Anomalous price impact and the critical nature of liquidity", relation: cites, bucket: market_microstructure}
+
+  - id: budish-2015-hft-arms-race
+    title: "The High-Frequency Trading Arms Race: Frequent Batch Auctions as a Market Design Response"
+    authors: [Eric Budish, Peter Cramton, John Shim]
+    year: 2015
+    bucket: market_microstructure
+    form: paper
+    venue: Quarterly Journal of Economics
+    pages: 65
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [latency-arbitrage, batch-auctions, market-design, high-value-target]
+    refs:
+      - {target: milgrom-2004-putting-auction-theory-to-work, relation: cites}
+      - {target: glosten-1985-bid-ask, relation: builds_on}
+
+  - id: menkveld-2013-hft-new-market-makers
+    title: "High Frequency Trading and the New Market Makers"
+    authors: [Albert J. Menkveld]
+    year: 2013
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Financial Markets
+    pages: 30
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [hft, inventory, empirical]
+
+  - id: ohara-2015-high-frequency-market-microstructure
+    title: "High Frequency Market Microstructure"
+    authors: [Maureen O'Hara]
+    year: 2015
+    bucket: market_microstructure
+    form: survey
+    venue: Journal of Financial Economics
+    pages: 20
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [survey, hft, modern-microstructure]
+    refs:
+      - {target: ohara-1995-market-microstructure-theory, relation: builds_on}
+      - {target: easley-2012-flow-toxicity-vpin, relation: cites}
+
+  - id: hendershott-2011-algorithmic-trading-liquidity
+    title: "Does Algorithmic Trading Improve Liquidity?"
+    authors: [Terrence Hendershott, Charles M. Jones, Albert J. Menkveld]
+    year: 2011
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Finance
+    pages: 34
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [algorithmic-trading, liquidity, natural-experiment]
+
+  - id: huang-2015-queue-reactive-model
+    title: "Simulating and Analyzing Order Book Data: The Queue-Reactive Model"
+    authors: [Weibing Huang, Charles-Albert Lehalle, Mathieu Rosenbaum]
+    year: 2015
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of the American Statistical Association
+    pages: 20
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [queue-reactive, order-book-simulation, queueing, high-value-target]
+    refs:
+      - {target: cont-2010-stochastic-model-order-book, relation: builds_on}
+      - {target: bacry-2015-hawkes-processes-finance, relation: cites}
+      - {target: cont-2013-price-dynamics-markovian-lob, relation: cites}
+
+  - id: donier-2015-metaorder-impact-bitcoin
+    title: "A Million Metaorder Analysis of Market Impact on the Bitcoin"
+    authors: [Jonathan Donier, Julius Bonart]
+    year: 2015
+    bucket: market_microstructure
+    form: paper
+    venue: "Market Microstructure and Liquidity"
+    pages: 22
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [impact, crypto, square-root-law, high-value-target]
+    refs:
+      - {target: bouchaud-2018-trades-quotes-prices, relation: builds_on}
+
+  # ------------------------------------------------------------------
+  # quant_finance_core — the rough volatility layer
+  # ------------------------------------------------------------------
+  - id: gatheral-2018-volatility-is-rough
+    title: "Volatility is Rough"
+    authors: [Jim Gatheral, Thibault Jaisson, Mathieu Rosenbaum]
+    year: 2018
+    bucket: quant_finance_core
+    form: paper
+    venue: Quantitative Finance
+    pages: 22
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Widely circulated preprint; check its licence."}
+    acquisition: {state: open_url}
+    tags: [rough-volatility, fractional, high-value-target]
+    refs:
+      - {target: bayer-2016-pricing-under-rough-volatility, relation: syllabus_with}
+      - {target: jaisson-2015-nearly-unstable-hawkes, relation: builds_on}
+      - {target: gatheral-2006-volatility-surface, relation: builds_on}
+
+  - id: bayer-2016-pricing-under-rough-volatility
+    title: "Pricing Under Rough Volatility"
+    authors: [Christian Bayer, Peter Friz, Jim Gatheral]
+    year: 2016
+    bucket: quant_finance_core
+    form: paper
+    venue: Quantitative Finance
+    pages: 16
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [rough-volatility, pricing, calibration]
+    refs:
+      - {target: friz-2020-course-rough-paths, relation: cites}
+      - {target: "El Euch & Rosenbaum — The characteristic function of rough Heston models", relation: cites, bucket: quant_finance_core}
+
+  # ------------------------------------------------------------------
+  # open_courseware — the bucket with the best rights upside was thinnest
+  # ------------------------------------------------------------------
+  - id: mit-ocw-18657-high-dimensional-statistics
+    title: "MIT 18.657 High-Dimensional Statistics (lecture notes)"
+    authors: [Philippe Rigollet, Jan-Christian Hütter]
+    year: 2015
+    bucket: open_courseware
+    form: lecture_notes
+    venue: MIT OpenCourseWare
+    pages: 200
+    density: high
+    priority: 5
+    rights: {status: cc_by_nc_sa, confidence: inferred, notes: "MIT OCW default licence; confirm on the specific course page."}
+    acquisition: {state: open_url}
+    tags: [high-dimensional-statistics, lecture-notes, high-value-target]
+    refs:
+      - {target: wainwright-2019-high-dimensional-statistics, relation: syllabus_with}
+      - {target: vershynin-2018-high-dimensional-probability, relation: syllabus_with}
+
+  - id: mit-ocw-6262-linear-algebra-learning-from-data
+    title: "MIT 18.065 Matrix Methods in Data Analysis, Signal Processing, and Machine Learning"
+    authors: [Gilbert Strang]
+    year: 2018
+    bucket: open_courseware
+    form: course
+    venue: MIT OpenCourseWare
+    pages: 300
+    density: medium
+    priority: 4
+    rights: {status: cc_by_nc_sa, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [linear-algebra, numerical-methods, lecture-notes]
+
+  - id: rosenbaum-polytechnique-microstructure-notes
+    title: "Market microstructure and high-frequency data — graduate lecture notes"
+    authors: [Mathieu Rosenbaum]
+    year: 2020
+    bucket: open_courseware
+    form: lecture_notes
+    venue: "École Polytechnique"
+    pages: 150
+    density: high
+    priority: 5
+    rights: {status: unknown, confidence: unknown, notes: "Existence and posting terms both need checking; a direct permission request is plausible."}
+    acquisition: {state: not_acquired}
+    tags: [microstructure, hawkes, rough-volatility, verify-existence]
+    refs:
+      - {target: huang-2015-queue-reactive-model, relation: syllabus_with}
+      - {target: gatheral-2018-volatility-is-rough, relation: syllabus_with}

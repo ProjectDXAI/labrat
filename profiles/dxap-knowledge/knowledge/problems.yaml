@@ -43,7 +43,7 @@ problems:
     statement: "Turnover is high enough that fees, funding and spread consume the edge the agent believes it has."
     observed_signature: "Positive gross edge, negative net after fees; short holding periods clustered around low-conviction entries."
     weight: 1.0
-    buckets: [market_microstructure, quant_finance_core]
+    buckets: [market_microstructure, quant_finance_core, defi_mechanics]
     tags: [execution, impact, adverse-selection, fee-drag]
 
   - problem_id: PB-ADVERSE-ENTRY
@@ -51,7 +51,7 @@ problems:
     statement: "Entries are systematically filled just before the price moves against them."
     observed_signature: "Negative mark-out at 1-30s after fill; worse on aggressive orders into thin books."
     weight: 1.0
-    buckets: [market_microstructure, queueing_networks]
+    buckets: [market_microstructure, queueing_networks, mathematical_foundations]
     tags: [adverse-selection, order-book, queueing, impact]
 
   - problem_id: PB-IMPACT-TIMING
@@ -59,7 +59,7 @@ problems:
     statement: "Large orders are worked without a model of how impact decays, so the schedule is either too fast or too slow."
     observed_signature: "Realized shortfall dominated by temporary impact; price reverts after completion."
     weight: 0.9
-    buckets: [market_microstructure, optimal_control, operations_research]
+    buckets: [market_microstructure, optimal_control, operations_research, machine_learning_frontier]
     tags: [execution, impact, resiliency]
 
   - problem_id: PB-GIVEBACK
@@ -67,7 +67,7 @@ problems:
     statement: "Winning positions give back most of their maximum favourable excursion before the agent exits."
     observed_signature: "High MFE, low realized capture; exits triggered by drawdown rather than by thesis decay."
     weight: 1.0
-    buckets: [decision_sequential, optimal_control]
+    buckets: [decision_sequential, optimal_control, inference_causality]
     tags: [optimal-stopping, exit, hazard]
 
   - problem_id: PB-THESIS-DECAY
@@ -83,7 +83,7 @@ problems:
     statement: "Transient flow is read as a state change, and genuine state changes are read as noise."
     observed_signature: "Reversals taken during trending regimes; trend-following entries at regime ends."
     weight: 1.0
-    buckets: [signal_processing, detection_tracking, dynamical_systems]
+    buckets: [signal_processing, detection_tracking, dynamical_systems, high_dim_statistics]
     tags: [changepoint, regime, filtering, detection]
 
   - problem_id: PB-ABSORPTION
@@ -107,7 +107,7 @@ problems:
     statement: "Related instruments across venues are priced inconsistently and the agent has no consistency test."
     observed_signature: "Simultaneous positions implying contradictory probabilities; no funding- or fee-adjusted comparison."
     weight: 0.8
-    buckets: [economics_information, exchange_documentation, network_science]
+    buckets: [economics_information, exchange_documentation, network_science, defi_mechanics]
     tags: [cross-market, arbitrage, prediction-market, funding]
 
   - problem_id: PB-FILL-UNCERTAINTY
@@ -123,5 +123,5 @@ problems:
     statement: "Inventory and funding costs are not priced into quoting or holding decisions on perpetuals."
     observed_signature: "Positions held through adverse funding; no inventory skew in quoting."
     weight: 0.8
-    buckets: [market_microstructure, operations_research]
+    buckets: [market_microstructure, operations_research, defi_mechanics]
     tags: [inventory, funding, market-making]

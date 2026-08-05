@@ -249,6 +249,25 @@ def surname(author: str) -> str:
     return slugify(parts[-1])
 
 
+def full_title_key(title: str) -> str:
+    """Like `title_key`, but keeps the subtitle.
+
+    The prefix key is what makes fuzzy matching work — a scout writing "Trading
+    and Exchanges" should resolve to the full-subtitle entry. But two volumes of
+    one series share a prefix and differ only after the colon, so the prefix key
+    alone would merge them. This distinguishes those.
+    """
+    text = unicodedata.normalize("NFKD", title or "").encode("ascii", "ignore").decode("ascii").lower()
+    words = [w for w in re.split(r"[^a-z0-9]+", text) if w and w not in STOPWORDS]
+    return "-".join(words[:8])
+
+
+def compatible_titles(left: str, right: str) -> bool:
+    """True when two titles could be the same work written at different lengths."""
+    a, b = full_title_key(left), full_title_key(right)
+    return a == b or a.startswith(b) or b.startswith(a)
+
+
 def dedupe_key(entry: dict[str, Any]) -> str:
     authors = entry.get("authors") or []
     first = surname(authors[0]) if authors else ""
@@ -447,11 +466,16 @@ def resolve_ref(ref: dict[str, Any], index: dict[str, dict[str, Any]]) -> dict[s
     if not probe["authors"] and ref.get("author"):
         probe["authors"] = [ref["author"]]
     key = dedupe_key(probe)
-    if key in index["by_key"]:
-        return index["by_key"][key]
+    candidate = index["by_key"].get(key)
+    if candidate is not None and compatible_titles(target, candidate.get("title", "")):
+        return candidate
     # A bare title with no author still resolves if exactly one stored title matches.
     title_only = title_key(target)
-    matches = [entry for stored_key, entry in index["by_key"].items() if stored_key.split("|", 1)[1] == title_only]
+    matches = [
+        entry
+        for stored_key, entry in index["by_key"].items()
+        if stored_key.split("|", 1)[1] == title_only and compatible_titles(target, entry.get("title", ""))
+    ]
     if len(matches) == 1:
         return matches[0]
     return None
@@ -803,7 +827,7 @@ def validate(entries: list[dict[str, Any]], taxonomy: dict[str, Any]) -> dict[st
     errors: list[str] = []
     warnings: list[str] = []
     seen_ids: set[str] = set()
-    seen_keys: dict[str, str] = {}
+    seen_keys: dict[str, tuple[str, str]] = {}
 
     for entry in entries:
         entry_id = entry.get("id")
@@ -814,9 +838,11 @@ def validate(entries: list[dict[str, Any]], taxonomy: dict[str, Any]) -> dict[st
         seen_ids.add(entry_id)
 
         key = dedupe_key(entry)
-        if key in seen_keys and seen_keys[key] != entry_id:
-            warnings.append(f"{entry_id}: probable duplicate of {seen_keys[key]} (key {key})")
-        seen_keys.setdefault(key, entry_id)
+        if key in seen_keys and seen_keys[key][0] != entry_id:
+            other_id, other_title = seen_keys[key]
+            if compatible_titles(entry.get("title", ""), other_title):
+                warnings.append(f"{entry_id}: probable duplicate of {other_id} (key {key})")
+        seen_keys.setdefault(key, (entry_id, entry.get("title", "")))
 
         if entry.get("form") not in FORMS:
             errors.append(f"{entry_id}: unknown form '{entry.get('form')}'")
@@ -1076,6 +1102,14 @@ def apply_findings_entry(existing: dict[str, Any], incoming: dict[str, Any]) -> 
     return merged, sorted(set(changes))
 
 
+def _key_match(index: dict[str, dict[str, Any]], incoming: dict[str, Any]) -> dict[str, Any] | None:
+    """Prefix-key lookup, guarded so two volumes of one series stay distinct."""
+    candidate = index["by_key"].get(dedupe_key(incoming))
+    if candidate is None:
+        return None
+    return candidate if compatible_titles(incoming.get("title", ""), candidate.get("title", "")) else None
+
+
 def close_round(
     paths: dict[str, Path],
     entries: list[dict[str, Any]],
@@ -1113,7 +1147,7 @@ def close_round(
             index["by_id"].get(incoming["id"])
             or (index["by_isbn"].get(isbn) if isbn else None)
             or (index["by_doi"].get(doi) if doi else None)
-            or index["by_key"].get(dedupe_key(incoming))
+            or _key_match(index, incoming)
         )
         if existing is None:
             if not incoming.get("title"):
