@@ -1,0 +1,319 @@
+mission: >
+  Map the quantitative-finance literature and its feeder disciplines as a citation network,
+  expand it round by round until each bucket stops yielding, and leave every item tagged with
+  its form and its rights so a corpus can be built from the legally clear subset.
+
+production_baseline:
+  experiment_id: "baseline_broad_sweep"
+  description: "An unfocused expansion round over the whole frontier: no bucket, no channel, limit 20. This is what 'just go find more books' looks like."
+  resource_class: "cpu"
+  config:
+    corpus:
+      dir: "corpus"
+    policy:
+      mode: "expand"
+      buckets: []
+      limit: 20
+      channel: "broad_sweep"
+      channel_brief: "No channel constraint. Search however you like."
+    scoring:
+      yield_target: 8
+      eligible_pages_target: 2000
+  seed_metrics:
+    search_eval: 0.0
+    selection_eval: 0.0
+    final_eval: 0.0
+
+families:
+
+  citation_chase:
+    description: "Follow the reference network out from the mapped hubs: co-cited works first, then the works those cite."
+    scientific_rationale: >
+      A work cited by several already-mapped texts is load-bearing in that literature.
+      Co-citation support is the cheapest available prior on importance, and it needs no
+      external ranking service. This family should saturate fastest and define the core.
+    decisive_challenge_claim: >
+      Citation chasing should win bridge_discovery early, because the works that several
+      literatures cite in common are exactly the cross-bucket connectors.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "microstructure_core"
+        description: "Chase the frontier out of the market microstructure hubs."
+        config_patch:
+          policy:
+            buckets: ["market_microstructure"]
+            limit: 20
+            channel: "citation_chase"
+            channel_brief: "Work only from reference lists and co-citation. No search engines, no reading lists."
+      - name: "control_and_or"
+        description: "Chase references across the control and operations research buckets."
+        config_patch:
+          policy:
+            buckets: ["optimal_control", "operations_research"]
+            limit: 20
+            channel: "citation_chase"
+    mutation_policy:
+      axes:
+        - path: "policy.buckets"
+          values:
+            - ["market_microstructure"]
+            - ["economics_information"]
+            - ["signal_processing", "detection_tracking"]
+            - ["queueing_networks", "operations_research"]
+            - ["information_theory", "bayesian_statistics"]
+        - path: "policy.limit"
+          values: [12, 20, 30]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["bridge_hunting", "syllabus_mining"]
+      config_patch:
+        policy:
+          channel: "citation_chase"
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  syllabus_mining:
+    description: "Work from graduate course pages: reading lists, lecture notes, problem sets, and the licence statement attached to them."
+    scientific_rationale: >
+      Syllabi encode expert judgement about what to read and in what order, and course
+      pages are where openly licensed material actually lives. This family is the main
+      route to a corpus that can legally be built, not just described.
+    decisive_challenge_claim: >
+      This family should win rights_clearance: openly licensed course material is the one
+      place where a round can end with confirmed, evidence-backed, ingestable pages.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 8
+    cheap_probes:
+      - name: "microstructure_syllabi"
+        description: "Graduate microstructure and market design courses."
+        config_patch:
+          policy:
+            buckets: ["open_courseware", "market_microstructure"]
+            limit: 15
+            channel: "syllabus_mining"
+            channel_brief: "Start from university course pages. Record the licence statement verbatim in rights.notes and the URL in rights.evidence."
+      - name: "estimation_syllabi"
+        description: "Estimation, filtering and stochastic control courses."
+        config_patch:
+          policy:
+            buckets: ["open_courseware", "signal_processing"]
+            limit: 15
+            channel: "syllabus_mining"
+    mutation_policy:
+      axes:
+        - path: "policy.buckets"
+          values:
+            - ["open_courseware", "market_microstructure"]
+            - ["open_courseware", "optimal_control"]
+            - ["open_courseware", "economics_information"]
+            - ["open_courseware", "bayesian_statistics"]
+        - path: "policy.limit"
+          values: [10, 15, 25]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["rights_first"]
+      config_patch:
+        policy:
+          channel: "syllabus_mining"
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  rights_first:
+    description: "Verification rounds: turn inferred rights tags into confirmed ones, working the entries where confirmation would unlock the most pages."
+    scientific_rationale: >
+      Mapping without clearance produces a reading list, not a corpus. The verify queue is
+      ranked by upside, so this family spends its effort where a licence page could move
+      something from needs_review into the manifest.
+    decisive_challenge_claim: >
+      This family should dominate rights_clearance and should lift selection_eval without
+      adding a single new entry — a shape no expansion family can imitate.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "verify_courseware"
+        description: "Verify the open courseware bucket, where the licence upside is highest."
+        config_patch:
+          policy:
+            mode: "verify"
+            buckets: ["open_courseware"]
+            limit: 15
+            channel: "rights_first"
+            channel_brief: "Read the actual licence page. Record the URL and the date. A silent page means all_rights_reserved, confirmed — not unknown."
+      - name: "verify_venue_docs"
+        description: "Verify exchange and venue documentation terms of use."
+        config_patch:
+          policy:
+            mode: "verify"
+            buckets: ["exchange_documentation"]
+            limit: 15
+            channel: "rights_first"
+    mutation_policy:
+      axes:
+        - path: "policy.buckets"
+          values:
+            - ["open_courseware"]
+            - ["exchange_documentation"]
+            - ["information_theory", "decision_sequential"]
+            - ["market_microstructure"]
+        - path: "policy.mode"
+          values: ["verify", "acquire"]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0
+
+  venue_documentation:
+    description: "Sweep exchange rulebooks, matching-engine and market-data specifications, protocol standards, venue APIs, and market structure regulation."
+    scientific_rationale: >
+      These describe the actual mechanism being traded against, and they are the material
+      most weakly represented in general pretraining. Regulatory text is also the one place
+      where a genuinely unrestricted rights status is common.
+    decisive_challenge_claim: >
+      This family should win rights_clearance on the regulatory slice specifically: public
+      agency documents can reach confirmed ingestable status where vendor docs cannot.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "crypto_venues"
+        description: "Perp DEX and prediction market documentation, where docs repositories sometimes carry a real licence."
+        config_patch:
+          policy:
+            buckets: ["exchange_documentation"]
+            limit: 15
+            channel: "venue_documentation"
+            channel_brief: "Check the docs repository, not just the rendered site: a LICENSE file there settles the rights question."
+      - name: "regulatory_text"
+        description: "Market structure rules, concept releases, and technical standards."
+        config_patch:
+          policy:
+            buckets: ["exchange_documentation"]
+            limit: 20
+            channel: "regulatory_text"
+    mutation_policy:
+      axes:
+        - path: "policy.limit"
+          values: [12, 20, 30]
+        - path: "policy.channel"
+          values: ["venue_documentation", "regulatory_text", "protocol_standards"]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["rights_first"]
+      config_patch:
+        policy:
+          buckets: ["exchange_documentation"]
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  bridge_hunting:
+    description: "Deliberately look for works that connect two buckets: queueing and order books, control and execution, detection and regime change, information theory and market state."
+    scientific_rationale: >
+      The transfer value of this corpus comes from abstractions that move between fields.
+      A work that only one bucket cites teaches one thing; a work two buckets cite teaches
+      a mapping. This family optimizes for the mapping.
+    decisive_challenge_claim: >
+      Bridge hunting should win bridge_discovery outright and should keep winning it after
+      citation_chase saturates, because the connectors are often not co-cited at all.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 6
+    cheap_probes:
+      - name: "queueing_to_lob"
+        description: "Queueing theory applied to limit order books."
+        config_patch:
+          policy:
+            buckets: ["queueing_networks", "market_microstructure"]
+            limit: 15
+            channel: "bridge_hunting"
+            channel_brief: "Only record a find if it genuinely cites or is cited across both buckets. Add the cross-bucket refs explicitly."
+      - name: "control_to_execution"
+        description: "Stochastic control and MPC applied to execution and inventory."
+        config_patch:
+          policy:
+            buckets: ["optimal_control", "market_microstructure"]
+            limit: 15
+            channel: "bridge_hunting"
+    mutation_policy:
+      axes:
+        - path: "policy.buckets"
+          values:
+            - ["queueing_networks", "market_microstructure"]
+            - ["detection_tracking", "market_microstructure"]
+            - ["information_theory", "quant_finance_core"]
+            - ["network_science", "dynamical_systems"]
+            - ["economics_information", "exchange_documentation"]
+    crossover_policy:
+      enabled: true
+      compatible_families: ["citation_chase"]
+      config_patch:
+        policy:
+          channel: "bridge_hunting"
+    audit:
+      invalid_fast_margin: 0.03
+      near_miss_margin: 0.015
+    frame_break:
+      plateau_window: 4
+      min_remaining_probes: 0
+
+  practitioner_channel:
+    description: "Desk manuals, market-maker training material, certification curricula and practitioner proceedings — pursued only where a licensing path exists."
+    scientific_rationale: >
+      Heuristic density is high and coverage in general pretraining is thin, but the rights
+      position is the worst of any bucket. Funded low on purpose: the value is in finding the
+      rare licensable item, not in listing everything that exists.
+    decisive_challenge_claim: >
+      If this family cannot lift rights_clearance above zero across several rounds, that is
+      itself the result: the bucket is a reference-only bucket and should be defunded.
+    resource_class: "cpu"
+    funding:
+      initial_credits: 4
+    cheap_probes:
+      - name: "licensable_training"
+        description: "Training material with an explicit commercial licence path."
+        config_patch:
+          policy:
+            buckets: ["practitioner_training"]
+            limit: 10
+            channel: "practitioner_channel"
+            channel_brief: >
+              Only catalogue material with a legitimate acquisition path. Anything confidential,
+              leaked, or shared without the owner's permission is recorded as
+              proprietary_confidential with status rejected, and never acquired.
+    mutation_policy:
+      axes:
+        - path: "policy.limit"
+          values: [8, 10, 15]
+        - path: "policy.mode"
+          values: ["expand", "verify"]
+    crossover_policy:
+      enabled: false
+      compatible_families: []
+      config_patch: {}
+    audit:
+      invalid_fast_margin: 0.04
+      near_miss_margin: 0.02
+    frame_break:
+      plateau_window: 3
+      min_remaining_probes: 0

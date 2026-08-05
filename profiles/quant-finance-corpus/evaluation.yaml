@@ -1,0 +1,63 @@
+mode: "external_consistent"
+
+# Productivity of the scouting policy: new works catalogued, frontier targets closed,
+# existing entries materially improved.
+search_eval:
+  path: "metrics.search.primary_metric"
+  direction: "maximize"
+
+# Legally usable value added: pages that cleared the manifest gate this round, plus
+# the rate at which rights tags became confirmed.
+selection_eval:
+  path: "metrics.selection.primary_metric"
+  direction: "maximize"
+
+# Share of the touched buckets' page targets that is now manifest-eligible.
+final_eval:
+  enabled: true
+  path: "metrics.final.primary_metric"
+  direction: "maximize"
+
+prediction_tests:
+  - name: "bridge_discovery"
+    description: >
+      Cross-bucket connections created per new entry. A family can raise search_eval by
+      piling up more of the same literature; it cannot fake connecting two of them.
+    path: "metrics.challenges.bridge_discovery.primary_metric"
+    direction: "maximize"
+    decisive: true
+  - name: "rights_clearance"
+    description: >
+      Share of the works touched this round that ended with a confirmed, evidence-backed
+      rights tag. This is what separates a bibliography from a buildable corpus.
+    path: "metrics.challenges.rights_clearance.primary_metric"
+    direction: "maximize"
+    decisive: true
+
+pareto_metrics:
+  - path: "metrics.selection.primary_metric"
+    direction: "maximize"
+    label: "clearance_value"
+  - path: "metrics.challenges.bridge_discovery.primary_metric"
+    direction: "maximize"
+    label: "bridge_score"
+  - path: "proxy_metrics.rediscovery_rate"
+    direction: "minimize"
+    label: "rediscovery"
+  - path: "proxy_metrics.frontier_open"
+    direction: "minimize"
+    label: "frontier_open"
+
+consistency:
+  fixed_seed: 1337
+  fixed_split_id: "quant_corpus_v1"
+  sealed_eval: null
+
+rerun_policy:
+  # A round is a one-shot human/agent-executed task, not a reproducible sample. Reruns
+  # here mean "another round under the same policy", so keep the promotion bar low and
+  # the variance tolerance high.
+  min_reruns_for_promotion: 1
+  max_relative_std: 0.35
+  suspicious_improvement_margin: 0.05
+  invalid_fast_margin: 0.03

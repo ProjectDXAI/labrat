@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 - 2026-08-05
+
+- Added `labrat corpus`: bibliography network mapping, iterative scouting rounds, and form/rights tagging, with a rights-gated build manifest that only admits entries carrying confirmed rights, an evidence URL, and a check date.
+- Added the `quant-finance-corpus` profile — a 173-entry seed bibliography across market microstructure, quantitative finance, information economics, signal processing, detection and tracking, control, operations research, queueing, information theory, Bayesian statistics, sequential decision theory, dynamical systems, network science, exchange documentation, open courseware, and practitioner training — where candidates are scouting policies and the decisive challenges are cross-domain bridge discovery and rights clearance.
+- Added corpus operator surfaces for both interfaces: `/corpus-round` and `/corpus-status` for Claude Code, the `corpus-scout` skill for Codex, and a shared round contract under `agent_prompts/shared/`.
+- Added `docs/CORPUS.md` and a `make smoke-corpus` end-to-end check; `make test` now runs both smoke paths.
+- Generated labs now ship `scripts/corpus.py`.
+
 ## 0.2.3 - 2026-04-23
 
 - Synced the Simplified Chinese README with the current CLI, profile, Codex skill, and runner guidance.

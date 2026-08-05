@@ -1,0 +1,30 @@
+checkpoint_interval: 5
+
+workers:
+  pools:
+    # Each slot is a scouting round waiting on a human or agent, not a CPU job. Keep the
+    # slot count near the number of scouts actually working, and the lease long enough
+    # that a round is not reaped while someone is still reading licence pages.
+    - resource_class: "cpu"
+      slots: 3
+      lease_timeout_seconds: 86400
+      heartbeat_timeout_seconds: 43200
+
+selection:
+  crossover_probability: 0.25
+  max_concurrent_per_lineage: 2
+  elite_archive:
+    global_top_k: 6
+    family_top_k: 2
+  pareto_mode: "read_only"
+
+funding:
+  dispatch_cost: 1
+  promote_credit: 3
+  stable_credit: 1
+  novelty_credit: 1
+  prediction_credit: 3
+
+plateau:
+  window: 3
+  min_delta: 0.01

@@ -1,0 +1,2635 @@
+# Seed bibliography for the quant-finance corpus.
+#
+# Every rights tag below is `confidence: inferred` or `unknown`, with no evidence
+# URL. That is deliberate: the seed is a map of what exists, not a clearance
+# decision. Nothing here is manifest-eligible until a verify round attaches a
+# licence page, a rights-holder statement, or a purchase/permission record.
+#
+# Page counts are estimates. `refs` entries without an id are frontier targets:
+# works the mapped literature points at that we have not catalogued yet.
+
+updated_at: seed
+entries:
+
+  # ------------------------------------------------------------------
+  # market_microstructure
+  # ------------------------------------------------------------------
+  - id: harris-2003-trading-exchanges
+    title: "Trading and Exchanges: Market Microstructure for Practitioners"
+    authors: [Larry Harris]
+    year: 2003
+    bucket: market_microstructure
+    form: textbook
+    venue: Oxford University Press
+    pages: 656
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Commercial academic press."}
+    acquisition: {state: purchasable}
+    tags: [orientation, institutions, order-types]
+    refs:
+      - {target: ohara-1995-market-microstructure-theory, relation: builds_on}
+      - {target: "Schwartz — Equity Markets: Structure, Trading, and Performance", relation: cites, bucket: market_microstructure}
+
+  - id: ohara-1995-market-microstructure-theory
+    title: "Market Microstructure Theory"
+    authors: [Maureen O'Hara]
+    year: 1995
+    bucket: market_microstructure
+    form: textbook
+    venue: Blackwell
+    pages: 304
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [adverse-selection, sequential-trade, inventory]
+    refs:
+      - {target: kyle-1985-continuous-auctions, relation: builds_on}
+      - {target: glosten-1985-bid-ask, relation: builds_on}
+      - {target: "Ho & Stoll — Optimal dealer pricing under transactions and return uncertainty", relation: cites, bucket: market_microstructure}
+      - {target: "Amihud & Mendelson — Dealership market: market making with inventory", relation: cites, bucket: market_microstructure}
+
+  - id: hasbrouck-2007-empirical-market-microstructure
+    title: "Empirical Market Microstructure"
+    authors: [Joel Hasbrouck]
+    year: 2007
+    bucket: market_microstructure
+    form: textbook
+    venue: Oxford University Press
+    pages: 208
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [vector-autoregression, price-discovery, information-share]
+    refs:
+      - {target: hasbrouck-1991-information-content-trades, relation: builds_on}
+      - {target: ohara-1995-market-microstructure-theory, relation: cites}
+      - {target: hamilton-1994-time-series-analysis, relation: cites}
+
+  - id: bouchaud-2018-trades-quotes-prices
+    title: "Trades, Quotes and Prices: Financial Markets Under the Microscope"
+    authors: [Jean-Philippe Bouchaud, Julius Bonart, Jonathan Donier, Martin Gould]
+    year: 2018
+    bucket: market_microstructure
+    form: textbook
+    venue: Cambridge University Press
+    pages: 464
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [price-impact, order-flow, propagator-model, empirical]
+    refs:
+      - {target: bouchaud-2009-how-markets-slowly-digest, relation: builds_on}
+      - {target: gatheral-2010-no-dynamic-arbitrage, relation: cites}
+      - {target: cont-2010-stochastic-model-order-book, relation: cites}
+      - {target: "Tóth et al — Anomalous price impact and the critical nature of liquidity", relation: cites, bucket: market_microstructure}
+
+  - id: cartea-2015-algorithmic-high-frequency-trading
+    title: "Algorithmic and High-Frequency Trading"
+    authors: [Álvaro Cartea, Sebastian Jaimungal, José Penalva]
+    year: 2015
+    bucket: market_microstructure
+    form: textbook
+    venue: Cambridge University Press
+    pages: 360
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [market-making, execution, stochastic-control, hjb]
+    refs:
+      - {target: avellaneda-2008-hft-limit-order-book, relation: builds_on}
+      - {target: gueant-2016-financial-mathematics-market-liquidity, relation: cites}
+      - {target: pham-2009-continuous-time-stochastic-control, relation: cites}
+      - {target: almgren-2000-optimal-execution, relation: cites}
+
+  - id: abergel-2016-limit-order-books
+    title: "Limit Order Books"
+    authors: [Frédéric Abergel, Marouane Anane, Anirban Chakraborti, Aymen Jedidi, Ioane Muni Toke]
+    year: 2016
+    bucket: market_microstructure
+    form: monograph
+    venue: Cambridge University Press
+    pages: 240
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [order-book-modelling, point-processes, queueing]
+    refs:
+      - {target: cont-2010-stochastic-model-order-book, relation: builds_on}
+      - {target: cont-2013-price-dynamics-markovian-lob, relation: cites}
+      - {target: "Muni Toke — Market making in an order book model and its impact on the spread", relation: cites, bucket: market_microstructure}
+
+  - id: foucault-2013-market-liquidity
+    title: "Market Liquidity: Theory, Evidence, and Policy"
+    authors: [Thierry Foucault, Marco Pagano, Ailsa Röell]
+    year: 2013
+    bucket: market_microstructure
+    form: textbook
+    venue: Oxford University Press
+    pages: 368
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [liquidity, market-design, policy]
+    refs:
+      - {target: glosten-1985-bid-ask, relation: builds_on}
+      - {target: kyle-1985-continuous-auctions, relation: builds_on}
+      - {target: "Biais, Hillion & Spatt — An empirical analysis of the limit order book", relation: cites, bucket: market_microstructure}
+
+  - id: lehalle-2018-market-microstructure-in-practice
+    title: "Market Microstructure in Practice"
+    authors: [Charles-Albert Lehalle, Sophie Laruelle]
+    year: 2018
+    bucket: market_microstructure
+    form: monograph
+    venue: World Scientific
+    pages: 366
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [fragmentation, execution, european-markets]
+    refs:
+      - {target: "Lehalle & Neuman — Incorporating signals into optimal trading", relation: cites, bucket: market_microstructure}
+
+  - id: johnson-2010-algorithmic-trading-dma
+    title: "Algorithmic Trading and DMA: An Introduction to Direct Access Trading Strategies"
+    authors: [Barry Johnson]
+    year: 2010
+    bucket: market_microstructure
+    form: manual
+    venue: 4Myeloma Press
+    pages: 592
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [order-types, execution-algorithms, venue-mechanics]
+
+  - id: gueant-2016-financial-mathematics-market-liquidity
+    title: "The Financial Mathematics of Market Liquidity: From Optimal Execution to Market Making"
+    authors: [Olivier Guéant]
+    year: 2016
+    bucket: market_microstructure
+    form: monograph
+    venue: Chapman and Hall/CRC
+    pages: 302
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [market-making, inventory-control, execution]
+    refs:
+      - {target: gueant-2013-dealing-with-inventory-risk, relation: builds_on}
+      - {target: fleming-2006-controlled-markov-processes, relation: cites}
+
+  - id: kyle-1985-continuous-auctions
+    title: "Continuous Auctions and Insider Trading"
+    authors: [Albert S. Kyle]
+    year: 1985
+    bucket: economics_information
+    form: paper
+    venue: Econometrica
+    pages: 22
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred, notes: "Journal paywall; author or institutional copies vary."}
+    acquisition: {state: library}
+    tags: [informed-trading, lambda, price-impact]
+    refs:
+      - {target: grossman-1980-impossibility-efficient-markets, relation: builds_on}
+
+  - id: glosten-1985-bid-ask
+    title: "Bid, Ask and Transaction Prices in a Specialist Market with Heterogeneously Informed Traders"
+    authors: [Lawrence R. Glosten, Paul R. Milgrom]
+    year: 1985
+    bucket: economics_information
+    form: paper
+    venue: Journal of Financial Economics
+    pages: 30
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [adverse-selection, sequential-trade, spread-decomposition]
+
+  - id: almgren-2000-optimal-execution
+    title: "Optimal Execution of Portfolio Transactions"
+    authors: [Robert Almgren, Neil Chriss]
+    year: 2000
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Risk
+    pages: 39
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Widely circulated author copy; hosting is not a licence."}
+    acquisition: {state: open_url}
+    tags: [execution, impact-model, mean-variance]
+    refs:
+      - {target: "Bertsimas & Lo — Optimal control of execution costs", relation: builds_on, bucket: market_microstructure}
+
+  - id: obizhaeva-2013-optimal-trading-strategy
+    title: "Optimal Trading Strategy and Supply/Demand Dynamics"
+    authors: [Anna A. Obizhaeva, Jiang Wang]
+    year: 2013
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Financial Markets
+    pages: 32
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [resiliency, transient-impact, execution]
+    refs:
+      - {target: almgren-2000-optimal-execution, relation: builds_on}
+
+  - id: avellaneda-2008-hft-limit-order-book
+    title: "High-frequency Trading in a Limit Order Book"
+    authors: [Marco Avellaneda, Sasha Stoikov]
+    year: 2008
+    bucket: market_microstructure
+    form: paper
+    venue: Quantitative Finance
+    pages: 19
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [market-making, reservation-price, inventory-skew]
+    refs:
+      - {target: "Ho & Stoll — Optimal dealer pricing under transactions and return uncertainty", relation: builds_on, bucket: market_microstructure}
+
+  - id: gueant-2013-dealing-with-inventory-risk
+    title: "Dealing with the Inventory Risk: A Solution to the Market Making Problem"
+    authors: [Olivier Guéant, Charles-Albert Lehalle, Joaquin Fernandez-Tapia]
+    year: 2013
+    bucket: market_microstructure
+    form: paper
+    venue: Mathematics and Financial Economics
+    pages: 31
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv preprint exists; check its licence, not the journal's."}
+    acquisition: {state: open_url}
+    tags: [market-making, inventory-control]
+
+  - id: cont-2010-stochastic-model-order-book
+    title: "A Stochastic Model for Order Book Dynamics"
+    authors: [Rama Cont, Sasha Stoikov, Rishi Talreja]
+    year: 2010
+    bucket: market_microstructure
+    form: paper
+    venue: Operations Research
+    pages: 20
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [queueing, birth-death, order-book]
+    refs:
+      - {target: kleinrock-1975-queueing-systems-vol1, relation: cites}
+
+  - id: cont-2013-price-dynamics-markovian-lob
+    title: "Price Dynamics in a Markovian Limit Order Market"
+    authors: [Rama Cont, Adrien de Larrard]
+    year: 2013
+    bucket: queueing_networks
+    form: paper
+    venue: SIAM Journal on Financial Mathematics
+    pages: 25
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [heavy-traffic, diffusion-limit, order-book]
+    refs:
+      - {target: whitt-2002-stochastic-process-limits, relation: builds_on}
+      - {target: cont-2010-stochastic-model-order-book, relation: builds_on}
+
+  - id: cont-2014-price-impact-order-book-events
+    title: "The Price Impact of Order Book Events"
+    authors: [Rama Cont, Arseniy Kukanov, Sasha Stoikov]
+    year: 2014
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Financial Econometrics
+    pages: 32
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [order-flow-imbalance, impact]
+
+  - id: hasbrouck-1991-information-content-trades
+    title: "Measuring the Information Content of Stock Trades"
+    authors: [Joel Hasbrouck]
+    year: 1991
+    bucket: market_microstructure
+    form: paper
+    venue: Journal of Finance
+    pages: 28
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [var, price-discovery]
+
+  - id: madhavan-2000-microstructure-survey
+    title: "Market Microstructure: A Survey"
+    authors: [Ananth Madhavan]
+    year: 2000
+    bucket: market_microstructure
+    form: survey
+    venue: Journal of Financial Markets
+    pages: 46
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [survey, orientation]
+    refs:
+      - {target: ohara-1995-market-microstructure-theory, relation: cites}
+      - {target: "Biais, Glosten & Spatt — Market microstructure: a survey of microfoundations", relation: cites, bucket: market_microstructure}
+
+  - id: bouchaud-2009-how-markets-slowly-digest
+    title: "How Markets Slowly Digest Changes in Supply and Demand"
+    authors: [Jean-Philippe Bouchaud, J. Doyne Farmer, Fabrizio Lillo]
+    year: 2009
+    bucket: market_microstructure
+    form: survey
+    venue: "Handbook of Financial Markets: Dynamics and Evolution"
+    pages: 92
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "arXiv version widely available; licence unchecked."}
+    acquisition: {state: open_url}
+    tags: [impact, order-flow-autocorrelation, efficiency]
+
+  - id: gatheral-2010-no-dynamic-arbitrage
+    title: "No-Dynamic-Arbitrage and Market Impact"
+    authors: [Jim Gatheral]
+    year: 2010
+    bucket: market_microstructure
+    form: paper
+    venue: Quantitative Finance
+    pages: 15
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [impact, decay-kernel, arbitrage]
+
+  - id: easley-2012-flow-toxicity-vpin
+    title: "Flow Toxicity and Liquidity in a High-Frequency World"
+    authors: [David Easley, Marcos López de Prado, Maureen O'Hara]
+    year: 2012
+    bucket: market_microstructure
+    form: paper
+    venue: Review of Financial Studies
+    pages: 45
+    density: medium
+    priority: 3
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [vpin, toxicity, volume-clock]
+
+  - id: hasbrouck-securities-trading-notes
+    title: "Securities Trading: Principles and Procedures (course notes)"
+    authors: [Joel Hasbrouck]
+    year: 2024
+    bucket: open_courseware
+    form: lecture_notes
+    venue: NYU Stern
+    pages: 350
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Posted on the author's teaching page. Ask directly about corpus rights — a direct grant is plausible here."}
+    acquisition: {state: open_url}
+    tags: [microstructure, teaching, high-value-target]
+    refs:
+      - {target: hasbrouck-2007-empirical-market-microstructure, relation: builds_on}
+
+  - id: sec-2010-equity-market-structure-concept-release
+    title: "Concept Release on Equity Market Structure"
+    authors: [U.S. Securities and Exchange Commission]
+    year: 2010
+    bucket: exchange_documentation
+    form: regulatory_filing
+    venue: "SEC Release No. 34-61358"
+    pages: 74
+    density: medium
+    priority: 4
+    rights: {status: government_work, confidence: inferred, notes: "US federal agency document; confirm the specific release before relying on this."}
+    acquisition: {state: open_url}
+    tags: [market-structure, regulation, us-equities]
+
+  - id: sec-2005-regulation-nms
+    title: "Regulation NMS — Final Rule"
+    authors: [U.S. Securities and Exchange Commission]
+    year: 2005
+    bucket: exchange_documentation
+    form: regulatory_filing
+    venue: "SEC Release No. 34-51808"
+    pages: 523
+    density: medium
+    priority: 4
+    rights: {status: government_work, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [order-protection, trade-through, us-equities]
+
+  # ------------------------------------------------------------------
+  # quant_finance_core
+  # ------------------------------------------------------------------
+  - id: shreve-2004-stochastic-calculus-finance-ii
+    title: "Stochastic Calculus for Finance II: Continuous-Time Models"
+    authors: [Steven E. Shreve]
+    year: 2004
+    bucket: quant_finance_core
+    form: textbook
+    venue: Springer
+    pages: 550
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [stochastic-calculus, martingales, foundations]
+    refs:
+      - {target: karatzas-1998-methods-mathematical-finance, relation: cites}
+
+  - id: bjork-2019-arbitrage-theory
+    title: "Arbitrage Theory in Continuous Time"
+    authors: [Tomas Björk]
+    year: 2019
+    bucket: quant_finance_core
+    form: textbook
+    venue: Oxford University Press
+    pages: 592
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [arbitrage, term-structure]
+
+  - id: hull-2021-options-futures-derivatives
+    title: "Options, Futures, and Other Derivatives"
+    authors: [John C. Hull]
+    year: 2021
+    bucket: quant_finance_core
+    form: textbook
+    venue: Pearson
+    pages: 896
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [derivatives, orientation]
+
+  - id: gatheral-2006-volatility-surface
+    title: "The Volatility Surface: A Practitioner's Guide"
+    authors: [Jim Gatheral]
+    year: 2006
+    bucket: quant_finance_core
+    form: textbook
+    venue: Wiley
+    pages: 208
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [volatility, smile, local-vol]
+    refs:
+      - {target: bergomi-2015-stochastic-volatility-modeling, relation: cites}
+
+  - id: bergomi-2015-stochastic-volatility-modeling
+    title: "Stochastic Volatility Modeling"
+    authors: [Lorenzo Bergomi]
+    year: 2015
+    bucket: quant_finance_core
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 520
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [volatility, forward-variance]
+
+  - id: rebonato-2004-volatility-correlation
+    title: "Volatility and Correlation: The Perfect Hedger and the Fox"
+    authors: [Riccardo Rebonato]
+    year: 2004
+    bucket: quant_finance_core
+    form: textbook
+    venue: Wiley
+    pages: 864
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [volatility, correlation, modelling-philosophy]
+
+  - id: glasserman-2003-monte-carlo-financial-engineering
+    title: "Monte Carlo Methods in Financial Engineering"
+    authors: [Paul Glasserman]
+    year: 2003
+    bucket: quant_finance_core
+    form: textbook
+    venue: Springer
+    pages: 596
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [monte-carlo, variance-reduction, simulation]
+
+  - id: cont-2003-financial-modelling-jump-processes
+    title: "Financial Modelling with Jump Processes"
+    authors: [Rama Cont, Peter Tankov]
+    year: 2003
+    bucket: quant_finance_core
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 552
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [levy-processes, jumps]
+
+  - id: karatzas-1998-methods-mathematical-finance
+    title: "Methods of Mathematical Finance"
+    authors: [Ioannis Karatzas, Steven E. Shreve]
+    year: 1998
+    bucket: quant_finance_core
+    form: monograph
+    venue: Springer
+    pages: 415
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [continuous-time, portfolio-optimization]
+
+  - id: campbell-1997-econometrics-financial-markets
+    title: "The Econometrics of Financial Markets"
+    authors: [John Y. Campbell, Andrew W. Lo, A. Craig MacKinlay]
+    year: 1997
+    bucket: quant_finance_core
+    form: textbook
+    venue: Princeton University Press
+    pages: 632
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [econometrics, event-studies, predictability]
+    refs:
+      - {target: hamilton-1994-time-series-analysis, relation: cites}
+
+  - id: hamilton-1994-time-series-analysis
+    title: "Time Series Analysis"
+    authors: [James D. Hamilton]
+    year: 1994
+    bucket: quant_finance_core
+    form: textbook
+    venue: Princeton University Press
+    pages: 820
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [time-series, state-space, regime-switching]
+    refs:
+      - {target: "Hamilton — A new approach to the economic analysis of nonstationary time series", relation: cites, bucket: quant_finance_core}
+
+  - id: tsay-2010-analysis-financial-time-series
+    title: "Analysis of Financial Time Series"
+    authors: [Ruey S. Tsay]
+    year: 2010
+    bucket: quant_finance_core
+    form: textbook
+    venue: Wiley
+    pages: 720
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [garch, volatility-models, applied]
+
+  - id: mcneil-2015-quantitative-risk-management
+    title: "Quantitative Risk Management: Concepts, Techniques and Tools"
+    authors: [Alexander J. McNeil, Rüdiger Frey, Paul Embrechts]
+    year: 2015
+    bucket: quant_finance_core
+    form: textbook
+    venue: Princeton University Press
+    pages: 720
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [risk, extremes, copulas]
+    refs:
+      - {target: "Embrechts, Klüppelberg & Mikosch — Modelling Extremal Events", relation: cites, bucket: quant_finance_core}
+
+  - id: grinold-1999-active-portfolio-management
+    title: "Active Portfolio Management"
+    authors: [Richard C. Grinold, Ronald N. Kahn]
+    year: 1999
+    bucket: quant_finance_core
+    form: textbook
+    venue: McGraw-Hill
+    pages: 596
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [information-ratio, breadth, alpha-construction]
+
+  - id: ang-2014-asset-management
+    title: "Asset Management: A Systematic Approach to Factor Investing"
+    authors: [Andrew Ang]
+    year: 2014
+    bucket: quant_finance_core
+    form: textbook
+    venue: Oxford University Press
+    pages: 717
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [factors, allocation]
+
+  - id: cochrane-2005-asset-pricing
+    title: "Asset Pricing"
+    authors: [John H. Cochrane]
+    year: 2005
+    bucket: quant_finance_core
+    form: textbook
+    venue: Princeton University Press
+    pages: 568
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author posts course notes separately; those may have different terms."}
+    acquisition: {state: purchasable}
+    tags: [sdf, gmm, asset-pricing]
+
+  - id: duffie-2001-dynamic-asset-pricing
+    title: "Dynamic Asset Pricing Theory"
+    authors: [Darrell Duffie]
+    year: 2001
+    bucket: quant_finance_core
+    form: textbook
+    venue: Princeton University Press
+    pages: 472
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [continuous-time, equilibrium]
+
+  - id: lopezdeprado-2018-advances-financial-ml
+    title: "Advances in Financial Machine Learning"
+    authors: [Marcos López de Prado]
+    year: 2018
+    bucket: quant_finance_core
+    form: textbook
+    venue: Wiley
+    pages: 400
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [labelling, backtest-overfitting, sample-weighting]
+    refs:
+      - {target: "Bailey & López de Prado — The deflated Sharpe ratio", relation: cites, bucket: quant_finance_core}
+
+  - id: taleb-1997-dynamic-hedging
+    title: "Dynamic Hedging: Managing Vanilla and Exotic Options"
+    authors: [Nassim Nicholas Taleb]
+    year: 1997
+    bucket: quant_finance_core
+    form: manual
+    venue: Wiley
+    pages: 528
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [practitioner, greeks, tail-risk, desk-heuristics]
+
+  - id: natenberg-1994-option-volatility-pricing
+    title: "Option Volatility and Pricing"
+    authors: [Sheldon Natenberg]
+    year: 1994
+    bucket: quant_finance_core
+    form: manual
+    venue: McGraw-Hill
+    pages: 469
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [options, market-maker-heuristics]
+
+  - id: sinclair-2013-volatility-trading
+    title: "Volatility Trading"
+    authors: [Euan Sinclair]
+    year: 2013
+    bucket: quant_finance_core
+    form: manual
+    venue: Wiley
+    pages: 300
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [options, practitioner, position-sizing]
+
+  - id: roncalli-2020-handbook-financial-risk-management
+    title: "Handbook of Financial Risk Management"
+    authors: [Thierry Roncalli]
+    year: 2020
+    bucket: quant_finance_core
+    form: handbook
+    venue: Chapman and Hall/CRC
+    pages: 1100
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author posts extensive course slides separately; check those terms too."}
+    acquisition: {state: purchasable}
+    tags: [risk, regulation, portfolio]
+
+  - id: ruppert-2015-statistics-financial-engineering
+    title: "Statistics and Data Analysis for Financial Engineering"
+    authors: [David Ruppert, David S. Matteson]
+    year: 2015
+    bucket: quant_finance_core
+    form: textbook
+    venue: Springer
+    pages: 719
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [applied-statistics, r]
+
+  # ------------------------------------------------------------------
+  # economics_information
+  # ------------------------------------------------------------------
+  - id: grossman-1980-impossibility-efficient-markets
+    title: "On the Impossibility of Informationally Efficient Markets"
+    authors: [Sanford J. Grossman, Joseph E. Stiglitz]
+    year: 1980
+    bucket: economics_information
+    form: paper
+    venue: American Economic Review
+    pages: 15
+    density: high
+    priority: 5
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [information-aggregation, noise-traders]
+
+  - id: milgrom-2004-putting-auction-theory-to-work
+    title: "Putting Auction Theory to Work"
+    authors: [Paul Milgrom]
+    year: 2004
+    bucket: economics_information
+    form: textbook
+    venue: Cambridge University Press
+    pages: 388
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [auctions, market-design]
+    refs:
+      - {target: krishna-2009-auction-theory, relation: cites}
+      - {target: "Wilson — Nonlinear Pricing", relation: cites, bucket: economics_information}
+
+  - id: krishna-2009-auction-theory
+    title: "Auction Theory"
+    authors: [Vijay Krishna]
+    year: 2009
+    bucket: economics_information
+    form: textbook
+    venue: Academic Press
+    pages: 336
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [auctions, revenue-equivalence]
+
+  - id: klemperer-2004-auctions-theory-practice
+    title: "Auctions: Theory and Practice"
+    authors: [Paul Klemperer]
+    year: 2004
+    bucket: economics_information
+    form: textbook
+    venue: Princeton University Press
+    pages: 246
+    density: medium
+    priority: 3
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author has posted chapter drafts; confirm before relying on this."}
+    acquisition: {state: open_url}
+    tags: [auctions, applied]
+
+  - id: masColell-1995-microeconomic-theory
+    title: "Microeconomic Theory"
+    authors: [Andreu Mas-Colell, Michael D. Whinston, Jerry R. Green]
+    year: 1995
+    bucket: economics_information
+    form: textbook
+    venue: Oxford University Press
+    pages: 981
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [graduate-micro, general-equilibrium, mechanism-design]
+
+  - id: fudenberg-1991-game-theory
+    title: "Game Theory"
+    authors: [Drew Fudenberg, Jean Tirole]
+    year: 1991
+    bucket: economics_information
+    form: textbook
+    venue: MIT Press
+    pages: 579
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [game-theory, dynamic-games, signalling]
+
+  - id: osborne-1994-course-in-game-theory
+    title: "A Course in Game Theory"
+    authors: [Martin J. Osborne, Ariel Rubinstein]
+    year: 1994
+    bucket: economics_information
+    form: textbook
+    venue: MIT Press
+    pages: 368
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors have made a free electronic edition available; verify the exact permission."}
+    acquisition: {state: open_url}
+    tags: [game-theory, high-value-target]
+
+  - id: vives-2008-information-learning-markets
+    title: "Information and Learning in Markets: The Impact of Market Microstructure"
+    authors: [Xavier Vives]
+    year: 2008
+    bucket: economics_information
+    form: textbook
+    venue: Princeton University Press
+    pages: 421
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [rational-expectations, learning, bridge-to-microstructure]
+    refs:
+      - {target: grossman-1980-impossibility-efficient-markets, relation: builds_on}
+      - {target: kyle-1985-continuous-auctions, relation: builds_on}
+      - {target: ohara-1995-market-microstructure-theory, relation: cites}
+
+  - id: brunnermeier-2001-asset-pricing-asymmetric-information
+    title: "Asset Pricing under Asymmetric Information: Bubbles, Crashes, Technical Analysis, and Herding"
+    authors: [Markus K. Brunnermeier]
+    year: 2001
+    bucket: economics_information
+    form: monograph
+    venue: Oxford University Press
+    pages: 264
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [bubbles, herding, information]
+
+  - id: nisan-2007-algorithmic-game-theory
+    title: "Algorithmic Game Theory"
+    authors: [Noam Nisan, Tim Roughgarden, Éva Tardos, Vijay V. Vazirani]
+    year: 2007
+    bucket: economics_information
+    form: handbook
+    venue: Cambridge University Press
+    pages: 776
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A free PDF has been posted with the publisher's agreement; confirm the terms of that posting."}
+    acquisition: {state: open_url}
+    tags: [mechanism-design, computational, high-value-target]
+    refs:
+      - {target: "Roughgarden — Twenty Lectures on Algorithmic Game Theory", relation: cites, bucket: open_courseware}
+
+  - id: wolfers-2004-prediction-markets
+    title: "Prediction Markets"
+    authors: [Justin Wolfers, Eric Zitzewitz]
+    year: 2004
+    bucket: economics_information
+    form: survey
+    venue: Journal of Economic Perspectives
+    pages: 22
+    density: medium
+    priority: 4
+    rights: {status: open_license_other, confidence: inferred, notes: "AEA makes JEP freely readable; that is not automatically a reuse licence."}
+    acquisition: {state: open_url}
+    tags: [prediction-markets, polymarket-relevant]
+
+  - id: hanson-2007-logarithmic-market-scoring
+    title: "Logarithmic Market Scoring Rules for Modular Combinatorial Information Aggregation"
+    authors: [Robin Hanson]
+    year: 2007
+    bucket: economics_information
+    form: paper
+    venue: Journal of Prediction Markets
+    pages: 15
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [lmsr, automated-market-maker, polymarket-relevant]
+    refs:
+      - {target: "Chen & Pennock — A utility framework for bounded-loss market makers", relation: cites, bucket: economics_information}
+
+  - id: roth-1990-two-sided-matching
+    title: "Two-Sided Matching: A Study in Game-Theoretic Modeling and Analysis"
+    authors: [Alvin E. Roth, Marilda A. Oliveira Sotomayor]
+    year: 1990
+    bucket: economics_information
+    form: monograph
+    venue: Cambridge University Press
+    pages: 265
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [matching, market-design]
+
+  - id: laffont-2002-theory-of-incentives
+    title: "The Theory of Incentives: The Principal-Agent Model"
+    authors: [Jean-Jacques Laffont, David Martimort]
+    year: 2002
+    bucket: economics_information
+    form: textbook
+    venue: Princeton University Press
+    pages: 421
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [contracts, incentives]
+
+  # ------------------------------------------------------------------
+  # signal_processing
+  # ------------------------------------------------------------------
+  - id: kay-1993-estimation-theory
+    title: "Fundamentals of Statistical Signal Processing, Volume I: Estimation Theory"
+    authors: [Steven M. Kay]
+    year: 1993
+    bucket: signal_processing
+    form: textbook
+    venue: Prentice Hall
+    pages: 595
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [estimation, crlb, mle]
+    refs:
+      - {target: kay-1998-detection-theory, relation: builds_on}
+      - {target: vantrees-2001-detection-estimation-modulation, relation: cites}
+
+  - id: kay-1998-detection-theory
+    title: "Fundamentals of Statistical Signal Processing, Volume II: Detection Theory"
+    authors: [Steven M. Kay]
+    year: 1998
+    bucket: detection_tracking
+    form: textbook
+    venue: Prentice Hall
+    pages: 560
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [detection, neyman-pearson, glrt]
+
+  - id: haykin-2013-adaptive-filter-theory
+    title: "Adaptive Filter Theory"
+    authors: [Simon Haykin]
+    year: 2013
+    bucket: signal_processing
+    form: textbook
+    venue: Pearson
+    pages: 912
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [lms, rls, kalman, adaptive]
+    refs:
+      - {target: sayed-2008-adaptive-filters, relation: cites}
+      - {target: widrow-1985-adaptive-signal-processing, relation: builds_on}
+
+  - id: sayed-2008-adaptive-filters
+    title: "Adaptive Filters"
+    authors: [Ali H. Sayed]
+    year: 2008
+    bucket: signal_processing
+    form: textbook
+    venue: Wiley-IEEE
+    pages: 786
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [adaptive, state-space, robustness]
+
+  - id: widrow-1985-adaptive-signal-processing
+    title: "Adaptive Signal Processing"
+    authors: [Bernard Widrow, Samuel D. Stearns]
+    year: 1985
+    bucket: signal_processing
+    form: textbook
+    venue: Prentice Hall
+    pages: 474
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [lms, historical]
+
+  - id: stoica-2005-spectral-analysis-signals
+    title: "Spectral Analysis of Signals"
+    authors: [Petre Stoica, Randolph Moses]
+    year: 2005
+    bucket: signal_processing
+    form: textbook
+    venue: Prentice Hall
+    pages: 452
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A PDF has circulated from author pages; verify before use."}
+    acquisition: {state: open_url}
+    tags: [spectral-estimation, periodogram, subspace-methods]
+
+  - id: poor-1994-signal-detection-estimation
+    title: "An Introduction to Signal Detection and Estimation"
+    authors: [H. Vincent Poor]
+    year: 1994
+    bucket: detection_tracking
+    form: textbook
+    venue: Springer
+    pages: 559
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [detection, estimation, decision-theory]
+
+  - id: vantrees-2001-detection-estimation-modulation
+    title: "Detection, Estimation, and Modulation Theory, Part I"
+    authors: [Harry L. Van Trees]
+    year: 2001
+    bucket: detection_tracking
+    form: textbook
+    venue: Wiley
+    pages: 716
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [detection, estimation, classic]
+
+  - id: mallat-2008-wavelet-tour
+    title: "A Wavelet Tour of Signal Processing: The Sparse Way"
+    authors: [Stéphane Mallat]
+    year: 2008
+    bucket: signal_processing
+    form: textbook
+    venue: Academic Press
+    pages: 832
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [wavelets, sparsity, multiscale]
+
+  - id: percival-2000-wavelet-methods-time-series
+    title: "Wavelet Methods for Time Series Analysis"
+    authors: [Donald B. Percival, Andrew T. Walden]
+    year: 2000
+    bucket: signal_processing
+    form: textbook
+    venue: Cambridge University Press
+    pages: 620
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [wavelets, time-series]
+
+  - id: priestley-1981-spectral-analysis-time-series
+    title: "Spectral Analysis and Time Series"
+    authors: [M. B. Priestley]
+    year: 1981
+    bucket: signal_processing
+    form: textbook
+    venue: Academic Press
+    pages: 890
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [spectral, nonstationary, classic]
+
+  - id: anderson-1979-optimal-filtering
+    title: "Optimal Filtering"
+    authors: [Brian D. O. Anderson, John B. Moore]
+    year: 1979
+    bucket: signal_processing
+    form: textbook
+    venue: Prentice Hall (Dover reprint)
+    pages: 357
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors have posted a scanned edition; confirm the permission statement."}
+    acquisition: {state: open_url}
+    tags: [kalman, smoothing, classic, high-value-target]
+
+  - id: sarkka-2013-bayesian-filtering-smoothing
+    title: "Bayesian Filtering and Smoothing"
+    authors: [Simo Särkkä]
+    year: 2013
+    bucket: signal_processing
+    form: textbook
+    venue: Cambridge University Press
+    pages: 254
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author hosts a PDF under a stated arrangement with the publisher; read that statement carefully."}
+    acquisition: {state: open_url}
+    tags: [kalman, particle-filter, smoothing, high-value-target]
+    refs:
+      - {target: doucet-2001-sequential-monte-carlo, relation: cites}
+      - {target: anderson-1979-optimal-filtering, relation: builds_on}
+
+  - id: simon-2006-optimal-state-estimation
+    title: "Optimal State Estimation: Kalman, H-infinity, and Nonlinear Approaches"
+    authors: [Dan Simon]
+    year: 2006
+    bucket: signal_processing
+    form: textbook
+    venue: Wiley
+    pages: 552
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [kalman, h-infinity, nonlinear-estimation]
+    refs:
+      - {target: zhou-1998-essentials-robust-control, relation: cites}
+
+  - id: doucet-2001-sequential-monte-carlo
+    title: "Sequential Monte Carlo Methods in Practice"
+    authors: [Arnaud Doucet, Nando de Freitas, Neil Gordon]
+    year: 2001
+    bucket: signal_processing
+    form: handbook
+    venue: Springer
+    pages: 581
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [particle-filters, smc]
+
+  - id: basseville-1993-detection-abrupt-changes
+    title: "Detection of Abrupt Changes: Theory and Application"
+    authors: [Michèle Basseville, Igor V. Nikiforov]
+    year: 1993
+    bucket: signal_processing
+    form: textbook
+    venue: Prentice Hall
+    pages: 528
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Out of print; authors have posted a PDF. Ask for an explicit corpus permission."}
+    acquisition: {state: open_url}
+    tags: [changepoint, cusum, regime-detection, high-value-target]
+    refs:
+      - {target: tartakovsky-2014-sequential-analysis, relation: cites}
+      - {target: "Page — Continuous inspection schemes", relation: cites, bucket: decision_sequential}
+
+  - id: tartakovsky-2014-sequential-analysis
+    title: "Sequential Analysis: Hypothesis Testing and Changepoint Detection"
+    authors: [Alexander Tartakovsky, Igor Nikiforov, Michèle Basseville]
+    year: 2014
+    bucket: decision_sequential
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 603
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [sequential-detection, changepoint, quickest-detection]
+
+  - id: oppenheim-2009-discrete-time-signal-processing
+    title: "Discrete-Time Signal Processing"
+    authors: [Alan V. Oppenheim, Ronald W. Schafer]
+    year: 2009
+    bucket: signal_processing
+    form: textbook
+    venue: Pearson
+    pages: 1120
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [dsp, foundations]
+
+  # ------------------------------------------------------------------
+  # detection_tracking
+  # ------------------------------------------------------------------
+  - id: barshalom-2001-estimation-tracking-navigation
+    title: "Estimation with Applications to Tracking and Navigation"
+    authors: [Yaakov Bar-Shalom, X. Rong Li, Thiagalingam Kirubarajan]
+    year: 2001
+    bucket: detection_tracking
+    form: textbook
+    venue: Wiley
+    pages: 584
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [tracking, data-association, imm]
+    refs:
+      - {target: blackman-1999-modern-tracking-systems, relation: cites}
+      - {target: anderson-1979-optimal-filtering, relation: builds_on}
+
+  - id: blackman-1999-modern-tracking-systems
+    title: "Design and Analysis of Modern Tracking Systems"
+    authors: [Samuel Blackman, Robert Popoli]
+    year: 1999
+    bucket: detection_tracking
+    form: textbook
+    venue: Artech House
+    pages: 1230
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [tracking, mht, sensor-fusion]
+
+  - id: ristic-2004-beyond-kalman-filter
+    title: "Beyond the Kalman Filter: Particle Filters for Tracking Applications"
+    authors: [Branko Ristic, Sanjeev Arulampalam, Neil Gordon]
+    year: 2004
+    bucket: detection_tracking
+    form: monograph
+    venue: Artech House
+    pages: 318
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [particle-filters, tracking]
+
+  - id: richards-2014-radar-signal-processing
+    title: "Fundamentals of Radar Signal Processing"
+    authors: [Mark A. Richards]
+    year: 2014
+    bucket: detection_tracking
+    form: textbook
+    venue: McGraw-Hill
+    pages: 656
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [radar, cfar, matched-filter]
+    refs:
+      - {target: "Skolnik — Introduction to Radar Systems", relation: cites, bucket: detection_tracking}
+
+  - id: mahler-2007-multisource-multitarget-fusion
+    title: "Statistical Multisource-Multitarget Information Fusion"
+    authors: [Ronald P. S. Mahler]
+    year: 2007
+    bucket: detection_tracking
+    form: monograph
+    venue: Artech House
+    pages: 874
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [random-finite-sets, phd-filter, fusion]
+
+  # ------------------------------------------------------------------
+  # optimal_control
+  # ------------------------------------------------------------------
+  - id: bertsekas-2017-dp-optimal-control-vol1
+    title: "Dynamic Programming and Optimal Control, Volume I"
+    authors: [Dimitri P. Bertsekas]
+    year: 2017
+    bucket: optimal_control
+    form: textbook
+    venue: Athena Scientific
+    pages: 576
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author posts slides and selected chapters; those postings may be separately permissioned."}
+    acquisition: {state: purchasable}
+    tags: [dynamic-programming, finite-horizon, foundations]
+    refs:
+      - {target: bertsekas-2012-dp-optimal-control-vol2, relation: builds_on}
+      - {target: puterman-1994-markov-decision-processes, relation: cites}
+
+  - id: bertsekas-2012-dp-optimal-control-vol2
+    title: "Dynamic Programming and Optimal Control, Volume II: Approximate Dynamic Programming"
+    authors: [Dimitri P. Bertsekas]
+    year: 2012
+    bucket: optimal_control
+    form: textbook
+    venue: Athena Scientific
+    pages: 712
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [approximate-dp, infinite-horizon]
+
+  - id: bertsekas-2019-rl-optimal-control
+    title: "Reinforcement Learning and Optimal Control"
+    authors: [Dimitri P. Bertsekas]
+    year: 2019
+    bucket: optimal_control
+    form: textbook
+    venue: Athena Scientific
+    pages: 388
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Draft chapters and full lecture slides have been posted by the author."}
+    acquisition: {state: purchasable}
+    tags: [rl, adp, rollout, bridge-to-rl]
+    refs:
+      - {target: sutton-2018-reinforcement-learning, relation: cites}
+      - {target: bertsekas-1996-neuro-dynamic-programming, relation: builds_on}
+
+  - id: bertsekas-1996-neuro-dynamic-programming
+    title: "Neuro-Dynamic Programming"
+    authors: [Dimitri P. Bertsekas, John N. Tsitsiklis]
+    year: 1996
+    bucket: optimal_control
+    form: monograph
+    venue: Athena Scientific
+    pages: 512
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [approximate-dp, td-learning, theory]
+
+  - id: fleming-2006-controlled-markov-processes
+    title: "Controlled Markov Processes and Viscosity Solutions"
+    authors: [Wendell H. Fleming, H. Mete Soner]
+    year: 2006
+    bucket: optimal_control
+    form: monograph
+    venue: Springer
+    pages: 429
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [hjb, viscosity-solutions, stochastic-control]
+
+  - id: pham-2009-continuous-time-stochastic-control
+    title: "Continuous-time Stochastic Control and Optimization with Financial Applications"
+    authors: [Huyên Pham]
+    year: 2009
+    bucket: optimal_control
+    form: textbook
+    venue: Springer
+    pages: 232
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [stochastic-control, finance-applications, bridge-to-microstructure]
+
+  - id: oksendal-2007-stochastic-control-jump-diffusions
+    title: "Applied Stochastic Control of Jump Diffusions"
+    authors: [Bernt Øksendal, Agnès Sulem]
+    year: 2007
+    bucket: optimal_control
+    form: monograph
+    venue: Springer
+    pages: 257
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [jump-diffusion, impulse-control]
+
+  - id: kushner-2001-numerical-methods-stochastic-control
+    title: "Numerical Methods for Stochastic Control Problems in Continuous Time"
+    authors: [Harold J. Kushner, Paul Dupuis]
+    year: 2001
+    bucket: optimal_control
+    form: monograph
+    venue: Springer
+    pages: 475
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [markov-chain-approximation, numerics]
+
+  - id: astrom-2008-feedback-systems
+    title: "Feedback Systems: An Introduction for Scientists and Engineers"
+    authors: [Karl Johan Åström, Richard M. Murray]
+    year: 2008
+    bucket: optimal_control
+    form: textbook
+    venue: Princeton University Press
+    pages: 408
+    density: medium
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors host a full PDF edition; read their stated terms."}
+    acquisition: {state: open_url}
+    tags: [feedback, stability, orientation, high-value-target]
+
+  - id: rawlings-2017-model-predictive-control
+    title: "Model Predictive Control: Theory, Computation, and Design"
+    authors: [James B. Rawlings, David Q. Mayne, Moritz M. Diehl]
+    year: 2017
+    bucket: optimal_control
+    form: textbook
+    venue: Nob Hill Publishing
+    pages: 770
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A free PDF is distributed by the authors; confirm the terms."}
+    acquisition: {state: open_url}
+    tags: [mpc, receding-horizon, constraints, high-value-target]
+    refs:
+      - {target: boyd-2004-convex-optimization, relation: cites}
+
+  - id: zhou-1998-essentials-robust-control
+    title: "Essentials of Robust Control"
+    authors: [Kemin Zhou, John C. Doyle]
+    year: 1998
+    bucket: optimal_control
+    form: textbook
+    venue: Prentice Hall
+    pages: 411
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [h-infinity, robustness, uncertainty]
+
+  - id: ioannou-1996-robust-adaptive-control
+    title: "Robust Adaptive Control"
+    authors: [Petros A. Ioannou, Jing Sun]
+    year: 1996
+    bucket: optimal_control
+    form: textbook
+    venue: Prentice Hall (Dover reprint)
+    pages: 848
+    density: high
+    priority: 3
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author has posted a PDF of the out-of-print edition."}
+    acquisition: {state: open_url}
+    tags: [adaptive-control, observers, stability]
+
+  - id: liberzon-2003-switching-systems-control
+    title: "Switching in Systems and Control"
+    authors: [Daniel Liberzon]
+    year: 2003
+    bucket: optimal_control
+    form: monograph
+    venue: Birkhäuser
+    pages: 233
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [hybrid-systems, switching, regime-relevant]
+    refs:
+      - {target: "Goebel, Sanfelice & Teel — Hybrid Dynamical Systems", relation: cites, bucket: optimal_control}
+
+  # ------------------------------------------------------------------
+  # operations_research
+  # ------------------------------------------------------------------
+  - id: powell-2011-approximate-dynamic-programming
+    title: "Approximate Dynamic Programming: Solving the Curses of Dimensionality"
+    authors: [Warren B. Powell]
+    year: 2011
+    bucket: operations_research
+    form: textbook
+    venue: Wiley
+    pages: 656
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [approximate-dp, resource-allocation, execution-relevant]
+    refs:
+      - {target: powell-2022-rl-stochastic-optimization, relation: builds_on}
+      - {target: bertsekas-2012-dp-optimal-control-vol2, relation: cites}
+
+  - id: powell-2022-rl-stochastic-optimization
+    title: "Reinforcement Learning and Stochastic Optimization: A Unified Framework for Sequential Decisions"
+    authors: [Warren B. Powell]
+    year: 2022
+    bucket: operations_research
+    form: textbook
+    venue: Wiley
+    pages: 1136
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author has posted chapter drafts and slides."}
+    acquisition: {state: purchasable}
+    tags: [sequential-decisions, policy-classes, unifying-framework]
+
+  - id: puterman-1994-markov-decision-processes
+    title: "Markov Decision Processes: Discrete Stochastic Dynamic Programming"
+    authors: [Martin L. Puterman]
+    year: 1994
+    bucket: operations_research
+    form: textbook
+    venue: Wiley
+    pages: 684
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [mdp, policy-iteration, foundations]
+
+  - id: ahuja-1993-network-flows
+    title: "Network Flows: Theory, Algorithms, and Applications"
+    authors: [Ravindra K. Ahuja, Thomas L. Magnanti, James B. Orlin]
+    year: 1993
+    bucket: operations_research
+    form: textbook
+    venue: Prentice Hall
+    pages: 846
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [network-flows, algorithms]
+    refs:
+      - {target: newman-2018-networks, relation: cites}
+
+  - id: bertsimas-1997-linear-optimization
+    title: "Introduction to Linear Optimization"
+    authors: [Dimitris Bertsimas, John N. Tsitsiklis]
+    year: 1997
+    bucket: operations_research
+    form: textbook
+    venue: Athena Scientific
+    pages: 587
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [linear-programming, duality]
+
+  - id: boyd-2004-convex-optimization
+    title: "Convex Optimization"
+    authors: [Stephen Boyd, Lieven Vandenberghe]
+    year: 2004
+    bucket: operations_research
+    form: textbook
+    venue: Cambridge University Press
+    pages: 716
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A free PDF is distributed from the authors' university page with the publisher's agreement; confirm the exact permission."}
+    acquisition: {state: open_url}
+    tags: [convex, duality, high-value-target]
+    refs:
+      - {target: nocedal-2006-numerical-optimization, relation: cites}
+      - {target: "Boyd & Vandenberghe — EE364a lecture slides", relation: syllabus_with, bucket: open_courseware}
+
+  - id: nocedal-2006-numerical-optimization
+    title: "Numerical Optimization"
+    authors: [Jorge Nocedal, Stephen J. Wright]
+    year: 2006
+    bucket: operations_research
+    form: textbook
+    venue: Springer
+    pages: 664
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [nonlinear-optimization, quasi-newton]
+
+  - id: nemhauser-1988-integer-combinatorial-optimization
+    title: "Integer and Combinatorial Optimization"
+    authors: [George L. Nemhauser, Laurence A. Wolsey]
+    year: 1988
+    bucket: operations_research
+    form: textbook
+    venue: Wiley
+    pages: 763
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [integer-programming, polyhedral]
+
+  - id: zipkin-2000-foundations-inventory-management
+    title: "Foundations of Inventory Management"
+    authors: [Paul H. Zipkin]
+    year: 2000
+    bucket: operations_research
+    form: textbook
+    venue: McGraw-Hill
+    pages: 514
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [inventory, base-stock, bridge-to-market-making]
+    refs:
+      - {target: porteus-2002-stochastic-inventory-theory, relation: cites}
+      - {target: avellaneda-2008-hft-limit-order-book, relation: syllabus_with}
+
+  - id: porteus-2002-stochastic-inventory-theory
+    title: "Foundations of Stochastic Inventory Theory"
+    authors: [Evan L. Porteus]
+    year: 2002
+    bucket: operations_research
+    form: textbook
+    venue: Stanford University Press
+    pages: 320
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [inventory, dynamic-programming]
+
+  - id: birge-2011-stochastic-programming
+    title: "Introduction to Stochastic Programming"
+    authors: [John R. Birge, François Louveaux]
+    year: 2011
+    bucket: operations_research
+    form: textbook
+    venue: Springer
+    pages: 485
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [stochastic-programming, scenario-trees]
+
+  - id: bental-2009-robust-optimization
+    title: "Robust Optimization"
+    authors: [Aharon Ben-Tal, Laurent El Ghaoui, Arkadi Nemirovski]
+    year: 2009
+    bucket: operations_research
+    form: monograph
+    venue: Princeton University Press
+    pages: 542
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [robust-optimization, uncertainty-sets]
+
+  - id: pinedo-2016-scheduling
+    title: "Scheduling: Theory, Algorithms, and Systems"
+    authors: [Michael L. Pinedo]
+    year: 2016
+    bucket: operations_research
+    form: textbook
+    venue: Springer
+    pages: 670
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [scheduling, stochastic-scheduling]
+
+  # ------------------------------------------------------------------
+  # queueing_networks
+  # ------------------------------------------------------------------
+  - id: kleinrock-1975-queueing-systems-vol1
+    title: "Queueing Systems, Volume I: Theory"
+    authors: [Leonard Kleinrock]
+    year: 1975
+    bucket: queueing_networks
+    form: textbook
+    venue: Wiley
+    pages: 417
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [queueing, foundations, order-book-relevant]
+    refs:
+      - {target: "Kleinrock — Queueing Systems, Volume II: Computer Applications", relation: builds_on, bucket: queueing_networks}
+
+  - id: gross-2008-fundamentals-queueing-theory
+    title: "Fundamentals of Queueing Theory"
+    authors: [Donald Gross, John F. Shortle, James M. Thompson, Carl M. Harris]
+    year: 2008
+    bucket: queueing_networks
+    form: textbook
+    venue: Wiley
+    pages: 528
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [queueing, applied]
+
+  - id: asmussen-2003-applied-probability-queues
+    title: "Applied Probability and Queues"
+    authors: [Søren Asmussen]
+    year: 2003
+    bucket: queueing_networks
+    form: textbook
+    venue: Springer
+    pages: 438
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [queueing, regenerative-processes, heavy-tails]
+
+  - id: whitt-2002-stochastic-process-limits
+    title: "Stochastic-Process Limits"
+    authors: [Ward Whitt]
+    year: 2002
+    bucket: queueing_networks
+    form: monograph
+    venue: Springer
+    pages: 602
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred, notes: "Author has posted extensive related notes and papers."}
+    acquisition: {state: purchasable}
+    tags: [heavy-traffic, diffusion-limits, order-book-relevant]
+
+  - id: chen-2001-fundamentals-queueing-networks
+    title: "Fundamentals of Queueing Networks: Performance, Asymptotics, and Optimization"
+    authors: [Hong Chen, David D. Yao]
+    year: 2001
+    bucket: queueing_networks
+    form: textbook
+    venue: Springer
+    pages: 405
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [queueing-networks, fluid-limits]
+
+  - id: harrison-1985-brownian-motion-stochastic-flow
+    title: "Brownian Motion and Stochastic Flow Systems"
+    authors: [J. Michael Harrison]
+    year: 1985
+    bucket: queueing_networks
+    form: monograph
+    venue: Wiley
+    pages: 142
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [brownian-approximation, control-of-queues]
+
+  # ------------------------------------------------------------------
+  # information_theory
+  # ------------------------------------------------------------------
+  - id: cover-2006-elements-information-theory
+    title: "Elements of Information Theory"
+    authors: [Thomas M. Cover, Joy A. Thomas]
+    year: 2006
+    bucket: information_theory
+    form: textbook
+    venue: Wiley
+    pages: 776
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [entropy, channel-capacity, foundations]
+    refs:
+      - {target: shannon-1948-mathematical-theory-communication, relation: builds_on}
+      - {target: "Cover — Universal portfolios", relation: cites, bucket: information_theory}
+
+  - id: mackay-2003-information-theory-inference
+    title: "Information Theory, Inference, and Learning Algorithms"
+    authors: [David J. C. MacKay]
+    year: 2003
+    bucket: information_theory
+    form: textbook
+    venue: Cambridge University Press
+    pages: 640
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Long-standing free-to-view online edition with an explicit statement from the author; read it."}
+    acquisition: {state: open_url}
+    tags: [inference, coding, high-value-target]
+
+  - id: shannon-1948-mathematical-theory-communication
+    title: "A Mathematical Theory of Communication"
+    authors: [Claude E. Shannon]
+    year: 1948
+    bucket: information_theory
+    form: paper
+    venue: Bell System Technical Journal
+    pages: 55
+    density: high
+    priority: 4
+    rights: {status: unknown, confidence: unknown, notes: "Widely reproduced; the actual rights position needs checking."}
+    acquisition: {state: open_url}
+    tags: [foundational]
+
+  - id: csiszar-2011-information-theory-coding-theorems
+    title: "Information Theory: Coding Theorems for Discrete Memoryless Systems"
+    authors: [Imre Csiszár, János Körner]
+    year: 2011
+    bucket: information_theory
+    form: monograph
+    venue: Cambridge University Press
+    pages: 522
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [coding-theorems, method-of-types]
+
+  - id: berger-1971-rate-distortion-theory
+    title: "Rate Distortion Theory: A Mathematical Basis for Data Compression"
+    authors: [Toby Berger]
+    year: 1971
+    bucket: information_theory
+    form: monograph
+    venue: Prentice Hall
+    pages: 311
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: library}
+    tags: [rate-distortion, compression, codec-relevant]
+
+  - id: grunwald-2007-mdl-principle
+    title: "The Minimum Description Length Principle"
+    authors: [Peter D. Grünwald]
+    year: 2007
+    bucket: information_theory
+    form: textbook
+    venue: MIT Press
+    pages: 703
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [mdl, model-selection, compression]
+    refs:
+      - {target: li-2008-kolmogorov-complexity, relation: cites}
+      - {target: "Rissanen — Stochastic Complexity in Statistical Inquiry", relation: builds_on, bucket: information_theory}
+
+  - id: li-2008-kolmogorov-complexity
+    title: "An Introduction to Kolmogorov Complexity and Its Applications"
+    authors: [Ming Li, Paul Vitányi]
+    year: 2008
+    bucket: information_theory
+    form: textbook
+    venue: Springer
+    pages: 792
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [algorithmic-complexity, universal-prediction]
+
+  - id: sayood-2017-data-compression
+    title: "Introduction to Data Compression"
+    authors: [Khalid Sayood]
+    year: 2017
+    bucket: information_theory
+    form: textbook
+    venue: Morgan Kaufmann
+    pages: 790
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [compression, quantization, codec-relevant]
+
+  # ------------------------------------------------------------------
+  # bayesian_statistics
+  # ------------------------------------------------------------------
+  - id: gelman-2013-bayesian-data-analysis
+    title: "Bayesian Data Analysis"
+    authors: [Andrew Gelman, John B. Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, Donald B. Rubin]
+    year: 2013
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 675
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors host a PDF for non-commercial reading; the exact wording matters here."}
+    acquisition: {state: open_url}
+    tags: [bayesian, hierarchical, workflow, high-value-target]
+    refs:
+      - {target: "Gelman et al — Bayesian Workflow", relation: cites, bucket: bayesian_statistics}
+
+  - id: robert-2007-bayesian-choice
+    title: "The Bayesian Choice: From Decision-Theoretic Foundations to Computational Implementation"
+    authors: [Christian P. Robert]
+    year: 2007
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Springer
+    pages: 606
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [decision-theory, bayesian-foundations]
+    refs:
+      - {target: berger-1985-statistical-decision-theory, relation: builds_on}
+
+  - id: berger-1985-statistical-decision-theory
+    title: "Statistical Decision Theory and Bayesian Analysis"
+    authors: [James O. Berger]
+    year: 1985
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Springer
+    pages: 617
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [decision-theory, admissibility, robustness]
+
+  - id: west-1997-bayesian-forecasting-dynamic-models
+    title: "Bayesian Forecasting and Dynamic Models"
+    authors: [Mike West, Jeff Harrison]
+    year: 1997
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Springer
+    pages: 682
+    density: high
+    priority: 5
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [dlm, state-space, forecasting, high-relevance]
+    refs:
+      - {target: sarkka-2013-bayesian-filtering-smoothing, relation: syllabus_with}
+      - {target: "Petris, Petrone & Campagnoli — Dynamic Linear Models with R", relation: cites, bucket: bayesian_statistics}
+
+  - id: murphy-2023-probabilistic-ml-advanced
+    title: "Probabilistic Machine Learning: Advanced Topics"
+    authors: [Kevin P. Murphy]
+    year: 2023
+    bucket: bayesian_statistics
+    form: textbook
+    venue: MIT Press
+    pages: 1300
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author distributes a draft PDF; the licence on the draft is the thing to check."}
+    acquisition: {state: open_url}
+    tags: [probabilistic-ml, inference, high-value-target]
+
+  - id: bishop-2006-pattern-recognition-ml
+    title: "Pattern Recognition and Machine Learning"
+    authors: [Christopher M. Bishop]
+    year: 2006
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Springer
+    pages: 738
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A free PDF was released with the publisher's agreement; check the terms of that release."}
+    acquisition: {state: open_url}
+    tags: [graphical-models, variational, high-value-target]
+
+  - id: rasmussen-2006-gaussian-processes
+    title: "Gaussian Processes for Machine Learning"
+    authors: [Carl Edward Rasmussen, Christopher K. I. Williams]
+    year: 2006
+    bucket: bayesian_statistics
+    form: textbook
+    venue: MIT Press
+    pages: 266
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Free online edition posted by the authors."}
+    acquisition: {state: open_url}
+    tags: [gaussian-processes, nonparametric]
+
+  - id: gamerman-2006-mcmc
+    title: "Markov Chain Monte Carlo: Stochastic Simulation for Bayesian Inference"
+    authors: [Dani Gamerman, Hedibert F. Lopes]
+    year: 2006
+    bucket: bayesian_statistics
+    form: textbook
+    venue: Chapman and Hall/CRC
+    pages: 344
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [mcmc, simulation]
+
+  # ------------------------------------------------------------------
+  # decision_sequential
+  # ------------------------------------------------------------------
+  - id: lattimore-2020-bandit-algorithms
+    title: "Bandit Algorithms"
+    authors: [Tor Lattimore, Csaba Szepesvári]
+    year: 2020
+    bucket: decision_sequential
+    form: textbook
+    venue: Cambridge University Press
+    pages: 536
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors host a free PDF of a pre-publication version."}
+    acquisition: {state: open_url}
+    tags: [bandits, regret, exploration, high-value-target]
+    refs:
+      - {target: cesabianchi-2006-prediction-learning-games, relation: cites}
+      - {target: gittins-2011-multiarmed-bandit-allocation-indices, relation: cites}
+
+  - id: cesabianchi-2006-prediction-learning-games
+    title: "Prediction, Learning, and Games"
+    authors: [Nicolò Cesa-Bianchi, Gábor Lugosi]
+    year: 2006
+    bucket: decision_sequential
+    form: textbook
+    venue: Cambridge University Press
+    pages: 394
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [online-learning, regret, adversarial]
+
+  - id: gittins-2011-multiarmed-bandit-allocation-indices
+    title: "Multi-armed Bandit Allocation Indices"
+    authors: [John Gittins, Kevin Glazebrook, Richard Weber]
+    year: 2011
+    bucket: decision_sequential
+    form: monograph
+    venue: Wiley
+    pages: 312
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [index-policies, allocation]
+
+  - id: wald-1947-sequential-analysis
+    title: "Sequential Analysis"
+    authors: [Abraham Wald]
+    year: 1947
+    bucket: decision_sequential
+    form: monograph
+    venue: Wiley (Dover reprint)
+    pages: 212
+    density: high
+    priority: 4
+    rights: {status: unknown, confidence: unknown, notes: "Check whether the original 1947 edition has entered the public domain in the relevant jurisdiction; the Dover reprint has its own rights."}
+    acquisition: {state: purchasable}
+    tags: [sprt, sequential-testing, historical, rights-upside]
+
+  - id: siegmund-1985-sequential-analysis
+    title: "Sequential Analysis: Tests and Confidence Intervals"
+    authors: [David Siegmund]
+    year: 1985
+    bucket: decision_sequential
+    form: monograph
+    venue: Springer
+    pages: 272
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [sequential-testing, boundary-crossing]
+
+  - id: peskir-2006-optimal-stopping
+    title: "Optimal Stopping and Free-Boundary Problems"
+    authors: [Goran Peskir, Albert Shiryaev]
+    year: 2006
+    bucket: decision_sequential
+    form: monograph
+    venue: Birkhäuser
+    pages: 500
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [optimal-stopping, free-boundary, execution-relevant]
+    refs:
+      - {target: "Shiryaev — Optimal Stopping Rules", relation: builds_on, bucket: decision_sequential}
+
+  - id: kochenderfer-2022-algorithms-decision-making
+    title: "Algorithms for Decision Making"
+    authors: [Mykel J. Kochenderfer, Tim A. Wheeler, Kyle H. Wray]
+    year: 2022
+    bucket: decision_sequential
+    form: textbook
+    venue: MIT Press
+    pages: 700
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Authors host a free PDF; MIT Press open-access arrangements sometimes carry a CC licence — check which."}
+    acquisition: {state: open_url}
+    tags: [pomdp, decision-networks, high-value-target]
+    refs:
+      - {target: "Kaelbling, Littman & Cassandra — Planning and acting in partially observable stochastic domains", relation: cites, bucket: decision_sequential}
+      - {target: puterman-1994-markov-decision-processes, relation: cites}
+
+  - id: sutton-2018-reinforcement-learning
+    title: "Reinforcement Learning: An Introduction"
+    authors: [Richard S. Sutton, Andrew G. Barto]
+    year: 2018
+    bucket: decision_sequential
+    form: textbook
+    venue: MIT Press
+    pages: 552
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Author-hosted PDF of the second edition; confirm the stated permission."}
+    acquisition: {state: open_url}
+    tags: [rl, td-learning, policy-gradient, high-value-target]
+
+  # ------------------------------------------------------------------
+  # dynamical_systems
+  # ------------------------------------------------------------------
+  - id: strogatz-2015-nonlinear-dynamics-chaos
+    title: "Nonlinear Dynamics and Chaos"
+    authors: [Steven H. Strogatz]
+    year: 2015
+    bucket: dynamical_systems
+    form: textbook
+    venue: Westview Press
+    pages: 532
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [bifurcation, orientation]
+    refs:
+      - {target: kuznetsov-2004-applied-bifurcation-theory, relation: cites}
+
+  - id: guckenheimer-1983-nonlinear-oscillations
+    title: "Nonlinear Oscillations, Dynamical Systems, and Bifurcations of Vector Fields"
+    authors: [John Guckenheimer, Philip Holmes]
+    year: 1983
+    bucket: dynamical_systems
+    form: monograph
+    venue: Springer
+    pages: 462
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [bifurcation, normal-forms]
+
+  - id: kuznetsov-2004-applied-bifurcation-theory
+    title: "Elements of Applied Bifurcation Theory"
+    authors: [Yuri A. Kuznetsov]
+    year: 2004
+    bucket: dynamical_systems
+    form: textbook
+    venue: Springer
+    pages: 632
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [bifurcation, continuation]
+
+  - id: kantz-2003-nonlinear-time-series-analysis
+    title: "Nonlinear Time Series Analysis"
+    authors: [Holger Kantz, Thomas Schreiber]
+    year: 2003
+    bucket: dynamical_systems
+    form: textbook
+    venue: Cambridge University Press
+    pages: 388
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [embedding, surrogate-data, nonlinearity-tests]
+
+  - id: scheffer-2009-critical-transitions
+    title: "Critical Transitions in Nature and Society"
+    authors: [Marten Scheffer]
+    year: 2009
+    bucket: dynamical_systems
+    form: monograph
+    venue: Princeton University Press
+    pages: 400
+    density: medium
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [critical-transitions, early-warning-signals, regime-shift]
+    refs:
+      - {target: "Scheffer et al — Early-warning signals for critical transitions", relation: cites, bucket: dynamical_systems}
+
+  - id: sornette-2003-why-stock-markets-crash
+    title: "Why Stock Markets Crash: Critical Events in Complex Financial Systems"
+    authors: [Didier Sornette]
+    year: 2003
+    bucket: dynamical_systems
+    form: monograph
+    venue: Princeton University Press
+    pages: 421
+    density: medium
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [log-periodic, crashes, criticality]
+
+  # ------------------------------------------------------------------
+  # network_science
+  # ------------------------------------------------------------------
+  - id: newman-2018-networks
+    title: "Networks"
+    authors: [Mark Newman]
+    year: 2018
+    bucket: network_science
+    form: textbook
+    venue: Oxford University Press
+    pages: 780
+    density: high
+    priority: 4
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [graphs, percolation, foundations]
+    refs:
+      - {target: "Stauffer & Aharony — Introduction to Percolation Theory", relation: cites, bucket: network_science}
+
+  - id: easley-2010-networks-crowds-markets
+    title: "Networks, Crowds, and Markets: Reasoning About a Highly Connected World"
+    authors: [David Easley, Jon Kleinberg]
+    year: 2010
+    bucket: network_science
+    form: textbook
+    venue: Cambridge University Press
+    pages: 744
+    density: medium
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred, notes: "A pre-publication draft is hosted by the authors."}
+    acquisition: {state: open_url}
+    tags: [networks, markets, cascades, high-value-target]
+    refs:
+      - {target: nisan-2007-algorithmic-game-theory, relation: cites}
+
+  - id: jackson-2008-social-economic-networks
+    title: "Social and Economic Networks"
+    authors: [Matthew O. Jackson]
+    year: 2008
+    bucket: network_science
+    form: textbook
+    venue: Princeton University Press
+    pages: 520
+    density: high
+    priority: 3
+    rights: {status: all_rights_reserved, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [network-formation, diffusion]
+
+  - id: acemoglu-2015-systemic-risk-financial-networks
+    title: "Systemic Risk and Stability in Financial Networks"
+    authors: [Daron Acemoglu, Asuman Ozdaglar, Alireza Tahbaz-Salehi]
+    year: 2015
+    bucket: network_science
+    form: paper
+    venue: American Economic Review
+    pages: 45
+    density: high
+    priority: 4
+    rights: {status: subscription_required, confidence: inferred}
+    acquisition: {state: library}
+    tags: [contagion, systemic-risk, liquidation-cascades]
+    refs:
+      - {target: "Gai & Kapadia — Contagion in financial networks", relation: cites, bucket: network_science}
+
+  # ------------------------------------------------------------------
+  # exchange_documentation
+  # ------------------------------------------------------------------
+  - id: nasdaq-totalview-itch-spec
+    title: "Nasdaq TotalView-ITCH Specification"
+    authors: [Nasdaq]
+    year: 2024
+    bucket: exchange_documentation
+    form: exchange_doc
+    pages: 60
+    density: high
+    priority: 5
+    rights: {status: public_but_restricted, confidence: inferred, notes: "Published spec, restrictive terms of use. Expect reference_only."}
+    acquisition: {state: open_url}
+    tags: [market-data, us-equities, message-protocol]
+    refs:
+      - {target: "Nasdaq OUCH order entry specification", relation: syllabus_with, bucket: exchange_documentation}
+
+  - id: cme-mdp3-market-data-platform
+    title: "CME MDP 3.0 Market Data Platform documentation"
+    authors: [CME Group]
+    year: 2024
+    bucket: exchange_documentation
+    form: exchange_doc
+    pages: 250
+    density: high
+    priority: 5
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [futures, market-data, sbe, implied-orders]
+    refs:
+      - {target: fix-sbe-standard, relation: builds_on}
+      - {target: "CME Rulebook", relation: cites, bucket: exchange_documentation}
+
+  - id: fix-protocol-spec
+    title: "FIX Protocol specification (4.4 / 5.0 SP2)"
+    authors: [FIX Trading Community]
+    year: 2011
+    bucket: exchange_documentation
+    form: standard
+    pages: 1200
+    density: medium
+    priority: 4
+    rights: {status: public_but_restricted, confidence: inferred, notes: "FIX materials are published under their own terms; check whether they permit redistribution."}
+    acquisition: {state: open_url}
+    tags: [protocol, order-entry, standard]
+
+  - id: fix-sbe-standard
+    title: "FIX Simple Binary Encoding specification"
+    authors: [FIX Trading Community]
+    year: 2020
+    bucket: exchange_documentation
+    form: standard
+    pages: 120
+    density: medium
+    priority: 3
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [encoding, low-latency]
+
+  - id: cboe-us-equities-pitch-spec
+    title: "Cboe US Equities PITCH / multicast depth-of-book specification"
+    authors: [Cboe Global Markets]
+    year: 2024
+    bucket: exchange_documentation
+    form: exchange_doc
+    pages: 90
+    density: high
+    priority: 4
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [market-data, us-equities]
+
+  - id: eurex-t7-eti-manual
+    title: "Eurex T7 Enhanced Trading Interface manual"
+    authors: [Eurex]
+    year: 2024
+    bucket: exchange_documentation
+    form: exchange_doc
+    pages: 400
+    density: high
+    priority: 3
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [derivatives, order-entry, europe]
+
+  - id: hyperliquid-api-docs
+    title: "Hyperliquid API and protocol documentation"
+    authors: [Hyperliquid]
+    year: 2025
+    bucket: exchange_documentation
+    form: api_doc
+    pages: 120
+    density: high
+    priority: 5
+    rights: {status: unknown, confidence: unknown, notes: "Check the docs repository licence — venue docs are sometimes MIT/CC via their public repo."}
+    acquisition: {state: open_url}
+    tags: [crypto, perpetuals, onchain-orderbook, live-venue, rights-upside]
+    refs:
+      - {target: "dYdX v4 protocol documentation", relation: syllabus_with, bucket: exchange_documentation}
+
+  - id: polymarket-clob-docs
+    title: "Polymarket CLOB API and market resolution documentation"
+    authors: [Polymarket]
+    year: 2025
+    bucket: exchange_documentation
+    form: api_doc
+    pages: 80
+    density: high
+    priority: 5
+    rights: {status: unknown, confidence: unknown, notes: "Check the public docs repository for an explicit licence."}
+    acquisition: {state: open_url}
+    tags: [prediction-market, crypto, live-venue, rights-upside]
+    refs:
+      - {target: hanson-2007-logarithmic-market-scoring, relation: syllabus_with}
+
+  - id: binance-futures-api-docs
+    title: "Binance derivatives API documentation"
+    authors: [Binance]
+    year: 2025
+    bucket: exchange_documentation
+    form: api_doc
+    pages: 150
+    density: medium
+    priority: 3
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [crypto, perpetuals, market-data]
+
+  # ------------------------------------------------------------------
+  # open_courseware
+  # ------------------------------------------------------------------
+  - id: mit-ocw-6262-discrete-stochastic-processes
+    title: "MIT 6.262 Discrete Stochastic Processes (course notes and lectures)"
+    authors: [Robert G. Gallager]
+    year: 2011
+    bucket: open_courseware
+    form: lecture_notes
+    venue: MIT OpenCourseWare
+    pages: 500
+    density: high
+    priority: 5
+    rights: {status: cc_by_nc_sa, confidence: inferred, notes: "MIT OCW default licence; confirm on the specific course page."}
+    acquisition: {state: open_url}
+    tags: [markov-chains, renewal, queueing-prep, high-value-target]
+    refs:
+      - {target: kleinrock-1975-queueing-systems-vol1, relation: syllabus_with}
+
+  - id: mit-ocw-18s096-mathematics-finance
+    title: "MIT 18.S096 Topics in Mathematics with Applications in Finance"
+    authors: [MIT Mathematics]
+    year: 2013
+    bucket: open_courseware
+    form: lecture_notes
+    venue: MIT OpenCourseWare
+    pages: 400
+    density: high
+    priority: 4
+    rights: {status: cc_by_nc_sa, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [quant-finance, lecture-notes]
+
+  - id: mit-ocw-15450-analytics-of-finance
+    title: "MIT 15.450 Analytics of Finance"
+    authors: [MIT Sloan]
+    year: 2010
+    bucket: open_courseware
+    form: lecture_notes
+    venue: MIT OpenCourseWare
+    pages: 350
+    density: high
+    priority: 4
+    rights: {status: cc_by_nc_sa, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [econometrics, derivatives, lecture-notes]
+
+  - id: stanford-ee364a-convex-optimization-notes
+    title: "Stanford EE364a Convex Optimization I — lecture slides and notes"
+    authors: [Stephen Boyd]
+    year: 2023
+    bucket: open_courseware
+    form: lecture_notes
+    venue: Stanford University
+    pages: 600
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Course materials posted publicly; the licence statement is what matters."}
+    acquisition: {state: open_url}
+    tags: [convex, slides, high-value-target]
+    refs:
+      - {target: boyd-2004-convex-optimization, relation: syllabus_with}
+
+  - id: berkeley-cs285-deep-rl
+    title: "UC Berkeley CS285 Deep Reinforcement Learning — lectures and notes"
+    authors: [Sergey Levine]
+    year: 2024
+    bucket: open_courseware
+    form: course
+    venue: UC Berkeley
+    pages: 400
+    density: high
+    priority: 4
+    rights: {status: author_hosted_free, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [deep-rl, slides]
+    refs:
+      - {target: sutton-2018-reinforcement-learning, relation: syllabus_with}
+
+  - id: almgren-nyu-statistical-arbitrage-notes
+    title: "NYU Courant — Time Series Analysis and Statistical Arbitrage (course notes)"
+    authors: [Robert Almgren]
+    year: 2009
+    bucket: open_courseware
+    form: lecture_notes
+    venue: NYU Courant
+    pages: 200
+    density: high
+    priority: 5
+    rights: {status: author_hosted_free, confidence: inferred, notes: "Posted course notes; a direct permission request is plausible."}
+    acquisition: {state: open_url}
+    tags: [stat-arb, execution, high-value-target]
+    refs:
+      - {target: almgren-2000-optimal-execution, relation: syllabus_with}
+
+  # ------------------------------------------------------------------
+  # practitioner_training
+  # ------------------------------------------------------------------
+  - id: cfa-institute-curriculum
+    title: "CFA Program Curriculum (Levels I-III)"
+    authors: [CFA Institute]
+    year: 2025
+    bucket: practitioner_training
+    form: course
+    pages: 3000
+    density: low
+    priority: 2
+    rights: {status: licensed_purchase_required, confidence: inferred, notes: "Candidate licence is personal and explicitly non-transferable. Reference only."}
+    acquisition: {state: purchasable}
+    tags: [certification, breadth]
+
+  - id: garp-frm-curriculum
+    title: "GARP FRM Program Curriculum"
+    authors: [Global Association of Risk Professionals]
+    year: 2025
+    bucket: practitioner_training
+    form: course
+    pages: 2000
+    density: low
+    priority: 2
+    rights: {status: licensed_purchase_required, confidence: inferred}
+    acquisition: {state: purchasable}
+    tags: [certification, risk]
+
+  - id: cme-institute-education
+    title: "CME Institute education modules (futures, options, market mechanics)"
+    authors: [CME Group]
+    year: 2025
+    bucket: practitioner_training
+    form: course
+    pages: 300
+    density: medium
+    priority: 3
+    rights: {status: public_but_restricted, confidence: inferred}
+    acquisition: {state: open_url}
+    tags: [futures-mechanics, education]
+
+  - id: janestreet-public-puzzles-talks
+    title: "Jane Street public puzzles, tech talks, and probability material"
+    authors: [Jane Street]
+    year: 2025
+    bucket: practitioner_training
+    form: course
+    pages: 150
+    density: medium
+    priority: 3
+    rights: {status: public_but_restricted, confidence: inferred, notes: "Publicly posted for recruiting; not licensed for redistribution."}
+    acquisition: {state: open_url}
+    tags: [interview-prep, probability, heuristics]
+
+  - id: leaked-prop-desk-manual-placeholder
+    title: "Unattributed prop desk training manual circulating on file-sharing sites"
+    authors: []
+    year: 2010
+    bucket: practitioner_training
+    form: manual
+    pages: 200
+    density: medium
+    priority: 1
+    status: rejected
+    rights: {status: proprietary_confidential, confidence: inferred, notes: "Confidential internal material. Excluded by policy: do not acquire, do not cite, do not ingest. Kept as an entry so the exclusion is recorded rather than rediscovered each round."}
+    acquisition: {state: unavailable}
+    tags: [excluded, policy-example]

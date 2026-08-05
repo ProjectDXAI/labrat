@@ -10,7 +10,7 @@
 
 `labrat` 把 Claude Code 和 Codex 视为同等的一线操作界面。更强的推理模型在 synthesis、audit、consolidation 这些步骤上最有价值，但运行时契约和文件布局对两个界面保持一致。
 
-**快速跳转** → [5 分钟跑起来](#5-分钟跑起来) · [从 profile 开始](#从-profile-开始) · [从零创建 lab](#从零创建-lab) · [为什么需要它](#为什么需要它)
+**快速跳转** → [5 分钟跑起来](#5-分钟跑起来) · [从 profile 开始](#从-profile-开始) · [构建语料库](#构建语料库) · [从零创建 lab](#从零创建-lab) · [为什么需要它](#为什么需要它)
 
 用更直白的话说：
 
@@ -131,8 +131,34 @@ Claude Code slash commands 是短小的 markdown 文件，会变成会话中的�
 ### 当前 profile
 
 - `transformer-arch`：一个小型字符级 transformer 架构搜索 profile，包含 held-out-distribution decisive challenges。它默认使用 synthetic runner，因此不需要训练框架也能跑通完整 runtime loop；如果你要做真实训练，替换 `scripts/run_experiment.py` 即可。
+- `quant-finance-corpus`：文献网络测绘与带权利标签的语料构建 profile。这里的 candidate 是「检索策略」而不是模型，decisive challenges 是跨领域桥接发现（bridge discovery）和权利澄清（rights clearance）。见 [构建语料库](#构建语料库)。
 
 更多 profiles（world-model、multi-dataset）会在后续 PR 中加入。profile 契约见 [docs/PROFILES.md](docs/PROFILES.md)，长任务和中间 checkpoint 约定见 [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md)。
+
+## 构建语料库
+
+`labrat corpus` 是同一套 runtime 的第二种用法：搜索的对象不是模型配置，而是「接下来该读什么」。它把一片文献映射成引用网络，按轮次有界地扩展，直到每个方向都不再产出新东西，并给每一条目打上形态（form）与权利（rights）标签。
+
+```bash
+labrat new ~/labs/my_corpus --profile=quant-finance-corpus
+cd ~/labs/my_corpus
+python scripts/corpus.py status                      # 覆盖度、权利状态、饱和度
+python scripts/corpus.py frontier --limit 15         # 下一步该找什么，以及为什么
+python scripts/corpus.py round open --mode expand --bucket market_microstructure
+# 阅读 corpus/rounds/round-001/request.md，做调研，填写 findings.yaml
+python scripts/corpus.py round close
+python scripts/corpus.py manifest                    # 通过权利闸门的构建清单
+```
+
+它与一份普通书单的区别有三点：
+
+- **frontier 是算出来的。** 已录入文献所引用、但尚未编目的作品会成为排序后的目标，打分依据是共被引支持度、引用方的优先级，以及该 bucket 距离页数目标还差多少。
+- **权利是一等公民。** 每个条目都带 form 标签和 rights 状态，并要求 evidence URL 与核查日期。没有 `confidence: confirmed` 加证据，就进不了 manifest —— 「可免费阅读」不等于「获得授权」，「买了一本」也不等于「获得语料授权」。
+- **饱和是停止条件。** 连续两轮扩展没有新增、且 frontier 为空，这个 bucket 才算完成。「穷尽」指的是饱和，而不是固定轮数。
+
+内置 profile 预置了 173 条文献，覆盖市场微观结构、量化金融、信息经济学、统计信号处理、检测与跟踪、控制论、运筹学、排队论、信息论、贝叶斯统计、序贯决策、动力系统、网络科学、交易所文档、开放课程材料和从业者培训材料。所有种子条目的权利标签都是 `inferred`，因此在有人真正读过许可条款之前，种子本身不会放行任何内容。
+
+数据模型、标签词表，以及如何把这套引擎用到别的领域，见 [docs/CORPUS.md](docs/CORPUS.md)。
 
 ## 从零创建 lab
 
@@ -168,6 +194,7 @@ Phase 0 必须产出：
 - [docs/getting-started.md](docs/getting-started.md)：实操启动流程
 - [docs/runners.md](docs/runners.md)：Codex 和 Claude Code 的操作契约
 - [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md)：frontier model prompting、reasoning effort 和 research guidance
+- [docs/CORPUS.md](docs/CORPUS.md)：文献网络测绘、迭代检索轮次和权利标签
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)：运行时、状态和评估细节
 - [docs/PROFILES.md](docs/PROFILES.md)：profile 机制和新 profile 编写方式
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md)：`checkpoints.jsonl`、`failure_class`、per-pool timeouts 的约定

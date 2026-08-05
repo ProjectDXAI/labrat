@@ -12,6 +12,7 @@ If Claude Code is opened inside a nested lab that has its own `CLAUDE.md`, follo
 - Scaffolded lab UX: `templates/AGENTS.md`, `templates/CLAUDE.md`, `templates/.agents/skills/`, `templates/.claude/commands/`, `templates/agent_prompts/`
 - Canonical example lab: `examples/nlp-sentiment/research_lab/`
 - Packaging/versioning: `pyproject.toml`, `labrat/__init__.py`, `CHANGELOG.md`
+- Corpus engine and its contract: `scripts/corpus.py`, `docs/CORPUS.md`, `profiles/quant-finance-corpus/corpus/taxonomy.yaml`
 
 ## Interface Rules
 
@@ -35,6 +36,8 @@ If Claude Code is opened inside a nested lab that has its own `CLAUDE.md`, follo
 - `. .venv/bin/activate && labrat next-prompt --lab-dir examples/nlp-sentiment/research_lab --runner claude --phase auto`
 - `. .venv/bin/activate && labrat next-prompt --lab-dir examples/nlp-sentiment/research_lab --runner codex --phase auto`
 - `. .venv/bin/activate && make smoke`
+- `. .venv/bin/activate && make smoke-corpus`
+- `. .venv/bin/activate && labrat corpus --corpus-dir profiles/quant-finance-corpus/corpus validate`
 
 ## Publish Discipline
 

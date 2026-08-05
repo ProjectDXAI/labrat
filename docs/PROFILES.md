@@ -6,7 +6,7 @@ Profiles let `new_lab.py` scaffold a *working* lab for a specific research workl
 
 Every lab — profile or not — gets:
 
-- the runtime scripts (`runtime.py`, `evaluator.py`, `operator_helper.py`, `bootstrap.py`, `lab_core.py`, `pareto.py`, `research_scout.py`)
+- the runtime scripts (`runtime.py`, `evaluator.py`, `operator_helper.py`, `bootstrap.py`, `lab_core.py`, `pareto.py`, `research_scout.py`, `corpus.py`)
 - the worker prompt files (`orchestrator.md`, `mutation_worker.md`, `crossover_worker.md`, `probe_worker.md`, `implementation_audit.md`, `frame_break.md`, `expansion_scout.md`, `tree_designer.md`, `consolidation_agent.md`)
 - the phase-prompt directory under `agent_prompts/`
 - a generic `AGENTS.md` at the lab root
@@ -34,6 +34,7 @@ The base files and the profile's files merge via `shutil.copytree(..., dirs_exis
 | Profile | Workload | Status |
 |---|---|---|
 | `transformer-arch` | Tiny character-level transformer architecture search, with held-out-distribution decisive challenges. Ships a synthetic runner that exercises the whole loop without a training framework; swap in your own trainer (PyTorch, JAX, etc.) when you want real training. | shipped |
+| `quant-finance-corpus` | Bibliography network mapping and rights-tagged corpus assembly across market microstructure, quantitative finance and their feeder disciplines. Candidates are scouting policies; decisive challenges are cross-domain bridge discovery and rights clearance. See [docs/CORPUS.md](CORPUS.md). | shipped |
 | `world-model` | Latent-dynamics model with environment-rollout decisive challenges. | follow-up PR |
 | `multi-dataset` | Multi-dataset mixing with leave-one-dataset-out decisive challenges. | follow-up PR |
 

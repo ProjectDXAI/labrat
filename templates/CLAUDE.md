@@ -103,6 +103,7 @@ Claude Code prompts for each bash invocation by default. For hands-off multi-tur
       "Bash(python scripts/pareto.py:*)",
       "Bash(python scripts/run_experiment.py:*)",
       "Bash(python scripts/research_scout.py:*)",
+      "Bash(python scripts/corpus.py:*)",
       "Bash(python scripts/bootstrap.py)",
       "Bash(python -m http.server:*)",
       "Bash(mkdir:experiments/*)",

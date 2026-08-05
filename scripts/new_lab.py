@@ -115,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         "lab_core.py",
         "pareto.py",
         "research_scout.py",
+        "corpus.py",
     ]
     for name in script_files:
         src = SCRIPTS_DIR / name

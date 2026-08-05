@@ -90,6 +90,50 @@ def build_parser() -> argparse.ArgumentParser:
     scout_group.add_argument("--family", help="Prepare a scout request for one family.")
     scout_group.add_argument("--expansion", action="store_true", help="Prepare a scout request for expansion work.")
 
+    corpus_cmd = subparsers.add_parser(
+        "corpus",
+        help="Map a bibliography network, run scouting rounds, and tag rights.",
+    )
+    corpus_cmd.add_argument("--lab-dir", type=Path, default=Path.cwd(), help="Lab root. The corpus lives in <lab>/corpus.")
+    corpus_cmd.add_argument("--corpus-dir", type=Path, default=None, help="Corpus directory override.")
+    corpus_subparsers = corpus_cmd.add_subparsers(dest="corpus_command", required=True)
+
+    corpus_subparsers.add_parser("init", help="Create the corpus workspace.")
+    corpus_validate = corpus_subparsers.add_parser("validate", help="Validate the bibliography against the vocabularies.")
+    corpus_validate.add_argument("--json", action="store_true")
+    corpus_status = corpus_subparsers.add_parser("status", help="Coverage, rights posture, network shape, saturation.")
+    corpus_status.add_argument("--json", action="store_true")
+    corpus_frontier = corpus_subparsers.add_parser("frontier", help="Rank the next scouting targets.")
+    corpus_frontier.add_argument("--bucket", default=None)
+    corpus_frontier.add_argument("--limit", type=int, default=25)
+    corpus_frontier.add_argument("--json", action="store_true")
+
+    corpus_round = corpus_subparsers.add_parser("round", help="Open or close an iterative scouting round.")
+    corpus_round_sub = corpus_round.add_subparsers(dest="round_command", required=True)
+    corpus_round_open = corpus_round_sub.add_parser("open")
+    corpus_round_open.add_argument("--mode", choices=["expand", "verify", "acquire"], default="expand")
+    corpus_round_open.add_argument("--bucket", action="append", default=None)
+    corpus_round_open.add_argument("--limit", type=int, default=None)
+    corpus_round_close = corpus_round_sub.add_parser("close")
+    corpus_round_close.add_argument("--round", type=int, default=None)
+    corpus_round_close.add_argument("--findings", type=Path, default=None)
+    corpus_round_sub.add_parser("list")
+
+    corpus_rights = corpus_subparsers.add_parser("rights", help="Rights report and verification queue.")
+    corpus_rights.add_argument("--verify-queue", action="store_true")
+    corpus_rights.add_argument("--bucket", default=None)
+    corpus_rights.add_argument("--limit", type=int, default=25)
+    corpus_rights.add_argument("--json", action="store_true")
+
+    corpus_manifest = corpus_subparsers.add_parser("manifest", help="Emit the rights-gated build manifest.")
+    corpus_manifest.add_argument("--out", type=Path, default=None)
+    corpus_graph = corpus_subparsers.add_parser("graph", help="Export the bibliography network.")
+    corpus_graph.add_argument("--out", type=Path, default=None)
+    corpus_report = corpus_subparsers.add_parser("report", help="Write the markdown corpus report.")
+    corpus_report.add_argument("--out", type=Path, default=None)
+    corpus_vocab = corpus_subparsers.add_parser("vocab", help="Print the form and rights vocabularies.")
+    corpus_vocab.add_argument("--json", action="store_true")
+
     runtime_cmd = subparsers.add_parser("runtime", help="Access low-level runtime operations.")
     runtime_cmd.add_argument("--lab-dir", type=Path, default=Path.cwd(), help="Lab root. Defaults to the current directory.")
     runtime_subparsers = runtime_cmd.add_subparsers(dest="runtime_command", required=True)
@@ -164,6 +208,38 @@ def main(argv: list[str] | None = None) -> int:
         else:
             delegated.append("--expansion")
         return _call("operator_helper", delegated)
+
+    if args.command == "corpus":
+        delegated = _lab_dir_args(args.lab_dir)
+        if args.corpus_dir:
+            delegated.extend(["--corpus-dir", str(args.corpus_dir.resolve())])
+        delegated.append(args.corpus_command)
+        if args.corpus_command == "round":
+            delegated.append(args.round_command)
+            if args.round_command == "open":
+                delegated.extend(["--mode", args.mode])
+                for bucket in args.bucket or []:
+                    delegated.extend(["--bucket", bucket])
+                if args.limit is not None:
+                    delegated.extend(["--limit", str(args.limit)])
+            if args.round_command == "close":
+                if args.round is not None:
+                    delegated.extend(["--round", str(args.round)])
+                if args.findings:
+                    delegated.extend(["--findings", str(args.findings.resolve())])
+            return _call("corpus", delegated)
+
+        if args.corpus_command in {"frontier", "rights"}:
+            if args.bucket:
+                delegated.extend(["--bucket", args.bucket])
+            delegated.extend(["--limit", str(args.limit)])
+            if args.corpus_command == "rights" and args.verify_queue:
+                delegated.append("--verify-queue")
+        if args.corpus_command in {"manifest", "graph", "report"} and args.out:
+            delegated.extend(["--out", str(args.out.resolve())])
+        if getattr(args, "json", False):
+            delegated.append("--json")
+        return _call("corpus", delegated)
 
     if args.command == "runtime":
         delegated = _lab_dir_args(args.lab_dir) + [args.runtime_command]

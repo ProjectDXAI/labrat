@@ -10,7 +10,7 @@
 
 `labrat` treats Claude Code and Codex as peer operator interfaces. Stronger reasoning models still help most on synthesis, audit, and consolidation, but the runtime contract and file layout stay the same across both.
 
-**Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
+**Jump to** → [Run it in 5 minutes](#run-it-in-5-minutes) · [Start from a profile](#start-from-a-profile) · [Build a corpus](#build-a-corpus) · [Create your own lab](#create-your-own-lab-from-scratch) · [Why it exists](#why-it-exists)
 
 In plain English:
 
@@ -131,8 +131,34 @@ Open Claude Code in the lab directory and type `/next`, or hand-run `python scri
 ### Available profiles
 
 - `transformer-arch` — tiny character-level transformer architecture search with held-out-distribution decisive challenges. Ships a synthetic runner so you can exercise the full runtime loop without a training framework; replace `scripts/run_experiment.py` with your own trainer when you want real training.
+- `quant-finance-corpus` — bibliography network mapping and rights-tagged corpus assembly. Candidates are scouting policies rather than models, and the decisive challenges are cross-domain bridge discovery and rights clearance. See [Build a corpus](#build-a-corpus).
 
 More profiles (world-model, multi-dataset) land in follow-up PRs. See [docs/PROFILES.md](docs/PROFILES.md) for the profile contract and [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md) for interim-checkpoint and long-running-job conventions.
+
+## Build a corpus
+
+`labrat corpus` is a second use of the same runtime: instead of searching over model configurations, it searches over *what to read next*. It maps a literature as a citation network, expands it in bounded rounds until each area stops yielding, and tags every item with its form and its rights.
+
+```bash
+labrat new ~/labs/my_corpus --profile=quant-finance-corpus
+cd ~/labs/my_corpus
+python scripts/corpus.py status                      # coverage, rights posture, saturation
+python scripts/corpus.py frontier --limit 15         # what to look for next, and why
+python scripts/corpus.py round open --mode expand --bucket market_microstructure
+# read corpus/rounds/round-001/request.md, research, fill in findings.yaml
+python scripts/corpus.py round close
+python scripts/corpus.py manifest                    # the rights-gated build list
+```
+
+Three things make it more than a reading list:
+
+- **The frontier is computed.** References to works you have not catalogued yet become ranked targets, scored by co-citation support, the citing works' priority, and how far the bucket is from its page target.
+- **Rights are first-class.** Every entry carries a form tag and a rights status with an evidence URL and a check date. Nothing reaches the manifest without `confidence: confirmed` plus evidence — free-to-read is not licensed, and a purchase is not a clearance.
+- **Saturation is the stopping rule.** A bucket is done when two consecutive expansion rounds add nothing new and its frontier is empty. "Exhaustive" means saturated, not a fixed round count.
+
+The bundled profile seeds 173 works across market microstructure, quantitative finance, information economics, signal processing, detection and tracking, control, operations research, queueing, information theory, Bayesian statistics, sequential decision theory, dynamical systems, network science, exchange documentation, open courseware and practitioner training. Every seed rights tag is `inferred`, so the seed clears nothing until someone reads a licence.
+
+See [docs/CORPUS.md](docs/CORPUS.md) for the data model, the tagging vocabularies, and how to point the engine at another domain.
 
 ## Create your own lab from scratch
 
@@ -168,6 +194,7 @@ Phase 0 must produce:
 - [docs/getting-started.md](docs/getting-started.md): setup and first-run flow
 - [docs/runners.md](docs/runners.md): Codex and Claude Code operator contract
 - [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md): frontier-model prompting, reasoning-effort, and research guidance
+- [docs/CORPUS.md](docs/CORPUS.md): bibliography network mapping, iterative scouting rounds, and rights tagging
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts
