@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `knowledge.py digest`: decides how much source text a decision packet actually needs.
+  Four tiers per anchor (card, note, excerpt, unit), a rights ceiling no trigger can
+  lift, five named escalation triggers logged next to the passage each one paid for, and
+  a multiple-choice knapsack that allocates a token budget across anchors instead of
+  reading the top-k in full.
+- `digest --compare` runs the `never`, `policy` and `always` arms and scores the policy
+  on tier agreement and cost share, so the triggers have to justify their tokens.
+- The digest reports two things separately from tier choice: anchors refused by a
+  licence, and anchors that a trigger asked for and the lab does not hold.
+- `make web` / `make web-data` and the corpus explorer under `web/`, documented in
+  `docs/EXPLORER.md`.
+
 ## 0.21.0 - 2026-08-06
 
 - Added `knowledge.py assess`, which reads the whole store at once. Every other command answers a question about one card, one context or one queue; this asks what the collection looks like taken together, where a different class of problem lives. It reports the contradiction structure and its clusters, which problems have a chain that actually reaches a decision, which anchors carry several cards and whether anyone read them, which confident cards rest on unopened material, and the orphans.

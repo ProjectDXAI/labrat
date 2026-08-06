@@ -408,3 +408,71 @@ Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-secon
 - **No live self-modifying retrieval.** `historical_utility` reads a frozen posterior, never results from inside the current batch.
 - **No trading claims from Gate 1.** Retrieval quality against expert labels is a precondition, not a result.
 - **No vector index or database.** The retrieval layer is deliberately small and dependency-free so it can be read and audited. A hybrid lexical/vector index slots in behind the same interface when the card count justifies it; the filters and the re-rank do not change.
+
+## Digest: how much source text a decision actually needs
+
+`retrieve` answers *which claims apply* and returns concept cards, which are compressed
+by construction. `digest` answers the next question: for each card in that packet, how
+much of the underlying source goes in front of the model?
+
+```bash
+python scripts/knowledge.py digest --context ctx.json --budget 6000
+python scripts/knowledge.py digest --context ctx.json --markdown
+python scripts/knowledge.py digest --context ctx.json --compare
+```
+
+Each anchor is offered at four tiers: `card` (the card's own fields, no source text),
+`note` (the reading note recorded when someone read that unit), `excerpt` (quoted passage
+text from the held pages, capped), and `unit` (every page the unit spans). Three things
+decide which one it gets.
+
+**Rights cap it.** A `reference_only` source can be cited and paraphrased from our own
+notes; its text does not enter the packet. The ceiling is taken from the stricter of the
+bibliography's derived rights and the class stamped on each extracted page, because when
+those two disagree it usually means one has not been re-checked. No trigger lifts a
+ceiling, and a use class this module has never been taught falls to `card` — the
+self-test fails if the corpus vocabulary grows a class with no ceiling.
+
+**Triggers raise it.** Escalation is never a vibe. Each trigger names a condition the
+card text demonstrably cannot settle, and every one that fires is written into the digest
+next to the passage it paid for:
+
+| trigger | fires when |
+| --- | --- |
+| `contested` | another card in this same packet contradicts it |
+| `unread_anchor` | nobody opened the unit, so the card is a claim about a source |
+| `low_confidence` | confidence is below the policy floor |
+| `lexical_miss` | the context asks about terms present in the source and absent from the card |
+| `load_bearing` | two or more cards in the packet rest on this one anchor |
+
+**The budget allocates it.** Top-k with full reads is the wrong shape: it spends
+everything on the first two anchors and starves the rest. This is a multiple-choice
+knapsack — at most one tier per anchor, maximum total value under a token ceiling — so it
+will buy four notes instead of one full unit when that is the better packet. Watch it
+work by tightening the budget on the same context:
+
+```
+budget 6000   1 unit + 1 excerpt    1892 tokens
+budget 1200   2 excerpts             696 tokens
+budget  400   1 excerpt + 1 card     348 tokens
+```
+
+### Two things the digest reports that are not tier choices
+
+**Refused by rights.** A trigger asked for source text and the licence said no. The row
+records what was wanted, what capped it, and whether the lab even holds the text, so it
+is clear whether clearing the licence would buy anything.
+
+**Asked for, and not held.** A trigger asked, the licence allows it, and there is neither
+a reading note nor an extracted page. Nothing is wrong with the packet; the material is
+missing. This is the fetch list.
+
+### The control arms
+
+`--arm never` serves cards only. `--arm always` serves every anchor at its rights
+ceiling. `--compare` runs all three and scores the policy against the unbounded arm on
+tier agreement and cost share. If the policy does not land close to `always` for a
+fraction of the tokens, the triggers are not earning their place and should change. When
+the licences bind before the triggers do, the comparison says so rather than crediting
+the policy for a decision the rights made.
+

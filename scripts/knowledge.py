@@ -32,6 +32,8 @@ from typing import Any
 import graphops
 from lab_core import load_json, load_yaml, now_iso, write_json, write_text, write_yaml
 
+import digest as digest_module
+
 try:  # methods.py is optional at read time; a lab may not have compiled tools yet.
     import methods as methods_module
 except Exception:  # pragma: no cover - only when the module is genuinely absent
@@ -1742,6 +1744,11 @@ def _card(**overrides: Any) -> dict[str, Any]:
 
 def self_test() -> dict[str, Any]:
     checks: list[str] = []
+
+    # The digest allocator has its own adversarial suite: rights ceilings, budget
+    # overspend, and the tier-value contract. Fold it in so one command covers both.
+    digest_result = digest_module.self_test()
+    checks.extend(f"digest/{line}" for line in digest_result["checks"])
     sources = {
         "src": {"id": "src", "year": 2010, "derived_rights": {"use_class": "reference_only", "manifest_eligible": False, "confidence": "confirmed"}},
         "open": {"id": "open", "year": 2010, "derived_rights": {"use_class": "ingest_full", "manifest_eligible": True, "confidence": "confirmed"}},
@@ -2003,6 +2010,68 @@ def cmd_retrieve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_digest(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+    context = json.loads(args.context.read_text())
+    policy = resolve_policy(store, args.policy, {
+        "k": args.k,
+        "abstain_threshold": args.abstain_threshold,
+    })
+    packet = retrieve(store, sources, context, policy)
+
+    if packet["abstained"]:
+        print(json.dumps({
+            "abstained": True,
+            "reason": packet["abstain_reason"],
+            "note": "No card cleared the threshold, so there is nothing to read for.",
+        }, indent=2))
+        return 0
+
+    digest_policy = dict(digest_module.DEFAULT_DIGEST_POLICY)
+    stored = (store.get("digest_policies") or {}).get(args.policy or "") or {}
+    digest_policy.update({k: v for k, v in stored.items() if k != "triggers"})
+    if stored.get("triggers"):
+        digest_policy["triggers"] = {**digest_policy["triggers"], **stored["triggers"]}
+    if args.budget:
+        digest_policy["budget_tokens"] = args.budget
+
+    passages = digest_module.load_passages((corpus_dir or (lab_root / "corpus")).resolve())
+
+    if args.compare:
+        report = digest_module.compare_arms(packet, sources, passages, context, digest_policy)
+        if args.out:
+            write_json(args.out, report)
+            print(json.dumps({"comparison": str(args.out), **report["arms"]}, indent=2))
+            return 0
+        print(json.dumps(report, indent=2))
+        return 0
+
+    result = digest_module.digest(packet, sources, passages, context, digest_policy, arm=args.arm)
+
+    if args.markdown:
+        text = digest_module.render_digest(result)
+        if args.out:
+            write_text(args.out, text)
+            print(json.dumps({"digest": str(args.out), "tokens_used": result["tokens_used"]}, indent=2))
+        else:
+            print(text)
+        return 0
+
+    if args.out:
+        write_json(args.out, result)
+        print(json.dumps({
+            "digest": str(args.out),
+            "tokens_used": result["tokens_used"],
+            "by_tier": result["by_tier"],
+            "refused_by_rights": len(result["refused_by_rights"]),
+        }, indent=2))
+        return 0
+    print(json.dumps(result, indent=2))
+    return 0
+
+
 def cmd_evaluate(args: argparse.Namespace) -> int:
     lab_root, paths, corpus_dir = resolve_dirs(args)
     store = load_store(paths)
@@ -2158,6 +2227,19 @@ def build_parser() -> argparse.ArgumentParser:
     retrieve_cmd.add_argument("--markdown", action="store_true")
     retrieve_cmd.add_argument("--out", type=Path, default=None)
 
+    digest_cmd = sub.add_parser("digest", help="Decide how much source text the packet actually needs, under a token budget.")
+    digest_cmd.add_argument("--context", type=Path, required=True)
+    digest_cmd.add_argument("--policy", default=None)
+    digest_cmd.add_argument("--k", type=int, default=None)
+    digest_cmd.add_argument("--budget", type=int, default=None, help="token ceiling for source text")
+    digest_cmd.add_argument("--abstain-threshold", type=float, default=None,
+                            help="override the retrieval abstain threshold for this run")
+    digest_cmd.add_argument("--arm", choices=["policy", "never", "always"], default="policy",
+                            help="never and always are the controls the policy is measured against")
+    digest_cmd.add_argument("--compare", action="store_true", help="run all three arms and score the policy")
+    digest_cmd.add_argument("--markdown", action="store_true")
+    digest_cmd.add_argument("--out", type=Path, default=None)
+
     evaluate_cmd = sub.add_parser("evaluate", help="Score retrieval policies against the labelled trial set.")
     evaluate_cmd.add_argument("--policy", default=None)
     evaluate_cmd.add_argument("--json", action="store_true")
@@ -2196,6 +2278,7 @@ def main(argv: list[str] | None = None) -> int:
         "status": cmd_status,
         "assess": cmd_assess,
         "retrieve": cmd_retrieve,
+        "digest": cmd_digest,
         "evaluate": cmd_evaluate,
         "bets": cmd_bets,
         "extensions": cmd_extensions,

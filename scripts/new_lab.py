@@ -123,6 +123,8 @@ def main(argv: list[str] | None = None) -> int:
         "graphops.py",
         "methods.py",
         "knowledge.py",
+        "digest.py",
+        "make_digest_fixture.py",
         "ledger.py",
         "resolve.py",
         "passages.py",
