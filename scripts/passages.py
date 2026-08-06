@@ -61,6 +61,21 @@ def have_extractor() -> bool:
     return shutil.which("pdftotext") is not None
 
 
+def extract_text_file(path: Path) -> list[str]:
+    """A markdown or text source, split into page-sized chunks on blank lines."""
+    body = path.read_text(errors="replace")
+    chunks, current, size = [], [], 0
+    for para in body.split("\n\n"):
+        current.append(para)
+        size += len(para)
+        if size > 3000:
+            chunks.append("\n\n".join(current))
+            current, size = [], 0
+    if current:
+        chunks.append("\n\n".join(current))
+    return chunks or [body]
+
+
 def extract_pages(pdf: Path) -> list[str]:
     """Page text via poppler. Returns [] when the PDF has no text layer at all."""
     try:
@@ -106,7 +121,10 @@ def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) 
             found.append(single)
         folder = base / entry_id
         if folder.is_dir():
-            found.extend(sorted(folder.glob("*.pdf")))
+            # Web documentation is held as markdown, not PDF: an exchange's docs site is
+            # the primary source and printing it to PDF only loses the anchors.
+            for pattern in ("*.pdf", "*.md", "*.txt"):
+                found.extend(sorted(folder.glob(pattern)))
     return found
 
 
@@ -134,7 +152,8 @@ def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False) -
             continue
         pages_indexed = 0
         for pdf in files:
-            for page_number, page_text in enumerate(extract_pages(pdf), start=1):
+            reader = extract_pages if pdf.suffix.lower() == ".pdf" else extract_text_file
+            for page_number, page_text in enumerate(reader(pdf), start=1):
                 for part, chunk in enumerate(split_page(page_text)):
                     rows.append({
                         "passage_id": f"{entry_id}#{pdf.stem}:p{page_number}" + (f".{part}" if part else ""),

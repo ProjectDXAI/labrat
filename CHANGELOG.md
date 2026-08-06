@@ -21,6 +21,12 @@
   live contradictions it could settle, problems it blocks from reaching a decision — and
   separately lists the buckets we hold almost nothing from, which produce no cards to
   block and so never surface in a gap analysis driven by existing cards.
+- `scripts/atlas.py` and `make map`: writes `MAP.md`, one self-describing file an agent
+  can read start to finish, plus flat `concepts.csv`, `sources.csv`, `units.csv` and
+  `chains.csv` for filtering. Both generated; the YAML stays the source of truth.
+- `scripts/add_library.py` registers a local library of purchased books as entries, and
+  `passages.py` now indexes markdown and text sources as well as PDFs, so an exchange's
+  documentation site can be a first-class source instead of something printed to PDF.
 - `make web` / `make web-data` and the corpus explorer under `web/`, documented in
   `docs/EXPLORER.md`.
 

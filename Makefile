@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -19,6 +19,7 @@ help:
 	@echo "  make web-data [LAB=dir]       export the corpus bundle the explorer reads"
 	@echo "  make web                      export, then run the explorer at localhost:3000"
 	@echo "  make acquire [LAB=dir]        rank what to acquire against what the store cannot support"
+	@echo "  make map [LAB=dir]            write MAP.md and the flat CSVs an agent can browse"
 
 install:
 	@$(PYTHON) -m pip install -e .
@@ -231,3 +232,6 @@ web: web-data
 
 acquire:
 	@$(PYTHON) scripts/acquire.py --lab $(LAB) --limit 20
+
+map:
+	@$(PYTHON) scripts/atlas.py --lab $(LAB) --out $(LAB)/map
