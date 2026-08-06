@@ -426,7 +426,12 @@ def reading_queue(
         target = bucket_row.get("target_pages") or 0
         gap = (bucket_row.get("pages_remaining") or 0) / target if target else 0.5
         for unit in entry_units(entry):
-            if unit.get("read_status") in {"compiled", "abandoned"}:
+            # A unit someone has opened is not a reading task, whether or not a card
+            # was compiled from it. Leaving `read` in here put already-read units at
+            # the top of "what to read next", because reading raises no score.
+            # Read-but-uncompiled work belongs to the compile queue, and `status`
+            # counts it as `awaiting_compile` so it cannot go quiet.
+            if unit.get("read_status") in {"read", "compiled", "abandoned"}:
                 continue
             score = (
                 0.4 * (int(unit.get("priority") or 3) / 5.0)
@@ -1521,6 +1526,9 @@ def status_payload(entries: list[dict[str, Any]], taxonomy: dict[str, Any], stat
         "unbucketed": cover["unbucketed"],
         "units_declared": units_declared,
         "unit_states": dict(sorted(unit_states.items(), key=lambda kv: -kv[1])),
+        # Read but not yet compiled. These leave the reading queue and are only
+        # visible here, so the number is the backlog the compile queue owes.
+        "units_awaiting_compile": unit_states.get("read", 0),
         "unit_pages_mapped": unit_pages_mapped,
         "sources_decomposed": sources_decomposed,
         "sources_not_decomposed": len(entries) - sources_decomposed,
@@ -1736,6 +1744,10 @@ def self_test() -> dict[str, Any]:
             "units": [
                 {"unit_id": "u1", "topic": "the useful chapter", "pages": 40, "priority": 5},
                 {"unit_id": "u2", "topic": "already done", "pages": 40, "read_status": "compiled"},
+                # Priority 5 and located, so it outscores u1 on every term. If reading
+                # did not remove a unit, this would head the queue forever.
+                {"unit_id": "u3", "topic": "opened, not yet compiled", "pages": 40,
+                 "priority": 5, "locator": "pp. 1-40", "read_status": "read"},
             ],
         }
     )
@@ -1743,7 +1755,7 @@ def self_test() -> dict[str, Any]:
     assert [row["unit_id"] for row in queue] == ["u1"], queue
     assert queue[0]["action"] == "map_first", queue
     assert entry_units(merge_defaults({"id": "n", "title": "N", "pages": 10}))[0]["unit_id"] == "whole"
-    checks.append("units: compiled units leave the queue, undecomposed sources fall back to one whole unit")
+    checks.append("units: read, compiled and abandoned units leave the reading queue; undecomposed sources fall back to one whole unit")
 
     # Units are a reading round's entire payload, and they were silently dropped once.
     stored = merge_defaults({"id": "u", "title": "T",
@@ -1839,6 +1851,8 @@ def cmd_status(paths: dict[str, Path], args: argparse.Namespace) -> int:
         f"{payload['units_declared']} units ({payload['unit_pages_mapped']} pages targeted) "
         + (", ".join(f"{k}={v}" for k, v in payload["unit_states"].items()) or "none read")
     )
+    if payload["units_awaiting_compile"]:
+        print(f"  awaiting compile: {payload['units_awaiting_compile']} units read but not yet compiled")
     print("  buckets:")
     for name, row in payload["buckets"].items():
         print(

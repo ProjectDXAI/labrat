@@ -317,6 +317,178 @@ findings:
       comparator; it costs almost nothing and it makes the difference between the modelled and the
       actual system visible in tests rather than in production.
 
+  - finding_id: FIND-OVERFITTING-HAS-A-CLOSED-FORM
+    title: "Backtest optimism is a closed-form function of the aspect ratio and of nothing else"
+    status: read
+    structure: "Free-probability asymptotics of a quadratic form built from a sample covariance."
+    domains: [high_dim_statistics, quant_finance_core, machine_learning_frontier]
+    correspondence: >
+      Fit a minimum-variance allocation on N assets using T observations, with q = N/T. Bun,
+      Bouchaud and Potters derive R_in^2 / (1 - q) = R_true^2 = (1 - q) R_out^2. The risk the fit
+      reports understates the risk actually realized by exactly (1 - q)^2. The derivation uses only
+      the asymptotic freeness of the sample noise from the population matrix, so the relation holds
+      for a COMPLETELY GENERAL population covariance C — nothing about the assets, the market or the
+      signal enters it. Bongiorno and Lamrani find the same shape in a different currency: the
+      expected information lost by using the sample covariance, E[KL(C||E)], is a closed function of
+      q alone and is likewise independent of C.
+    what_it_buys: >
+      In-sample optimism is usually treated as an unknown to be measured by cross-validation. In
+      this regime it is a known number available before any data is seen, fixed by how many
+      parameters are fit against how many observations. At q = 1 the arithmetic is brutal and exact:
+      in-sample risk is identically zero and out-of-sample risk diverges. A backtest that looks
+      flawless at N = T is not evidence of anything; it is the formula being evaluated at its pole.
+      It also gives a free specification test — measure in-sample and out-of-sample risk, form their
+      ratio, and compare it against (1 - q)^2. A ratio far from the prediction indicts an assumption
+      (non-stationarity, a predictor aligned with the principal components, fat tails) rather than
+      the strategy.
+    sources_read:
+      - "arXiv 1610.08104 — Bun, Bouchaud and Potters, cleaning large correlation matrices, sections 7.1.1-7.1.3"
+      - "arXiv 2310.01963 — Bongiorno and Lamrani, quantifying the information lost in optimal covariance matrix cleaning, section 3"
+    agent_seed: >
+      Any harness that fits parameters and reports a performance number should compute q = N/T for
+      the fit and report the analytic optimism factor next to the result, unasked. Make it a
+      property of the evaluation object rather than a diagnostic someone remembers to run, and make
+      the reported number the deflated one with the raw figure available behind it. Then add the
+      specification test as a first-class output: the ratio of realized to predicted risk against
+      its (1 - q)^2 prediction, with a large deviation raising a flag on the assumptions rather than
+      on the strategy. The point is that the correction needs no holdout, no resampling and no extra
+      data — it is arithmetic on two integers the harness already knows.
+
+  - finding_id: FIND-SHRINK-PAST-THE-TRUTH
+    title: "The best estimator of a covariance is deliberately more conservative than the truth"
+    status: read
+    structure: "Optimal estimation under partial knowledge of a basis, where uncertainty in the eigenvectors is paid for in the eigenvalues."
+    domains: [high_dim_statistics, inference_causality, decision_sequential]
+    correspondence: >
+      For rotationally invariant estimators, the oracle satisfies Tr(Xi_oracle)^2 <= Tr C^2 <=
+      Tr E^2, where C is the population matrix and E the sample one. The middle term is the truth.
+      So the optimal cleaned spectrum is narrower not only than the noisy sample spectrum, which is
+      unsurprising, but narrower than the population spectrum itself. The reason is structural: an
+      RIE keeps the SAMPLE eigenvectors, which are wrong, and the only compensation available is to
+      moderate the eigenvalues attached to them. Placing an eigenvalue at its true magnitude on a
+      misaligned direction is worse than placing a smaller one there.
+    what_it_buys: >
+      It separates two objectives that are habitually conflated: recovering the parameters, and
+      making good decisions with the parameters. Estimating the population eigenvalues correctly is
+      the wrong goal here, and provably so — an estimator that succeeded at it would be beaten by
+      one that deliberately undershoots. The general shape is that when a decomposition has a part
+      you can estimate well and a part you cannot, the correct response is to bias the part you can
+      estimate to absorb the error in the part you cannot, rather than to estimate each part as
+      accurately as possible in isolation.
+    sources_read:
+      - "arXiv 1610.08104 — Bun, Bouchaud and Potters, cleaning large correlation matrices, section 6.3"
+    agent_seed: >
+      Wherever a system estimates a structure in two pieces — a direction and a magnitude, a
+      classification and a confidence, a retrieved document and a relevance weight — do not optimize
+      the pieces separately. Ask what the error in the piece you cannot measure implies for the
+      piece you can, and shrink the measurable one to absorb it. Build the estimator so the
+      shrinkage strength is a function of the estimated error in the OTHER component, and write a
+      test asserting the shrunk output is more conservative than the ground truth on synthetic data
+      where the truth is known. That test will look wrong to anyone who has not read this; say so in
+      the comment.
+
+  - finding_id: FIND-CONVENIENT-LOSS-HIDES-THE-DIVERGENCE
+    title: "The tractable loss function is a truncation of the meaningful one, and the truncation is finite exactly where the truth blows up"
+    status: read
+    structure: "A series expansion in which the conventional objective is the leading term of an information-theoretic objective with a finite radius of convergence."
+    domains: [high_dim_statistics, information_theory, machine_learning_frontier]
+    correspondence: >
+      For the oracle rotationally invariant estimator under an inverse-Wishart population, the
+      expected Kullback-Leibler divergence is an alternating series whose leading term is exactly a
+      quarter of the expected Frobenius error. Minimizing squared error is therefore minimizing
+      information loss to first order. But the series converges only for rq < 4, so there is a
+      regime — many features relative to observations — in which the Frobenius error remains finite
+      and small while the KL divergence is infinite. The two measures do not merely disagree about
+      magnitude there; one of them is reporting a number and the other is reporting that the
+      approximation carries no information at all.
+    what_it_buys: >
+      A concrete instance of a general hazard: the loss function chosen because it is analytically
+      tractable agrees with the one you actually care about in the easy regime and diverges from it
+      in the hard regime, so the disagreement is invisible in exactly the tests where it would be
+      caught. The finite value is the more dangerous output, because a finite number is read as a
+      passing grade. This is worth carrying as a template rather than a fact about covariances: ask
+      of any convenient objective which meaningful objective it is the leading term of, and where
+      that expansion stops converging.
+    sources_read:
+      - "arXiv 2310.01963 — Bongiorno and Lamrani, quantifying the information lost in optimal covariance matrix cleaning, sections 4-5"
+    agent_seed: >
+      When a system reports a fit quality, report the regime alongside it, not just the number. Make
+      the evaluation compute whether it sits inside the domain where the cheap metric tracks the
+      expensive one, and have it refuse — abstain, not warn — outside that domain. Concretely for
+      covariance work: compute rq and refuse to report a Frobenius-based quality score once it
+      approaches 4. More generally, treat every squared-error objective in the codebase as a
+      first-order approximation to something, and make the approximation's validity a checked
+      precondition rather than a remark in a docstring.
+
+  - finding_id: FIND-QUOTING-IS-HARDER-THAN-MATCHING
+    title: "Quoting a combinatorial market is in a different complexity class from matching one"
+    status: read
+    structure: "A counting problem hidden inside a pricing rule: the market maker's cost function is a permanent."
+    domains: [economics_information, mathematical_foundations, defi_mechanics]
+    correspondence: >
+      For subset betting over permutations, the LMSR cost function is C(Q) = b log perm(B) with
+      B_ij = exp(q_ij / b). Pricing therefore reduces from the permanent of a 0-1 matrix and is
+      #P-hard; Boolean betting on disjunctions of two literals is #P-hard by reduction from #2-SAT.
+      Meanwhile Chen, Fortnow, Lambert, Pennock and Wortman note that matching divisible subset
+      bets — the same bet language, run as an auctioneer with no market maker — is polynomial. The
+      automated market maker is not a more convenient implementation of the same mechanism; on the
+      same expressive language it is strictly harder, and the hardness sits in the requirement to
+      quote a coherent price for every outcome rather than in the bets themselves.
+    what_it_buys: >
+      It reframes a design choice usually made for liquidity reasons. Polymarket is a central limit
+      order book rather than a scoring-rule maker, and this result says the order book can carry
+      combinatorial structure that no tractable LMSR could quote. The tractability is bought by
+      giving up the guarantee of a price for every proposition — which is exactly the gap that
+      logical inconsistency lives in. So the incoherence a CLOB permits is not sloppiness; it is
+      the price paid for staying in P, and its size is bounded by how far the matching engine's
+      silence can drift before someone trades it away.
+    sources_read:
+      - "arXiv 0802.1362 — Chen, Fortnow, Lambert, Pennock and Wortman, complexity of combinatorial market makers, sections 4-5"
+    agent_seed: >
+      Before building any component that maintains a coherent joint distribution over a
+      combinatorially large space, ask which counting problem it embeds — the answer is usually a
+      permanent or a #SAT count in disguise, and finding it early saves building the exact version
+      first. Design the interface so pricing is explicitly approximate with a stated loss bound
+      rather than exact-but-slow, and keep an enumerable-space exact path as a test oracle only.
+      Where a system consumes prices from a venue, treat the venue's mechanism type as a typed
+      property: a scoring-rule maker guarantees coherence and cannot be combinatorial, an order book
+      is combinatorial and guarantees nothing, and code that assumes the wrong one will be
+      systematically wrong in one direction.
+
+    # This one is the reason to keep a findings file at all: neither literature
+    # cites the other in the sources read here, and the bound is the same bound.
+  - finding_id: FIND-SUBSIDY-IS-REGRET
+    title: "The market maker's worst-case loss and the online learner's regret are one bound"
+    status: read
+    structure: "Exponential weights, appearing once as a price vector and once as a distribution over experts."
+    domains: [economics_information, machine_learning_frontier, information_theory]
+    correspondence: >
+      LMSR instantaneous prices, p_w(q) proportional to exp(q_w / b), have exactly the form of the
+      weights in Littlestone and Warmuth's Weighted Majority. Setting each expert's instantaneous
+      loss to l_it = (2 eps - q_it) / (eta b) makes the induced weight sequence the market's price
+      sequence, and the standard regret bound eta T + ln(n)/eta then recovers the market maker's
+      well-known worst-case subsidy of b ln(n). The liquidity parameter b is the inverse learning
+      rate. A trader moving the price is an adversary supplying a loss vector.
+    what_it_buys: >
+      Two literatures with essentially no shared citations are studying one object, so results
+      transfer in both directions. Anything the online-learning community proves about exponential
+      weights over structured spaces — permutation learning, tracking a shifting comparator,
+      adaptive learning rates — becomes a statement about market-maker pricing, which is how the
+      authors get an approximation algorithm for a #P-hard pricing problem with a bounded loss
+      guarantee. Read the other way, the market gives an economic reading of the learning rate:
+      what a learner pays for adaptivity, a market maker pays as subsidy.
+    sources_read:
+      - "arXiv 0802.1362 — Chen, Fortnow, Lambert, Pennock and Wortman, complexity of combinatorial market makers, section 6"
+    agent_seed: >
+      When a system needs to maintain a calibrated distribution that updates in response to
+      adversarial evidence, write it once as exponential weights and expose both readings — the
+      learning rate and the liquidity parameter are the same number, and having both names available
+      makes the tuning argument concrete rather than aesthetic. Practically: reach for the
+      online-learning literature whenever a market-maker problem looks intractable, because the
+      regret-bounded approximation usually already exists there under a different name, and its loss
+      bound translates directly into a subsidy bound. Structure any pricing module so its guarantee
+      is stated as a regret, since that is the form in which the proofs are available.
+
 # Patterns worth watching for, recorded so they are noticed when they recur.
 recurring_shapes:
   - shape: "A nuisance parameter turns out to select the model class"
@@ -328,12 +500,28 @@ recurring_shapes:
     why_it_matters: "The failure is not loss of power, it is a confident wrong answer that moves in a plausible direction."
 
   - shape: "The same object under two names in two fields with no shared citations"
-    instances: [FIND-ADVERSE-SELECTION-RENAMED]
+    instances: [FIND-ADVERSE-SELECTION-RENAMED, FIND-SUBSIDY-IS-REGRET]
     why_it_matters: "Each side has results the other lacks, and the translation is usually short once the correspondence is seen."
+
+  - shape: "Tractability bought by giving up a guarantee, with the gap being where the opportunity lives"
+    instances: [FIND-QUOTING-IS-HARDER-THAN-MATCHING]
+    why_it_matters: "The missing guarantee names the anomaly precisely, so the mechanism tells you what to look for before any data does."
 
   - shape: "An invariant enforced by the mechanism rather than by the participants"
     instances: [FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE, FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE]
     why_it_matters: "Enforced invariants bound where anything interesting can happen, and they are enumerable from the mechanism in advance."
+
+  - shape: "A penalty fixed by the geometry of the estimation rather than by its content"
+    instances: [FIND-OVERFITTING-HAS-A-CLOSED-FORM]
+    why_it_matters: "When the cost depends only on how many parameters meet how much data, it is knowable before the data is seen and needs no holdout to correct."
+
+  - shape: "Estimating each component as well as possible is not the optimum"
+    instances: [FIND-SHRINK-PAST-THE-TRUTH]
+    why_it_matters: "Error in a component you cannot measure has to be absorbed somewhere; the component you can measure is the only place available."
+
+  - shape: "The tractable objective agrees with the real one only in the easy regime"
+    instances: [FIND-CONVENIENT-LOSS-HIDES-THE-DIVERGENCE]
+    why_it_matters: "The disagreement is absent from the tests that would catch it, and the surviving number reads as a pass."
 
   - shape: "A quantity that is empirically orthogonal to volatility"
     instances: [FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY]
