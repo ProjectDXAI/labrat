@@ -97,6 +97,14 @@
   the first twelve rows of the real queue were all already read. Read units now leave the queue, and
   `status` reports `units_awaiting_compile` so the backlog is visible rather than silent. The
   self-test plants a read unit that outscores every unread one on every term.
+- `passages.py` indexed every file of a course held under both `study/` and `sources/`
+  twice. Two real copies, different inodes, identical contents, so resolving paths did not
+  see it; deduplication is now on name and size. The corpus was overstated by 1,305
+  passages and about 336k tokens. Affected 40 entries, worst the MIT OCW courses.
+- Multi-file sources can be located by file: `file:lec09` scopes a reading unit to the
+  files whose names contain that fragment. A course is dozens of PDFs with page numbers
+  restarting in each, so `pp. 12-30` across one was not a locator at all.
+
 - Removed the licence gate from both reading paths (`knowledge.py digest` and
   `passages.py brief`) rather than making it configurable. `corpus.py` still records every
   source's terms, which is the thing to consult if any of this is published; reading

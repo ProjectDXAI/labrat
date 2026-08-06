@@ -113,7 +113,12 @@ def passage_paths(root: Path) -> dict[str, Path]:
 
 
 def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) -> list[Path]:
-    """Every local file we hold for an entry, whether a single paper or a course folder."""
+    """Every local file we hold for an entry, whether a single paper or a course folder.
+
+    Deduplicated by resolved path. Several course folders exist under both `study/` and
+    `sources/`, and globbing both bases indexed every one of their files twice: 1,305
+    byte-identical passages, and a page count overstating the corpus by that much.
+    """
     found: list[Path] = []
     for base in (study_dir, sources_dir):
         single = base / f"{entry_id}.pdf"
@@ -125,7 +130,18 @@ def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) 
             # the primary source and printing it to PDF only loses the anchors.
             for pattern in ("*.pdf", "*.md", "*.txt"):
                 found.extend(sorted(folder.glob(pattern)))
-    return found
+
+    # Keyed on name and size, not resolved path. Several course folders exist as two
+    # real copies, one under study/ and one under sources/, with different inodes and
+    # identical contents. Resolving paths does not see that; name plus size does.
+    unique: dict[tuple[str, int], Path] = {}
+    for path in found:
+        try:
+            key = (path.name, path.stat().st_size)
+        except OSError:
+            continue
+        unique.setdefault(key, path)
+    return list(unique.values())
 
 
 def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False) -> dict[str, Any]:
@@ -542,6 +558,22 @@ def self_test() -> dict[str, Any]:
         assert hit["why_it_matched"] and hit["read_it_at"], hit
     assert closed_hit["locator"] == "g.pdf p.2"
     checks.append("emit_passage: text and locator emitted for anything held")
+
+    # Two real copies of one course, one under study/ and one under sources/, indexed
+    # every page twice and overstated the corpus by 1,305 passages. Different inodes, so
+    # resolving paths does not catch it; name and size do.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        for base in ("study", "sources"):
+            folder = root / base / "course"
+            folder.mkdir(parents=True)
+            (folder / "lec01.pdf").write_bytes(b"identical bytes")
+        files = source_files(root, "course", root / "study", root / "sources")
+        assert len(files) == 1, files
+        (root / "sources" / "course" / "lec02.pdf").write_bytes(b"different length here")
+        files = source_files(root, "course", root / "study", root / "sources")
+        assert len(files) == 2, files
+    checks.append("source_files: one document held in two places is indexed once")
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)

@@ -170,6 +170,18 @@ def load_passages(corpus_dir: Path) -> dict[str, list[dict[str, Any]]]:
 PAGE_RANGE = re.compile(r"pp?\.\s*(\d+)\s*(?:-|–|—|to)\s*(\d+)", re.IGNORECASE)
 PAGE_SINGLE = re.compile(r"pp?\.\s*(\d+)", re.IGNORECASE)
 
+# A course is not a book. An OCW entry is dozens of separate PDFs -- lectures, problem
+# sets, solutions, exams -- concatenated under one entry id, and page numbers restart in
+# each. `pp. 12-30` across that is not a locator, it is a page range through arbitrary
+# files. `file:lec09` scopes to the file whose name contains that fragment, which is the
+# only thing that means anything for a multi-file source.
+FILE_SCOPE = re.compile(r"file:\s*([A-Za-z0-9_.-]+)", re.IGNORECASE)
+
+
+def locator_files(locator: str | None) -> list[str]:
+    """Filename fragments a locator scopes to, e.g. `file:lec09, file:lec10`."""
+    return [m.lower() for m in FILE_SCOPE.findall(locator or "")]
+
 
 def locator_pages(locator: str | None) -> tuple[int, int] | None:
     """`section 1, pp. 1-2` -> (1, 2). Returns None when the locator names no pages."""
@@ -195,7 +207,18 @@ def unit_passages(
     rows = passages.get(entry_id) or []
     if not rows:
         return []
-    span = locator_pages((unit or {}).get("locator"))
+
+    locator = (unit or {}).get("locator")
+    scopes = locator_files(locator)
+    if scopes:
+        scoped = [
+            row for row in rows
+            if any(s in (row.get("file") or "").lower() for s in scopes)
+        ]
+        if scoped:
+            rows = scoped
+
+    span = locator_pages(locator)
     if not span:
         return rows
     low, high = span
