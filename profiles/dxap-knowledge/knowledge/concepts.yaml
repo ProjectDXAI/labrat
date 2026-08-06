@@ -91,7 +91,7 @@ concepts:
     tags: [flow, impact, reversion, liquidity]
 
   - concept_id: KC-MICRO-QUEUE
-    canonical_name: "Queue position determines fill quality, not just fill probability"
+    canonical_name: "Queue position in a limit order book determines the fill an order receives"
     plain_description: >
       A passive order's expected outcome depends on where it sits in the queue: orders that fill
       from the back of a depleting queue are selected against, because the queue depletes fastest
@@ -288,7 +288,7 @@ concepts:
   # Vertical: optimal stopping, exits and giveback
   # ----------------------------------------------------------------------------
   - concept_id: KC-STOP-CONTINUATION
-    canonical_name: "Exit as an optimal stopping problem, not a drawdown rule"
+    canonical_name: "Optimal stopping: the exit rule is the boundary of the continuation region"
     plain_description: >
       Whether to hold a winning position is a comparison between the value of continuing and the
       value of stopping now, net of costs — not a fixed fraction of the maximum favourable
@@ -328,7 +328,7 @@ concepts:
     tags: [optimal-stopping, exit, hazard, continuation]
 
   - concept_id: KC-REGIME-PERSISTENCE
-    canonical_name: "Trend persistence makes early stopping expensive"
+    canonical_name: "Order flow is persistent over long lags, and price impact must decay to offset it"
     plain_description: >
       In a persistent regime, the distribution of future excursions is fat-tailed enough that
       most of the return comes from a small number of positions held far past their first
@@ -367,7 +367,7 @@ concepts:
   # Vertical: information arrival and structural change
   # ----------------------------------------------------------------------------
   - concept_id: KC-FILTER-STATE
-    canonical_name: "Separating state from noise with a recursive filter"
+    canonical_name: "Recursive Bayesian filtering: the posterior over a hidden state updates in closed form"
     plain_description: >
       A recursive filter maintains an estimate of an unobserved state and its uncertainty, and
       its innovations — the surprise in each observation — are the natural test of whether the
@@ -405,7 +405,7 @@ concepts:
     tags: [filtering, kalman, state-estimation, innovation]
 
   - concept_id: KC-DETECT-CUSUM
-    canonical_name: "Sequential change detection with an explicit delay-versus-false-alarm trade"
+    canonical_name: "CUSUM: sequential change detection at a chosen detection delay and false alarm rate"
     plain_description: >
       Detecting that a series has changed level is a sequential decision with two costs: how long
       detection takes, and how often it fires when nothing happened. A cumulative sum statistic
@@ -442,7 +442,7 @@ concepts:
     tags: [changepoint, detection, sequential, regime]
 
   - concept_id: KC-INFO-ABSORPTION
-    canonical_name: "Information is absorbed over time, not at the instant of release"
+    canonical_name: "The bid-ask spread is the market maker's compensation for trading against private information"
     plain_description: >
       Prices incorporate a catalyst over a period whose length depends on the instrument's
       liquidity and the participants' attention, so the tradable question is how much of the move
@@ -519,7 +519,7 @@ concepts:
     tags: [prediction-market, lmsr, market-design, polymarket-relevant]
 
   - concept_id: KC-PRED-LIQUIDITY-MOVE
-    canonical_name: "A probability move can be liquidity, not belief"
+    canonical_name: "A probability move in a thin prediction market can be pure liquidity"
     plain_description: >
       In a thin prediction market, a price change often reflects one participant's size against a
       shallow book rather than any revision of collective belief.
@@ -594,7 +594,7 @@ concepts:
     tags: [cross-market, prediction-market, funding, arbitrage, polymarket-relevant]
 
   - concept_id: KC-COST-FLOOR
-    canonical_name: "The cost floor a signal must clear"
+    canonical_name: "Transaction cost decomposes into spread, impact, delay and opportunity cost"
     plain_description: >
       A strategy's expected gross edge per trade must exceed the full round-trip cost — spread
       paid, fees, funding carry and expected adverse selection — before turnover is worth taking,
@@ -636,7 +636,7 @@ concepts:
   # sections actually read, not at recalled chapter numbers.
   # ----------------------------------------------------------------------------
   - concept_id: KC-HAWKES-CRITICALITY
-    canonical_name: "Order flow sits near criticality, and the branching ratio measures how near"
+    canonical_name: "The branching ratio measures endogenous activity, conditional on the kernel it is estimated under"
     plain_description: >
       Most market events are triggered by other market events rather than by outside information.
       The share that is internally triggered is the branching ratio of a self-exciting process, and
@@ -712,7 +712,7 @@ concepts:
     tags: [hawkes, reflexivity, contested, early-warning]
 
   - concept_id: KC-IRREVERSIBILITY
-    canonical_name: "Time-asymmetry of a price series, and what it does and does not imply"
+    canonical_name: "Time-irreversibility of a trajectory, and how often the reverse appears by chance"
     plain_description: >
       A series whose statistics differ when played backwards has an arrow of time. Every equity
       series that has been measured this way shows some asymmetry, so its presence is not the
@@ -982,7 +982,7 @@ concepts:
     workstream: dxap_agents
 
   - concept_id: KC-COUNTERPARTY-INFO
-    canonical_name: "Adverse selection is a property of the counterparty, not only of the state"
+    canonical_name: "Adverse selection varies by counterparty identity at a fixed market state"
     plain_description: >
       When fills carry the identity of both sides, adverse selection can be attributed to who was on
       the other side rather than inferred from market conditions. If a counterparty's flow marks out
@@ -1076,7 +1076,7 @@ concepts:
     tags: [branching, cascade, forecasting, transfer, seismology, read-directly]
 
   - concept_id: KC-ALARM-LOSS
-    canonical_name: "Probability gain is not an objective; the error diagram is"
+    canonical_name: "The error diagram evaluates an alarm across its whole threshold range"
     plain_description: >
       A rule that fires only in the most certain case has an enormous probability gain and
       predicts almost nothing. Optimising gain therefore selects silence. The quantity to minimise is the
@@ -1169,7 +1169,7 @@ concepts:
     workstream: polymarket
 
   - concept_id: KC-EARLY-WARNING-FRAGILITY
-    canonical_name: "Critical slowing down is real and its false-positive rate is the binding constraint"
+    canonical_name: "Critical slowing down precedes a transition, at a false-positive rate that bounds its use"
     plain_description: >
       Variance and autocorrelation rise as a system approaches a tipping point, which makes
       them generic leading indicators requiring no model of the mechanism. The problem is not
@@ -1439,7 +1439,7 @@ concepts:
     workstream: hyperliquid_l4
 
   - concept_id: KC-OFFLINE-SHIFT
-    canonical_name: "Evaluating a policy on data it did not generate is extrapolation, not measurement"
+    canonical_name: "Offline policy evaluation is a counterfactual query, and distributional shift is what breaks it"
     plain_description: >
       Asking what an agent would have done under a treatment, using traces recorded without that
       treatment, requires estimating outcomes in situations the recorded agent did not enter. The
@@ -1482,7 +1482,7 @@ concepts:
     workstream: dxap_agents
 
   - concept_id: KC-REAL-DRIFT
-    canonical_name: "The relationship can change while the inputs look identical"
+    canonical_name: "Real concept drift changes P(y|x) while P(x) is unchanged"
     plain_description: >
       A model decays when the conditional distribution of the outcome given the inputs changes.
       That can happen with the input distribution completely unchanged, which means monitoring
@@ -1748,7 +1748,7 @@ concepts:
     tags: [hawkes, criticality, scaling-limit, rough-volatility, mathematical, read-directly]
 
   - concept_id: KC-TIME-UNIFORM-WIDTH
-    canonical_name: "Looking whenever you like costs a log-log factor, and it is worth knowing the price"
+    canonical_name: "Time-uniform confidence sequences, and why the asymptotically optimal rate is the wrong one to buy"
     plain_description: >
       An interval valid at one pre-chosen sample size and an interval valid at every sample size
       simultaneously are different objects. The second is wider, and the amount it is wider by is

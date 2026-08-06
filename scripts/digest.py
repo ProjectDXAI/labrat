@@ -79,14 +79,22 @@ TIER_GAIN = {
     TIER_SOURCE: 2.05,
 }
 
-# The ceiling a rights class puts on tier. Not a preference and not overridable: a
-# trigger can ask for the text and still be refused it.
+# Two different questions get called "rights", and conflating them is how a local
+# reading tool ends up refusing to show you a paper sitting on your own disk.
 #
-# Only the classes that clear derivative use reach the text tiers. `ingest_check_terms`
-# does not: its whole meaning is that the terms were never read, and an unread licence is
-# not a permissive one. `needs_review` and `reference_only` stop at the note, because a
-# note is our own writing about the source rather than the source.
-RIGHTS_CEILING = {
+# `corpus.py` answers the redistribution question: may this text go into a corpus, a
+# manifest, a published artifact, a model someone deploys. CC BY-NC and "subscription
+# required" bite hard there, and that engine is right to be strict.
+#
+# This module answers a different one: how much of a source you already hold should be
+# put in front of a model, locally, to help you read it. A licence restricting
+# redistribution does not restrict reading, so `personal` mode does not cap on it.
+#
+# `redistribution` mode exists for when a digest is going to leave the machine -- pasted
+# into something published, shipped with a product, used to build a dataset. It restores
+# the corpus ceilings. Every served passage carries its rights class either way, so the
+# constraint is recorded and can be re-applied to anything that gets published later.
+REDISTRIBUTION_CEILING = {
     "ingest_full": TIER_SOURCE,
     "ingest_attribution": TIER_SOURCE,
     "ingest_share_alike": TIER_SOURCE,
@@ -97,9 +105,21 @@ RIGHTS_CEILING = {
     "excluded": TIER_CARD,
 }
 
+# Personal reading has one real limit, and it is not a copyright ceiling. `excluded` is
+# `proprietary_confidential`: leaked, NDA-bound, or otherwise material the corpus engine
+# says we should not be holding at all. That stays out whatever mode is set, because the
+# objection to it was never about redistribution.
+PERSONAL_CEILING = {name: TIER_SOURCE for name in REDISTRIBUTION_CEILING}
+PERSONAL_CEILING["excluded"] = TIER_CARD
+
+RIGHTS_MODES = {"personal": PERSONAL_CEILING, "redistribution": REDISTRIBUTION_CEILING}
+
+# Kept as the name the rest of the module reads, so a mode swap is one lookup.
+RIGHTS_CEILING = REDISTRIBUTION_CEILING
+
 # Anything the corpus vocabulary grows that this module has not been taught falls to the
-# card tier. Failing closed is the right default, and `unmapped_rights_classes` turns the
-# silence into a reportable fact so a new licence class cannot quietly cost us every quote.
+# card tier under redistribution rules. Failing closed is right when the question is what
+# may be published; `unmapped_rights_classes` turns the silence into a reportable fact.
 UNMAPPED_CEILING = TIER_CARD
 
 
@@ -122,6 +142,9 @@ DEFAULT_DIGEST_POLICY: dict[str, Any] = {
     # 60k leaves a long-context model most of its window for the reasoning it was given
     # the material for. Lower it when the packet feeds something smaller.
     "budget_tokens": 60000,
+    # Reading locally, not publishing. Set `redistribution` when the digest is going
+    # somewhere the licence terms actually apply.
+    "rights_mode": "personal",
     "confidence_floor": 0.6,
     # An excerpt used to be 1400 characters, which is under a third of one extracted page
     # and reads as a teaser rather than evidence. Roughly five pages is a passage someone
@@ -244,19 +267,26 @@ def entry_passages(
     return passages.get(entry_id) or []
 
 
-def rights_ceiling(entry: dict[str, Any] | None, rows: list[dict[str, Any]]) -> tuple[int, str]:
+def rights_ceiling(
+    entry: dict[str, Any] | None,
+    rows: list[dict[str, Any]],
+    mode: str = "personal",
+) -> tuple[int, str]:
     """The tier this anchor may not exceed, and the class that set it.
 
-    Two sources disagree in practice: the bibliography's derived rights, and the class
-    stamped on each extracted page. Take the stricter of the two, because the reason they
-    disagree is usually that one of them has not been re-checked.
+    Under `redistribution`, two records disagree in practice -- the bibliography's derived
+    rights and the class stamped on each extracted page -- and the stricter wins, because
+    the reason they disagree is usually that one has not been re-checked. Under
+    `personal` the only thing that caps anything is material we should not be holding.
     """
+    table = RIGHTS_MODES.get(mode, PERSONAL_CEILING)
+    unmapped = UNMAPPED_CEILING if mode == "redistribution" else TIER_SOURCE
     derived = ((entry or {}).get("derived_rights") or {}).get("use_class") or "unknown"
-    ceiling = RIGHTS_CEILING.get(derived, UNMAPPED_CEILING)
+    ceiling = table.get(derived, unmapped)
     binding = derived
     for row in rows:
         row_class = row.get("use_class") or "unknown"
-        row_ceiling = RIGHTS_CEILING.get(row_class, UNMAPPED_CEILING)
+        row_ceiling = table.get(row_class, unmapped)
         if row_ceiling < ceiling:
             ceiling, binding = row_ceiling, row_class
     return ceiling, binding
@@ -358,7 +388,9 @@ def build_candidates(
             # and three units of one paper can each claim the same pages.
             locator_unresolved = bool(rows) and locator_pages((unit or {}).get("locator")) is None
             full_text = wants_full_text(entry, full_requests or set())
-            ceiling, binding_class = rights_ceiling(entry, all_rows or rows)
+            ceiling, binding_class = rights_ceiling(
+                entry, all_rows or rows, policy.get("rights_mode", "personal")
+            )
             triggers = fire_triggers(
                 card, _key(ref), unit, rows, packet, query_terms, anchor_card_count, policy
             )
@@ -910,23 +942,29 @@ def self_test() -> dict[str, Any]:
     assert not unmapped, f"use classes with no tier ceiling: {unmapped}"
     checks.append("rights: every use class the corpus can emit has a ceiling")
 
-    # A ceiling is a ceiling. No trigger lifts it.
-    entry = {"derived_rights": {"use_class": "reference_only"}}
-    ceiling, binding = rights_ceiling(entry, [])
-    assert ceiling == TIER_NOTE and binding == "reference_only"
-    checks.append("rights: reference_only stops at the note")
+    # Reading a paper you hold is not redistributing it, so personal mode does not cap on
+    # a licence that only restricts redistribution.
+    restricted = {"derived_rights": {"use_class": "reference_only"}}
+    assert rights_ceiling(restricted, [], "personal")[0] == TIER_SOURCE
+    assert rights_ceiling(restricted, [], "redistribution")[0] == TIER_NOTE
+    checks.append("rights: a redistribution licence caps publishing, not local reading")
 
-    # The stricter of the two rights records wins, because disagreement means one is stale.
+    # Material we should not hold at all stays out either way. That objection was never
+    # about redistribution.
+    confidential = {"derived_rights": {"use_class": "excluded"}}
+    assert rights_ceiling(confidential, [], "personal")[0] == TIER_CARD
+    assert rights_ceiling(confidential, [], "redistribution")[0] == TIER_CARD
+    checks.append("rights: confidential material is refused in both modes")
+
+    # Under redistribution the stricter of the two records wins: disagreement means one
+    # of them has not been re-checked.
     mixed = rights_ceiling(
         {"derived_rights": {"use_class": "ingest_full"}},
         [{"use_class": "ingest_full"}, {"use_class": "reference_only"}],
+        "redistribution",
     )
     assert mixed == (TIER_NOTE, "reference_only"), mixed
-    checks.append("rights: a permissive entry with one restricted page is capped by the page")
-
-    # An excluded source cannot be escalated at all, whatever fired.
-    assert rights_ceiling({"derived_rights": {"use_class": "excluded"}}, [])[0] == TIER_CARD
-    checks.append("rights: excluded sources never reach source text")
+    checks.append("rights: publishing takes the stricter of the entry and the page")
 
     # The allocator spends a tight budget on the anchor that needs it, not the first one.
     cheap = _candidate(concept_id="KC-CHEAP", anchor="a", base_value=1.0, trigger_weight=0.0)

@@ -27,6 +27,12 @@
 
 ### Fixed
 
+- The digest no longer applies redistribution licences to local reading. `corpus.py`'s
+  rights model exists for corpus construction, where CC BY-NC and subscription terms
+  genuinely bite; it was being used to gate how much of a paper you already hold could be
+  shown to you on your own machine. `rights_mode` now defaults to `personal` and
+  `--rights-mode redistribution` restores the strict ceilings for a packet that will be
+  published. Confidential material is refused in both.
 - A unit whose locator names no pages no longer serves the whole entry as its `unit`
   tier. Ninety-four of this corpus's hundred-and-five units are in that state, so a card
   anchored to "the empirical section" was arriving with all 54 pages of the paper.

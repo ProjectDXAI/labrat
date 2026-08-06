@@ -450,9 +450,23 @@ fix is to write page numbers into the locator.
 
 Three things decide which one an anchor gets.
 
-**Rights cap it.** The four `ingest_*` classes that clear derivative use reach `source`.
-`ingest_check_terms` does not, because its whole meaning is that the terms were never
-read. A `reference_only` source can be cited and paraphrased from our own
+**Rights cap it, and only when you are publishing.** Two different questions get called
+"rights". `corpus.py` answers the redistribution question: may this text go into a
+corpus, a manifest, a published artifact, a model someone deploys. CC BY-NC and
+"subscription required" bite hard there. The digest answers a different one: how much of
+a source you already hold should go in front of a model, locally, to help you read it. A
+licence restricting redistribution does not restrict reading, so the default
+`rights_mode: personal` does not cap on it.
+
+`--rights-mode redistribution` restores the corpus ceilings for a packet that is going
+somewhere published. Every served passage carries its rights class in both modes, so the
+constraint is recorded and can be re-applied later. One thing is refused in both:
+`excluded` is `proprietary_confidential` — leaked or NDA-bound material the corpus engine
+says we should not hold at all, which was never a redistribution objection.
+
+Under `redistribution`, the four `ingest_*` classes that clear derivative use reach
+`source`. `ingest_check_terms` does not, because its whole meaning is that the terms were
+never read. A `reference_only` source can be cited and paraphrased from our own
 notes; its text does not enter the packet. The ceiling is taken from the stricter of the
 bibliography's derived rights and the class stamped on each extracted page, because when
 those two disagree it usually means one has not been re-checked. No trigger lifts a

@@ -2036,6 +2036,8 @@ def cmd_digest(args: argparse.Namespace) -> int:
         digest_policy["triggers"] = {**digest_policy["triggers"], **stored["triggers"]}
     if args.budget:
         digest_policy["budget_tokens"] = args.budget
+    if args.rights_mode:
+        digest_policy["rights_mode"] = args.rights_mode
 
     passages = digest_module.load_passages((corpus_dir or (lab_root / "corpus")).resolve())
     full_requests = {"*"} if args.full_all else set(args.full or [])
@@ -2238,6 +2240,9 @@ def build_parser() -> argparse.ArgumentParser:
     digest_cmd.add_argument("--policy", default=None)
     digest_cmd.add_argument("--k", type=int, default=None)
     digest_cmd.add_argument("--budget", type=int, default=None, help="token ceiling for source text")
+    digest_cmd.add_argument("--rights-mode", choices=["personal", "redistribution"], default=None,
+                            help="personal reading ignores redistribution licences; "
+                                 "redistribution restores the corpus ceilings for a packet that will be published")
     digest_cmd.add_argument("--full", action="append", default=None, metavar="SOURCE_ID",
                             help="bring this source in whole when the licence allows; repeatable")
     digest_cmd.add_argument("--full-all", action="store_true",
