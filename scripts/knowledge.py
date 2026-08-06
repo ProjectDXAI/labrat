@@ -1469,6 +1469,204 @@ def _cards_on_read_units(store: dict[str, Any], sources: dict[str, dict[str, Any
     return {"grounded": grounded, "ungrounded": ungrounded}
 
 
+def assess(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Read the whole store at once and report its structure rather than its contents.
+
+    Every other command answers a question about one card, one context or one queue.
+    This one asks what the store looks like taken together: where claims contradict
+    each other, which chains from a diagnosed problem to a decision are actually
+    complete, which sources carry more weight than anyone checked, and where high
+    confidence sits on top of material nobody opened. Those are properties of the
+    collection, and they are invisible from inside any single card.
+    """
+    concepts = store.get("concepts") or []
+    by_id = {c["concept_id"]: c for c in concepts}
+    methods = store.get("methods") or []
+    hypotheses = store.get("hypotheses") or []
+    decisions = store.get("decisions") or store.get("decision_relevance") or []
+    problems = store.get("problems") or []
+    opened = read_units(sources)
+
+    # --- 1. Contradiction structure -------------------------------------------------
+    edges: set[tuple[str, str]] = set()
+    for concept in concepts:
+        for other in concept.get("contradicting_concept_ids") or []:
+            if other in by_id:
+                edges.add(tuple(sorted((concept["concept_id"], other))))
+    adjacency: dict[str, set[str]] = {c["concept_id"]: set() for c in concepts}
+    for left, right in edges:
+        adjacency[left].add(right)
+        adjacency[right].add(left)
+
+    clusters, seen = [], set()
+    for concept_id in sorted(adjacency):
+        if concept_id in seen or not adjacency[concept_id]:
+            continue
+        stack, group = [concept_id], []
+        while stack:
+            current = stack.pop()
+            if current in seen:
+                continue
+            seen.add(current)
+            group.append(current)
+            stack.extend(sorted(adjacency[current] - seen))
+        clusters.append(sorted(group))
+    clusters.sort(key=lambda g: (-len(g), g[0]))
+
+    uncountered = [
+        c["concept_id"] for c in concepts
+        if not (c.get("contradicting_concept_ids") or []) and not (c.get("alternative_explanations") or [])
+    ]
+
+    # --- 2. Evidence chains: problem -> concept -> method -> hypothesis -> decision ---
+    bound_concepts = {cid for m in methods for cid in (m.get("concept_ids") or [])}
+    hypothesis_concepts = {h.get("concept_id") for h in hypotheses}
+    decision_concepts = {d.get("concept_id") for d in decisions}
+
+    chains = []
+    for problem in problems:
+        pid = problem.get("problem_id")
+        covering = [c for c in concepts if pid in (c.get("problem_ids") or [])]
+        complete = [
+            c["concept_id"] for c in covering
+            if c["concept_id"] in bound_concepts
+            and c["concept_id"] in hypothesis_concepts
+            and c["concept_id"] in decision_concepts
+        ]
+        chains.append({
+            "problem_id": pid,
+            "workstream": problem.get("workstream"),
+            "weight": problem.get("weight"),
+            "concepts": len(covering),
+            "with_method": sum(1 for c in covering if c["concept_id"] in bound_concepts),
+            "with_hypothesis": sum(1 for c in covering if c["concept_id"] in hypothesis_concepts),
+            "with_decision_card": sum(1 for c in covering if c["concept_id"] in decision_concepts),
+            "complete_chains": complete,
+        })
+    chains.sort(key=lambda row: (len(row["complete_chains"]), row["concepts"]))
+
+    # --- 3. Load-bearing sources -----------------------------------------------------
+    source_load: dict[str, dict[str, Any]] = {}
+    for concept in concepts:
+        for raw in concept.get("source_passage_ids") or []:
+            ref = parse_passage_ref(raw)
+            key = f"{ref['source_id']}#{ref['anchor']}" if ref.get("anchor") else ref["source_id"]
+            row = source_load.setdefault(key, {"anchor": key, "source_id": ref["source_id"],
+                                               "cards": [], "read": key in opened})
+            row["cards"].append(concept["concept_id"])
+    load = sorted(source_load.values(), key=lambda r: (-len(r["cards"]), r["anchor"]))
+    single_points = [r for r in load if len(r["cards"]) >= 2 and not r["read"]]
+
+    # --- 4. The dangerous quadrant: high confidence on unread anchors -----------------
+    def grounded(concept: dict[str, Any]) -> bool:
+        for raw in concept.get("source_passage_ids") or []:
+            ref = parse_passage_ref(raw)
+            if f"{ref['source_id']}#{ref['anchor']}" in opened:
+                return True
+        return False
+
+    overconfident = sorted(
+        ({"concept_id": c["concept_id"], "confidence": c.get("confidence"),
+          "name": c.get("canonical_name")}
+         for c in concepts if not grounded(c) and (c.get("confidence") or 0) >= 0.6),
+        key=lambda r: -(r["confidence"] or 0),
+    )
+
+    # --- 5. Orphans ------------------------------------------------------------------
+    orphan_methods = [m["method_id"] for m in methods if not (m.get("concept_ids") or [])]
+    concepts_without_problem = [c["concept_id"] for c in concepts if not (c.get("problem_ids") or [])]
+
+    # --- 6. Distribution -------------------------------------------------------------
+    workstreams: dict[str, int] = {}
+    for concept in concepts:
+        workstreams[concept.get("workstream") or "cross_cutting"] = \
+            workstreams.get(concept.get("workstream") or "cross_cutting", 0) + 1
+    statuses: dict[str, int] = {}
+    for concept in concepts:
+        statuses[concept.get("implementation_status")] = statuses.get(concept.get("implementation_status"), 0) + 1
+
+    return {
+        "counts": {
+            "concepts": len(concepts), "methods": len(methods), "hypotheses": len(hypotheses),
+            "decision_cards": len(decisions), "problems": len(problems),
+        },
+        "contradiction": {
+            "pairs": sorted(edges),
+            "clusters": clusters,
+            "concepts_in_a_contradiction": len(seen),
+            "uncountered_concepts": uncountered,
+        },
+        "chains": chains,
+        "complete_chain_problems": [row["problem_id"] for row in chains if row["complete_chains"]],
+        "problems_without_concept": [row["problem_id"] for row in chains if row["concepts"] == 0],
+        "load_bearing_sources": load[:12],
+        "unread_single_points": single_points,
+        "high_confidence_on_unread": overconfident,
+        "orphan_methods": orphan_methods,
+        "concepts_without_problem": concepts_without_problem,
+        "by_workstream": workstreams,
+        "by_implementation_status": statuses,
+        "grounded_share": round(sum(1 for c in concepts if grounded(c)) / max(len(concepts), 1), 3),
+    }
+
+
+def render_assessment(payload: dict[str, Any]) -> str:
+    counts = payload["counts"]
+    lines = [
+        "# Corpus assessment", "",
+        f"{counts['concepts']} concepts, {counts['methods']} method bindings, "
+        f"{counts['hypotheses']} hypotheses, {counts['decision_cards']} decision cards, "
+        f"across {counts['problems']} diagnosed problems. "
+        f"{payload['grounded_share']:.0%} of concepts rest on a source unit someone opened.", "",
+    ]
+
+    contradiction = payload["contradiction"]
+    lines += ["## Where the corpus argues with itself", "",
+              f"{len(contradiction['pairs'])} contradiction pairs covering "
+              f"{contradiction['concepts_in_a_contradiction']} concepts, in "
+              f"{len(contradiction['clusters'])} clusters.", ""]
+    for cluster in contradiction["clusters"]:
+        lines.append(f"- {' ↔ '.join(cluster)}")
+    if contradiction["uncountered_concepts"]:
+        lines += ["", "Carrying neither a contradicting card nor an alternative explanation "
+                      "(these should not exist; the gate requires one or the other):", ""]
+        for concept_id in contradiction["uncountered_concepts"]:
+            lines.append(f"- {concept_id}")
+
+    lines += ["", "## Chains that reach a decision", "",
+              "A problem is only served when some concept covering it has a bound method, "
+              "a hypothesis with a cost model, and a decision card. Anything short of that "
+              "is a claim the agent cannot act on.", "",
+              "| Problem | Concepts | +method | +hypothesis | +decision | Complete |", "|---|---|---|---|---|---|"]
+    for row in payload["chains"]:
+        lines.append(f"| `{row['problem_id']}` | {row['concepts']} | {row['with_method']} | "
+                     f"{row['with_hypothesis']} | {row['with_decision_card']} | "
+                     f"{len(row['complete_chains'])} |")
+
+    if payload["unread_single_points"]:
+        lines += ["", "## Sources carrying weight nobody has checked", "",
+                  "Anchors backing two or more cards where the unit has not been read. "
+                  "If one of these is wrong, everything above it is wrong together.", ""]
+        for row in payload["unread_single_points"]:
+            lines.append(f"- `{row['anchor']}` — {len(row['cards'])} cards: {', '.join(row['cards'])}")
+
+    if payload["high_confidence_on_unread"]:
+        lines += ["", "## High confidence on unopened material", "",
+                  "Confidence at or above 0.6 with no anchor anyone has read. Not necessarily "
+                  "wrong, but the confidence is a memory of the literature rather than a reading of it.", ""]
+        for row in payload["high_confidence_on_unread"]:
+            lines.append(f"- `{row['concept_id']}` ({row['confidence']}) — {row['name']}")
+
+    lines += ["", "## Distribution", "",
+              "| Workstream | Concepts |", "|---|---|"]
+    for name, count in sorted(payload["by_workstream"].items(), key=lambda kv: -kv[1]):
+        lines.append(f"| {name} | {count} |")
+    lines += ["", "| Implementation status | Concepts |", "|---|---|"]
+    for name, count in sorted(payload["by_implementation_status"].items(), key=lambda kv: -kv[1]):
+        lines.append(f"| {name} | {count} |")
+    return "\n".join(lines)
+
+
 def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
     validation = validate_store(store, sources)
     servable = servable_concepts(store, sources)
@@ -1646,6 +1844,44 @@ def self_test() -> dict[str, Any]:
     assert violations and violations[0]["violation"] == "missing_observables", violations
     checks.append("stress: perturbations apply and integrity violations are detected")
 
+    # assess() reads the whole store at once, so its failure mode is silently reporting
+    # a healthy structure on a broken one. Check it finds what is planted.
+    planted_store = {
+        "concepts": [
+            {"concept_id": "A", "canonical_name": "A", "confidence": 0.9,
+             "contradicting_concept_ids": ["B"], "problem_ids": ["P1"],
+             "source_passage_ids": ["src#unread-part"]},
+            {"concept_id": "B", "canonical_name": "B", "confidence": 0.4,
+             "contradicting_concept_ids": ["A"], "problem_ids": ["P1"],
+             "source_passage_ids": ["src#unread-part"], "alternative_explanations": ["x"]},
+            {"concept_id": "C", "canonical_name": "C", "confidence": 0.5,
+             "problem_ids": [], "source_passage_ids": ["src#read-part"]},
+        ],
+        "methods": [{"method_id": "m1", "concept_ids": ["A"]}, {"method_id": "orphan", "concept_ids": []}],
+        "hypotheses": [{"hypothesis_id": "h1", "concept_id": "A"}],
+        "decisions": [{"decision_relevance_id": "d1", "concept_id": "A"}],
+        "problems": [{"problem_id": "P1"}, {"problem_id": "P2"}],
+    }
+    planted_sources = {"src": {"id": "src", "units": [
+        {"unit_id": "read-part", "read_status": "read"},
+        {"unit_id": "unread-part", "read_status": "unread"},
+    ]}}
+    report = assess(planted_store, planted_sources)
+    assert report["contradiction"]["clusters"] == [["A", "B"]], report["contradiction"]["clusters"]
+    assert report["contradiction"]["uncountered_concepts"] == ["C"], report["contradiction"]
+    assert report["complete_chain_problems"] == ["P1"], report["complete_chain_problems"]
+    assert report["problems_without_concept"] == ["P2"], report["problems_without_concept"]
+    assert report["orphan_methods"] == ["orphan"], report["orphan_methods"]
+    assert report["concepts_without_problem"] == ["C"], report["concepts_without_problem"]
+    # src#unread-part backs two cards and nobody opened it: exactly the single point of failure.
+    assert [r["anchor"] for r in report["unread_single_points"]] == ["src#unread-part"], report["unread_single_points"]
+    # A is confident and ungrounded; B is ungrounded but not confident; C is grounded.
+    assert [r["concept_id"] for r in report["high_confidence_on_unread"]] == ["A"], report["high_confidence_on_unread"]
+    assert report["grounded_share"] == 0.333, report["grounded_share"]  # one of three, rounded
+    rendered = render_assessment(report)
+    assert "A ↔ B" in rendered and "src#unread-part" in rendered, rendered[:400]
+    checks.append("assess: finds the planted contradiction cluster, the only complete chain, the uncovered problem, the orphan method, the unread anchor two cards depend on, and the confident ungrounded card")
+
     return {"ok": True, "checks": checks}
 
 
@@ -1696,6 +1932,20 @@ def cmd_validate(args: argparse.Namespace) -> int:
                 for message in warnings:
                     print(f"WARN   {identifier}: {message}")
     return 0 if result["ok"] else 1
+
+
+def cmd_assess(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+    payload = assess(store, sources)
+    text = render_assessment(payload) if args.markdown else json.dumps(payload, indent=2)
+    if args.out:
+        Path(args.out).write_text(text)
+        print(f"wrote {args.out}")
+    else:
+        print(text)
+    return 0
 
 
 def cmd_status(args: argparse.Namespace) -> int:
@@ -1894,6 +2144,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("init", help="Create an empty knowledge store.")
     validate_cmd = sub.add_parser("validate", help="Run the SERVABLE gate over every card.")
     validate_cmd.add_argument("--json", action="store_true")
+    assess_cmd = sub.add_parser("assess", help="Read the whole store at once: contradictions, chains, load-bearing sources, fragility.")
+    assess_cmd.add_argument("--markdown", action="store_true")
+    assess_cmd.add_argument("--out", default=None)
+
     status_cmd = sub.add_parser("status", help="Coverage of the problem map, gaps, and gates.")
     status_cmd.add_argument("--json", action="store_true")
 
@@ -1940,6 +2194,7 @@ def main(argv: list[str] | None = None) -> int:
         "init": cmd_init,
         "validate": cmd_validate,
         "status": cmd_status,
+        "assess": cmd_assess,
         "retrieve": cmd_retrieve,
         "evaluate": cmd_evaluate,
         "bets": cmd_bets,

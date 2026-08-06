@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.21.0 - 2026-08-06
+
+- Added `knowledge.py assess`, which reads the whole store at once. Every other command answers a question about one card, one context or one queue; this asks what the collection looks like taken together, where a different class of problem lives. It reports the contradiction structure and its clusters, which problems have a chain that actually reaches a decision, which anchors carry several cards and whether anyone read them, which confident cards rest on unopened material, and the orphans.
+- **The finding that justified building it.** `PB-INVENTORY-FUNDING` and `PB-STALE-PROBABILITY` have five and seven concepts, four hypotheses and five decision cards between them, and **zero complete chains** — no single concept covering either problem carries a bound method, a hypothesis and a decision card together. Both look healthy by every count-based measure and neither can be acted on. Breadth of coverage is not a path from a source to a decision, and only reading the store as a whole shows the difference.
+- The structural result is otherwise clean: every anchor supporting two or more cards has been read, no method is bound to nothing, no concept floats outside the problem map, and no card carries neither a contradicting card nor an alternative explanation. Those are the four ways a store like this rots quietly, and `make smoke-knowledge` now asserts all four are empty.
+- 18 contradiction pairs in 8 clusters. Each cluster is a question the corpus has two defensible answers to rather than a defect: what price impact is and how it scales; whether near-critical order flow is real or an estimator artifact; what a quoted price means; whether a regime change is visible before it matters; whether flow carries information; whether queue position means anything on a batching venue; whether logged data can answer a counterfactual; and whether an incoherent event tree is an opportunity or an artifact of who is trading which leg.
+- Sixteen cards carry confidence at or above 0.6 with no anchor anyone has opened, including the four most confident in the store. They are almost all the microstructure and execution canon, which is paywalled — so the most confident part of the corpus is the least verified part, and that is an acquisition problem rather than an effort one.
+- Added `docs/CORPUS_ASSESSMENT.md`: the current reading, with the generated structure separated from the judgment about what it means.
+- Fixed a real bug the new command surfaced immediately: it read decision cards from the wrong store key and reported zero, which would have made every chain look broken. Caught because the planted self-test expects exactly one complete chain.
+
 ## 0.20.0 - 2026-08-06
 
 - Four more held sources read and compiled. Units read 36 to 40, provenance 24 of 40 cards to 27 of 43.

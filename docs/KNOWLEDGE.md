@@ -332,6 +332,24 @@ They say plainly that many authors unduly identify the first two. This corpus wa
 
 `KC-IMPACT-CONFLATION` records this, contradicts `KC-INFO-KYLE` deliberately, and carries the correction in its own failure modes rather than in a footnote. Metaorder reconstruction normally needs participant attribution that almost no dataset has. This venue publishes both counterparty addresses on every fill, so the third measure is estimable here rather than assumed, which is what `HY-IMPACT-EXPONENT` proposes to do.
 
+## Reading the whole store at once
+
+```bash
+python scripts/knowledge.py assess --markdown
+```
+
+Every other command answers a question about one card, one context or one queue. This one asks what the collection looks like taken together, which is where a different class of problem lives:
+
+- **Contradiction structure** — which cards argue with which, and the clusters they form. A cluster is a question the corpus has two defensible answers to, not a defect.
+- **Chains that reach a decision** — a problem is served only when some concept covering it has a bound method, a hypothesis with a cost model, *and* a decision card. Anything less is a claim the agent cannot act on, and a problem can look well covered by every count-based measure while having no complete chain at all.
+- **Load-bearing sources** — anchors supporting several cards. One of these being wrong takes everything above it down together, and the check that matters is whether anyone read it.
+- **High confidence on unopened material** — cards at confidence 0.6 or above with no anchor anyone opened. Not evidence they are wrong; evidence that the confidence is a memory of the literature rather than a reading of it.
+- **Orphans** — methods bound to nothing, concepts outside the problem map, cards carrying neither a contradiction nor an alternative explanation.
+
+`make smoke-knowledge` asserts the last group is empty and that the contradiction structure has not collapsed. Those are the four ways a store like this rots quietly, and they are cheap to check and invisible from inside any single card.
+
+See [docs/CORPUS_ASSESSMENT.md](CORPUS_ASSESSMENT.md) for the current reading.
+
 ## Ranking what to compile next
 
 ```bash
