@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T08:08:12.806152+00:00'
+updated_at: '2026-08-06T08:18:35.453851+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -4330,7 +4330,7 @@ entries:
   venue: ACM Advances in Financial Technologies
   identifiers:
     isbn: null
-    doi: 10.2139/ssrn.3636514
+    doi: 10.48550/arXiv.2003.10001
     url: https://doi.org/10.2139/ssrn.3636514
   pages: 12
   density: high
@@ -4344,7 +4344,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/2003.10001
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: boyd-2004-convex-optimization
@@ -4578,7 +4581,7 @@ entries:
   venue: ACM Internet Measurement Conference 2021
   identifiers:
     isbn: null
-    doi: 10.1145/3487552.3487811
+    doi: 10.48550/arXiv.2106.06389
     url: https://doi.org/10.1145/3487552.3487811
   pages: 15
   density: high
@@ -4591,8 +4594,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/2106.06389
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: gudgeon-2020-decentralized-financial-crisis
@@ -4629,7 +4635,7 @@ entries:
   venue: IEEE Symposium on Security and Privacy 2022
   identifiers:
     isbn: null
-    doi: 10.1109/sp46214.2022.9833734
+    doi: 10.48550/arXiv.2101.05511
     url: https://doi.org/10.1109/sp46214.2022.9833734
   pages: 18
   density: high
@@ -4642,8 +4648,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/2101.05511
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: daian-2020-flash-boys-2
@@ -9395,7 +9404,7 @@ entries:
   venue: International Conference on Machine Learning 2016
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1511.03722
     url: null
   pages: 10
   density: high
@@ -9408,8 +9417,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/1511.03722
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: dudik-2011-doubly-robust-policy-evaluation
@@ -9578,7 +9590,10 @@ entries:
     notes: JMLR papers carry an explicit licence; read it — this bucket may be genuinely ingestable.
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1502.02362
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs: []
   discovered:
@@ -9616,7 +9631,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1604.00923
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs: []
   discovered:
@@ -9655,8 +9673,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/1904.06019
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: angelopoulos-2023-conformal-prediction-intro
@@ -10526,7 +10547,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/2005.01643
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units:
   - unit_id: offline-rl-problem
     topic: 'why offline RL differs: distribution shift and extrapolation error'
@@ -10591,7 +10615,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1803.06917
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: cont-2014-price-impact-order-book-events
@@ -10666,7 +10693,7 @@ entries:
   venue: NeurIPS 2019
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1905.08494
     url: null
   pages: 11
   density: high
@@ -10679,8 +10706,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/1905.08494
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: chevyrev-2016-signature-method-primer
@@ -10768,7 +10798,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/2006.04779
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs: []
   discovered:
@@ -10806,8 +10839,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/1309.0260
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: chevyrev-2016-signature-method-primer
@@ -11314,8 +11350,58 @@ entries:
     notes: arXiv version widely available; licence unchecked.
   acquisition:
     state: open_url
-    copy_path: null
-  units: []
+    source_url: https://arxiv.org/abs/0809.0822
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
+  units:
+  - unit_id: s3
+    topic: liquidity as the intermediary between information and price, and why prices are not in equilibrium
+    title: null
+    locator: section 3.7, pp. 19-20
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Liquidity is defined as the inverse of the price response to a trade of given size, and
+      the response to information decomposes into the trade response to information divided by liquidity. The consequence
+      they draw is that variation in the price response to news is as much a liquidity fact as an information fact,
+      so reading a large move as a large signal conflates the two.
+
+      '
+  - unit_id: s4
+    topic: long memory in order flow, and which sign series carries it
+    title: null
+    locator: section 4.1, pp. 24-25
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Order signs are reduced to plus or minus one because order sizes are heavy tailed with
+      long memory of their own, so averages built on sizes converge slowly. Market orders, limit orders and cancellations
+      each show long memory separately. The detail worth having: if a cancellation of a buy order is signed negative,
+      matching the only direction of price move it can cause, the combined series of market orders, limit orders
+      and cancellations does NOT show long memory. That is a directly checkable claim about our own feed, and it
+      says which construction of order-flow sign is the informative one.
+
+      '
+  - unit_id: overview
+    topic: the framework's claim about where processed information comes from
+    title: null
+    locator: abstract and section 1.1
+    kind: section
+    pages: 6
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Revealed liquidity is very low relative to latent supply and demand, so large orders
+      are worked incrementally over periods as long as months, which is what makes order flow persistent. Their
+      reading is that agents are at best weakly informed with similar and very noisy individual impact, and that
+      most processed information comes from supply and demand itself rather than from external news.
+
+      '
   refs: []
   discovered:
     round: 0
@@ -11659,7 +11745,7 @@ entries:
   venue: Market Microstructure and Liquidity
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1412.4503
     url: null
   pages: 22
   density: high
@@ -11673,7 +11759,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1412.4503
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: bouchaud-2018-trades-quotes-prices
@@ -13306,7 +13395,7 @@ entries:
   venue: Market Microstructure and Liquidity
   identifiers:
     isbn: null
-    doi: 10.1142/s2382626615500057
+    doi: 10.48550/arXiv.1502.04592
     url: https://doi.org/10.1142/s2382626615500057
   pages: 46
   density: high
@@ -13320,7 +13409,10 @@ entries:
     notes: arXiv preprint exists; check its licence.
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1502.04592
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units:
   - unit_id: hawkes-estimation
     topic: estimating Hawkes kernels from order flow data
@@ -13477,7 +13569,7 @@ entries:
   venue: arXiv
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1603.03788
     url: null
   pages: 45
   density: high
@@ -13491,7 +13583,10 @@ entries:
     notes: arXiv; the per-paper licence decides reuse, not the platform.
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1603.03788
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units:
   - unit_id: s2
     topic: the definition of the signature and its invariance under time reparametrization
@@ -13580,7 +13675,7 @@ entries:
   venue: European Physical Journal B
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1302.1405
     url: https://arxiv.org/abs/1302.1405
   pages: 9
   density: high
@@ -13594,7 +13689,10 @@ entries:
     notes: arXiv preprint read directly at ar5iv; the per-paper licence still needs checking.
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1302.1405
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units:
   - unit_id: estimator-and-bias
     topic: MLE with a power-law kernel, and why fitting an exponential kernel on short windows biases the branching
@@ -13909,7 +14007,7 @@ entries:
   venue: Physical Review E
   identifiers:
     isbn: null
-    doi: null
+    doi: 10.48550/arXiv.1201.3572
     url: null
   pages: 8
   density: high
@@ -13922,8 +14020,11 @@ entries:
     grant: null
     notes: Not read directly. Known through the Hardiman critique; treat its claims as contested until read.
   acquisition:
-    state: library
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/abs/1201.3572
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units: []
   refs:
   - target: hawkes-1971-spectra-self-exciting
@@ -18699,7 +18800,7 @@ entries:
   venue: Chaos
   identifiers:
     isbn: null
-    doi: 10.1063/1.5055855
+    doi: 10.48550/arXiv.1809.04377
     url: https://arxiv.org/abs/1809.04377
   pages: 8
   density: high
@@ -18713,7 +18814,10 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/abs/1809.04377
+    obtained_at: '2026-08-06'
+    note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
+      the rights tag is unchanged.
   units:
   - unit_id: method
     topic: comparing forward and time-reversed ordinal pattern distributions by Jensen-Shannon divergence, against

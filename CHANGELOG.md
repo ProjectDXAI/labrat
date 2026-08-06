@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.0 - 2026-08-06
+
+- The dedicated arXiv harvest ran to completion without tripping its breaker: 19 preprints downloaded, 116 titles with no arXiv match, 4 errors. Local holdings went from 41 sources with extractable text to 64, and the passage index from 3,849 to 5,963.
+- What it brought in matters more than how many. The preprints are the sources that existing concept cards were already citing without anyone having opened them: Bouchaud, Farmer and Lillo on slow digestion of order flow, Tóth et al on latent liquidity, Donier on metaorder impact, Filimonov and Sornette on reflexivity, Bacry on Hawkes processes in finance, Guéant on inventory risk. Provenance is now 18 of 32 cards on units someone opened, and `KC-MICRO-MECHANICAL-FLOW` and `KC-REGIME-PERSISTENCE` are grounded for the first time.
+- One detail from that reading is directly checkable on our own feed and worth stating: market orders, limit orders and cancellations each show long memory in their sign series separately, but if a cancellation of a buy order is signed negative — matching the only direction of price move it can cause — the combined series does **not** show long memory. That decides which construction of order-flow sign is the informative one, and it is not the obvious one.
+- Units read went 12 to 27 across three releases. 425 entries, 45 decomposed into 87 units.
+
 ## 0.15.0 - 2026-08-06
 
 - Added `resolve.py arxiv`, a dedicated slow preprint harvest. arXiv was previously a passenger on `identify`, sharing its pace and its circuit breaker, so one throttle partway through a run killed the index for every title after it. Preprints are the largest pool of readable full text the corpus has any claim on, which earns them their own pass at their own rate.
