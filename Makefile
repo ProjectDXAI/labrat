@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -16,6 +16,8 @@ help:
 	@echo "  make smoke-knowledge          end-to-end smoke test for the dxap-knowledge profile"
 	@echo "  make clean-smoke              remove the temporary smoke lab"
 	@echo "  make test                     runs every smoke path and self-test"
+	@echo "  make web-data [LAB=dir]       export the corpus bundle the explorer reads"
+	@echo "  make web                      export, then run the explorer at localhost:3000"
 
 install:
 	@$(PYTHON) -m pip install -e .
@@ -208,3 +210,14 @@ smoke: clean-smoke
 	@echo ""
 	@echo ">>> smoke PROFILE=$(PROFILE) PASSED"
 	@echo "    (lab left at $(SMOKE_LAB)/ for inspection; run 'make clean-smoke' to remove)"
+
+LAB ?= corpus-lab
+
+web-data:
+	@test -f $(LAB)/corpus/bibliography.yaml || (echo "ERROR: no corpus at $(LAB). Scaffold one: python scripts/new_lab.py $(LAB) --profile=quant-finance-corpus --profile=dxap-knowledge" && exit 1)
+	@$(PYTHON) scripts/export_web.py --lab $(LAB) --out web/public/corpus.json
+
+web: web-data
+	@test -d web/node_modules || (cd web && npm install)
+	@echo ">>> explorer on http://localhost:3000"
+	@cd web && npm run dev

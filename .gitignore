@@ -30,3 +30,7 @@ corpus/sources/
 corpus/.resolve-cache/
 _wk/
 corpus-lab/
+web/node_modules/
+web/.next/
+web/public/corpus.json
+.DS_Store

@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+/*
+  A reading and cross-referencing tool used in long sessions, where the screen is
+  the main light source and the content is dense text plus a node graph. Dark
+  follows from that, not from tools looking good dark.
+
+  Restrained: one accent (amber, the reading lamp). Every other colour here is
+  carrying data -- read against unread, rights class, contradiction -- not decoration.
+*/
+
+@theme {
+  --color-bg: oklch(0.155 0.008 255);
+  --color-surface: oklch(0.196 0.009 255);
+  --color-surface-2: oklch(0.238 0.011 255);
+  --color-line: oklch(0.305 0.012 255);
+  --color-line-soft: oklch(0.252 0.010 255);
+
+  --color-ink: oklch(0.945 0.004 255);
+  --color-ink-2: oklch(0.795 0.008 255);
+  --color-muted: oklch(0.672 0.010 255);
+
+  --color-accent: oklch(0.795 0.135 78);
+  --color-accent-dim: oklch(0.430 0.075 78);
+  --color-accent-ink: oklch(0.185 0.030 78);
+
+  --color-ok: oklch(0.735 0.125 152);
+  --color-warn: oklch(0.790 0.135 78);
+  --color-bad: oklch(0.700 0.165 26);
+  --color-info: oklch(0.720 0.105 235);
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
+::selection {
+  background: var(--color-accent-dim);
+  color: var(--color-ink);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Native scrollbar shape kept; only the colour is brought into the theme so it
+   does not glare white against a dark surface. */
+* {
+  scrollbar-color: var(--color-line) transparent;
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.prose-tight p {
+  margin: 0 0 0.5rem;
+}
