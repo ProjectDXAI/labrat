@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T03:55:31.514750+00:00'
+updated_at: '2026-08-06T04:36:00.474613+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -180,9 +180,9 @@ entries:
   - target: gelman-2013-bayesian-data-analysis
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - reproduction-number
@@ -537,9 +537,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - strategy-evaluation
@@ -596,9 +596,9 @@ entries:
   - target: strogatz-2015-nonlinear-dynamics-chaos
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - critical-slowing-down
@@ -751,9 +751,9 @@ entries:
   - target: brunnermeier-2001-asset-pricing-asymmetric-information
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - favorite-longshot
@@ -801,9 +801,9 @@ entries:
   - target: murphy-1973-vector-partition-probability-score
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - net-benefit
@@ -899,9 +899,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - reproduction-number
@@ -1138,9 +1138,9 @@ entries:
   - target: cori-2013-estimating-time-varying-reproduction-numbers
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - endemic-epidemic
@@ -1414,9 +1414,9 @@ entries:
   - target: hanson-2007-logarithmic-market-scoring
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - market-design
@@ -1604,9 +1604,9 @@ entries:
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - etas
@@ -1651,9 +1651,9 @@ entries:
   - target: rawlings-2017-model-predictive-control
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - drift
@@ -1744,9 +1744,9 @@ entries:
   - target: talluri-2004-revenue-management
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - locational-pricing
@@ -1890,9 +1890,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - probability-gain
@@ -1939,9 +1939,9 @@ entries:
   - target: punt-2016-management-strategy-evaluation
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - adaptive-management
@@ -1990,9 +1990,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: builds_on
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - prospective-testing
@@ -2047,9 +2047,9 @@ entries:
   - target: montgomery-2019-statistical-quality-control
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - early-warning
@@ -2098,9 +2098,9 @@ entries:
   - target: farmer-2002-market-force-ecology-evolution
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - market-ecology
@@ -2147,9 +2147,9 @@ entries:
   - target: easley-2010-networks-crowds-markets
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - market-ecology
@@ -2200,9 +2200,9 @@ entries:
   - target: athreya-1972-branching-processes
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - predictability-limit
@@ -2261,9 +2261,9 @@ entries:
   - target: axelsson-2000-base-rate-fallacy
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - decision-value
@@ -2491,9 +2491,9 @@ entries:
   - target: bacry-2015-hawkes-processes-finance
     relation: cites
   discovered:
-    round: 1
-    method: seed
-    source: null
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
   status: candidate
   tags:
   - omori
@@ -2990,9 +2990,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Kaelbling, Littman & Cassandra — Planning and acting in partially observable stochastic domains
+  - target: kaelbling-1998-planning-acting-pomdp
     relation: cites
     bucket: decision_sequential
+    note: null
   - target: puterman-1994-markov-decision-processes
     relation: cites
   discovered:
@@ -3094,6 +3095,50 @@ entries:
     also derives finance results in the same language, so the testing apparatus and the market model share a foundation.
 
     '
+- id: shiryaev-2008-optimal-stopping-rules
+  title: Optimal Stopping Rules
+  authors:
+  - Albert N. Shiryaev
+  year: 2008
+  bucket: decision_sequential
+  form: monograph
+  venue: Springer
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 220
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: peskir-2006-optimal-stopping
+    relation: cites
+  - target: tartakovsky-2014-sequential-analysis
+    relation: cites
+  - target: charnov-1976-marginal-value-theorem
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - optimal-stopping
+  - disorder-problem
+  - sequential
+  notes: Includes the disorder problem, which is the exit decision and the changepoint decision stated as one object
+    rather than two.
 - id: sutton-2018-reinforcement-learning
   title: 'Reinforcement Learning: An Introduction'
   authors:
@@ -3323,8 +3368,9 @@ entries:
     relation: cites
   - target: bertsekas-2017-dp-optimal-control-vol1
     relation: cites
-  - target: Shiryaev — Optimal Stopping Rules
+  - target: shiryaev-2008-optimal-stopping-rules
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -3339,6 +3385,51 @@ entries:
     That band is the shape the exit problem actually has once fees and impact are in the objective.
 
     '
+- id: kaelbling-1998-planning-acting-pomdp
+  title: Planning and Acting in Partially Observable Stochastic Domains
+  authors:
+  - Leslie Pack Kaelbling
+  - Michael L. Littman
+  - Anthony R. Cassandra
+  year: 1998
+  bucket: decision_sequential
+  form: paper
+  venue: Artificial Intelligence 101(1-2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 36
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: puterman-1994-markov-decision-processes
+    relation: builds_on
+  - target: kochenderfer-2022-algorithms-decision-making
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - pomdp
+  - belief-state
+  - partial-observability
+  - agentic
+  notes: Acting on a belief state rather than a state, which is what an agent with an incomplete view of the book
+    is actually doing.
 - id: peskir-2006-optimal-stopping
   title: Optimal Stopping and Free-Boundary Problems
   authors:
@@ -3388,9 +3479,10 @@ entries:
     concepts_expected: []
     notes: null
   refs:
-  - target: Shiryaev — Optimal Stopping Rules
+  - target: shiryaev-2008-optimal-stopping-rules
     relation: builds_on
     bucket: decision_sequential
+    note: null
   discovered:
     round: 0
     method: seed
@@ -3729,9 +3821,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Proposer-builder separation and block auction design references
+  - target: heimbach-2023-proposer-builder-separation
     relation: cites
     bucket: defi_mechanics
+    note: null
   - target: budish-2015-hft-arms-race
     relation: syllabus_with
   discovered:
@@ -3745,6 +3838,580 @@ entries:
   - sequencing
   - high-value-target
   notes: null
+- id: eskandari-2021-sok-oracles
+  title: 'SoK: Oracles from the Ground Truth to Market Manipulation'
+  authors:
+  - Shayan Eskandari
+  - Mehdi Salehi
+  - Wanyun Catherine Gu
+  - Jeremy Clark
+  year: 2021
+  bucket: defi_mechanics
+  form: proceedings
+  venue: ACM Advances in Financial Technologies 2021
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: angeris-2020-improved-price-oracles-cfmm
+    relation: builds_on
+  - target: qin-2021-empirical-study-defi-liquidations
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - oracle
+  - manipulation
+  - defi
+  - hyperliquid-relevant
+  notes: 'How a price gets on chain, and every way that has been gamed. On this venue the oracle drives funding
+    and liquidation, so oracle design is not infrastructure trivia, it is the mechanism behind a class of forced
+    flow we can observe directly.
+
+    '
+- id: he-2022-fundamentals-perpetual-futures
+  title: Fundamentals of Perpetual Futures
+  authors:
+  - Songrun He
+  - Asaf Manela
+  - Omri Ross
+  - Victor von Wachter
+  year: 2022
+  bucket: defi_mechanics
+  form: working_paper
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 55
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hull-2021-options-futures-derivatives
+    relation: cites
+  - target: hyperliquid-api-docs
+    relation: builds_on
+  - target: gueant-2016-financial-mathematics-market-liquidity
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - perpetuals
+  - funding
+  - basis
+  - hyperliquid-relevant
+  - defi
+  notes: 'The pricing theory of a contract with no expiry, where the funding rate does the work maturity does elsewhere.
+    Every position we hold on Hyperliquid is one of these and the corpus had no account of what determines its basis.
+
+    '
+- id: qin-2021-empirical-study-defi-liquidations
+  title: 'An Empirical Study of DeFi Liquidations: Incentives, Risks, and Instabilities'
+  authors:
+  - Kaihua Qin
+  - Liyi Zhu
+  - Pablo Gamito
+  - Philipp Jovanovic
+  - Arthur Gervais
+  year: 2021
+  bucket: defi_mechanics
+  form: proceedings
+  venue: ACM Internet Measurement Conference 2021
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gudgeon-2020-decentralized-financial-crisis
+    relation: cites
+  - target: watts-2002-simple-model-global-cascades
+    relation: cites
+  - target: daian-2020-flash-boys-2
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - liquidation
+  - cascades
+  - oracle
+  - defi
+  - hyperliquid-relevant
+  notes: 'Measures who liquidates whom, at what discount, and how the incentive design turns a price move into a
+    queue of forced sellers. The mechanical trigger our oracle-basis extension proposes to observe, already measured
+    on a different chain.
+
+    '
+- id: qin-2022-quantifying-blockchain-extractable-value
+  title: 'Quantifying Blockchain Extractable Value: How Dark is the Forest?'
+  authors:
+  - Kaihua Qin
+  - Liyi Zhu
+  - Arthur Gervais
+  year: 2022
+  bucket: defi_mechanics
+  form: proceedings
+  venue: IEEE Symposium on Security and Privacy 2022
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 18
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: daian-2020-flash-boys-2
+    relation: builds_on
+  - target: kelkar-2020-order-fairness-byzantine
+    relation: cites
+  - target: roughgarden-2021-eip1559-fee-mechanism
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - mev
+  - ordering
+  - extraction
+  - defi
+  - onchain
+  notes: 'Puts a number on what ordering power is worth. That number is the upper bound on what the batch-priority
+    hierarchy is protecting a maker from, and the lower bound on what a proposer is being paid to reorder.
+
+    '
+- id: aoyagi-2021-coexisting-exchange-platforms
+  title: 'Coexisting Exchange Platforms: Limit Order Books and Automated Market Makers'
+  authors:
+  - Jun Aoyagi
+  - Yuki Ito
+  year: 2021
+  bucket: defi_mechanics
+  form: working_paper
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 45
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: lehar-2024-decentralized-exchange-uniswap-amm
+    relation: cites
+  - target: glosten-1994-electronic-open-limit-order-book
+    relation: cites
+  - target: vives-2008-information-learning-markets
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - amm
+  - clob
+  - venue-competition
+  - defi
+  - verify-metadata
+  notes: 'When informed flow chooses between a book and a pool, and what that does to both. Directly relevant to
+    reading Hyperliquid flow against on-chain pool flow in the same instrument. Publication venue needs confirming.
+
+    '
+- id: barbon-2021-quality-of-cryptocurrency-markets
+  title: 'On The Quality Of Cryptocurrency Markets: Centralized Versus Decentralized Exchanges'
+  authors:
+  - Andrea Barbon
+  - Angelo Ranaldo
+  year: 2021
+  bucket: defi_mechanics
+  form: working_paper
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 50
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hasbrouck-2007-empirical-market-microstructure
+    relation: cites
+  - target: aoyagi-2021-coexisting-exchange-platforms
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - liquidity
+  - price-discovery
+  - venue-comparison
+  - defi
+  notes: Measures spread, depth and price discovery across venue types with the standard microstructure toolkit,
+    which is the comparison our own data can extend.
+- id: gudgeon-2020-decentralized-financial-crisis
+  title: The Decentralized Financial Crisis
+  authors:
+  - Lewis Gudgeon
+  - Daniel Perez
+  - Dominik Harz
+  - Benjamin Livshits
+  - Arthur Gervais
+  year: 2020
+  bucket: defi_mechanics
+  form: proceedings
+  venue: Crypto Valley Conference on Blockchain Technology 2020
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: qin-2021-empirical-study-defi-liquidations
+    relation: cites
+  - target: acemoglu-2015-systemic-risk-financial-networks
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - systemic-risk
+  - liquidation
+  - governance
+  - defi
+  notes: Stress-tests a lending protocol to the point of undercollateralization, which is the failure mode a perp
+    venue shares with a lending one.
+- id: heimbach-2023-proposer-builder-separation
+  title: 'Ethereum''s Proposer-Builder Separation: Promises and Realities'
+  authors:
+  - Lioba Heimbach
+  - Lucianna Kiffer
+  - Christof Ferreira Torres
+  - Roger Wattenhofer
+  year: 2023
+  bucket: defi_mechanics
+  form: proceedings
+  venue: ACM Internet Measurement Conference 2023
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: qin-2022-quantifying-blockchain-extractable-value
+    relation: builds_on
+  - target: roughgarden-2021-eip1559-fee-mechanism
+    relation: cites
+  - target: kelkar-2020-order-fairness-byzantine
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - pbs
+  - block-auction
+  - mev
+  - ordering
+  - defi
+  - verify-metadata
+  notes: Who actually captures ordering value once the block-building market exists, measured rather than modelled.
+- id: lehar-2024-decentralized-exchange-uniswap-amm
+  title: 'Decentralized Exchange: The Uniswap Automated Market Maker'
+  authors:
+  - Alfred Lehar
+  - Christine A. Parlour
+  year: 2024
+  bucket: defi_mechanics
+  form: paper
+  venue: Journal of Finance
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 45
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: milionis-2022-loss-versus-rebalancing
+    relation: cites
+  - target: foucault-2013-market-liquidity
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - amm
+  - liquidity-provision
+  - empirical
+  - defi
+  notes: The microstructure treatment of an AMM by microstructure economists rather than by protocol designers,
+    which is a different and useful lens on the same object.
+- id: milionis-2023-amm-arbitrage-profits-with-fees
+  title: Automated Market Making and Arbitrage Profits in the Presence of Fees
+  authors:
+  - Jason Milionis
+  - Ciamac C. Moallemi
+  - Tim Roughgarden
+  year: 2023
+  bucket: defi_mechanics
+  form: working_paper
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 30
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: milionis-2022-loss-versus-rebalancing
+    relation: builds_on
+  - target: adams-2021-uniswap-v3-core
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - lvr
+  - fees
+  - amm
+  - defi
+  notes: The fee-adjusted version of loss-versus-rebalancing, which is the one that decides whether providing liquidity
+    pays at all.
+- id: werner-2022-sok-decentralized-finance
+  title: 'SoK: Decentralized Finance (DeFi)'
+  authors:
+  - Sam M. Werner
+  - Daniel Perez
+  - Lewis Gudgeon
+  - Ariah Klages-Mundt
+  - Dominik Harz
+  - William J. Knottenbelt
+  year: 2022
+  bucket: defi_mechanics
+  form: proceedings
+  venue: ACM Advances in Financial Technologies 2022
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 20
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: adams-2021-uniswap-v3-core
+    relation: cites
+  - target: gudgeon-2020-decentralized-financial-crisis
+    relation: cites
+  - target: eskandari-2021-sok-oracles
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - survey
+  - defi
+  - primitives
+  notes: The map of the primitives and how they compose. Cheapest way to find out what a mechanism is called before
+    searching for its literature.
+- id: adams-2020-uniswap-v2-core
+  title: Uniswap v2 Core
+  authors:
+  - Hayden Adams
+  - Noah Zinsmeister
+  - Dan Robinson
+  year: 2020
+  bucket: defi_mechanics
+  form: working_paper
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 10
+  density: high
+  priority: 3
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: adams-2021-uniswap-v3-core
+    relation: cites
+  - target: eskandari-2021-sok-oracles
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - amm
+  - constant-product
+  - oracle
+  - defi
+  notes: Where the time-weighted on-chain oracle comes from, which is what most manipulation studies attack.
 - id: angeris-2021-cfmm-multi-asset-convex
   title: 'Constant Function Market Makers: Multi-Asset Trades via Convex Optimization'
   authors:
@@ -3913,8 +4580,9 @@ entries:
     relation: builds_on
   - target: daian-2020-flash-boys-2
     relation: cites
-  - target: Proposer-builder separation and block auction design references
+  - target: heimbach-2023-proposer-builder-separation
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -6496,6 +7164,52 @@ entries:
   - order-entry
   - standard
   notes: null
+- id: kalshi-rulebook
+  title: Kalshi Exchange Rulebook and Contract Specifications
+  authors:
+  - Kalshi
+  year: 2026
+  bucket: exchange_documentation
+  form: rulebook
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 300
+  density: medium
+  priority: 4
+  rights:
+    status: public_but_restricted
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: polymarket-clob-docs
+    relation: cites
+  - target: cftc-event-contracts-guidance
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - prediction-market
+  - regulated
+  - rulebook
+  - polymarket-relevant
+  notes: 'A CFTC-regulated event-contract exchange with a published rulebook: settlement sources, dispute procedure,
+    position limits and market-maker obligations all stated rather than inferred. The control case for what Polymarket
+    leaves to convention.
+
+    '
 - id: sec-2005-regulation-nms
   title: Regulation NMS — Final Rule
   authors:
@@ -6649,6 +7363,51 @@ entries:
   - tendermint
   - onchain
   notes: null
+- id: cftc-event-contracts-guidance
+  title: CFTC Rules and Guidance on Event Contracts
+  authors:
+  - Commodity Futures Trading Commission
+  year: 2024
+  bucket: exchange_documentation
+  form: regulatory_filing
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 120
+  density: medium
+  priority: 3
+  rights:
+    status: government_work
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: kalshi-rulebook
+    relation: cites
+  - target: sec-2005-regulation-nms
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - regulation
+  - event-contracts
+  - prediction-market
+  - polymarket-relevant
+  notes: 'What a regulator considers a permissible event contract and why, which bounds the question set a regulated
+    venue can list. Likely a US government work and therefore acquirable; worth a verify round.
+
+    '
 - id: cme-rulebook
   title: CME Group Rulebook
   authors:
@@ -6690,6 +7449,48 @@ entries:
   - priority
   notes: Matching-algorithm rules per product, including pro-rata and allocation splits — the counterexample set
     for price-time priority.
+- id: deribit-api-docs
+  title: Deribit API Documentation
+  authors:
+  - Deribit
+  year: 2026
+  bucket: exchange_documentation
+  form: api_doc
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 120
+  density: medium
+  priority: 3
+  rights:
+    status: public_but_restricted
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: binance-futures-api-docs
+    relation: cites
+  - target: hyperliquid-api-docs
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - venue
+  - options
+  - perpetuals
+  - api
+  notes: The options venue whose implied surface is the cross-market reference for crypto volatility.
 - id: eurex-t7-eti-manual
   title: Eurex T7 Enhanced Trading Interface manual
   authors:
@@ -8428,9 +9229,10 @@ entries:
   refs:
   - target: shannon-1948-mathematical-theory-communication
     relation: builds_on
-  - target: Cover — Universal portfolios
+  - target: cover-1991-universal-portfolios
     relation: cites
     bucket: information_theory
+    note: null
   discovered:
     round: 0
     method: seed
@@ -8515,6 +9317,53 @@ entries:
   - compression
   - codec-relevant
   notes: null
+- id: cover-1991-universal-portfolios
+  title: Universal Portfolios
+  authors:
+  - Thomas M. Cover
+  year: 1991
+  bucket: information_theory
+  form: paper
+  venue: Mathematical Finance 1(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 22
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: cover-2006-elements-information-theory
+    relation: builds_on
+  - target: cesabianchi-2006-prediction-learning-games
+    relation: cites
+  - target: fernholz-stochastic-portfolio-theory
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - universal-portfolio
+  - regret
+  - online-learning
+  notes: 'A portfolio that matches the best constant-rebalanced portfolio in hindsight, with no distributional assumption
+    at all. The information-theoretic cousin of the regret bounds, and a genuinely different way to state what a
+    strategy owes you.
+
+    '
 - id: grunwald-2007-mdl-principle
   title: The Minimum Description Length Principle
   authors:
@@ -9481,6 +10330,51 @@ entries:
   - reservation-price
   - inventory-skew
   notes: null
+- id: biais-2005-microstructure-survey-microfoundations
+  title: 'Market Microstructure: A Survey of Microfoundations, Empirical Results, and Policy Implications'
+  authors:
+  - Bruno Biais
+  - Lawrence Glosten
+  - Chester Spatt
+  year: 2005
+  bucket: market_microstructure
+  form: survey
+  venue: Journal of Financial Markets 8(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 47
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: madhavan-2000-microstructure-survey
+    relation: cites
+  - target: glosten-1994-electronic-open-limit-order-book
+    relation: cites
+  - target: biais-1995-empirical-analysis-limit-order-book
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - survey
+  - microstructure
+  - foundations
+  notes: null
 - id: bouchaud-2009-how-markets-slowly-digest
   title: How Markets Slowly Digest Changes in Supply and Demand
   authors:
@@ -10153,6 +11047,54 @@ entries:
   - impact-scaling
   - high-value-target
   notes: null
+- id: lehalle-2019-incorporating-signals-optimal-trading
+  title: Incorporating Signals into Optimal Trading
+  authors:
+  - Charles-Albert Lehalle
+  - Eyal Neuman
+  year: 2019
+  bucket: market_microstructure
+  form: paper
+  venue: Finance and Stochastics 23(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 32
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: almgren-2000-optimal-execution
+    relation: builds_on
+  - target: cartea-2015-algorithmic-high-frequency-trading
+    relation: cites
+  - target: cardaliaguet-2018-mean-field-game-trade-crowding
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - execution
+  - alpha-signals
+  - optimal-control
+  notes: 'Execution with a predictive signal in the objective rather than bolted on afterwards. The formal answer
+    to a question our execution cards keep dodging: how much of a short-horizon edge should be spent on trading
+    faster.
+
+    '
 - id: ohara-1995-market-microstructure-theory
   title: Market Microstructure Theory
   authors:
@@ -10341,9 +11283,10 @@ entries:
     relation: builds_on
   - target: cont-2013-price-dynamics-markovian-lob
     relation: cites
-  - target: Muni Toke — Market making in an order book model and its impact on the spread
+  - target: munitoke-2011-market-making-order-book-model
     relation: cites
     bucket: market_microstructure
+    note: null
   discovered:
     round: 0
     method: seed
@@ -10469,8 +11412,9 @@ entries:
   refs:
   - target: foucault-2013-market-liquidity
     relation: cites
-  - target: 'Biais, Glosten & Spatt — Market microstructure: a survey of microfoundations'
+  - target: biais-2005-microstructure-survey-microfoundations
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -10824,9 +11768,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Lehalle & Neuman — Incorporating signals into optimal trading
+  - target: lehalle-2019-incorporating-signals-optimal-trading
     relation: cites
     bucket: market_microstructure
+    note: null
   discovered:
     round: 0
     method: seed
@@ -10866,9 +11811,10 @@ entries:
   refs:
   - target: ohara-1995-market-microstructure-theory
     relation: cites
-  - target: 'Biais, Glosten & Spatt — Market microstructure: a survey of microfoundations'
+  - target: biais-2005-microstructure-survey-microfoundations
     relation: cites
     bucket: market_microstructure
+    note: null
   discovered:
     round: 0
     method: seed
@@ -11122,6 +12068,47 @@ entries:
   - contradiction-queue
   - market-design
   notes: The case against discrete batching, kept so the batch-priority work has a live opposing account.
+- id: munitoke-2011-market-making-order-book-model
+  title: Market Making in an Order Book Model and its Impact on the Spread
+  authors:
+  - Ioane Muni Toke
+  year: 2011
+  bucket: market_microstructure
+  form: paper
+  venue: Econophysics of Order-Driven Markets
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 16
+  density: high
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: cont-2010-stochastic-model-order-book
+    relation: cites
+  - target: abergel-2016-limit-order-books
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - market-making
+  - order-book
+  - queueing
+  notes: null
 - id: sandas-2001-adverse-selection-competitive-market-making
   title: 'Adverse Selection and Competitive Market Making: Empirical Evidence from a Limit Order Market'
   authors:
@@ -11266,9 +12253,10 @@ entries:
     relation: builds_on
   - target: hasbrouck-2007-empirical-market-microstructure
     relation: syllabus_with
-  - target: Zhang, Mykland & Aït-Sahalia — A tale of two time scales
+  - target: zhang-2005-tale-of-two-time-scales
     relation: cites
     bucket: mathematical_foundations
+    note: null
   discovered:
     round: 0
     method: seed
@@ -11598,9 +12586,10 @@ entries:
   refs:
   - target: bremaud-1981-point-processes-queues
     relation: cites
-  - target: Daley & Vere-Jones — An Introduction to the Theory of Point Processes, Volume II
+  - target: daley-2008-point-processes-vol2
     relation: builds_on
     bucket: mathematical_foundations
+    note: null
   discovered:
     round: 0
     method: seed
@@ -11814,6 +12803,48 @@ entries:
   - crowded-trades
   - bridge
   notes: null
+- id: daley-2008-point-processes-vol2
+  title: 'An Introduction to the Theory of Point Processes, Volume II: General Theory and Structure'
+  authors:
+  - Daryl J. Daley
+  - David Vere-Jones
+  year: 2008
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Springer
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 570
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: daley-2003-point-processes-vol1
+    relation: builds_on
+  - target: ogata-1988-statistical-models-earthquake
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - point-process
+  - conditional-intensity
+  - hawkes
+  notes: null
 - id: dembo-1998-large-deviations
   title: Large Deviations Techniques and Applications
   authors:
@@ -12014,9 +13045,10 @@ entries:
   refs:
   - target: villani-2009-optimal-transport
     relation: builds_on
-  - target: Mohajerin Esfahani & Kuhn — Data-driven distributionally robust optimization using the Wasserstein metric
+  - target: mohajerinesfahani-2018-wasserstein-dro
     relation: cites
     bucket: operations_research
+    note: null
   discovered:
     round: 0
     method: seed
@@ -12067,6 +13099,50 @@ entries:
   - stochastic-integration
   - jumps
   notes: null
+- id: zhang-2005-tale-of-two-time-scales
+  title: 'A Tale of Two Time Scales: Determining Integrated Volatility with Noisy High-Frequency Data'
+  authors:
+  - Lan Zhang
+  - Per A. Mykland
+  - Yacine Aït-Sahalia
+  year: 2005
+  bucket: mathematical_foundations
+  form: paper
+  venue: Journal of the American Statistical Association 100(472)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: aitsahalia-2014-high-frequency-econometrics
+    relation: builds_on
+  - target: hasbrouck-2007-empirical-market-microstructure
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - microstructure-noise
+  - realized-volatility
+  - sampling
+  notes: Sampling faster makes the volatility estimate worse, which is the sampling-frequency trap every high-frequency
+    estimator we run can fall into.
 - id: zhang-2017-bsde
   title: 'Backward Stochastic Differential Equations: From Linear to Fully Nonlinear PDEs'
   authors:
@@ -12538,9 +13614,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Gai & Kapadia — Contagion in financial networks
+  - target: gai-2010-contagion-in-financial-networks
     relation: cites
     bucket: network_science
+    note: null
   discovered:
     round: 0
     method: seed
@@ -12592,6 +13669,50 @@ entries:
   - cascades
   - high-value-target
   notes: null
+- id: gai-2010-contagion-in-financial-networks
+  title: Contagion in Financial Networks
+  authors:
+  - Prasanna Gai
+  - Sujit Kapadia
+  year: 2010
+  bucket: network_science
+  form: paper
+  venue: Proceedings of the Royal Society A 466(2120)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 22
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: watts-2002-simple-model-global-cascades
+    relation: builds_on
+  - target: acemoglu-2015-systemic-risk-financial-networks
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - contagion
+  - cascades
+  - networks
+  - systemic-risk
+  notes: 'Robust-yet-fragile: more connectivity lowers the probability of contagion and raises its severity, which
+    is the shape a liquidation cascade has.'
 - id: newman-2018-networks
   title: Networks
   authors:
@@ -12619,9 +13740,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Stauffer & Aharony — Introduction to Percolation Theory
+  - target: stauffer-1994-introduction-percolation-theory
     relation: cites
     bucket: network_science
+    note: null
   discovered:
     round: 0
     method: seed
@@ -12663,10 +13785,12 @@ entries:
     relation: builds_on
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
-  - target: Gai & Kapadia — Contagion in financial networks
+  - target: gai-2010-contagion-in-financial-networks
     relation: cites
-  - target: Stauffer & Aharony — Introduction to Percolation Theory
+    note: null
+  - target: stauffer-1994-introduction-percolation-theory
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -12716,6 +13840,48 @@ entries:
   tags:
   - network-formation
   - diffusion
+  notes: null
+- id: stauffer-1994-introduction-percolation-theory
+  title: Introduction to Percolation Theory
+  authors:
+  - Dietrich Stauffer
+  - Amnon Aharony
+  year: 1994
+  bucket: network_science
+  form: textbook
+  venue: Taylor and Francis
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 190
+  density: high
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: watts-2002-simple-model-global-cascades
+    relation: cites
+  - target: jensen-1998-self-organized-criticality
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - percolation
+  - criticality
+  - phase-transition
   notes: null
 - id: almgren-nyu-statistical-arbitrage-notes
   title: NYU Courant — Time Series Analysis and Statistical Arbitrage (course notes)
@@ -13450,6 +14616,51 @@ entries:
   - linear-programming
   - duality
   notes: null
+- id: mohajerinesfahani-2018-wasserstein-dro
+  title: Data-Driven Distributionally Robust Optimization Using the Wasserstein Metric
+  authors:
+  - Peyman Mohajerin Esfahani
+  - Daniel Kuhn
+  year: 2018
+  bucket: operations_research
+  form: paper
+  venue: Mathematical Programming 171
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 52
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: bental-2009-robust-optimization
+    relation: builds_on
+  - target: villani-2009-optimal-transport
+    relation: cites
+  - target: punt-2016-management-strategy-evaluation
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - distributionally-robust
+  - wasserstein
+  - optimization
+  notes: Optimize against every distribution within a transport ball of the empirical one, with a tractable reformulation.
+    The robustness statement our sizing decisions lack.
 - id: nocedal-2006-numerical-optimization
   title: Numerical Optimization
   authors:
@@ -14526,6 +15737,47 @@ entries:
   - fractional
   - high-value-target
   notes: null
+- id: hamilton-1989-new-approach-nonstationary-time-series
+  title: A New Approach to the Economic Analysis of Nonstationary Time Series and the Business Cycle
+  authors:
+  - James D. Hamilton
+  year: 1989
+  bucket: quant_finance_core
+  form: paper
+  venue: Econometrica 57(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 27
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hamilton-1994-time-series-analysis
+    relation: cites
+  - target: sarkka-2013-bayesian-filtering-smoothing
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - regime-switching
+  - markov-switching
+  - filtering
+  notes: null
 - id: hamilton-1994-time-series-analysis
   title: Time Series Analysis
   authors:
@@ -14553,9 +15805,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Hamilton — A new approach to the economic analysis of nonstationary time series
+  - target: hamilton-1989-new-approach-nonstationary-time-series
     relation: cites
     bucket: quant_finance_core
+    note: null
   discovered:
     round: 0
     method: seed
@@ -15515,9 +16768,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: 'Kleinrock — Queueing Systems, Volume II: Computer Applications'
+  - target: kleinrock-1976-queueing-systems-vol2
     relation: builds_on
     bucket: queueing_networks
+    note: null
   discovered:
     round: 0
     method: seed
@@ -15634,8 +16888,9 @@ entries:
     relation: builds_on
   - target: gross-2008-fundamentals-queueing-theory
     relation: cites
-  - target: 'Kleinrock — Queueing Systems, Volume II: Computer Applications'
+  - target: kleinrock-1976-queueing-systems-vol2
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -15769,6 +17024,51 @@ entries:
   - queueing
   - applied
   notes: null
+- id: kleinrock-1976-queueing-systems-vol2
+  title: 'Queueing Systems, Volume II: Computer Applications'
+  authors:
+  - Leonard Kleinrock
+  year: 1976
+  bucket: queueing_networks
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 550
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: kleinrock-1975-queueing-systems-vol1
+    relation: builds_on
+  - target: jaiswal-1968-priority-queues
+    relation: cites
+  - target: takagi-1986-analysis-polling-systems
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+  status: candidate
+  tags:
+  - queueing
+  - priority
+  - scheduling
+  - hyperliquid-relevant
+  notes: Volume II is where the priority and scheduling disciplines live, which is the half that matters for a batched
+    book.
 - id: neuts-1989-structured-stochastic-matrices
   title: Structured Stochastic Matrices of M/G/1 Type and Their Applications
   authors:

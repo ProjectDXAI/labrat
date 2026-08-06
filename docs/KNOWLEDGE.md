@@ -252,6 +252,47 @@ Three of these use observables the published literature has not had. Counterpart
 
 `betting_eprocess` sits beside `ledger.py analyze` rather than replacing it. The ledger is fixed-sample, clustered, and refuses to run before the batch freezes; that is what to read once outcomes have matured. The e-process is what to read while they are still accumulating and someone is looking every day anyway. Its guarantee is Ville's inequality: under the null the capital process is a non-negative martingale with mean one, so the chance it *ever* reaches 1/α is at most α, at any stopping time the observer likes. The self-test checks that property directly by averaging the capital over every equiprobable null path.
 
+## Pulling the corpus into analysis work
+
+`knowledge.py retrieve` answers a *decision*: a structured context with a market, a horizon, available observables and a decision type. That is the live path and it is deliberately narrow.
+
+Analysis work has a different shape. You have a question in prose, and you want the corpus pulled into whatever you are working on.
+
+```bash
+python scripts/passages.py index                                    # extract and index what we hold
+python scripts/passages.py brief --question "..." --markdown
+python scripts/passages.py search --query "..." [--quote-local]
+```
+
+A brief comes back in the order it should be read:
+
+1. **What we have compiled** — the concept cards that bear on the question, each with the assumptions it needs, the card that contradicts it, and its source anchors. This comes first because a card carries assumptions and failure modes and a passage carries neither.
+2. **What would change the answer** — the union of the failure modes across those cards. A brief with no falsifiers is an opinion.
+3. **In the sources** — ranked passages with exact locators, subject to the rights gate below.
+4. **Read next** — unread units in sources we already hold.
+5. **Catalogued, relevant, not on disk** — what to go and get.
+6. **Open questions on the same ground** — matching frontier bets and extensions, with their first computation if one exists.
+
+### Passages are subordinate to concepts, on purpose
+
+A nearest passage is selected because its words resemble the query, not because its mechanism applies. So passages appear as evidence anchors under a compiled claim and as a reading queue, never as the answer. This is the same distinction the `raw_similarity` control arm exists to measure: on the shipped trial set it has a perfect hit rate and precision 0.23, and it answers every inapplicable context.
+
+The brief reports its own coverage in the header — passages indexed, sources held, catalogue size — so it is visible when the passage layer has nothing to offer and the compiled layer is carrying the whole answer. Right now that reads *3,540 passages from 32 sources held locally, out of 405 catalogued*, because the microstructure canon is almost entirely paywalled and the material we can hold is skewed toward open courseware and preprints.
+
+### The rights gate is on output, not on indexing
+
+Everything we legitimately hold gets indexed, so search can find it. What may be *emitted* depends on the use class:
+
+| Use class | What a result carries |
+|---|---|
+| `ingest_*` | Locator plus a snippet of the text |
+| `reference_only`, `needs_review` | Locator, the terms that matched and their counts, and where to open it — never the sentence |
+| `excluded` | Not indexed at all |
+
+The second row is the load-bearing one. A brief is written to be carried into an analysis, and from there into memos and artifacts. Text that may not be redistributed must not ride along inside it. `--quote-local` overrides this for personal reading and says so in a banner; it changes what is printed, not what the licence permits, and the `quotable` flag on every result stays false.
+
+Corpus-wide vocabulary is floored out of the ranking. A term carried by more than a quarter of passages cannot discriminate between them, and in a corpus that is entirely about order books, words like "orders" and "position" clear any generic stopword list while still being noise. When every word in a question is corpus-wide, the brief returns no passages and says why rather than ranking on page length.
+
 ## Ranking what to compile next
 
 ```bash
