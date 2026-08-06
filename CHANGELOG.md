@@ -9,6 +9,7 @@
 - Nineteen labelled trials, up from fourteen. `decision_value` keeps precision at 1.00 and correct abstention at 1.00, and its stress robustness rose to 0.94 with zero integrity violations; `raw_similarity` now commits 549.
 - Fifteen of the eighteen exploratory extensions name a first computation that exists, up from six. Their scores were deliberately left alone: raising the score of a proposal because an implementation was written for it would let the ranking reward whatever happened to get built.
 - Provenance rose from 4 of 20 cards on units someone opened to 9 of 25. Every card added in this release is anchored to venue documentation or to our own schema, both read directly.
+- `docs/WORKSTREAMS.md` updated to the new counts, with the ranked next actions re-split: what runs against the warehouse today, and what has a first computation but still needs plumbing — batch reconstruction, account state joined to resting orders, and the sham cards themselves.
 
 ## 0.8.0 - 2026-08-06
 

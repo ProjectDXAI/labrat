@@ -43,39 +43,43 @@ Not captured: own-order queue rank, individual order lifecycle events, fee sched
 ## Where the work stands
 
 ```
-267 bibliographic records · 57 reading units · 12 units actually read
-20 concept cards (4 anchored to a read unit, 16 to unread anchors)
-11 method bindings at pinned versions · 12 implemented methods
-11 frontier bets · 18 exploratory extensions
-manifest: 2 entries eligible — our own repo, plus one confirmed CC course
+267 bibliographic records · 60 reading units · 12 units actually read
+25 concept cards (9 anchored to a read unit, 16 to unread anchors)
+16 method bindings at pinned versions · 17 implemented methods
+11 frontier bets · 18 exploratory extensions (15 with a runnable first computation)
+19 labelled retrieval trials · every diagnosed problem has a servable concept
+manifest: 1 entry eligible at seed (our own repo); a confirmed CC course clears in the smoke round
 ```
 
-`python scripts/knowledge.py status` prints the provenance line. **4 of 20 cards rest on a unit someone opened.** Seeding from working knowledge is a legitimate way to start; leaving it that way silently is not.
+`python scripts/knowledge.py status` prints the provenance line. **9 of 25 cards rest on a unit someone opened**, and every card added since the first reading pass is one of them. Seeding from working knowledge is a legitimate way to start; leaving it that way silently is not.
+
+The four workstream problems the venue reads opened are now covered: `KC-BATCH-PRIORITY`, `KC-PHANTOM-DEPTH`, `KC-EVENT-TREE-CONSTRAINTS`, `KC-ANYTIME-ATTRIBUTION` and `KC-COUNTERPARTY-INFO`, each with a bound method and a hypothesis carrying a cost model. `make smoke-knowledge` now fails if any problem in the map has no servable concept, so the next gap announces itself.
 
 ## Ranked next actions
 
-### Runnable today, no new data
+### Runnable today against the warehouse
 
-1. `EXT-EVENT-TREE-CONSTRAINTS` (8.2) — group `pm_market_snapshots` by `event_id`, treat each group as a partition, run `prediction_market_consistency --settlement atomic`, measure how often it fails to sum to one beyond the cost hurdle. Everything needed is already in the warehouse.
-2. `EXT-CTF-ATOMIC-ARB` (5.8) — split constraints into protocol-enforced and free, price each against its true hurdle, compare against what could actually have been executed.
-3. `EXT-COUNTERPARTY-FLOW` (5.3) — rank addresses by realized mark-out of their aggressive flow, test out-of-sample persistence.
+1. `EXT-EVENT-TREE-CONSTRAINTS` (8.2) — `event_tree_constraints` derives the partition set from `pm_market_snapshots` grouped by `event_id` and marks which partitions the token layer enforces; feed its `enforced` rows straight into `prediction_market_consistency` with `settlement=atomic`. The two compose without translation and the smoke path checks that they do. What is left is pointing it at a week of real snapshots.
+2. `EXT-CTF-ATOMIC-ARB` (5.8) — the enforced/free split is what `event_tree_constraints` returns. Price each class against its true hurdle and compare against what could actually have been executed.
+3. `EXT-COUNTERPARTY-FLOW` (5.3) — `counterparty_markout` ranks addresses by shrunk mark-out and measures out-of-sample rank persistence. Needs mark-outs computed from `hl_trades` joined to a mid-price series; the statistic itself is done.
 4. `EXT-FANO-EXPONENT` (3.8) — pure theory plus simulation, small enough to finish: derive how the Fano-based `n(w)` grows with aggregation scale under a power-law kernel, invert to read the exponent.
 
-### Needs a decision or new plumbing
+### First computation exists; the data plumbing does not
 
-- `EXT-BATCH-QUEUE` — the queueing model for type-prioritized consensus batches. Highest novelty in the file; needs batch reconstruction from the feed.
-- `EXT-AGENT-SHAM-ARM` — matched-but-irrelevant cards alongside the real retrieval arm. Without it, every retrieval benefit measured on agents is confounded with the deliberation effect.
-- `EXT-PHANTOM-DEPTH` — needs account-level state joined to resting orders.
+- `EXT-BATCH-QUEUE` — `batch_priority_fill` takes a batch and returns the execution order, the arrival-time counterfactual and the cancels that escaped an earlier aggressive order. It takes the batch as given, so reconstructing batch boundaries from the feed is the remaining work, and a wrong reconstruction invalidates every number it produces.
+- `EXT-PHANTOM-DEPTH` — `depth_realization` measures the shortfall between displayed and executable depth. It cannot attribute the shortfall to margin rather than to ordinary cancellation; that needs account-level state joined to resting orders.
+- `EXT-AGENT-SHAM-ARM` — `betting_eprocess` is the monitor for the comparison. The sham cards themselves — matched for length, structure and citation density, wrong on market and horizon — still have to be generated. Without that arm, every retrieval benefit measured on agents is confounded with the deliberation effect.
+- `EXT-ORDER-COUNT-QUEUE`, `EXT-LVR-DISCRETE`, `EXT-VENUE-LAG-NULL` — the three proposals still naming no first computation at all.
 
 ### Corpus hygiene, highest leverage first
 
 ```bash
 python scripts/corpus.py rights --verify-queue --limit 20   # 266 sources held, 0 verified
-python scripts/corpus.py reading --limit 15                 # 45 units unread
+python scripts/corpus.py reading --limit 15                 # 48 units unread
 python scripts/corpus.py frontier --limit 20                # 47 open targets
 ```
 
-The binding constraint is no longer coverage. It is that **266 of 267 sources have never had their rights checked**, and **45 of 57 reading units are unopened**. Two `verify` rounds on `open_courseware` and the venue documentation would move the manifest more than another hundred entries.
+The binding constraint is no longer coverage. It is that **266 of 267 sources have never had their rights checked**, and **48 of 60 reading units are unopened**. Two `verify` rounds on `open_courseware` and the venue documentation would move the manifest more than another hundred entries.
 
 The single most load-bearing unknown: `hyperliquid-api-docs#market-data-feeds` is marked unread, and whether resting orders carry a persistent publicly visible owner decides how much of the L4 workstream is possible. Open that unit next.
 
