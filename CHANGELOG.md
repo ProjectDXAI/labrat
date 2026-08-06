@@ -4,6 +4,15 @@
 
 ### Added
 
+- `knowledge.py admission`: a source-level gate. A source counts as admitted only once it
+  has produced an anchored card, that card's assumptions and failure modes, a falsifiable
+  hypothesis, named observables, a bound method where it claims an implementation, a
+  counterweight, and a mapping to a problem. Nothing new is being asked for: every check
+  reads a field the SERVABLE gate already requires, projected onto the source that produced
+  it. On this corpus, 9 of 92 held sources are admitted and 83 are still records.
+- `promote_units.py` declares reading units on held sources that have none, and multi-file
+  sources can be scoped `file:lec09`.
+
 - `reversible_projection` 1.0.0: exact time-irreversibility as an information projection. Wolfer
   and Watanabe give the m-projection onto the reversible manifold as the arithmetic mean of a kernel
   and its time-reversal and the e-projection as their rescaled geometric mean; `D(P || P_m)` is then

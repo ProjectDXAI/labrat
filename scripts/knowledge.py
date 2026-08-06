@@ -346,6 +346,89 @@ def decision_gate(card: dict[str, Any], store: dict[str, Any]) -> dict[str, Any]
     return {"decision_relevance_id": card.get("decision_relevance_id"), "usable": not errors, "errors": errors, "warnings": warnings}
 
 
+ADMISSION_CHECKS = [
+    ("anchored_card", "a concept card anchored to it"),
+    ("assumptions", "that card's assumptions and failure modes"),
+    ("hypothesis", "a falsifiable hypothesis on that card"),
+    ("data_contract", "the observables it needs, named"),
+    ("method", "a deterministic method bound to it"),
+    ("counterweight", "a contradiction or a competing explanation"),
+    ("problem", "a mapping to a PB-* problem"),
+]
+
+
+def admission(store: dict[str, Any], sources: dict[str, dict[str, Any]],
+              held: set[str] | None = None) -> dict[str, Any]:
+    """Has a source earned its place, or is it still a bibliographic record?
+
+    A corpus grows by acquisition and gets better by compilation, and only the first of
+    those is easy. Without a gate at the source level you end up with five hundred records
+    and the same forty cards. The checks are not new standards: every one reads a field
+    the SERVABLE gate already requires, projected onto the source that produced it.
+
+    `method` is marked not-applicable rather than failed when no card from this source
+    claims an implementation -- a source can be conceptual and still earn admission.
+    """
+    by_concept: dict[str, list[dict[str, Any]]] = {}
+    for concept in store.get("concepts") or []:
+        for raw in concept.get("source_passage_ids") or []:
+            by_concept.setdefault(parse_passage_ref(raw)["source_id"], []).append(concept)
+
+    hypotheses: dict[str, list[dict[str, Any]]] = {}
+    for row in store.get("hypotheses") or []:
+        hypotheses.setdefault(row.get("concept_id"), []).append(row)
+    methods: dict[str, list[dict[str, Any]]] = {}
+    for binding in store.get("methods") or []:
+        for cid in binding.get("concept_ids") or []:
+            methods.setdefault(cid, []).append(binding)
+
+    rows = []
+    for source_id in sorted(sources) if held is None else sorted(held):
+        concepts = by_concept.get(source_id, [])
+        results: dict[str, Any] = {}
+        results["anchored_card"] = bool(concepts)
+        results["assumptions"] = any(
+            (c.get("assumptions") and c.get("known_failure_modes")) for c in concepts
+        )
+        results["hypothesis"] = any(
+            any(h.get("ex_ante_prediction") and h.get("null_hypothesis")
+                for h in hypotheses.get(c["concept_id"], []))
+            for c in concepts
+        )
+        results["data_contract"] = any(c.get("required_observables") for c in concepts)
+        claims_implementation = any(
+            c.get("implementation_status") in {"implemented", "validated"} for c in concepts
+        )
+        bound = any(methods.get(c["concept_id"]) for c in concepts)
+        results["method"] = True if not claims_implementation and not bound else bound
+        results["method_applicable"] = claims_implementation or bound
+        results["counterweight"] = any(
+            (c.get("contradicting_concept_ids") or c.get("alternative_explanations"))
+            for c in concepts
+        )
+        results["problem"] = any(c.get("problem_ids") for c in concepts)
+
+        missing = [label for key, label in ADMISSION_CHECKS if not results.get(key)]
+        rows.append({
+            "source_id": source_id,
+            "admitted": not missing,
+            "cards": sorted(c["concept_id"] for c in concepts),
+            "missing": missing,
+            "checks": {key: results.get(key) for key, _ in ADMISSION_CHECKS},
+            "method_applicable": results["method_applicable"],
+        })
+
+    admitted = [r for r in rows if r["admitted"]]
+    return {
+        "ok": True,
+        "considered": len(rows),
+        "admitted": len(admitted),
+        "rejected": len(rows) - len(admitted),
+        "admitted_ids": [r["source_id"] for r in admitted],
+        "sources": rows,
+    }
+
+
 def validate_store(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
     concepts = [concept_gate(row, sources, store) for row in store["concepts"]]
     hypotheses = [hypothesis_gate(row, store) for row in store["hypotheses"]]
@@ -2131,6 +2214,37 @@ def cmd_digest(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_admission(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+
+    held = None
+    if args.held_only:
+        import digest as digest_module
+        passages = digest_module.load_passages((corpus_dir or (lab_root / "corpus")).resolve())
+        held = {sid for sid in sources if passages.get(sid)}
+
+    result = admission(store, sources, held)
+    if args.json:
+        print(json.dumps(result, indent=2))
+        return 0
+
+    print(f"{result['admitted']} of {result['considered']} sources admitted, "
+          f"{result['rejected']} still bibliographic records.")
+    print()
+    for row in result["sources"]:
+        if row["admitted"] and not args.verbose:
+            continue
+        mark = "PASS" if row["admitted"] else "----"
+        print(f"{mark}  {row['source_id']}")
+        if row["cards"]:
+            print(f"        cards: {', '.join(row['cards'])}")
+        if row["missing"]:
+            print(f"        needs: {'; '.join(row['missing'])}")
+    return 0
+
+
 def cmd_evaluate(args: argparse.Namespace) -> int:
     lab_root, paths, corpus_dir = resolve_dirs(args)
     store = load_store(paths)
@@ -2353,6 +2467,11 @@ def build_parser() -> argparse.ArgumentParser:
     digest_cmd.add_argument("--markdown", action="store_true")
     digest_cmd.add_argument("--out", type=Path, default=None)
 
+    admission_cmd = sub.add_parser("admission", help="Has each source earned its place, or is it still a bibliographic record?")
+    admission_cmd.add_argument("--held-only", action="store_true", help="only sources whose text we hold")
+    admission_cmd.add_argument("--verbose", action="store_true", help="show the ones that passed too")
+    admission_cmd.add_argument("--json", action="store_true")
+
     evaluate_cmd = sub.add_parser("evaluate", help="Score retrieval policies against the labelled trial set.")
     evaluate_cmd.add_argument("--policy", default=None)
     evaluate_cmd.add_argument("--json", action="store_true")
@@ -2397,6 +2516,7 @@ def main(argv: list[str] | None = None) -> int:
         "status": cmd_status,
         "assess": cmd_assess,
         "retrieve": cmd_retrieve,
+        "admission": cmd_admission,
         "digest": cmd_digest,
         "evaluate": cmd_evaluate,
         "bets": cmd_bets,
