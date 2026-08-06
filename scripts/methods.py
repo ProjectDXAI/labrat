@@ -650,7 +650,7 @@ def hawkes_branching_ratio(counts: list[float], min_windows: int = 20, scales: l
         "The raw divergence is positively biased at finite length, so it must be read against the surrogate null rather than in absolute terms. Martinez, Herrera-Diestra and Chavez make the surrogate population part of the method for this reason; Flanagan and Lacasa work with windows of 5000 points and an explicit finite-size correction.",
         "Every financial series studied in the published work is irreversible to some degree, so a positive result is not itself interesting. The usable signal is the RANKING across instruments and periods, not the presence of irreversibility.",
         "Ordinal patterns discard magnitude, so a series with irreversible amplitudes but symmetric ordering reads as reversible.",
-        "Shuffling destroys all temporal structure, so the null is 'no dynamics at all'. It cannot distinguish irreversibility from ordinary linear autocorrelation; a phase-randomized surrogate would be the sharper null and is not implemented here.",
+        "Shuffling destroys all temporal structure, so the null is 'no dynamics at all'. It cannot distinguish irreversibility from ordinary linear autocorrelation; a phase-randomized surrogate would be the sharper null and is not implemented here. Where the series can be symbolized into a Markov state, `reversible_projection` answers the same question exactly, with no null to calibrate against.",
     ],
     concepts=["KC-IRREVERSIBILITY"],
 )
@@ -1856,6 +1856,146 @@ def robust_location_scale(values: list[float], tuning: float = 1.345, iterations
 # --------------------------------------------------------------------------------------
 
 
+@method(
+    name="reversible_projection",
+    version="1.0.0",
+    summary="Exact time-irreversibility as an information projection: the divergence from an estimated Markov kernel to the nearest reversible one, with no surrogate null.",
+    inputs={
+        "symbols": "sequence of discrete states in time order (mutually exclusive with `kernel`)",
+        "kernel": "row-stochastic transition matrix as a list of lists (mutually exclusive with `symbols`)",
+        "smoothing": "additive count smoothing applied when estimating a kernel from symbols (default 0.0)",
+    },
+    outputs={
+        "irreversibility": "D(P || P_m), the divergence rate from the chain to its m-projection, in nats",
+        "normalized": "divergence scaled to [0,1] by ln 2, its maximum",
+        "js_identity_residual": "|D(P||P_m) - JS(Q, Q^T)|, which is zero analytically and is reported as a numerical check",
+        "stationary": "the stationary distribution used to weight the divergence",
+        "m_projection": "(P + P*)/2, the nearest reversible kernel under D(P||.)",
+        "e_projection": "the stochastically rescaled geometric mean of P and P*, or null when their supports do not overlap",
+        "edge_contributions": "per state pair contribution to the total, largest first",
+        "verdict": "reversible | weakly_irreversible | irreversible",
+    },
+    as_of_contract="Uses only the observed sequence. The time reversal is of the estimated kernel, not of anything after the decision timestamp.",
+    failure_modes=[
+        "The estimated kernel must be irreducible. A sequence that never returns to a state gives a reducible chain and is refused rather than silently regularized.",
+        "Divergence is positively biased at short sample lengths for the same reason any plug-in divergence is: rare transitions are estimated as rarer or commoner than they are. Unlike the ordinal-pattern statistic this bias is in the ESTIMATE, not in the statistic, so it shrinks with data rather than needing a null to calibrate against.",
+        "The e-projection is undefined when P and its reversal have disjoint support, which happens for any deterministic cycle. It is returned as null rather than as zero.",
+        "Symbolization is a modelling choice made before this method sees anything. A series with irreversible amplitudes can symbolize to a reversible chain.",
+        "This measures asymmetry of the estimated FIRST-ORDER kernel. A process whose irreversibility lives at longer lags reads as reversible unless the state is widened to carry the history.",
+    ],
+    concepts=["KC-IRREVERSIBILITY"],
+)
+def reversible_projection(
+    symbols: list[Any] | None = None,
+    kernel: list[list[float]] | None = None,
+    smoothing: float = 0.0,
+) -> dict[str, Any]:
+    if (symbols is None) == (kernel is None):
+        return {"refused": "supply exactly one of `symbols` or `kernel`"}
+
+    if symbols is not None:
+        if len(symbols) < 3:
+            return {"refused": "need at least 3 observations to estimate a transition"}
+        states = sorted({str(s) for s in symbols}, key=str)
+        index = {s: i for i, s in enumerate(states)}
+        n = len(states)
+        if n < 2:
+            return {"refused": "need at least 2 distinct states"}
+        counts = [[float(smoothing)] * n for _ in range(n)]
+        for a, b in zip(symbols, symbols[1:]):
+            counts[index[str(a)]][index[str(b)]] += 1.0
+        rows = []
+        for row in counts:
+            total = sum(row)
+            if total <= 0:
+                return {"refused": "a state is never left; the estimated chain is reducible"}
+            rows.append([v / total for v in row])
+        P = rows
+    else:
+        P = [[float(v) for v in row] for row in kernel]
+        n = len(P)
+        states = [str(i) for i in range(n)]
+        if any(len(row) != n for row in P):
+            return {"refused": "kernel must be square"}
+        if any(abs(sum(row) - 1.0) > 1e-8 for row in P):
+            return {"refused": "kernel rows must sum to one"}
+        if any(v < 0 for row in P for v in row):
+            return {"refused": "kernel entries must be non-negative"}
+
+    # Stationary distribution by power iteration. Deterministic, and the residual is
+    # checked rather than assumed, so a reducible or periodic chain is refused here
+    # instead of producing a confident wrong weighting.
+    pi = [1.0 / n] * n
+    for _ in range(20000):
+        nxt = [sum(pi[x] * P[x][y] for x in range(n)) for y in range(n)]
+        total = sum(nxt) or 1.0
+        nxt = [v / total for v in nxt]
+        # Averaging with the previous iterate makes the iteration converge for periodic
+        # chains too, whose power iteration would otherwise cycle forever.
+        pi, prev = [0.5 * (a + b) for a, b in zip(nxt, pi)], pi
+        if max(abs(a - b) for a, b in zip(pi, prev)) < 1e-15:
+            break
+    residual = max(abs(sum(pi[x] * P[x][y] for x in range(n)) - pi[y]) for y in range(n))
+    if residual > 1e-8:
+        return {"refused": f"stationary distribution did not converge (residual {residual:.2e}); chain is likely reducible"}
+    if min(pi) <= 0:
+        return {"refused": "a state carries no stationary mass; chain is reducible"}
+
+    # Edge measure Q(x,y) = pi(x) P(x,y). Reversibility is exactly the symmetry of Q.
+    Q = [[pi[x] * P[x][y] for y in range(n)] for x in range(n)]
+
+    # m-projection. In edge-measure coordinates this is simply the symmetrization of Q,
+    # so P_m(x,y) = (Q(x,y) + Q(y,x)) / (2 pi(x)).
+    m_projection = [[(Q[x][y] + Q[y][x]) / (2.0 * pi[x]) for y in range(n)] for x in range(n)]
+
+    # D(P || P_m) = sum_xy Q(x,y) log( 2 Q(x,y) / (Q(x,y) + Q(y,x)) ).
+    divergence = 0.0
+    contributions: list[dict[str, Any]] = []
+    for x in range(n):
+        for y in range(n):
+            q, qt = Q[x][y], Q[y][x]
+            if q <= 0:
+                continue
+            term = q * math.log(2.0 * q / (q + qt))
+            divergence += term
+            if term > 0:
+                contributions.append({"from": states[x], "to": states[y], "contribution": term})
+    contributions.sort(key=lambda row: -row["contribution"])
+
+    # The same number as a Jensen-Shannon divergence between the edge measure and its
+    # transpose. Analytically identical; reported so a numerical drift is visible.
+    js = 0.0
+    for x in range(n):
+        for y in range(n):
+            mid = 0.5 * (Q[x][y] + Q[y][x])
+            if Q[x][y] > 0:
+                js += 0.5 * Q[x][y] * math.log(Q[x][y] / mid)
+            if Q[y][x] > 0:
+                js += 0.5 * Q[y][x] * math.log(Q[y][x] / mid)
+
+    # e-projection: stochastic rescaling of the geometric mean of P and its reversal.
+    # Undefined when the supports do not overlap, which is the deterministic-cycle case.
+    reversal = [[(pi[y] * P[y][x] / pi[x]) if pi[x] > 0 else 0.0 for y in range(n)] for x in range(n)]
+    geometric = [[math.sqrt(P[x][y] * reversal[x][y]) for y in range(n)] for x in range(n)]
+    e_projection: list[list[float]] | None = None
+    if all(sum(row) > 0 for row in geometric):
+        e_projection = [[v / sum(row) for v in row] for row in geometric]
+
+    normalized = divergence / math.log(2.0)
+    return {
+        "irreversibility": divergence,
+        "normalized": normalized,
+        "js_identity_residual": abs(divergence - js),
+        "stationary": {states[i]: pi[i] for i in range(n)},
+        "m_projection": m_projection,
+        "e_projection": e_projection,
+        "edge_contributions": contributions[:20],
+        "states": states,
+        "verdict": ("reversible" if normalized < 1e-9 else "weakly_irreversible" if normalized < 0.1 else "irreversible"),
+    }
+
+
+
 def self_test() -> dict[str, Any]:
     checks: list[str] = []
 
@@ -2311,6 +2451,44 @@ def self_test() -> dict[str, Any]:
     assert resistant["downweighted_share"] > 0, resistant
     assert robust_location_scale([1.0, 2.0])["refused"]
     checks.append("robust_location_scale: exact on symmetric data, one arbitrary point moves the mean by three orders of magnitude and not the M-estimate, degenerate scale refused")
+
+    # A deterministic three-cycle is the extreme case and its divergence is exactly ln 2:
+    # every edge has Q = 1/3 forward and 0 backward, so each term is (1/3) log 2.
+    cycle = reversible_projection(kernel=[[0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]])
+    assert abs(cycle["irreversibility"] - math.log(2.0)) < 1e-12, cycle["irreversibility"]
+    assert abs(cycle["normalized"] - 1.0) < 1e-12, cycle["normalized"]
+    assert cycle["e_projection"] is None, "a deterministic cycle has no overlap with its reversal"
+    assert cycle["verdict"] == "irreversible", cycle["verdict"]
+    # A chain with a symmetric edge measure is its own m-projection, exactly.
+    symmetric = reversible_projection(kernel=[[0.5, 0.5, 0.0], [0.25, 0.5, 0.25], [0.0, 0.5, 0.5]])
+    assert abs(symmetric["irreversibility"]) < 1e-12, symmetric["irreversibility"]
+    assert symmetric["verdict"] == "reversible", symmetric
+    for x, row in enumerate(symmetric["m_projection"]):
+        for y, value in enumerate(row):
+            assert abs(value - [[0.5, 0.5, 0.0], [0.25, 0.5, 0.25], [0.0, 0.5, 0.5]][x][y]) < 1e-12, (x, y, value)
+    # The identity D(P||P_m) = JS(Q, Q^T) is exact, so the residual is numerical noise only.
+    biased = reversible_projection(kernel=[[0.1, 0.8, 0.1], [0.1, 0.1, 0.8], [0.8, 0.1, 0.1]])
+    assert biased["js_identity_residual"] < 1e-12, biased["js_identity_residual"]
+    assert 0 < biased["irreversibility"] < math.log(2.0), biased["irreversibility"]
+    # The Pythagorean identity: projecting first costs nothing on the way to any reversible target.
+    target = [[0.5, 0.25, 0.25], [0.25, 0.5, 0.25], [0.25, 0.25, 0.5]]
+    pi = biased["stationary"]
+    order = biased["states"]
+    pv = [pi[s] for s in order]
+    src = [[0.1, 0.8, 0.1], [0.1, 0.1, 0.8], [0.8, 0.1, 0.1]]
+    mid = biased["m_projection"]
+    direct = sum(pv[x] * src[x][y] * math.log(src[x][y] / target[x][y]) for x in range(3) for y in range(3))
+    leg = sum(pv[x] * mid[x][y] * math.log(mid[x][y] / target[x][y]) for x in range(3) for y in range(3))
+    assert abs(direct - (biased["irreversibility"] + leg)) < 1e-12, (direct, biased["irreversibility"] + leg)
+    # Estimated from symbols, a cycle read forward and the same cycle read backward are
+    # equally irreversible, which is the bisection property showing up as a symmetry.
+    forward = reversible_projection(symbols=list("abcabcabcabcabcabcabcabc"))
+    backward = reversible_projection(symbols=list("abcabcabcabcabcabcabcabc")[::-1])
+    assert abs(forward["irreversibility"] - backward["irreversibility"]) < 1e-9, (forward, backward)
+    assert reversible_projection(symbols=["a", "a", "a"]).get("refused")
+    assert reversible_projection(kernel=[[0.5, 0.4], [0.5, 0.5]]).get("refused")
+    assert reversible_projection().get("refused")
+    checks.append("reversible_projection: deterministic cycle gives exactly ln 2, a symmetric edge measure projects to itself, the Jensen-Shannon identity and the Pythagorean identity both hold to 1e-12, and reducible or malformed input is refused")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 

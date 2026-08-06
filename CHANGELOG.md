@@ -4,6 +4,15 @@
 
 ### Added
 
+- `reversible_projection` 1.0.0: exact time-irreversibility as an information projection. Wolfer
+  and Watanabe give the m-projection onto the reversible manifold as the arithmetic mean of a kernel
+  and its time-reversal and the e-projection as their rescaled geometric mean; `D(P || P_m)` is then
+  the divergence to the nearest reversible chain with no surrogate null to calibrate against.
+  Writing it produced a small result the source does not state: in edge-measure coordinates that
+  divergence is exactly the Jensen-Shannon divergence between `Q` and its transpose, which makes it
+  the same divergence our surrogate-based ordinal statistic computes, applied to a different object.
+  The self-test asserts the identity and the Pythagorean decomposition to 1e-12, and a deterministic
+  three-cycle returns exactly `ln 2`.
 - `knowledge/structural_findings.yaml` and `knowledge.py findings`: patterns that recur across two
   or more unrelated domains, each recording the structure, the correspondence, what it buys, the
   sources actually read to reach it, and an `agent_seed` written for whoever builds there next.
@@ -24,6 +33,10 @@
   show mirror descent is natural gradient descent on the dual manifold, which joins to the LMSR
   result: market-maker pricing, exponential weights and natural gradient are one algorithm in three
   coordinate systems, recorded as the file's one `conjecture` because the join is asserted nowhere.
+  Wolfer and Watanabe show the reversible Markov kernels form both an exponential and a mixture
+  family, and that reversibility is exactly the condition under which eigenvalue perturbation is
+  dimension-free — losing it swaps Weyl's inequality for a bound exponential in the dimension, which
+  ties the irreversibility reading to the random-matrix one.
 - Rights are metadata rather than a gate. The corpus taxonomy records `mode: exploratory`, and
   nothing in the reading or compiling path consults rights status. The manifest machinery is
   unchanged, so a redistributable build remains possible if it is ever wanted.

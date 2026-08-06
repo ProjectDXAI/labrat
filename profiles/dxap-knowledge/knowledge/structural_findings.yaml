@@ -605,6 +605,85 @@ findings:
       needs, because the efficiency result and the regret result rest on premises that contradict
       each other.
 
+  - finding_id: FIND-REVERSIBILIZATION-IS-A-MEAN
+    title: "The two closest reversible chains are the arithmetic and geometric means of a process and its reverse"
+    status: read
+    structure: "Information projections onto a submanifold that is simultaneously an exponential family and a mixture family."
+    domains: [mathematical_foundations, information_theory, signal_processing]
+    correspondence: >
+      Wolfer and Watanabe show the set of irreducible reversible Markov kernels is both an m-family
+      and an e-family — rare enough that they flag it as surprising — and that the projections onto
+      it have closed forms. The m-projection is the arithmetic mean P_m = (P + P*)/2 of the kernel
+      and its time-reversal; the e-projection is the stochastically rescaled geometric mean,
+      proportional to sqrt(P(x,x') P*(x,x')). Each satisfies a Pythagorean identity, in opposite
+      argument orders because the divergence is not symmetric, and both projections are equidistant
+      from the chain and its reverse. The same manifold is also the smallest exponential family
+      containing the symmetric kernels and the smallest mixture family containing the memoryless
+      ones — two unrelated generating sets landing on one object.
+    what_it_buys: >
+      Irreversibility gets a closed form. D(P || P_m) is the divergence from a process to the
+      nearest reversible one, with an exact Pythagorean decomposition and no surrogate data,
+      no randomization and no p-value machinery — which is what our own `time_irreversibility`
+      method needs, since its ordinal-pattern statistic is only interpretable against a simulated
+      null. It also settles a question that otherwise looks like taste: there are exactly two
+      canonical ways to symmetrize a process, they are the two familiar means, and which one is
+      correct is decided by which direction of the divergence the application cares about rather
+      than by preference.
+    sources_read:
+      - "arXiv 2106.05669 — Wolfer and Watanabe, information geometry of reversible Markov chains, section 6 and Theorem 6.1"
+    agent_seed: >
+      Where a system measures time-asymmetry, estimate a transition kernel and report
+      D(P || (P + P*)/2) directly instead of comparing a statistic against shuffled surrogates. It
+      is cheaper, deterministic, and decomposes additively, so the contribution of each state pair
+      to the total asymmetry falls out of the same computation rather than needing a second pass.
+      Keep both projections available and make the choice explicit at the call site: the arithmetic
+      mean is right when the reference is the observed process, the geometric mean when the
+      reference is the model being tested. Where an existing surrogate-based irreversibility test
+      already ships, run both and treat disagreement as informative — the surrogate null and the
+      projection are answering slightly different questions and it is worth knowing when they part.
+    implemented_as: >
+      `reversible_projection` 1.0.0 in scripts/methods.py. Writing it produced a small result the
+      source does not state: in edge-measure coordinates D(P || P_m) is exactly the Jensen-Shannon
+      divergence between Q and its transpose, since P_m corresponds to the symmetrized edge measure.
+      That makes the exact projection and our existing surrogate-calibrated ordinal statistic the
+      same divergence applied to different objects. The self-test asserts the identity and the
+      Pythagorean decomposition to 1e-12, and a deterministic three-cycle returns exactly ln 2.
+
+  - finding_id: FIND-IRREVERSIBILITY-COSTS-SPECTRAL-STABILITY
+    title: "Reversibility is exactly the condition under which eigenvalue estimates are dimension-free"
+    status: read
+    structure: "A perturbation bound that degrades from dimensionless to exponential in dimension when self-adjointness is lost."
+    domains: [mathematical_foundations, high_dim_statistics, dynamical_systems]
+    correspondence: >
+      A reversible kernel is self-adjoint in the stationary inner product, so its eigenvalues are
+      real, the second largest in magnitude controls the mixing time, and eigenvalue perturbation
+      obeys Weyl's inequality, whose constant does not involve the dimension. Wolfer and Watanabe
+      point out the brittleness on the other side: any deviation from reversibility can send the
+      spectrum complex and replaces Weyl with Ostrowski-Elsner, whose bound is possibly exponential
+      in the dimension. The property is not a convenience assumption that buys tidier proofs — it is
+      the precise boundary between an estimate that is stable in high dimension and one that is not.
+    what_it_buys: >
+      It connects two things that looked unrelated in this corpus. Time-irreversibility was recorded
+      as an interesting state variable because it is empirically orthogonal to volatility; the
+      random-matrix reading was about how badly sample eigenvalues mislead in high dimension. This
+      says they are the same subject: irreversibility is what makes the eigenvalues hard to estimate.
+      So a system that measures asymmetry is also measuring how far it can trust its own spectral
+      diagnostics, and the two should be reported together rather than as separate instruments. It
+      also gives a reason to project before doing spectral work — the projection is not a
+      simplification that loses information, it is what makes the perturbation bound apply.
+    sources_read:
+      - "arXiv 2106.05669 — Wolfer and Watanabe, information geometry of reversible Markov chains, opening of section 6"
+      - "arXiv 1610.08104 — Bun, Bouchaud and Potters, cleaning large correlation matrices, section 6.3"
+    agent_seed: >
+      Anywhere a system extracts eigenvalues from an estimated operator and acts on them — mixing
+      times, spectral clustering, regime counts, principal components of a transition structure —
+      first measure how far the operator is from self-adjoint, and gate the confidence attached to
+      the spectrum on that distance rather than on sample size alone. Concretely: compute the
+      divergence to the reversible projection, and where it is large either project first and say so,
+      or widen the uncertainty on every eigenvalue-derived quantity. Treat a complex eigenvalue
+      appearing in what should be a stable spectrum as a diagnostic that the reversibility assumption
+      has failed, not as a numerical nuisance to take the real part of.
+
 # Patterns worth watching for, recorded so they are noticed when they recur.
 recurring_shapes:
   - shape: "A nuisance parameter turns out to select the model class"
@@ -644,8 +723,12 @@ recurring_shapes:
     why_it_matters: "The stronger-looking requirement is not conservative, it is a different and often infeasible problem."
 
   - shape: "A quantity that is empirically orthogonal to volatility"
-    instances: [FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY]
+    instances: [FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY, FIND-IRREVERSIBILITY-COSTS-SPECTRAL-STABILITY]
     why_it_matters: "Most proposed state variables are volatility wearing a hat; the rare orthogonal one is worth keeping even before it predicts anything."
+
+  - shape: "Two unrelated generating sets converging on the same object"
+    instances: [FIND-REVERSIBILIZATION-IS-A-MEAN]
+    why_it_matters: "A structure reachable from two directions is usually more canonical than either derivation suggests, and inherits results from both."
 
   - shape: "One inequality underwriting several apparently separate capabilities"
     instances: [FIND-MAXIMAL-INEQUALITY-UNDERWRITES-PEEKING, FIND-DISSIPATION-IS-NONPREDICTIVE-MEMORY, FIND-PRECISION-COSTS-DISSIPATION]

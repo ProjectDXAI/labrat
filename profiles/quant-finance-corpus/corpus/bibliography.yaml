@@ -21575,3 +21575,70 @@ entries:
       attains the Cramer-Rao bound. The direction of transfer also runs the other way: natural gradient is a second-order
       method requiring the metric tensor, mirror descent is first-order, so the equivalence implements second-order
       behaviour at first-order cost.'
+- id: wolfer-2021-information-geometry-reversible-markov
+  title: Information Geometry of Reversible Markov Chains
+  authors:
+  - Geoffrey Wolfer
+  - Shun Watanabe
+  year: 2021
+  bucket: mathematical_foundations
+  form: paper
+  priority: 5
+  status: reviewed
+  pages: 38
+  identifiers:
+    isbn: null
+    doi: 10.1007/s41884-021-00061-7
+    url: https://arxiv.org/abs/2106.05669
+  tags:
+  - information-geometry
+  - markov-chains
+  - reversibility
+  - time-irreversibility
+  - exponential-family
+  - spectral-stability
+  refs:
+  - target: raskutti-2014-information-geometry-mirror-descent
+    relation: related_to
+  units:
+  - unit_id: reversible-projections
+    topic: the closest reversible chain, in closed form, under each direction of the divergence
+    title: null
+    locator: section 6 and Theorem 6.1, pp. 22-23
+    kind: paper_section
+    pages: 2
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly, including the proof of Theorem 6.1. The m-projection of an irreducible kernel P onto
+      the reversible manifold is the ARITHMETIC mean P_m = (P + P*)/2 with its time-reversal; the e-projection is
+      the stochastically rescaled GEOMETRIC mean, P_e(x,x'') proportional to sqrt(P(x,x'') P*(x,x'')). Each satisfies
+      a Pythagorean identity, in opposite argument orders, since the divergence is not symmetric. Proposition 6.1
+      gives the bisection property: both projections are equidistant from a kernel and its time-reversal.'
+  - unit_id: reversibility-and-spectral-stability
+    topic: what reversibility buys spectrally and what losing it costs
+    title: null
+    locator: opening of section 6, p. 22
+    kind: paper_section
+    pages: 1
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. Reversible kernels are self-adjoint, so eigenvalues are real, the second largest in magnitude
+      controls mixing, and eigenvalue perturbation is governed by Weyl's inequality, which is dimensionless. Any
+      deviation from reversibility can make the spectrum complex and replaces Weyl with Ostrowski-Elsner, whose
+      cost is possibly EXPONENTIAL in the dimension. The authors call these properties powerful yet brittle.
+  - unit_id: reversible-family-is-doubly-flat
+    topic: the reversible manifold as both an exponential and a mixture family
+    title: null
+    locator: section 1.2 summary and Theorems 5.1, 9.1, 9.2
+    kind: paper_section
+    pages: 2
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly (the outline statement of the main results, not the full proofs). The set of irreducible
+      reversible kernels is simultaneously an m-family and an e-family, which the authors flag as surprising. It
+      is also characterized twice over: the smallest exponential family containing the symmetric kernels, and the
+      smallest mixture family containing the memoryless ones. Reversibility itself is checkable in time polynomial
+      in the number of states via the Kolmogorov cycle criterion.'
