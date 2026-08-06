@@ -167,6 +167,33 @@ A bucket is `saturated` when two consecutive **expansion** rounds add nothing ne
 
 `rediscovery_rate` — the share of a round's findings that were already mapped — is the early warning: it climbs before a bucket goes dry.
 
+## Sourcing: resolving, verifying and acquiring
+
+`scripts/resolve.py` is the deterministic resolver. It fills in identifiers from public bibliographic infrastructure, reads licences off the pages that grant them, and downloads what genuinely clears.
+
+```bash
+python scripts/resolve.py identify --limit 400        # title -> DOI, against Crossref
+python scripts/resolve.py licence  --limit 60         # DOI -> licence, from the landing page
+python scripts/resolve.py fetch --dest corpus/sources # only what the manifest already admits
+```
+
+Three rules do the work:
+
+- **Refuse rather than guess.** A candidate must clear a title-similarity threshold, a one-year window and an author check, or it goes to quarantine with its candidates listed. A truncated registry title is rescued by a containment path that requires an exact year *and* a matching author, so a one-word record cannot capture an unrelated work. On the shipped corpus that resolves 56 of 305 and quarantines the rest, most of them books with several editions where the right answer is genuinely ambiguous.
+- **An API error is not a negative result.** A rate limit cached as "no such work" is how a resolver quietly stops working while still printing a number. Errors are surfaced separately and never cached. This was not hypothetical: the first run silently recorded 216 quota failures as "not found".
+- **The aggregator's licence field is a lead, not a grant.** Verification fetches the landing page and requires the licence to be stated there, recording the operative text. A page that loads and grants nothing is recorded as `all_rights_reserved, confirmed` — a result that retires the entry from the verify queue. A page that will not load is recorded as unresolved, because absence of evidence is not evidence.
+
+### What actually cleared
+
+| Class | Outcome |
+|---|---|
+| MIT OpenCourseWare | **CC BY-NC-SA, confirmed** on both the terms page and each course page. 5 courses, 109 PDFs, 37 MB downloaded |
+| Publisher landing pages that loaded | 20 read in full, none granting an open licence → `all_rights_reserved, confirmed` |
+| Publisher pages behind a bot wall | 20 returned 403 → unresolved, not assumed either way |
+| arXiv | The default grant is a licence **to arXiv** to distribute, not a licence to us. Read on the page and mapped to `author_hosted_free` → `reference_only` |
+
+That last row is the one worth internalizing. arXiv is the largest pool of freely readable material the corpus touches, and freely readable is not licensed. A paper there is ingestable only if its author chose a CC licence, which has to be checked per paper.
+
 ## Running it as a labrat lab
 
 ```bash

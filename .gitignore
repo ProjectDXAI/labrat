@@ -25,3 +25,7 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+corpus-sources/
+corpus/sources/
+corpus/.resolve-cache/
+_wk/

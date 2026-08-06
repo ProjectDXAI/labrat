@@ -124,6 +124,7 @@ def main(argv: list[str] | None = None) -> int:
         "methods.py",
         "knowledge.py",
         "ledger.py",
+        "resolve.py",
     ]
     for name in script_files:
         src = SCRIPTS_DIR / name

@@ -1,201 +1,338 @@
-# Corpus taxonomy — quantitative finance and its feeder disciplines.
-#
-# Buckets are topical, not organizational: a bucket is a body of literature that
-# should saturate as a unit. `target_pages` is the working budget for a dense,
-# concept-heavy corpus, not a quota to fill with whatever is cheapest to obtain.
-#
-# Seed page counts in bibliography.yaml are order-of-magnitude estimates. A verify
-# round replaces them with the real figure alongside the rights evidence.
-
 defaults:
-  saturation_dry_rounds: 2      # consecutive rounds with no new entry before a bucket is called saturated
-  round_limit: 25               # default targets per round
-  page_counts: "Seed page counts are estimates. Verification rounds replace them."
-  rights_policy: >
-    Nothing enters the build manifest without rights.confidence == confirmed, an
-    evidence URL, and a check date. Everything else is study-only: read it, learn
-    from it, write our own explanations. Free to read is not free to redistribute.
+  saturation_dry_rounds: 2
+  round_limit: 25
+  page_counts: Seed page counts are estimates. Verification rounds replace them.
+  rights_policy: 'Nothing enters the build manifest without rights.confidence == confirmed, an evidence URL, and
+    a check date. Everything else is study-only: read it, learn from it, write our own explanations. Free to read
+    is not free to redistribute.
 
+    '
 buckets:
   market_microstructure:
     tier: 1
     target_pages: 50000
-    description: "Order books, dealer inventory, adverse selection, price impact, execution."
-    why: "Closest transfer to live venues. Dense theory that the open web only summarizes."
-    core_topics: [adverse_selection, inventory_risk, informed_trading, queue_priority, price_impact, resiliency, hidden_liquidity, execution]
-
+    description: Order books, dealer inventory, adverse selection, price impact, execution.
+    why: Closest transfer to live venues. Dense theory that the open web only summarizes.
+    core_topics:
+    - adverse_selection
+    - inventory_risk
+    - informed_trading
+    - queue_priority
+    - price_impact
+    - resiliency
+    - hidden_liquidity
+    - execution
   quant_finance_core:
     tier: 1
     target_pages: 80000
-    description: "Derivatives, stochastic calculus, volatility modelling, risk, portfolio construction, financial econometrics."
-    why: "The shared vocabulary every other bucket is expressed in."
-    core_topics: [stochastic_calculus, volatility, term_structure, risk_management, portfolio_construction, financial_econometrics]
-
+    description: Derivatives, stochastic calculus, volatility modelling, risk, portfolio construction, financial
+      econometrics.
+    why: The shared vocabulary every other bucket is expressed in.
+    core_topics:
+    - stochastic_calculus
+    - volatility
+    - term_structure
+    - risk_management
+    - portfolio_construction
+    - financial_econometrics
   economics_information:
     tier: 5
     target_pages: 40000
-    description: "Information economics, auctions, mechanism design, market design, prediction markets."
-    why: "Explains why a price moves the way it does when someone knows something. Maps onto prediction markets and matching engines."
-    core_topics: [asymmetric_information, auctions, mechanism_design, matching, market_design, prediction_markets]
-
+    description: Information economics, auctions, mechanism design, market design, prediction markets.
+    why: Explains why a price moves the way it does when someone knows something. Maps onto prediction markets and
+      matching engines.
+    core_topics:
+    - asymmetric_information
+    - auctions
+    - mechanism_design
+    - matching
+    - market_design
+    - prediction_markets
   signal_processing:
     tier: 2
     target_pages: 60000
-    description: "Estimation, filtering, adaptive filters, spectral analysis, wavelets, changepoint detection."
-    why: "Mature machinery for weak signals in noisy streams. Underused in ML trading."
-    core_topics: [kalman_filtering, particle_filters, adaptive_filtering, spectral_estimation, wavelets, changepoint]
-
+    description: Estimation, filtering, adaptive filters, spectral analysis, wavelets, changepoint detection.
+    why: Mature machinery for weak signals in noisy streams. Underused in ML trading.
+    core_topics:
+    - kalman_filtering
+    - particle_filters
+    - adaptive_filtering
+    - spectral_estimation
+    - wavelets
+    - changepoint
   detection_tracking:
     tier: 2
     target_pages: 20000
-    description: "Detection theory, radar/sonar signal processing, target tracking, data association, sensor fusion."
-    why: "Markets are noisy observation problems with association ambiguity. This literature solved that first."
-    core_topics: [detection_theory, tracking, data_association, sensor_fusion, sequential_detection]
-
+    description: Detection theory, radar/sonar signal processing, target tracking, data association, sensor fusion.
+    why: Markets are noisy observation problems with association ambiguity. This literature solved that first.
+    core_topics:
+    - detection_theory
+    - tracking
+    - data_association
+    - sensor_fusion
+    - sequential_detection
   optimal_control:
     tier: 3
     target_pages: 35000
-    description: "Optimal, stochastic, robust and predictive control; hybrid and switching systems; adaptive observers."
-    why: "Trading is sequential control under uncertainty. RL is one corner of this literature."
-    core_topics: [stochastic_control, hjb, mpc, robust_control, adaptive_control, hybrid_systems, state_estimation]
-
+    description: Optimal, stochastic, robust and predictive control; hybrid and switching systems; adaptive observers.
+    why: Trading is sequential control under uncertainty. RL is one corner of this literature.
+    core_topics:
+    - stochastic_control
+    - hjb
+    - mpc
+    - robust_control
+    - adaptive_control
+    - hybrid_systems
+    - state_estimation
   operations_research:
     tier: 4
     target_pages: 40000
-    description: "Dynamic programming, approximate DP, inventory theory, scheduling, network flows, integer and robust optimization."
-    why: "Most execution algorithms originated here rather than in ML."
-    core_topics: [dynamic_programming, approximate_dp, inventory, scheduling, network_flows, integer_programming, robust_optimization]
-
+    description: Dynamic programming, approximate DP, inventory theory, scheduling, network flows, integer and robust
+      optimization.
+    why: Most execution algorithms originated here rather than in ML.
+    core_topics:
+    - dynamic_programming
+    - approximate_dp
+    - inventory
+    - scheduling
+    - network_flows
+    - integer_programming
+    - robust_optimization
   queueing_networks:
     tier: 4
     target_pages: 15000
-    description: "Queueing theory, heavy-traffic limits, queueing networks, fluid and diffusion approximations."
-    why: "A limit order book is a queueing system with priority classes."
-    core_topics: [queueing, priority_queues, heavy_traffic, diffusion_limits, matrix_analytic]
-
+    description: Queueing theory, heavy-traffic limits, queueing networks, fluid and diffusion approximations.
+    why: A limit order book is a queueing system with priority classes.
+    core_topics:
+    - queueing
+    - priority_queues
+    - heavy_traffic
+    - diffusion_limits
+    - matrix_analytic
   information_theory:
     tier: 4
     target_pages: 25000
-    description: "Entropy, rate distortion, coding, compression, MDL, algorithmic complexity."
-    why: "Direct connection to learned market representations and compressed state."
-    core_topics: [entropy, rate_distortion, coding, compression, mdl, kolmogorov_complexity]
-
+    description: Entropy, rate distortion, coding, compression, MDL, algorithmic complexity.
+    why: Direct connection to learned market representations and compressed state.
+    core_topics:
+    - entropy
+    - rate_distortion
+    - coding
+    - compression
+    - mdl
+    - kolmogorov_complexity
   bayesian_statistics:
     tier: 2
     target_pages: 40000
-    description: "Bayesian inference, hierarchical models, dynamic linear models, probabilistic ML."
-    why: "The inference half of the state-estimation problem."
-    core_topics: [bayesian_inference, hierarchical_models, dlm, mcmc, gaussian_processes, model_selection]
-
+    description: Bayesian inference, hierarchical models, dynamic linear models, probabilistic ML.
+    why: The inference half of the state-estimation problem.
+    core_topics:
+    - bayesian_inference
+    - hierarchical_models
+    - dlm
+    - mcmc
+    - gaussian_processes
+    - model_selection
   decision_sequential:
     tier: 3
     target_pages: 25000
-    description: "Bayesian decision theory, sequential hypothesis testing, optimal stopping, bandits, POMDPs."
-    why: "The decision half. Directly applicable to agentic trading."
-    core_topics: [sequential_testing, optimal_stopping, bandits, pomdp, regret, exploration]
-
+    description: Bayesian decision theory, sequential hypothesis testing, optimal stopping, bandits, POMDPs.
+    why: The decision half. Directly applicable to agentic trading.
+    core_topics:
+    - sequential_testing
+    - optimal_stopping
+    - bandits
+    - pomdp
+    - regret
+    - exploration
   dynamical_systems:
     tier: 4
     target_pages: 20000
-    description: "Nonlinear dynamics, bifurcations, critical transitions, nonlinear time series."
-    why: "Regime shifts and reflexive blowups are bifurcation phenomena, not outliers."
-    core_topics: [bifurcation, chaos, critical_transitions, nonlinear_time_series, early_warning]
-
+    description: Nonlinear dynamics, bifurcations, critical transitions, nonlinear time series.
+    why: Regime shifts and reflexive blowups are bifurcation phenomena, not outliers.
+    core_topics:
+    - bifurcation
+    - chaos
+    - critical_transitions
+    - nonlinear_time_series
+    - early_warning
   network_science:
     tier: 4
     target_pages: 12000
-    description: "Graphs, flows, percolation, contagion, cascades, systemic risk."
-    why: "Liquidation cascades and cross-venue contagion are network phenomena."
-    core_topics: [graphs, percolation, contagion, cascades, systemic_risk]
-
+    description: Graphs, flows, percolation, contagion, cascades, systemic risk.
+    why: Liquidation cascades and cross-venue contagion are network phenomena.
+    core_topics:
+    - graphs
+    - percolation
+    - contagion
+    - cascades
+    - systemic_risk
   exchange_documentation:
     tier: 1
     target_pages: 50000
-    description: "Exchange rulebooks, matching-engine and market-data specifications, protocol standards, venue APIs, market structure regulation."
-    why: "The literal rules of the game we trade in. Almost never absorbed properly during pretraining."
-    core_topics: [matching_rules, market_data_protocols, order_types, fee_schedules, crypto_venue_apis, market_structure_regulation]
-    rights_note: "Public availability here rarely implies a licence. Expect reference_only."
-
+    description: Exchange rulebooks, matching-engine and market-data specifications, protocol standards, venue APIs,
+      market structure regulation.
+    why: The literal rules of the game we trade in. Almost never absorbed properly during pretraining.
+    core_topics:
+    - matching_rules
+    - market_data_protocols
+    - order_types
+    - fee_schedules
+    - crypto_venue_apis
+    - market_structure_regulation
+    rights_note: Public availability here rarely implies a licence. Expect reference_only.
   open_courseware:
     tier: 1
     target_pages: 100000
-    description: "University lecture notes, course readers, problem sets and slides, with the licence attached."
-    why: "The densest legally clean material available. Openly licensed notes are the backbone of an ingestable corpus."
-    core_topics: [lecture_notes, problem_sets, course_readers, seminar_notes]
-    rights_note: "This bucket is where confirmed open licences are most likely. Prioritize verification here."
-
+    description: University lecture notes, course readers, problem sets and slides, with the licence attached.
+    why: The densest legally clean material available. Openly licensed notes are the backbone of an ingestable corpus.
+    core_topics:
+    - lecture_notes
+    - problem_sets
+    - course_readers
+    - seminar_notes
+    rights_note: This bucket is where confirmed open licences are most likely. Prioritize verification here.
   practitioner_training:
     tier: 6
     target_pages: 15000
-    description: "Desk manuals, market-maker training material, professional certification curricula, practitioner conference proceedings."
-    why: "Low mathematical sophistication, high heuristic density. Hardest bucket to obtain legally."
-    core_topics: [market_making_heuristics, risk_limits, desk_procedures, certification_curricula]
-    rights_note: "Opportunistic. Licensed or excluded; never acquire confidential or leaked material."
-
+    description: Desk manuals, market-maker training material, professional certification curricula, practitioner
+      conference proceedings.
+    why: Low mathematical sophistication, high heuristic density. Hardest bucket to obtain legally.
+    core_topics:
+    - market_making_heuristics
+    - risk_limits
+    - desk_procedures
+    - certification_curricula
+    rights_note: Opportunistic. Licensed or excluded; never acquire confidential or leaked material.
   mathematical_foundations:
     tier: 2
     target_pages: 45000
-    description: "Point processes and Hawkes, rough paths and signatures, optimal transport, mean-field games, Malliavin calculus and BSDEs, stochastic approximation, Markov chain stability, high-frequency econometrics."
-    why: "The machinery the microstructure and control literatures assume you already have. Concept cards were leaning on it implicitly with nothing behind them."
-    core_topics: [point_processes, hawkes, rough_paths, signatures, optimal_transport, mean_field_games, bsde, stochastic_approximation, ergodicity, high_frequency_econometrics]
-
+    description: Point processes and Hawkes, rough paths and signatures, optimal transport, mean-field games, Malliavin
+      calculus and BSDEs, stochastic approximation, Markov chain stability, high-frequency econometrics.
+    why: The machinery the microstructure and control literatures assume you already have. Concept cards were leaning
+      on it implicitly with nothing behind them.
+    core_topics:
+    - point_processes
+    - hawkes
+    - rough_paths
+    - signatures
+    - optimal_transport
+    - mean_field_games
+    - bsde
+    - stochastic_approximation
+    - ergodicity
+    - high_frequency_econometrics
   high_dim_statistics:
     tier: 2
     target_pages: 30000
-    description: "Random matrix theory, high-dimensional probability and statistics, concentration, covariance estimation and cleaning, extreme value theory."
-    why: "Every correlation matrix, factor model and tail estimate in a real book is high-dimensional and small-sample. Without this the estimates are confidently wrong."
-    core_topics: [random_matrix_theory, concentration, covariance_cleaning, sparsity, extreme_values, asymptotic_statistics]
-
+    description: Random matrix theory, high-dimensional probability and statistics, concentration, covariance estimation
+      and cleaning, extreme value theory.
+    why: Every correlation matrix, factor model and tail estimate in a real book is high-dimensional and small-sample.
+      Without this the estimates are confidently wrong.
+    core_topics:
+    - random_matrix_theory
+    - concentration
+    - covariance_cleaning
+    - sparsity
+    - extreme_values
+    - asymptotic_statistics
   inference_causality:
     tier: 3
     target_pages: 30000
-    description: "Causal inference, off-policy evaluation, anytime-valid and sequential inference, multiple testing, backtest overfitting, conformal prediction."
-    why: "This is the literature behind our own evaluation design. We built a randomized attribution ledger with nothing in the corpus to justify its inference."
-    core_topics: [causal_inference, treatment_effects, off_policy_evaluation, confidence_sequences, multiple_testing, backtest_overfitting, conformal]
-
+    description: Causal inference, off-policy evaluation, anytime-valid and sequential inference, multiple testing,
+      backtest overfitting, conformal prediction.
+    why: This is the literature behind our own evaluation design. We built a randomized attribution ledger with
+      nothing in the corpus to justify its inference.
+    core_topics:
+    - causal_inference
+    - treatment_effects
+    - off_policy_evaluation
+    - confidence_sequences
+    - multiple_testing
+    - backtest_overfitting
+    - conformal
   machine_learning_frontier:
     tier: 2
     target_pages: 35000
-    description: "Deep hedging, neural differential equations, signature methods in learning, offline reinforcement learning, learned order-book models, machine learning in asset pricing."
-    why: "The post-2016 layer where the field actually moved, and the part of the literature least represented as textbooks."
-    core_topics: [deep_hedging, neural_sde, offline_rl, lob_deep_learning, ml_asset_pricing, sequence_models]
-
+    description: Deep hedging, neural differential equations, signature methods in learning, offline reinforcement
+      learning, learned order-book models, machine learning in asset pricing.
+    why: The post-2016 layer where the field actually moved, and the part of the literature least represented as
+      textbooks.
+    core_topics:
+    - deep_hedging
+    - neural_sde
+    - offline_rl
+    - lob_deep_learning
+    - ml_asset_pricing
+    - sequence_models
   defi_mechanics:
     tier: 1
     target_pages: 20000
-    description: "Automated market maker mathematics, loss-versus-rebalancing, MEV and sequencing, perpetual funding mechanics, liquidation cascades, on-chain market structure."
-    why: "Two of the venues we trade are on-chain. This mechanism literature is five years old, mostly outside books, and almost absent from general pretraining."
-    core_topics: [amm, cfmm, impermanent_loss, lvr, mev, funding_rate, liquidation, sequencing]
-
-# Explicitly deprioritized. Low signal density per page; do not spend rounds here.
+    description: Automated market maker mathematics, loss-versus-rebalancing, MEV and sequencing, perpetual funding
+      mechanics, liquidation cascades, on-chain market structure.
+    why: Two of the venues we trade are on-chain. This mechanism literature is five years old, mostly outside books,
+      and almost absent from general pretraining.
+    core_topics:
+    - amm
+    - cfmm
+    - impermanent_loss
+    - lvr
+    - mev
+    - funding_rate
+    - liquidation
+    - sequencing
+  adjacent_disciplines:
+    label: Adjacent disciplines with unexported methods
+    target_pages: 30000
+    description: 'Fields that solved a structurally identical problem for a different reason, and whose solution
+      has not been imported here. The test for admission is not that the subject is interesting: it is that a named
+      DXAP problem has the same shape as a problem this field treats as routine, and that the transfer is specific
+      enough to fail. Entries must carry cross-bucket refs, because a discipline with no edge into the working literature
+      is a reading list rather than a bridge.'
+    examples:
+    - seismological forecast evaluation for prospective testing discipline
+    - meteorological verification for probability scoring
+    - actuarial credibility for the optimal version of an ad-hoc shrinkage
+    - competing-risks survival analysis for exits with several causes
 deprioritized:
-  - name: technical_analysis
-    reason: "Pattern taxonomies without a generating model. Already saturated online."
-  - name: retail_trading_books
-    reason: "Repackaged basics; density far below the tier 1 buckets."
-  - name: trading_psychology
-    reason: "Anecdotal; little that survives contact with a systematic agent."
-  - name: retail_options_books
-    reason: "Superseded by the volatility modelling entries in quant_finance_core."
-  - name: candlestick_books
-    reason: "No mechanism, no rights upside."
-  - name: momentum_investing_popular
-    reason: "The academic factor literature covers it far better."
-  - name: ai_for_finance_trade_books
-    reason: "Introductory ML restated with tickers attached."
-
-# Cross-bucket connections worth mapping explicitly. Bridge entries score higher on the frontier.
+- name: technical_analysis
+  reason: Pattern taxonomies without a generating model. Already saturated online.
+- name: retail_trading_books
+  reason: Repackaged basics; density far below the tier 1 buckets.
+- name: trading_psychology
+  reason: Anecdotal; little that survives contact with a systematic agent.
+- name: retail_options_books
+  reason: Superseded by the volatility modelling entries in quant_finance_core.
+- name: candlestick_books
+  reason: No mechanism, no rights upside.
+- name: momentum_investing_popular
+  reason: The academic factor literature covers it far better.
+- name: ai_for_finance_trade_books
+  reason: Introductory ML restated with tickers attached.
 bridges:
-  - [queueing_networks, market_microstructure]
-  - [optimal_control, market_microstructure]
-  - [signal_processing, decision_sequential]
-  - [detection_tracking, signal_processing]
-  - [economics_information, market_microstructure]
-  - [information_theory, bayesian_statistics]
-  - [operations_research, optimal_control]
-  - [network_science, dynamical_systems]
-  - [mathematical_foundations, market_microstructure]
-  - [high_dim_statistics, quant_finance_core]
-  - [inference_causality, machine_learning_frontier]
-  - [defi_mechanics, exchange_documentation]
-  - [machine_learning_frontier, optimal_control]
+- - queueing_networks
+  - market_microstructure
+- - optimal_control
+  - market_microstructure
+- - signal_processing
+  - decision_sequential
+- - detection_tracking
+  - signal_processing
+- - economics_information
+  - market_microstructure
+- - information_theory
+  - bayesian_statistics
+- - operations_research
+  - optimal_control
+- - network_science
+  - dynamical_systems
+- - mathematical_foundations
+  - market_microstructure
+- - high_dim_statistics
+  - quant_finance_core
+- - inference_causality
+  - machine_learning_frontier
+- - defi_mechanics
+  - exchange_documentation
+- - machine_learning_frontier
+  - optimal_control

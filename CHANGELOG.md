@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.11.0 - 2026-08-06
+
+- Added `scripts/resolve.py`: the deterministic resolver the design called for and never had. `identify` fills in identifiers from Crossref, `licence` reads the licence off the landing page, `fetch` downloads what the manifest already admits. Matching refuses rather than guesses — title similarity, a one-year window and an author check, with a containment path for truncated registry titles that demands an exact year and a matching author.
+- An API error is now distinct from a negative result and is never cached. The first run against OpenAlex silently recorded 216 quota failures as "no such work", which is precisely how a resolver stops working while still printing a plausible number.
+- **First real acquisition.** 5 MIT OpenCourseWare courses confirmed CC BY-NC-SA by reading both the terms page and each course page, then 109 PDFs and 37 MB downloaded through the rights gate. 20 publisher pages were read in full and grant nothing, so they are now `all_rights_reserved, confirmed` and off the verify queue; 20 more sit behind a bot wall and are recorded as unresolved rather than assumed.
+- Recorded what arXiv actually grants. The default is a licence to arXiv to distribute, not a licence to us, and the resolver refuses to read it as an open licence. arXiv is the largest pool of freely readable material the corpus touches and almost none of it is ingestable.
+- The seed rights assertion now checks the invariant that matters — every manifest-eligible entry carries confirmed rights, an evidence URL and a check date — instead of enumerating which licences are acceptable. The old form broke the moment a real licence was confirmed.
+- Added the `adjacent_disciplines` bucket and 31 entries: fields that solved a structurally identical problem for a different reason and never exported the solution. Seismology's ETAS and its prospective CSEP testing regime, meteorological forecast verification and Murphy's calibration/resolution split, actuarial credibility as the derived version of our hand-tuned shrinkage, competing-risks survival for exits with several causes, group-sequential trial design as the live rival to anytime-valid monitoring, the doctrinal paradox for coherent individuals producing an incoherent aggregate, Charnov's marginal value theorem as the exit rule with opportunity cost priced, optimal search theory, multivariate SPC with contribution plots, the base-rate fallacy in intrusion detection, revenue management's bid-price control, accelerated degradation testing, TREC evaluation methodology for Gate 1, correlated polling error, item response theory, and the bullwhip effect.
+- Admission to that bucket requires a named DXAP problem with the same shape and refs into the working literature. 52 cross-bucket edges resulted; a discipline with no edge in is a reading list rather than a bridge.
+- 326 to 357 entries. `resolve.py self-test` joins `make selftest`, and generated labs now ship the resolver.
+
 ## 0.10.0 - 2026-08-06
 
 - Expanded the bibliography from 267 to 326 entries, aimed at the three workstreams rather than at coverage. The canon was already here; what was missing was the machinery for the systems we actually trade.
