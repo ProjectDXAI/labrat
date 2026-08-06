@@ -227,6 +227,7 @@ Phase 0 must produce:
 - [docs/MODEL_GUIDANCE.md](docs/MODEL_GUIDANCE.md): frontier-model prompting, reasoning-effort, and research guidance
 - [docs/CORPUS.md](docs/CORPUS.md): bibliography network mapping, iterative scouting rounds, and rights tagging
 - [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md): the executable bibliography — concept compilation, filtered retrieval, deterministic methods, and the attribution ledger
+- [docs/WORKSTREAMS.md](docs/WORKSTREAMS.md): current state of the corpus and knowledge work, ranked next actions, and what is blocked
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): runtime, state, and evaluation details
 - [docs/PROFILES.md](docs/PROFILES.md): profile mechanism and how to author a new one
 - [docs/LONG_HORIZON.md](docs/LONG_HORIZON.md): `checkpoints.jsonl` contract, `failure_class` values, per-pool timeouts

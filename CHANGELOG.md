@@ -2,6 +2,8 @@
 
 ## 0.8.0 - 2026-08-06
 
+- Added `docs/WORKSTREAMS.md`: working notes on the three workstreams, what the warehouse captures, ranked next actions, corpus hygiene priorities, the access gap, and the rules the repo enforces — written to be picked up on a local machine.
+
 - Encoded the three live workstreams — Polymarket prediction markets, Hyperliquid L4 order-book research, and LLM-based agentic asset managers — into the problem map with their venue mechanics, so the compile queue and retrieval rank by proximity to work that is actually happening. Added four workstream-specific problems.
 - Read venue documentation directly. HyperCore sorts actions within a consensus batch by a type hierarchy — orders without GTC/IOC, then cancels, then GTC/IOC orders — before proposer order, which is not the continuous arrival-time priority every order-book model assumes. Polymarket's conditional-token layer merges a complete set for collateral atomically, which invalidates the leg-by-leg cost model used for logical arbitrage.
 - `prediction_market_consistency` 1.1.0 adds `settlement=atomic`, applying the single-transaction hurdle only to partition constraints the token layer actually enforces, and leaving conjunction and implication breaches on the leg-by-leg model.
