@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T09:47:00.978905+00:00'
+updated_at: '2026-08-06T10:31:07.110779+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -4620,7 +4620,23 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
       the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: incentive-and-no-drain
+    topic: when a constant function market maker reports the right price, and what cannot be taken from it
+    title: null
+    locator: abstract and sections 3-4
+    kind: section
+    pages: 8
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Sufficient conditions under which agents interacting with a constant function market
+      maker are incentivized to report the correct price, and can compute the reporting trade efficiently. They
+      also derive lower bounds on the total value of the reserves, and lower bounds guaranteeing that no agent can
+      drain the reserves by any set of trades. The argument runs through convex duality, which is the same machinery
+      as the scoring-rule correspondence and the transport dual elsewhere in this corpus.
+
+      '
   refs:
   - target: boyd-2004-convex-optimization
     relation: builds_on
@@ -10877,6 +10893,24 @@ entries:
     read_status: unread
     concepts_expected: []
     notes: null
+  - unit_id: time-uniform-rates
+    topic: what width a confidence interval must have to be valid at every time at once
+    title: null
+    locator: abstract and introduction
+    kind: section
+    pages: 8
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Confidence sequences are uniformly valid over an unbounded horizon, with nonasymptotic
+      coverage under nonparametric conditions and widths that go to zero. They connect three things: the Cramer-Chernoff
+      method for exponential concentration, the law of the iterated logarithm, and the sequential probability ratio
+      test — the sequences are time-uniform extensions of the first, tight nonasymptotic characterizations of the
+      second, and nonparametric generalizations of the third. The operative fact is the rate: a time-uniform interval
+      is wider than a fixed-sample one by a log-log factor, and that factor is the price of being allowed to look
+      whenever you like. They derive an empirical-Bernstein bound growing at the LIL rate.
+
+      '
   refs:
   - target: ramdas-2023-game-theoretic-statistics
     relation: builds_on
@@ -12703,7 +12737,25 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
       the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: square-root-confirmation
+    topic: the square-root law measured on over a million reconstructed metaorders
+    title: null
+    locator: abstract and results
+    kind: section
+    pages: 8
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. A complete dataset allowing over a million metaorders to be reconstructed on Bitcoin/USD.
+      The square-root law holds across four decades of size, and it holds along the whole trajectory of a metaorder
+      rather than only at the final execution price. Two things make this the useful confirmation for us: it is
+      a crypto venue rather than an equity market, and it held despite the quasi-absence of statistical arbitrage
+      and market-making strategies at the time — which rules out explanations that require sophisticated arbitrageurs.
+      They also decompose flow into informed and uninformed, with the uninformed part showing almost complete long-term
+      decay of impact.
+
+      '
   refs:
   - target: bouchaud-2018-trades-quotes-prices
     relation: builds_on
@@ -15600,7 +15652,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: conjugate-duality
+    topic: conjugate functions and the duality that recurs as scoring rules, transport and market-maker cost
+    title: null
+    locator: sections 12-16 and 30-31
+    kind: section
+    pages: 60
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: boyd-2004-convex-optimization
     relation: cites
@@ -15861,7 +15923,24 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: scaling-limit
+    topic: what a Hawkes process converges to when its kernel norm approaches one
+    title: null
+    locator: abstract and section 1
+    kind: section
+    pages: 6
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. The empirical starting point is that only nearly unstable Hawkes processes fit order-flow
+      data properly, where nearly unstable means the L1 norm of the kernel is close to unity. Their main theorem:
+      after suitable rescaling such processes converge to integrated Cox-Ingersoll-Ross. Applied to the Hawkes-based
+      price model, the same criticality condition gives convergence to Heston. So criticality in the flow is not
+      a curiosity of the estimate — it is the thing that generates the macroscopic volatility dynamics, and one
+      model reproduces both the microstructure and the large-scale stylized facts.
+
+      '
   refs:
   - target: gatheral-2018-volatility-is-rough
     relation: cites

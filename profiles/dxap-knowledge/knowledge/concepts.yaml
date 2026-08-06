@@ -196,6 +196,7 @@ concepts:
       - "The exponent is not universal across venue types; crypto perp books differ from equities."
     source_passage_ids:
       - "toth-2011-anomalous-price-impact#latent-book-argument"
+      - "donier-2015-metaorder-impact-bitcoin#square-root-confirmation"
       - "bouchaud-2018-trades-quotes-prices#ch12"
       - "gatheral-2010-no-dynamic-arbitrage#s3"
     contradicting_concept_ids: [KC-INFO-KYLE]
@@ -1700,3 +1701,134 @@ concepts:
     confidence: 0.7
     problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-ADVERSE-ENTRY]
     tags: [robust, breakdown-point, influence-function, heavy-tails, mathematical]
+
+  - concept_id: KC-CRITICALITY-SCALING
+    canonical_name: "Near-critical order flow is what generates the volatility dynamics above it"
+    plain_description: >
+      Order flow only fits a self-exciting model when that model is nearly unstable, with the
+      kernel norm close to one. That is not an awkward estimate to be explained away: rescale a
+      nearly unstable process and it converges to the classical continuous-time volatility
+      models. The criticality at the microstructure scale is the mechanism producing the
+      macroscopic dynamics, and one model reproduces both.
+    mechanism: >
+      For a Hawkes process with kernel L1 norm approaching one from below, Jaisson and Rosenbaum
+      show the rescaled process converges to an integrated Cox-Ingersoll-Ross process. Applied to
+      the Hawkes-based price model, the same criticality condition gives convergence to Heston.
+      Criticality is the parameter regime in which the microscopic point process and the
+      macroscopic diffusion are the same object seen at two resolutions, which explains why the
+      estimate lands near one and why the same data shows stylized facts at both scales.
+    formal_equations: "lambda_t = mu + integral phi(t - s) dN_s with ||phi||_1 -> 1; rescaled N converges to integrated CIR; the Hawkes price model converges to Heston under the same condition"
+    assumptions:
+      - "The kernel is estimated on a scale where its mass is captured, which is the same window problem the branching-ratio estimator carries."
+      - "The limit is asymptotic in the rescaling, so a finite sample sits somewhere between the two descriptions rather than at either."
+      - "The flow is well described by a self-exciting point process in the first place, rather than by an exogenous arrival process with clustering from another cause."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [seconds, minutes, hours, days]
+    required_observables: [trade_prints, mid_price_series]
+    required_data_resolution: "Event-level arrivals for the microscopic fit and a longer price series for the macroscopic one, on the same instrument."
+    expected_empirical_signature: >
+      Branching-ratio estimates clustering just below one across instruments and periods rather
+      than spread over the interval, and volatility dynamics on the same instrument consistent
+      with a CIR-type variance process whose parameters relate to the fitted kernel.
+    alternative_explanations:
+      - "The estimate lands near one because the estimator is biased upward by kernel misspecification, not because the process is near critical. That is exactly the artifact Hardiman, Bercot and Bouchaud document, and it produces the same reading."
+      - "Both scales show clustering because both are driven by a common exogenous arrival process, in which case the correspondence is coincidence rather than mechanism."
+    known_failure_modes:
+      - "A limit theorem describes the regime near the boundary, not the boundary. Estimates on real data are finite-sample and sit between the two descriptions, so quoting either as the truth is over-reading."
+      - "It shares the window problem with everything else built on Hawkes kernels: a scale-local estimate of the norm is not the norm."
+      - "The result is a convergence, not an identification. Recovering Heston parameters from a fitted kernel is a further step this does not license."
+    source_passage_ids:
+      - "jaisson-2015-nearly-unstable-hawkes#scaling-limit"
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+    contradicting_concept_ids: [KC-REFLEXIVITY-DRIFT]
+    supporting_concept_ids: [KC-HAWKES-CRITICALITY, KC-VOLATILITY-CASCADE, KC-CASCADE-HORIZON]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG]
+    tags: [hawkes, criticality, scaling-limit, rough-volatility, mathematical, read-directly]
+
+  - concept_id: KC-TIME-UNIFORM-WIDTH
+    canonical_name: "Looking whenever you like costs a log-log factor, and it is worth knowing the price"
+    plain_description: >
+      An interval valid at one pre-chosen sample size and an interval valid at every sample size
+      simultaneously are different objects. The second is wider, and the amount it is wider by is
+      not arbitrary: it is a law-of-the-iterated-logarithm factor. That is the price of being
+      allowed to stop when you like, and it is small enough that paying it is usually right.
+    mechanism: >
+      Fixed-sample concentration bounds the deviation at one time. A time-uniform bound has to
+      hold at all times at once, so it must accommodate the largest fluctuation the process ever
+      makes, whose size is governed by the law of the iterated logarithm. Howard, Ramdas,
+      McAuliffe and Sekhon build sequences by extending the Cramer-Chernoff method to be
+      time-uniform, which gives nonasymptotic coverage under nonparametric conditions with
+      widths that still go to zero.
+    formal_equations: "fixed-sample width ~ sqrt(log(1/alpha)/n); time-uniform width ~ sqrt(log log n / n) up to constants, the LIL rate"
+    assumptions:
+      - "Observations satisfy the sub-Gaussian or Bernstein condition the chosen bound requires; the bound is nonparametric, not assumption-free."
+      - "The process is adapted to the filtration the bound is stated over, and that filtration is the one the observer actually has."
+    market_types: [any]
+    relevant_horizons: [days, weeks]
+    required_observables: [matured_outcomes, decision_log]
+    required_data_resolution: "Matured outcomes arriving in maturation order at the unit of analysis."
+    expected_empirical_signature: >
+      A confidence sequence whose width shrinks toward zero rather than plateauing, sitting a
+      modest and slowly growing multiple above the corresponding fixed-sample interval at the
+      same sample size.
+    alternative_explanations:
+      - "A sequence whose width does not shrink is not paying a log-log premium, it is misapplied — the observations do not satisfy the tail condition assumed."
+    known_failure_modes:
+      - "The premium is real but small, which cuts both ways: it is rarely a reason to avoid anytime-valid methods, and it is also not a licence to claim they are free."
+      - "Widths going to zero is a property of the construction, not a guarantee about any particular run. A sequence that stays wide is evidence the tail condition is wrong rather than that the effect is absent."
+      - "Our own betting construction inverts a capital process on a grid, so its endpoints are accurate only to the grid step, and that discretization error is separate from and additional to the statistical width."
+    source_passage_ids:
+      - "howard-2021-confidence-sequences#time-uniform-rates"
+      - "ramdas-2023-game-theoretic-statistics#e-values-and-ville"
+    contradicting_concept_ids: []
+    alternative_note: "Its own alternative explanation is the diagnostic: a non-shrinking sequence indicts the tail assumption rather than the method."
+    supporting_concept_ids: [KC-ANYTIME-ATTRIBUTION]
+    implementation_status: specified
+    confidence: 0.75
+    problem_ids: [PB-AGENT-ATTRIBUTION]
+    tags: [anytime-valid, lil, concentration, mathematical, read-directly]
+
+  - concept_id: KC-CFMM-ORACLE
+    canonical_name: "A market maker can be an oracle whose honesty is a theorem rather than a trust assumption"
+    plain_description: >
+      A constant function market maker reports a price implicitly, through the trades it accepts.
+      Under stated conditions the agent who moves that price to the true one profits by doing so,
+      which makes correct reporting an incentive result rather than a promise. The same convex
+      structure bounds what can be taken out of the pool by any sequence of trades at all.
+    mechanism: >
+      A CFMM's trading function defines a convex feasible set, and its marginal price is the
+      gradient at the current reserves. An agent who observes a true price different from the
+      marginal price can trade toward it and capture the difference, so profit-seeking moves the
+      reported price to the true one. Angeris and Chitra give sufficient conditions for this and
+      show the reporting trade is computable efficiently. Convex duality on the same object gives
+      lower bounds on the value of the reserves and a guarantee that no set of trades drains them.
+    formal_equations: "marginal price = gradient of the trading function at the reserves; strong duality gives p*_R(c) = sup over lambda of the dual objective, yielding the reserve lower bound"
+    assumptions:
+      - "The agent can trade in the size the correction requires, and the true price is observable to them."
+      - "Fees and gas are small relative to the mispricing being corrected, which is exactly what fails for small deviations."
+      - "The trading function is the one in force; a protocol upgrade changes the geometry the bounds rest on."
+    market_types: [amm, perp_dex]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [oracle_price, mid_price_series, liquidity_and_volume]
+    required_data_resolution: "Pool reserves and trades at event granularity, alongside an external reference price."
+    expected_empirical_signature: >
+      Marginal pool price tracking the external reference with deviations bounded by the
+      round-trip cost of the correcting trade, and reserve value staying above the derived lower
+      bound through periods of heavy trading.
+    alternative_explanations:
+      - "Tracking is maintained by a small number of well-capitalised arbitrageurs rather than by the incentive being general, in which case the property is an empirical regularity about participants and not a structural one."
+    known_failure_modes:
+      - "The incentive only bites above the cost of correcting, so a band of mispricing persists whose width is the round-trip cost. Reading the pool price as the true price inside that band is exactly wrong."
+      - "The no-drain guarantee is about trades against the trading function. It says nothing about governance, upgrades, or a bug, which is how pools actually lose their reserves."
+      - "This is a different oracle failure mode from a time-weighted feed. That one buys manipulation resistance with staleness; this one is fresh and has a cost-width band instead. Confusing the two imports the wrong correction."
+    source_passage_ids:
+      - "angeris-2020-improved-price-oracles-cfmm#incentive-and-no-drain"
+      - "rockafellar-1970-convex-analysis#conjugate-duality"
+    contradicting_concept_ids: [KC-ORACLE-LAG]
+    supporting_concept_ids: [KC-PRED-LMSR]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-STALE-PROBABILITY, PB-XMARKET]
+    tags: [cfmm, oracle, convex-duality, incentive, defi, mathematical, read-directly]

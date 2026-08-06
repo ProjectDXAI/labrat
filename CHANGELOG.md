@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.20.0 - 2026-08-06
+
+- Four more held sources read and compiled. Units read 36 to 40, provenance 24 of 40 cards to 27 of 43.
+- `KC-CRITICALITY-SCALING` is the mathematical bridge this corpus was missing. Jaisson and Rosenbaum start from the empirical fact that order-flow data only fits a Hawkes process when it is nearly unstable, and prove that after rescaling such processes converge to integrated Cox-Ingersoll-Ross — and that the Hawkes-based price model converges to Heston under the same criticality condition. So the branching ratio landing near one is not an awkward estimate to explain away: criticality at the microstructure scale is the regime in which the point process and the macroscopic diffusion are the same object at two resolutions. The card is paired with its own rival, since Hardiman's estimator artifact produces the same reading.
+- `KC-IMPACT-SQRT` gained the confirmation that matters for our venue class. Donier and Bonart reconstruct over a million metaorders on Bitcoin/USD and find the square-root law holding across four decades of size, along the whole trajectory rather than only at the final execution price, **despite the quasi-absence of statistical arbitrage and market-making strategies** — which rules out every explanation requiring sophisticated arbitrageurs.
+- `KC-TIME-UNIFORM-WIDTH`: the premium for being allowed to look whenever you like is a law-of-the-iterated-logarithm factor, not an arbitrary penalty. Howard et al build sequences by making the Cramér-Chernoff method time-uniform, giving nonasymptotic nonparametric coverage with widths that still go to zero. A sequence whose width does not shrink indicts the tail assumption rather than the method.
+- `KC-CFMM-ORACLE`: a constant function market maker reports a price implicitly, and under stated conditions the agent who corrects it profits by doing so — honesty as an incentive result rather than a trust assumption, with convex duality bounding what any set of trades can remove from the pool. It contradicts `KC-ORACLE-LAG` deliberately: a time-weighted feed buys manipulation resistance with staleness, a CFMM is fresh and has a cost-width band instead, and importing one correction into the other is the error.
+- **The SERVABLE gate caught an overclaim of mine.** `KC-TIME-UNIFORM-WIDTH` was written as `implemented` because we ship a confidence sequence, but our construction inverts a capital process on a grid and does not compute the LIL rate the card describes. The gate refused it until the status was corrected to `specified`. That is the version pin and the binding requirement doing exactly the job they exist for.
+- 43 servable concepts, 457 entries, 58 decomposed into 104 units, zero validator warnings.
+
 ## 0.19.0 - 2026-08-06
 
 - Made executable four pieces of mathematics the corpus carried and never ran. 23 methods, 27 closed-form checks.
