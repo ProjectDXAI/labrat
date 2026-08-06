@@ -183,6 +183,18 @@ Three rules do the work:
 - **An API error is not a negative result.** A rate limit cached as "no such work" is how a resolver quietly stops working while still printing a number. Errors are surfaced separately and never cached. This was not hypothetical: the first run silently recorded 216 quota failures as "not found".
 - **The aggregator's licence field is a lead, not a grant.** Verification fetches the landing page and requires the licence to be stated there, recording the operative text. A page that loads and grants nothing is recorded as `all_rights_reserved, confirmed` — a result that retires the entry from the verify queue. A page that will not load is recorded as unresolved, because absence of evidence is not evidence.
 
+### Study copies are a different question from corpus ingest
+
+```bash
+python scripts/resolve.py study --dest corpus/study
+```
+
+`fetch` builds the corpus and is gated by the manifest, because putting a text into a corpus is a distribution and a derivative use. `study` downloads reading copies of full texts the publisher already serves for free, and is gated by nothing except availability. The corpus model already drew this line: `reference_only` means *read it, learn from it, write our own explanations, do not copy it in*. A study copy is the "read it" half.
+
+Nothing in `study` changes a rights tag or a use class. An entry downloaded as a study copy still holds `all_rights_reserved` or `author_hosted_free`, still reads `reference_only`, and still cannot enter the manifest. The only field that moves is `acquisition`, which records where the reading copy sits and where it came from. Keeping those two ledgers separate is the point: a folder full of PDFs is not a licence, and an engine that conflated them would quietly launder one into the other.
+
+Locations come from Unpaywall by DOI, and from arXiv directly where a preprint exists. arXiv's Atom API refuses this environment outright — persistent 429 on every query, including at the documented three-second delay — so the resolver reads the public search results page instead, which carries the identifier, full title, author list and original announcement year. It parses the *originally announced* date rather than the submission date, because a v3 revision would place a 2015 paper in 2024 and fail the year check for entirely the wrong reason.
+
 ### What actually cleared
 
 | Class | Outcome |

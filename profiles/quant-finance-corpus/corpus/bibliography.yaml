@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T02:33:17.997176+00:00'
+updated_at: '2026-08-06T03:25:33.733622+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -145,6 +145,110 @@ entries:
     still beating what else I could be doing, net of the cost of switching".
 
     '
+- id: cori-2013-estimating-time-varying-reproduction-numbers
+  title: A New Framework and Software to Estimate Time-Varying Reproduction Numbers During Epidemics
+  authors:
+  - Anne Cori
+  - Neil M. Ferguson
+  - Christophe Fraser
+  - Simon Cauchemez
+  year: 2013
+  bucket: adjacent_disciplines
+  form: paper
+  venue: American Journal of Epidemiology 178(9)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: wallinga-2004-different-epidemic-curves
+    relation: builds_on
+  - target: gelman-2013-bayesian-data-analysis
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - reproduction-number
+  - credible-intervals
+  - real-time
+  - transfer
+  - implemented-adjacent
+  notes: 'The practical estimator, with credible intervals and an explicit window choice, and an honest treatment
+    of how the window trades resolution against noise. Our Hawkes estimator has the same window problem and none
+    of this machinery. Likely CC BY — worth a verify round, and probably downloadable.
+
+    '
+- id: dakos-2012-methods-early-warnings
+  title: Methods for Detecting Early Warnings of Critical Transitions in Time Series Illustrated Using Simulated
+    Ecological Data
+  authors:
+  - Vasilis Dakos
+  - Stephen R. Carpenter
+  - Wolf M. Mooij
+  - Ingrid A. van de Leemput
+  - Marten Scheffer
+  year: 2012
+  bucket: adjacent_disciplines
+  form: paper
+  venue: PLoS ONE 7(7)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 20
+  density: high
+  priority: 5
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: scheffer-2009-early-warning-signals
+    relation: builds_on
+  - target: kantz-2003-nonlinear-time-series-analysis
+    relation: cites
+  - target: montgomery-2019-statistical-quality-control
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - early-warning
+  - detrending
+  - false-positives
+  - transfer
+  - regime
+  notes: 'The methods paper, and more usefully the failure catalogue: detrending choice, window length and filtering
+    all move the indicator, and the false-positive rate on surrogate data is high. Read before treating rising autocorrelation
+    as a signal. PLoS ONE is CC BY, so this one is genuinely acquirable.
+
+    '
 - id: fine-1999-subdistribution-competing-risk
   title: A Proportional Hazards Model for the Subdistribution of a Competing Risk
   authors:
@@ -245,6 +349,56 @@ entries:
     is.
 
     '
+- id: helmstetter-2003-predictability-etas
+  title: Predictability in the Epidemic-Type Aftershock Sequence Model of Interacting Triggered Seismicity
+  authors:
+  - Agnès Helmstetter
+  - Didier Sornette
+  year: 2003
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Journal of Geophysical Research 108(B10)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 18
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  - target: sornette-2003-why-stock-markets-crash
+    relation: builds_on
+  - target: athreya-1972-branching-processes
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - predictability-limit
+  - etas
+  - criticality
+  - seismology
+  - transfer
+  notes: 'Derives how much predictability a self-exciting process can offer as a function of its branching ratio,
+    and finds it small even near criticality. That is a ceiling on what FB-CRITICALITY can deliver, computed rather
+    than asserted, and it is the kind of result worth knowing before rather than after building on the idea.
+
+    '
 - id: jennison-1999-group-sequential-methods
   title: Group Sequential Methods with Applications to Clinical Trials
   authors:
@@ -329,9 +483,9 @@ entries:
     relation: cites
   - target: hansen-2005-superior-predictive-ability
     relation: cites
-  - target: Zechar, Schorlemmer & Liukis — The Collaboratory for the Study of Earthquake Predictability testing
-      center
+  - target: zechar-2010-csep-testing-center
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -346,6 +500,65 @@ entries:
   notes: 'The argument for building shared prospective testing infrastructure rather than arguing about retrospective
     claims, and the founding case for CSEP. Four pages, and it is the closest thing anyone has written to a constitution
     for PB-AGENT-ATTRIBUTION.
+
+    '
+- id: jordan-2011-operational-earthquake-forecasting
+  title: 'Operational Earthquake Forecasting: State of Knowledge and Guidelines for Utilization'
+  authors:
+  - Thomas H. Jordan
+  - Yun-Tai Chen
+  - Paolo Gasparini
+  - Raul Madariaga
+  - Ian Main
+  - Warner Marzocchi
+  - Gerassimos Papadopoulos
+  - Gennady Sobolev
+  - Koshun Yamaoka
+  - Jochen Zschau
+  year: 2011
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Annals of Geophysics 54(4)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 91
+  density: medium
+  priority: 5
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: schorlemmer-2007-earthquake-likelihood-model-testing
+    relation: builds_on
+  - target: vickers-2006-decision-curve-analysis
+    relation: cites
+  - target: axelsson-2000-base-rate-fallacy
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - decision-value
+  - low-probability-gain
+  - seismology
+  - transfer
+  - abstention
+  notes: 'What to do with a forecast whose probability gain is real but small. The answer is not to suppress it
+    and not to act on it directly, but to route it through an explicit decision protocol with stated costs. That
+    is the abstention problem, and this is a field that had to answer it in public with lives attached. Annals of
+    Geophysics is open access — a verify round should clear it.
 
     '
 - id: list-2002-aggregating-sets-of-judgments
@@ -500,6 +713,117 @@ entries:
     and magnitude dependence. Transfers to PB-REGIME-BREAK: the diagnostics we lack were written here.
 
     '
+- id: punt-2016-management-strategy-evaluation
+  title: 'Management Strategy Evaluation: Best Practices'
+  authors:
+  - André E. Punt
+  - Doug S. Butterworth
+  - Carryn L. de Moor
+  - José A. A. De Oliveira
+  - Malcolm Haddon
+  year: 2016
+  bucket: adjacent_disciplines
+  form: survey
+  venue: Fish and Fisheries 17(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 27
+  density: high
+  priority: 5
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: bental-2009-robust-optimization
+    relation: cites
+  - target: kochenderfer-2022-algorithms-decision-making
+    relation: cites
+  - target: schorlemmer-2007-earthquake-likelihood-model-testing
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - strategy-evaluation
+  - robustness
+  - deep-uncertainty
+  - transfer
+  - gate2
+  notes: 'Simulation-test a decision rule against a set of plausible worlds you cannot distinguish, score it on
+    stated performance measures, and deploy the rule rather than the model. This is Gate 2 done properly by a field
+    where a wrong rule collapses a fishery, and it is far ahead of anything in the trading literature on robustness.
+    Likely CC BY.
+
+    '
+- id: scheffer-2009-early-warning-signals
+  title: Early-Warning Signals for Critical Transitions
+  authors:
+  - Marten Scheffer
+  - Jordi Bascompte
+  - William A. Brock
+  - Victor Brovkin
+  - Stephen R. Carpenter
+  - Vasilis Dakos
+  - Hermann Held
+  - Egbert H. van Nes
+  - Max Rietkerk
+  - George Sugihara
+  year: 2009
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Nature 461(7260)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: scheffer-2009-critical-transitions
+    relation: builds_on
+  - target: kuznetsov-2004-applied-bifurcation-theory
+    relation: cites
+  - target: strogatz-2015-nonlinear-dynamics-chaos
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - critical-slowing-down
+  - early-warning
+  - transfer
+  - regime
+  notes: 'Critical slowing down: variance and lag-1 autocorrelation rise as a system approaches a tipping point,
+    whatever the system is. A generic leading indicator for PB-REGIME-BREAK that needs no model of the mechanism,
+    which is both its appeal and the reason to read the next entry before believing it.
+
+    '
 - id: schorlemmer-2007-earthquake-likelihood-model-testing
   title: Earthquake Likelihood Model Testing
   authors:
@@ -606,6 +930,106 @@ entries:
     to its size, and a portfolio of breaches is far less diversified than it looks.
 
     '
+- id: snowberg-2010-favorite-longshot-bias
+  title: 'Explaining the Favorite-Longshot Bias: Is it Risk-Love or Misperceptions?'
+  authors:
+  - Erik Snowberg
+  - Justin Wolfers
+  year: 2010
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Journal of Political Economy 118(4)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 26
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: wolfers-2004-prediction-markets
+    relation: builds_on
+  - target: manski-2006-interpreting-prediction-markets
+    relation: cites
+  - target: brunnermeier-2001-asset-pricing-asymmetric-information
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - favorite-longshot
+  - binary-markets
+  - bias
+  - transfer
+  - polymarket-relevant
+  notes: 'Long shots are systematically overpriced and favourites underpriced, robustly, across decades of binary
+    betting data. If that survives on Polymarket it is a standing tilt on every tail contract, and this paper is
+    also the cleanest worked example of separating a preference explanation from a belief explanation.
+
+    '
+- id: vickers-2006-decision-curve-analysis
+  title: 'Decision Curve Analysis: A Novel Method for Evaluating Prediction Models'
+  authors:
+  - Andrew J. Vickers
+  - Elena B. Elkin
+  year: 2006
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Medical Decision Making 26(6)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 9
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gneiting-2007-calibration-and-sharpness
+    relation: cites
+  - target: axelsson-2000-base-rate-fallacy
+    relation: cites
+  - target: murphy-1973-vector-partition-probability-score
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - net-benefit
+  - threshold
+  - decision-analysis
+  - transfer
+  - evaluation
+  notes: 'Score a model by net benefit across the range of decision thresholds a user might hold, rather than by
+    AUC. The threshold encodes the cost ratio, so the curve says for whom the model is worth using and for whom
+    it is not. That is the honest way to report a trading signal, and nobody in trading reports it this way.
+
+    '
 - id: voorhees-2005-trec-experiment-evaluation
   title: 'TREC: Experiment and Evaluation in Information Retrieval'
   authors:
@@ -652,6 +1076,56 @@ entries:
   notes: 'Thirty years of learning how to compare retrieval systems when relevance labels are expensive and necessarily
     incomplete: pooled judgments, judgment depth, assessor disagreement, and which measures survive it. Our fourteen
     hand-written trials are a test collection with none of these problems solved.
+
+    '
+- id: wallinga-2004-different-epidemic-curves
+  title: Different Epidemic Curves for Severe Acute Respiratory Syndrome Reveal Similar Impacts of Control Measures
+  authors:
+  - Jacco Wallinga
+  - Peter Teunis
+  year: 2004
+  bucket: adjacent_disciplines
+  form: paper
+  venue: American Journal of Epidemiology 160(6)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: athreya-1972-branching-processes
+    relation: builds_on
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  - target: ogata-1988-statistical-models-earthquake
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - reproduction-number
+  - real-time
+  - reporting-delay
+  - transfer
+  - hawkes
+  notes: 'Estimating the effective reproduction number from incident cases as they arrive. R_t is a branching ratio
+    measured in real time under incomplete and delayed observation, which is our problem with sequencing gaps wearing
+    a different name — and this literature solved the delay correction first.
 
     '
 - id: zhuang-2002-stochastic-declustering
@@ -844,6 +1318,149 @@ entries:
   - actuarial
   - transfer
   notes: null
+- id: farmer-1999-frontiers-of-finance
+  title: 'Frontiers of Finance: Evolution and Efficient Markets'
+  authors:
+  - J. Doyne Farmer
+  - Andrew W. Lo
+  year: 1999
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Proceedings of the National Academy of Sciences 96(18)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 4
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: grossman-1980-impossibility-efficient-markets
+    relation: cites
+  - target: farmer-2002-market-force-ecology-evolution
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - market-ecology
+  - evolution
+  - crowding
+  - transfer
+  - agentic
+  notes: Four pages arguing that market efficiency is an ecological equilibrium rather than a property, which reframes
+    crowding as carrying capacity.
+- id: farmer-2002-market-force-ecology-evolution
+  title: Market Force, Ecology and Evolution
+  authors:
+  - J. Doyne Farmer
+  year: 2002
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Industrial and Corporate Change 11(5)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 47
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: farmer-1999-frontiers-of-finance
+    relation: builds_on
+  - target: cardaliaguet-2018-mean-field-game-trade-crowding
+    relation: cites
+  - target: easley-2010-networks-crowds-markets
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - market-ecology
+  - capacity
+  - crowding
+  - transfer
+  - agentic
+  notes: 'Strategies as species with population dynamics: a strategy''s return depends on how much capital is already
+    running it, and diversity is maintained by that feedback. The right frame for a fleet of agents trading one
+    venue against each other, and a sharper one than the mean-field-game formulation because capacity is explicit.
+
+    '
+- id: held-2005-multivariate-surveillance-counts
+  title: A Statistical Framework for the Analysis of Multivariate Infectious Disease Surveillance Counts
+  authors:
+  - Leonhard Held
+  - Michael Höhle
+  - Mathias Hofmann
+  year: 2005
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Statistical Modelling 5(3)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 21
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: zhuang-2002-stochastic-declustering
+    relation: cites
+  - target: cori-2013-estimating-time-varying-reproduction-numbers
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - endemic-epidemic
+  - count-data
+  - surveillance
+  - transfer
+  - regime
+  notes: 'Splits counts into an endemic baseline and an epidemic self-exciting part, across several correlated units
+    at once. That is exactly the background-versus-triggered decomposition, fitted on counts rather than on timestamps,
+    which is the data shape our warehouse actually delivers at aggregation.
+
+    '
 - id: jolliffe-2012-forecast-verification
   title: 'Forecast Verification: A Practitioner''s Guide in Atmospheric Science'
   authors:
@@ -1073,6 +1690,53 @@ entries:
     amplification from local optimization, with the batching cause landing squarely on a venue that batches.
 
     '
+- id: levitt-2004-gambling-markets-organised-differently
+  title: Why are Gambling Markets Organised So Differently from Financial Markets?
+  authors:
+  - Steven D. Levitt
+  year: 2004
+  bucket: adjacent_disciplines
+  form: paper
+  venue: The Economic Journal 114(495)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 20
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: snowberg-2010-favorite-longshot-bias
+    relation: cites
+  - target: hanson-2007-logarithmic-market-scoring
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - market-design
+  - bookmaker
+  - binary-markets
+  - transfer
+  - polymarket-relevant
+  notes: 'A bookmaker who sets prices and does not balance the book outperforms one who does, because they can predict
+    bettor bias better than bettors predict outcomes. The market-design counterweight to assuming a CLOB is the
+    right venue for a binary claim.
+
+    '
 - id: lord-1980-item-response-theory
   title: Applications of Item Response Theory to Practical Testing Problems
   authors:
@@ -1216,6 +1880,100 @@ entries:
     the discipline that turns them into a stated operating characteristic.
 
     '
+- id: ogata-1998-space-time-point-process-models
+  title: Space-Time Point-Process Models for Earthquake Occurrences
+  authors:
+  - Yosihiko Ogata
+  year: 1998
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Annals of the Institute of Statistical Mathematics 50(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 32
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: ogata-1988-statistical-models-earthquake
+    relation: builds_on
+  - target: acemoglu-2015-systemic-risk-financial-networks
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - etas
+  - spatial
+  - seismology
+  - transfer
+  notes: 'Triggering that spreads through a space as well as through time. Substitute instrument or venue for space
+    and it is the cross-asset contagion model we keep describing in words.
+
+    '
+- id: rasmussen-1997-risk-management-dynamic-society
+  title: 'Risk Management in a Dynamic Society: A Modelling Problem'
+  authors:
+  - Jens Rasmussen
+  year: 1997
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Safety Science 27(2-3)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 31
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: lee-1997-bullwhip-effect
+    relation: cites
+  - target: axelsson-2000-base-rate-fallacy
+    relation: cites
+  - target: rawlings-2017-model-predictive-control
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - drift
+  - safety-boundary
+  - optimization-pressure
+  - transfer
+  - agentic
+  notes: 'Under efficiency pressure, a system migrates toward the boundary of safe operation until it crosses it,
+    and every local step is rational. An agent optimizing net return against risk limits does exactly this, which
+    means limits chosen once are limits that erode, and the failure looks like a sequence of reasonable decisions.
+
+    '
 - id: sanderson-2010-test-collection-evaluation
   title: Test Collection Based Evaluation of Information Retrieval Systems
   authors:
@@ -1257,6 +2015,57 @@ entries:
   - gate1
   notes: 'Includes the pool-bias results: a system whose documents were never pooled is systematically undervalued,
     which is what happens to a card the labeller did not think of.'
+- id: schweppe-1988-spot-pricing-of-electricity
+  title: Spot Pricing of Electricity
+  authors:
+  - Fred C. Schweppe
+  - Michael C. Caramanis
+  - Richard D. Tabors
+  - Roger E. Bohn
+  year: 1988
+  bucket: adjacent_disciplines
+  form: monograph
+  venue: Kluwer Academic
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 355
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: bertsimas-1997-linear-optimization
+    relation: builds_on
+  - target: nemhauser-1988-integer-combinatorial-optimization
+    relation: cites
+  - target: talluri-2004-revenue-management
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - locational-pricing
+  - network-constraints
+  - enforced-consistency
+  - transfer
+  notes: 'Prices at every node of a network, derived as the duals of physical constraints, so consistency across
+    related contracts is enforced by the optimization rather than by arbitrage. The clean analogue of the protocol-enforced
+    side of the Polymarket constraint split: where the mechanism enforces it, mispricing has nowhere to live.
+
+    '
 - id: stone-1975-theory-of-optimal-search
   title: Theory of Optimal Search
   authors:
@@ -1353,6 +2162,206 @@ entries:
   notes: 'Bid-price control values remaining capacity at its shadow price and accepts an order only if it beats
     that price. Substitute risk budget or margin for seats and it is the inventory-aware accept-or-abstain decision,
     with the opportunity cost of the capacity priced rather than ignored.
+
+    '
+- id: utsu-1995-centenary-omori-formula
+  title: The Centenary of the Omori Formula for a Decay Law of Aftershock Activity
+  authors:
+  - Tokuji Utsu
+  - Yosihiko Ogata
+  - Ritsuko S. Matsu'ura
+  year: 1995
+  bucket: adjacent_disciplines
+  form: survey
+  venue: Journal of Physics of the Earth 43(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 33
+  density: high
+  priority: 4
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: ogata-1988-statistical-models-earthquake
+    relation: builds_on
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  - target: bacry-2015-hawkes-processes-finance
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - omori
+  - power-law-kernel
+  - seismology
+  - transfer
+  - hawkes
+  notes: 'A hundred years of fitting the decay of triggered activity, and what goes wrong when you do. The Omori
+    exponent is the kernel exponent our branching-ratio work needs and does not estimate; this is the accumulated
+    practice of estimating it.
+
+    '
+- id: vere-jones-1995-forecasting-earthquakes
+  title: Forecasting Earthquakes and Earthquake Risk
+  authors:
+  - David Vere-Jones
+  year: 1995
+  bucket: adjacent_disciplines
+  form: paper
+  venue: International Journal of Forecasting 11(4)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 18
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gneiting-2007-proper-scoring-rules
+    relation: cites
+  - target: murphy-1973-vector-partition-probability-score
+    relation: cites
+  - target: ogata-1988-statistical-models-earthquake
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - probability-gain
+  - forecast-evaluation
+  - seismology
+  - transfer
+  notes: 'Probability gain as the unit of forecast value: how much more likely the event is given the forecast than
+    under the base rate. A cleaner currency for a trading signal than hit rate, and it composes with the cost model
+    instead of ignoring it.
+
+    '
+- id: walters-1978-adaptive-management
+  title: Ecological Optimization and Adaptive Management
+  authors:
+  - Carl J. Walters
+  - Ray Hilborn
+  year: 1978
+  bucket: adjacent_disciplines
+  form: survey
+  venue: Annual Review of Ecology and Systematics 9
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 31
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: lattimore-2020-bandit-algorithms
+    relation: cites
+  - target: powell-2022-rl-stochastic-optimization
+    relation: cites
+  - target: punt-2016-management-strategy-evaluation
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - adaptive-management
+  - dual-control
+  - exploration
+  - transfer
+  notes: 'Acting to learn as well as to earn, in a system you cannot experiment on twice. Dual control before the
+    bandit literature had a name for it, and written by people whose exploration budget is measured in fish stocks.
+
+    '
+- id: zechar-2010-csep-testing-center
+  title: The Collaboratory for the Study of Earthquake Predictability Perspective on Computational Earthquake Science
+  authors:
+  - Jeremy D. Zechar
+  - Danijel Schorlemmer
+  - Maria Liukis
+  - John Yu
+  - Fabian Euchner
+  - Philip J. Maechling
+  - Thomas H. Jordan
+  year: 2010
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Concurrency and Computation Practice and Experience 22(12)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 15
+  density: medium
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: jordan-2006-earthquake-predictability-brick-by-brick
+    relation: builds_on
+  - target: schorlemmer-2007-earthquake-likelihood-model-testing
+    relation: builds_on
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - prospective-testing
+  - infrastructure
+  - seismology
+  - transfer
+  - gate3
+  notes: 'The engineering of a prospective testing centre: forecasts registered before the period, run automatically,
+    scored publicly, with no opportunity to revise after the fact. The infrastructure argument we would otherwise
+    have to make from scratch.
 
     '
 - id: koopman-1980-search-and-screening
@@ -3404,9 +4413,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Scheffer et al — Early-warning signals for critical transitions
+  - target: scheffer-2009-early-warning-signals
     relation: cites
     bucket: dynamical_systems
+    note: null
   discovered:
     round: 0
     method: seed

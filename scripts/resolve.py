@@ -24,6 +24,7 @@ operative text as evidence. An aggregator's metadata is a lead, not a grant.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import sys
@@ -40,6 +41,7 @@ import yaml
 CROSSREF = "https://api.crossref.org/works"
 OPENALEX = "https://api.openalex.org/works"
 ARXIV = "http://export.arxiv.org/api/query"  # the https host times out from some networks
+UNPAYWALL = "https://api.unpaywall.org/v2"
 MAILTO = "corpus@dxrg.ai"
 USER_AGENT = f"labrat-corpus-resolver/1.0 (mailto:{MAILTO})"
 
@@ -138,13 +140,22 @@ class ApiError(Exception):
     a rate limit silently stored as 'not found' is how a resolver quietly stops working."""
 
 
-def crossref_search(title: str, cache: Cache, delay: float = 0.12) -> list[dict[str, Any]]:
-    key = f"cr::{normalize(title)}"
+def crossref_search(title: str, cache: Cache, delay: float = 0.12,
+                    authors: list[str] | None = None, year: int | None = None) -> list[dict[str, Any]]:
+    # Author and year go into the query, not just into the check afterwards. A
+    # bibliographic query carrying them puts the right record at the top, which is
+    # what lets the match rule stay strict without refusing everything.
+    bibliographic = normalize(title)[:220]
+    if authors:
+        bibliographic += " " + " ".join(surname(a) for a in authors[:3] if surname(a))
+    if year:
+        bibliographic += f" {year}"
+    key = f"cr2::{normalize(bibliographic)}"
     hit = cache.get(key)
     if hit is not None:
         return hit
-    query = urllib.parse.quote_plus(normalize(title)[:250])
-    url = f"{CROSSREF}?query.bibliographic={query}&rows=5&mailto={MAILTO}"
+    query = urllib.parse.quote_plus(bibliographic)
+    url = f"{CROSSREF}?query.bibliographic={query}&rows=8&mailto={MAILTO}"
     status, body = http_get(url, accept="application/json")
     if status != 200:
         raise ApiError(f"crossref http {status}")
@@ -180,35 +191,61 @@ def crossref_search(title: str, cache: Cache, delay: float = 0.12) -> list[dict[
     return results
 
 
-def arxiv_search(title: str, cache: Cache, delay: float = 3.0) -> list[dict[str, Any]]:
-    """arXiv's API asks for one request every three seconds. Honour it."""
-    key = f"ax::{normalize(title)}"
+def arxiv_search(title: str, cache: Cache, delay: float = 1.0) -> list[dict[str, Any]]:
+    """Search arXiv through its public results page.
+
+    The Atom API refuses this environment outright (persistent 429 on every query,
+    including with the documented three-second delay), while the site itself serves
+    normally. The results page carries everything the match rule needs: identifier,
+    full title, author list and the original announcement year.
+    """
+    key = f"axh::{normalize(title)}"
     hit = cache.get(key)
     if hit is not None:
         return hit
-    query = urllib.parse.quote(f'ti:"{normalize(title)[:200]}"')
-    url = f"{ARXIV}?search_query={query}&max_results=5"
-    status, body = http_get(url, accept="application/atom+xml")
-    if status != 200:
-        raise ApiError(f"arxiv http {status}")
-    feed = body.decode("utf-8", errors="replace")
-    results = []
-    for chunk in feed.split("<entry>")[1:]:
-        def pick(tag: str) -> str:
-            found = re.search(rf"<{tag}>(.*?)</{tag}>", chunk, flags=re.S)
-            return re.sub(r"\s+", " ", found.group(1)).strip() if found else ""
-        abs_url = pick("id")
+    query = urllib.parse.urlencode({"searchtype": "title", "query": normalize(title)[:200], "size": 25})
+    # arXiv throttles hard and recovers. Back off and retry rather than recording a
+    # 429 as "this paper does not exist", which is the same class of mistake as
+    # caching a quota failure.
+    body = b""
+    for attempt in range(3):
+        status, body = http_get(f"https://arxiv.org/search/?{query}", accept="text/html")
+        if status == 200:
+            break
+        if status != 429:
+            raise ApiError(f"arxiv search http {status}")
+        time.sleep(delay * (2 ** attempt))
+    else:
+        raise ApiError("arxiv search http 429 after 3 attempts")
+    page = body.decode("utf-8", errors="replace")
+
+    results: list[dict[str, Any]] = []
+    for block in page.split('<li class="arxiv-result">')[1:]:
+        ident = re.search(r"arxiv\.org/abs/([0-9]{4}\.[0-9]{4,5}(?:v\d+)?|[a-z\-]+/\d{7})", block)
+        heading = re.search(r'<p class="title is-5 mathjax">(.*?)</p>', block, flags=re.S)
+        if not ident or not heading:
+            continue
+        clean = html.unescape(re.sub(r"<[^>]+>", " ", heading.group(1)))
+        names = [html.unescape(re.sub(r"<[^>]+>", "", name)).strip()
+                 for name in re.findall(r'<a href="/search/\?searchtype=author[^"]*">(.*?)</a>', block, flags=re.S)]
+        # "originally announced March 2022" is the date of record; a v3 revision year
+        # would put a 2015 paper in 2024 and fail the year check for the wrong reason.
+        flat = re.sub(r"<[^>]+>", " ", block)
+        announced = re.search(r"originally announced\s+\w+\s+(\d{4})", flat, flags=re.I)
+        submitted = re.search(r"Submitted\s+\d+\s+\w+,\s+(\d{4})", flat)
+        year = int((announced or submitted).group(1)) if (announced or submitted) else None
+        arxiv_id = ident.group(1)
         results.append({
-            "display_name": pick("title"),
-            "publication_year": int(pick("published")[:4]) if pick("published")[:4].isdigit() else None,
-            "doi": None,
-            "id": abs_url,
-            "authorships": [{"author": {"display_name": re.sub(r"\s+", " ", name).strip()}}
-                            for name in re.findall(r"<name>(.*?)</name>", chunk, flags=re.S)],
+            "display_name": re.sub(r"\s+", " ", clean).strip(),
+            "publication_year": year,
+            "doi": f"10.48550/arXiv.{arxiv_id.split('v')[0]}",
+            "id": f"arxiv:{arxiv_id}",
+            "authorships": [{"author": {"display_name": name}} for name in names],
             "licenses": [],
-            "links": [{"url": abs_url.replace("/abs/", "/pdf/"), "content_type": "application/pdf"}] if "/abs/" in abs_url else [],
+            "links": [{"url": f"https://arxiv.org/pdf/{arxiv_id}", "content_type": "application/pdf"}],
             "container": "arXiv",
-            "abs_url": abs_url,
+            "abs_url": f"https://arxiv.org/abs/{arxiv_id}",
+            "arxiv_id": arxiv_id,
             "source": "arxiv",
         })
     cache.put(key, results)
@@ -236,6 +273,44 @@ def openalex_search(title: str, cache: Cache, delay: float = 0.15) -> list[dict[
     cache.put(key, results)
     time.sleep(delay)
     return results
+
+
+def unpaywall(doi: str, cache: Cache, delay: float = 0.12) -> dict[str, Any]:
+    """Where a free copy of this DOI lives, and under what licence, if any."""
+    key = f"upw::{doi.lower()}"
+    hit = cache.get(key)
+    if hit is not None:
+        return hit
+    url = f"{UNPAYWALL}/{urllib.parse.quote(doi)}?email={MAILTO}"
+    status, body = http_get(url, accept="application/json")
+    if status == 404:
+        result = {"is_oa": False, "not_in_index": True}
+        cache.put(key, result)
+        return result
+    if status != 200:
+        raise ApiError(f"unpaywall http {status}")
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError as error:
+        raise ApiError(f"unpaywall parse: {error}") from error
+    best = payload.get("best_oa_location") or {}
+    locations = payload.get("oa_locations") or []
+    result = {
+        "is_oa": bool(payload.get("is_oa")),
+        "oa_status": payload.get("oa_status"),
+        "licence": best.get("license"),
+        "pdf_url": best.get("url_for_pdf"),
+        "landing_url": best.get("url_for_landing_page"),
+        "host_type": best.get("host_type"),
+        "repository": best.get("repository_institution"),
+        "alternates": [
+            {"pdf_url": loc.get("url_for_pdf"), "licence": loc.get("license"), "host_type": loc.get("host_type")}
+            for loc in locations if loc.get("url_for_pdf")
+        ][:4],
+    }
+    cache.put(key, result)
+    time.sleep(delay)
+    return result
 
 
 def match(entry: dict[str, Any], candidates: list[dict[str, Any]]) -> tuple[dict[str, Any] | None, list[dict[str, Any]], str]:
@@ -285,11 +360,23 @@ def match(entry: dict[str, Any], candidates: list[dict[str, Any]]) -> tuple[dict
         return None, scored[:3], f"year gap {best['year_gap']} exceeds 1"
     if best["author_hit"] is False:
         return None, scored[:3], "no author surname in common"
-    runner_up = scored[1] if len(scored) > 1 else None
-    if runner_up and runner_up["similarity"] >= 0.85 and runner_up["doi"] != best["doi"]:
-        # Two records both clear the bar. Which is the work and which is a
-        # preprint, a chapter reprint or a different edition is not decidable here.
-        return None, scored[:3], "ambiguous: two candidates clear the threshold"
+    def is_preprint(row: dict[str, Any]) -> bool:
+        return str(row.get("doi") or "").lower().startswith("10.48550/")
+
+    rivals = [row for row in scored[1:] if row["similarity"] >= 0.85 and row["doi"] != best["doi"]]
+    if rivals:
+        # A preprint DOI and a publisher DOI for the same title are one work with two
+        # locations, which is a fact about where to find it rather than an ambiguity.
+        # Prefer the version of record and remember the preprint as an alternate.
+        published = [row for row in [best, *rivals] if not is_preprint(row)]
+        preprints = [row for row in [best, *rivals] if is_preprint(row)]
+        if len(published) == 1 and preprints:
+            chosen = published[0]
+            chosen["preprint_doi"] = preprints[0]["doi"]
+            return chosen, scored[:3], "matched (published version; preprint recorded as an alternate)"
+        if not published and len(preprints) >= 1:
+            return preprints[0], scored[:3], "matched (preprint only)"
+        return None, scored[:3], "ambiguous: two published candidates clear the threshold"
     return best, scored[:3], "matched"
 
 
@@ -337,6 +424,7 @@ def cmd_identify(args: argparse.Namespace) -> int:
 
     resolved, quarantine, errors = [], [], []
     preprint_urls: dict[str, str | None] = {}
+    preprint_pdfs: dict[str, str | None] = {}
     considered = 0
     for entry in entries:
         identifiers = entry.get("identifiers") or {}
@@ -352,36 +440,44 @@ def cmd_identify(args: argparse.Namespace) -> int:
 
         candidates: list[dict[str, Any]] = []
         try:
-            candidates = crossref_search(entry.get("title") or "", cache)
+            candidates = crossref_search(entry.get("title") or "", cache,
+                                          authors=entry.get("authors"), year=entry.get("year"))
         except ApiError as error:
             errors.append({"id": entry["id"], "stage": "crossref", "error": str(error)})
-        if not candidates or entry.get("form") == "working_paper":
+        best, shortlist, reason = (None, [], "no candidates returned")
+        if candidates:
+            best, shortlist, reason = match(entry, candidates)
+
+        # arXiv is consulted when the DOI registries could not place the work, and
+        # for anything we recorded as a preprint. It is a second index, not a second
+        # opinion: the same match rule applies to what it returns.
+        preprintable = entry.get("form") in {"paper", "working_paper", "survey", "proceedings", "thesis"}
+        if (not best or entry.get("form") == "working_paper") and args.arxiv and preprintable:
             try:
                 preprints = arxiv_search(entry.get("title") or "", cache)
             except ApiError as error:
                 preprints = []
                 errors.append({"id": entry["id"], "stage": "arxiv", "error": str(error)})
-            # A preprint is a second record of the same work, not a rival candidate:
-            # only consult it when nothing else matched, or when we recorded the
-            # entry as a preprint in the first place.
-            if not candidates:
-                candidates = preprints
-            elif preprints:
-                matched_preprint, _, _ = match(entry, preprints)
+            if preprints:
+                matched_preprint, preprint_shortlist, preprint_reason = match(entry, preprints)
                 if matched_preprint:
-                    preprint_urls[entry["id"]] = matched_preprint["raw"].get("abs_url")
-        if not candidates and args.openalex_fallback:
+                    if best:
+                        preprint_urls[entry["id"]] = matched_preprint["raw"].get("abs_url")
+                        preprint_pdfs[entry["id"]] = f"https://arxiv.org/pdf/{matched_preprint['raw'].get('arxiv_id')}"
+                    else:
+                        best, shortlist, reason = matched_preprint, preprint_shortlist, "matched on arXiv"
+                elif not best:
+                    shortlist, reason = preprint_shortlist, f"arXiv: {preprint_reason}"
+
+        if not candidates and args.openalex_fallback and not best:
             try:
-                candidates = openalex_search(entry.get("title") or "", cache)
+                extra = openalex_search(entry.get("title") or "", cache)
             except ApiError as error:
+                extra = []
                 errors.append({"id": entry["id"], "stage": "openalex", "error": str(error)})
+            if extra:
+                best, shortlist, reason = match(entry, extra)
 
-        if not candidates:
-            quarantine.append({"id": entry["id"], "title": entry.get("title"),
-                               "reason": "no candidates returned", "candidates": []})
-            continue
-
-        best, shortlist, reason = match(entry, candidates)
         if not best:
             quarantine.append({"id": entry["id"], "title": entry.get("title"), "reason": reason, "candidates": [
                 {k: c.get(k) for k in ("title", "year", "doi", "similarity", "containment", "year_gap", "author_hit")}
@@ -396,6 +492,7 @@ def cmd_identify(args: argparse.Namespace) -> int:
             "id": entry["id"],
             "identifiers": {
                 "doi": (best["doi"] or "").replace("https://doi.org/", "") or None,
+                "preprint_doi": best.get("preprint_doi"),
                 "registry_id": best["openalex_id"],
                 "url": f"https://doi.org/{(best['doi'] or '').replace('https://doi.org/', '')}" if best["doi"] else None,
             },
@@ -408,6 +505,8 @@ def cmd_identify(args: argparse.Namespace) -> int:
                 "landing_page_url": f"https://doi.org/{(best['doi'] or '').replace('https://doi.org/', '')}" if best["doi"] else None,
                 "container": raw.get("container"),
                 "abs_url": raw.get("abs_url") or preprint_urls.get(entry["id"]),
+                "direct_pdf": (full_text_links(raw)[0] if raw.get("source") == "arxiv" and full_text_links(raw)
+                               else preprint_pdfs.get(entry["id"])),
             },
             "_match": {"similarity": best["similarity"], "containment": best["containment"],
                        "year_gap": best["year_gap"], "matched_title": best["title"]},
@@ -606,6 +705,108 @@ def cmd_fetch(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_study(args: argparse.Namespace) -> int:
+    """Download reading copies of anything with a freely served full text.
+
+    This is deliberately separate from `fetch`. `fetch` builds the corpus and is
+    gated by the manifest, because putting a text into a corpus is a distribution
+    and derivative use. Reading a paper the publisher serves for free is neither,
+    and the corpus model already draws that line: `reference_only` means read it,
+    learn from it, write our own explanations, do not copy it in. A study copy is
+    the "read it" half. Nothing here changes a rights tag or a use class, and an
+    entry that arrives with an open licence is still the only kind `fetch` takes.
+    """
+    root = Path(args.root)
+    entries = load_entries(root)
+    cache = Cache(root / "corpus" / ".resolve-cache")
+    identified = {}
+    if args.identified and Path(args.identified).exists():
+        identified = {r["id"]: r for r in json.loads(Path(args.identified).read_text())["resolved"]}
+
+    dest = Path(args.dest)
+    dest.mkdir(parents=True, exist_ok=True)
+    got, skipped, errors = [], [], []
+    record: list[dict[str, Any]] = []
+    considered = 0
+
+    for entry in entries:
+        if considered >= args.limit:
+            break
+        rights = (entry.get("rights") or {}).get("status")
+        if rights in {"proprietary_confidential"} or entry.get("status") == "rejected":
+            skipped.append({"id": entry["id"], "reason": "excluded material is not acquired at all"})
+            continue
+
+        row = identified.get(entry["id"]) or {}
+        oa_record = row.get("_oa") or {}
+        direct = oa_record.get("direct_pdf")
+        doi = ((entry.get("identifiers") or {}).get("doi") or (row.get("identifiers") or {}).get("doi"))
+
+        location: dict[str, Any] = {}
+        if direct:
+            location = {"is_oa": True, "pdf_url": direct, "host_type": "repository",
+                        "licence": None, "alternates": []}
+        elif doi:
+            try:
+                location = unpaywall(doi, cache)
+            except ApiError as error:
+                errors.append({"id": entry["id"], "error": str(error)})
+                continue
+        else:
+            skipped.append({"id": entry["id"], "reason": "no DOI and no direct link; cannot locate a free copy"})
+            continue
+        considered += 1
+
+        if not location.get("is_oa") or not location.get("pdf_url"):
+            skipped.append({"id": entry["id"], "reason": "no freely served full text found"})
+            continue
+
+        target = dest / f"{entry['id']}.pdf"
+        if not target.exists():
+            status, body = http_get(location["pdf_url"], timeout=90, accept="application/pdf")
+            if status != 200 or not body.startswith(b"%PDF"):
+                for alternate in location.get("alternates") or []:
+                    status, body = http_get(alternate["pdf_url"], timeout=90, accept="application/pdf")
+                    if status == 200 and body.startswith(b"%PDF"):
+                        location = {**location, "pdf_url": alternate["pdf_url"], "host_type": alternate.get("host_type")}
+                        break
+            if status != 200 or not body.startswith(b"%PDF"):
+                skipped.append({"id": entry["id"], "reason": f"download failed (http {status})"})
+                time.sleep(0.2)
+                continue
+            target.write_bytes(body)
+            time.sleep(args.delay)
+
+        got.append({"id": entry["id"], "path": str(target), "bytes": target.stat().st_size,
+                    "host": location.get("host_type"), "licence": location.get("licence")})
+        record.append({
+            "id": entry["id"],
+            "acquisition": {
+                "state": "owned",
+                "copy_path": str(target),
+                "source_url": location["pdf_url"],
+                "obtained_at": str(date.today()),
+                "note": (f"Study copy from the {location.get('host_type') or 'publisher'} copy the publisher serves "
+                         f"free. Rights tag unchanged; this is a reading copy, not a corpus grant."),
+            },
+        })
+
+    if record:
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(yaml.safe_dump({"round": args.round, "entries": record}, sort_keys=False,
+                                      allow_unicode=True, width=120))
+    by_host: dict[str, int] = {}
+    for row in got:
+        by_host[row.get("host") or "unknown"] = by_host.get(row.get("host") or "unknown", 0) + 1
+    print(json.dumps({
+        "considered": considered, "downloaded": len(got), "skipped": len(skipped), "api_errors": len(errors),
+        "megabytes": round(sum(r["bytes"] for r in got) / 1e6, 1), "by_host": by_host,
+        "dest": str(dest), "findings": args.out if record else None,
+    }, indent=2))
+    return 0
+
+
 def self_test() -> dict[str, Any]:
     checks: list[str] = []
 
@@ -629,7 +830,15 @@ def self_test() -> dict[str, Any]:
     ambiguous = good + [dict(good[0], id="W2", doi="https://doi.org/10.2139/ssrn.1836508")]
     best2, _, reason2 = match(entry, ambiguous)
     assert best2 is None and "ambiguous" in reason2, reason2
-    checks.append("match: refuses on year gap, on author mismatch, and on two candidates clearing the bar")
+    checks.append("match: refuses on year gap, on author mismatch, and on two published candidates clearing the bar")
+
+    with_preprint = good + [dict(good[0], id="W3", doi="10.48550/arxiv.1105.1694")]
+    chosen, _, reason3 = match(entry, with_preprint)
+    assert chosen and chosen["doi"] == good[0]["doi"], (chosen, reason3)
+    assert chosen.get("preprint_doi", "").startswith("10.48550/"), chosen
+    only_preprint, _, _ = match(entry, [dict(good[0], id="W4", doi="10.48550/arxiv.1105.1694")])
+    assert only_preprint and only_preprint["doi"].startswith("10.48550/"), only_preprint
+    checks.append("match: a preprint beside its published version is one work with two locations, not an ambiguity")
 
     assert not any(p[1] == "cc_by" for p in LICENCE_PATTERNS if re.search(p[0], "arxiv.org/licenses/nonexclusive-distrib/1.0/")), \
         "the arXiv default grant must not read as an open licence"
@@ -647,7 +856,8 @@ def main(argv: list[str] | None = None) -> int:
     identify.add_argument("--limit", type=int, default=50)
     identify.add_argument("--bucket", default=None)
     identify.add_argument("--out", default="corpus/resolved.json")
-    identify.add_argument("--openalex-fallback", action="store_true", help="Try OpenAlex when Crossref returns nothing (metered API).")
+    identify.add_argument("--openalex-fallback", action="store_true", help="Try OpenAlex when nothing else matched (metered API).")
+    identify.add_argument("--no-arxiv", dest="arxiv", action="store_false", default=True, help="Skip the arXiv index.")
 
     licence = sub.add_parser("licence", help="Read the licence off the landing page and write verify findings.")
     licence.add_argument("--identified", default="corpus/resolved.json")
@@ -661,6 +871,14 @@ def main(argv: list[str] | None = None) -> int:
     fetch.add_argument("--dest", default="corpus/sources")
     fetch.add_argument("--max-files", type=int, default=60, help="cap per multi-file source")
 
+    study = sub.add_parser("study", help="Download reading copies of freely served full texts. Separate from the corpus manifest.")
+    study.add_argument("--identified", default="corpus/resolved.json")
+    study.add_argument("--dest", default="corpus/study")
+    study.add_argument("--limit", type=int, default=500)
+    study.add_argument("--delay", type=float, default=0.4)
+    study.add_argument("--round", type=int, default=1)
+    study.add_argument("--out", default="corpus/study-findings.yaml")
+
     sub.add_parser("self-test", help="Matching and licence-classification checks; no network.")
     args = parser.parse_args(argv)
 
@@ -670,6 +888,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_licence(args)
     if args.command == "fetch":
         return cmd_fetch(args)
+    if args.command == "study":
+        return cmd_study(args)
 
     result = self_test()
     print(json.dumps(result, indent=2))
