@@ -511,3 +511,31 @@ decision_relevance:
     minimum_required_confidence: 0.5
     important_side_effects:
       - "Abstaining around the wedge means standing aside exactly when volume is highest, which has an opportunity cost that should be recorded rather than assumed to be zero."
+
+  - decision_relevance_id: DR-IMPACT-SIZING
+    concept_id: KC-IMPACT-CONFLATION
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      The size being considered is priced against the measure that matches it: a metaorder worked
+      over time against the metaorder curve, a single aggressive order against the single-order
+      curve, and neither against an interval regression slope.
+    evidence_that_would_argue_against_action: >
+      The only coefficient available is an interval regression, which lives in the linear regime
+      and will understate the cost of a large parent order and overstate the cost of a small one.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Correcting this raises estimated cost for large orders, which will reduce intended size. That is the intended consequence, not a side effect to be tuned away."
+
+  - decision_relevance_id: DR-OFFLINE-ABSTAIN
+    concept_id: KC-OFFLINE-SHIFT
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The question is what the agent would have done under a treatment it was never run with, the
+      only evidence is logged traces, and the evaluated policy departs enough from the logging one
+      that most of its states are outside the logged distribution.
+    evidence_that_would_argue_against_action: >
+      Coverage can be checked and is adequate, or the claim being made is behavioural rather than
+      economic, which is what fixed historical contexts can actually support.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Refusing an offline estimate leaves the question open until a randomized arm exists, which has a real cost in time and should be recorded rather than treated as free caution."

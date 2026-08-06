@@ -431,3 +431,28 @@ hypotheses:
       - "The lead disappears once our own data-path latency is controlled for, meaning the wedge was measurement rather than mechanism."
       - "The oracle's window changes during the sample, making a single measured lag meaningless."
       - "Liquidation clustering is fully explained by realized volatility, leaving the wedge with no incremental content."
+
+  - hypothesis_id: HY-IMPACT-EXPONENT
+    concept_id: KC-IMPACT-CONFLATION
+    market_context: "Hyperliquid perpetuals, using the counterparty attribution on every fill to reconstruct metaorders."
+    causal_story: >
+      The three impact measures aggregate over different things, so fitting the same data three
+      ways should produce three different exponents. The venue publishes both counterparty
+      addresses, so metaorders can be reconstructed rather than inferred, which makes the third
+      measure directly estimable here and not merely assumed.
+    ex_ante_prediction: >
+      The metaorder exponent estimated from address-reconstructed parent orders falls in 0.4 to
+      0.7, the single-order exponent falls below 0.3, and the interval regression slope rises
+      toward linearity as the interval lengthens rather than converging on the metaorder exponent.
+    null_hypothesis: "The three measures yield statistically indistinguishable exponents on the same data."
+    measurement_operator:
+      description: "Group fills by counterparty address and contiguity to reconstruct metaorders; fit impact against size for each of the three definitions separately."
+      params: {}
+    eligible_universe: "Instruments with counterparty-attributed fills and enough reconstructed metaorders per size decile to fit a power law."
+    decision_timestamp_rule: "Impact measured forward from the first child fill of a metaorder; no use of the parent's completion in defining its start."
+    outcome_horizons: [1m, 30m, 1d]
+    cost_model: "The purpose is a cost model, so none is imposed; the fitted metaorder curve is what a sizing decision should price against."
+    invalidation_conditions:
+      - "Address contiguity does not reconstruct metaorders well enough to separate them from unrelated flow, in which case the third measure is not estimable here either."
+      - "All three exponents coincide, which would mean the distinction does not bind on this venue."
+      - "The metaorder exponent falls outside 0.4 to 0.7 by enough that the published range does not transfer to a perpetual venue at all."

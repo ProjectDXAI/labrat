@@ -195,6 +195,7 @@ concepts:
       - "Estimated without a decay model, it double-counts transient impact as permanent."
       - "The exponent is not universal across venue types; crypto perp books differ from equities."
     source_passage_ids:
+      - "toth-2011-anomalous-price-impact#latent-book-argument"
       - "bouchaud-2018-trades-quotes-prices#ch12"
       - "gatheral-2010-no-dynamic-arbitrage#s3"
     contradicting_concept_ids: [KC-INFO-KYLE]
@@ -700,7 +701,7 @@ concepts:
     known_failure_modes:
       - "Reproducing the trend on synthetic data generated at constant criticality shows the method can manufacture the result it reports."
     source_passage_ids:
-      - "filimonov-2012-quantifying-reflexivity"
+      - "filimonov-2012-quantifying-reflexivity#endogeneity-trend"
       - "hardiman-2013-critical-reflexivity#estimator-and-bias"
     contradicting_concept_ids: [KC-HAWKES-CRITICALITY]
     supporting_concept_ids: []
@@ -1346,3 +1347,135 @@ concepts:
     problem_ids: [PB-STALE-PROBABILITY, PB-INVENTORY-FUNDING, PB-PHANTOM-LIQUIDITY]
     tags: [oracle, staleness, twap, liquidation, onchain, read-directly]
     workstream: hyperliquid_l4
+
+  - concept_id: KC-IMPACT-CONFLATION
+    canonical_name: "Three different quantities are called price impact, and they scale differently"
+    plain_description: >
+      The immediate impact of one market order, the price change over an interval against that
+      interval's order imbalance, and the total impact of a metaorder worked over time are three
+      distinct things with three different exponents. They are routinely treated as one, and a
+      coefficient estimated on one of them does not price the others.
+    mechanism: >
+      Immediate impact of a single order of size q is strongly concave, roughly q to the 0.2 or
+      even logarithmic, because it walks a book whose local density is small. Interval price
+      change against interval imbalance becomes more linear as the interval lengthens, because
+      aggregation averages over many orders from different participants. Total metaorder impact
+      follows the square-root law, exponent 0.4 to 0.7, because a metaorder is fragmented against
+      a latent book whose density vanishes at the price. The three differ because they aggregate
+      over different things: one order, many participants' orders, one participant's decision.
+    formal_equations: "single order: impact ~ q^0.2 or log q; interval: dP ~ lambda x Q_T, increasingly linear in T; metaorder: Delta(Q) ~ Q^delta with delta in [0.4, 0.7]"
+    assumptions:
+      - "The metaorder can be identified as one decision, which needs participant attribution and is why most studies cannot do it."
+      - "The interval used for the linear measure is long enough to aggregate many orders but short enough that the coefficient is stable."
+      - "Reported exponents are comparable across studies, which the source warns they are not: impact definition, asset pooling and fit range all differ."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [trade_prints, mid_price_series, counterparty_ids]
+    required_data_resolution: "Trade prints with sizes; metaorder reconstruction additionally needs participant attribution."
+    expected_empirical_signature: >
+      Fitting the same data three ways produces three different exponents, and the interval
+      regression's slope rises toward linearity as the interval lengthens rather than converging
+      to the metaorder exponent.
+    alternative_explanations:
+      - "The differences are artifacts of how each study defines and measures impact rather than of the underlying quantities, which the source concedes is partly true and argues is not the whole story."
+    known_failure_modes:
+      - "This corpus already commits the conflation. `kyle_lambda` regresses interval price change on interval signed volume, which is the second measure and lives in the linear regime; `order_flow_imbalance` is in the same family. Neither prices a metaorder, and using either to size one applies a linear coefficient to a concave problem, which understates the cost of large orders and overstates the cost of small ones."
+      - "Metaorder identification needs participant attribution, which almost no dataset has. On this venue we do have it, which is unusual, and it makes the third measure computable rather than assumed."
+      - "The exponent range 0.4 to 0.7 is wide enough that cost estimates built on the midpoint are wrong by a large factor at the extremes of size."
+    source_passage_ids:
+      - "toth-2011-anomalous-price-impact#impact-measures-distinguished"
+    contradicting_concept_ids: [KC-INFO-KYLE]
+    supporting_concept_ids: [KC-IMPACT-SQRT, KC-COUNTERPARTY-INFO]
+    implementation_status: specified
+    confidence: 0.7
+    problem_ids: [PB-IMPACT-TIMING, PB-COST-DRAG]
+    tags: [impact, metaorder, exponent, correction, read-directly]
+
+  - concept_id: KC-LIQUIDATION-DESIGN
+    canonical_name: "Liquidation design decides how much forced flow arrives and who gets it"
+    plain_description: >
+      A protocol liquidates either by auction or at a fixed spread, and the choice determines how
+      much of the borrower's collateral leaves as liquidator profit and how concentrated the
+      resulting forced selling is. The mechanism is public, so the flow it produces is predictable
+      from the design rather than only from the price path.
+    mechanism: >
+      Under a fixed-spread design the liquidator repays debt and receives collateral at a preset
+      discount, so the profit per liquidation is set by the protocol rather than competed away.
+      Caps on how much debt one liquidation may repay can be circumvented by successive
+      liquidations in the same transaction, which lifts the intended limit. An auction design
+      competes the discount down instead but takes time, during which the price can move further.
+      Either way the forced flow arrives in a shape the design determines.
+    formal_equations: "fixed spread: liquidator receives repaid_debt x (1 + spread) in collateral, capped by the close factor; successive liquidations compose to exceed that cap"
+    assumptions:
+      - "The venue's liquidation parameters are known and current, since protocols change them by governance."
+      - "The oracle driving the liquidation trigger is the one we are observing."
+      - "Liquidators are profit-maximising and technically capable of the composed strategy, which the source demonstrates on real chain state."
+    market_types: [perp_dex, amm]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [oracle_price, mark_price, open_interest, trade_prints, counterparty_ids]
+    required_data_resolution: "Liquidation events with size and counterparty, alongside the oracle series that triggered them."
+    expected_empirical_signature: >
+      Forced flow clustering at the collateral thresholds the design implies rather than at round
+      price levels, liquidator profit per event close to the protocol's spread rather than
+      competed toward zero, and a size distribution shaped by the close factor and its
+      circumvention.
+    alternative_explanations:
+      - "Clustering at thresholds reflects where positions were opened rather than how they are closed, which produces similar clustering from a different cause."
+      - "What looks like design-determined profit is compensation for the gas and inventory risk the liquidator carries, in which case it is a fee and not a transfer."
+    known_failure_modes:
+      - "The empirical work is on Ethereum lending protocols, not on a perpetuals venue. The design taxonomy transfers; the magnitudes do not, and assuming they do is the obvious error."
+      - "Parameters change by governance without notice, so a measured relationship is valid only for the configuration it was measured under."
+      - "Predicting forced flow and trading ahead of it means being on the same side as the liquidators, which is the crowded side by construction."
+    source_passage_ids:
+      - "qin-2021-empirical-study-defi-liquidations#mechanism-designs"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by its alternative explanations; the competing accounts are position-opening clustering and liquidator cost compensation, and both are testable against the same data."
+    supporting_concept_ids: [KC-ORACLE-LAG, KC-PHANTOM-DEPTH]
+    implementation_status: specified
+    confidence: 0.5
+    problem_ids: [PB-PHANTOM-LIQUIDITY, PB-INVENTORY-FUNDING, PB-REGIME-BREAK]
+    tags: [liquidation, mechanism-design, forced-flow, onchain, read-directly]
+    workstream: hyperliquid_l4
+
+  - concept_id: KC-OFFLINE-SHIFT
+    canonical_name: "Evaluating a policy on data it did not generate is extrapolation, not measurement"
+    plain_description: >
+      Asking what an agent would have done under a treatment, using traces recorded without that
+      treatment, requires estimating outcomes in situations the recorded agent did not enter. The
+      estimate there is an extrapolation of a fitted model, and it is confidently wrong in exactly
+      the places where the two policies differ most.
+    mechanism: >
+      A policy under evaluation visits a distribution of states its logging policy did not. Any
+      value estimate is fitted on the logged distribution, so queries outside it are
+      out-of-distribution, and function approximators extrapolate there without signalling that
+      they are doing so. The error is worst precisely where the evaluated policy departs from the
+      logged one, which is the region the whole exercise is about.
+    formal_equations: "counterfactual value under pi given data from beta requires E over d^pi(s) of Q(s, pi(s)), while the data only supports d^beta; the gap grows with the divergence between pi and beta"
+    assumptions:
+      - "The logged behaviour policy is stationary enough over the trace period for its state distribution to be a meaningful reference."
+      - "The reward or outcome recorded in the trace is the one the treatment is meant to improve."
+      - "Coverage can be checked, which needs the logged action propensities and not only the actions."
+    market_types: [any]
+    relevant_horizons: [days, weeks]
+    required_observables: [decision_log, matured_outcomes]
+    required_data_resolution: "Decision traces with the actions taken, the context, and ideally the propensity of each action under the logging policy."
+    expected_empirical_signature: >
+      Off-policy value estimates whose disagreement with a randomized comparison grows with the
+      divergence between the evaluated and logged policies, and confidence intervals that do not
+      widen in the region where coverage is thinnest.
+    alternative_explanations:
+      - "Disagreement between offline and randomized estimates reflects the randomized trial's own small sample rather than extrapolation error, which is the charitable reading and needs ruling out."
+    known_failure_modes:
+      - "This is the reason Gate 2 is a behavioural comparison and not an economic one. Fixed historical contexts cannot reproduce the path-dependent consequences of orders, fills and memory, and an off-policy value estimate over them is extrapolation dressed as measurement."
+      - "Importance-sampling estimators have variance that grows with the horizon, so an agent's long trajectory is exactly where they break."
+      - "The failure is silent: an extrapolating estimator returns a number with a plausible interval rather than refusing."
+    source_passage_ids:
+      - "levine-2020-offline-rl-tutorial#distributional-shift"
+    contradicting_concept_ids: []
+    alternative_note: "The competing account is that a randomized comparison's own noise explains the disagreement, which is the first thing to rule out and not an opposing theory."
+    supporting_concept_ids: [KC-ANYTIME-ATTRIBUTION]
+    implementation_status: specified
+    confidence: 0.7
+    problem_ids: [PB-AGENT-ATTRIBUTION]
+    tags: [off-policy, distribution-shift, evaluation, agentic, read-directly]
+    workstream: dxap_agents

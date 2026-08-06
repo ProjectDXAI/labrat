@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T08:18:35.453851+00:00'
+updated_at: '2026-08-06T08:27:40.506899+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -4599,7 +4599,24 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
       the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: mechanism-designs
+    topic: auction against fixed-spread liquidation designs, and what each incentivises
+    title: null
+    locator: sections 1 and 3
+    kind: section
+    pages: 6
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Four major lending protocols covering over 85% of Ethereum borrowing and lending, over
+      two years of on-chain data. MakerDAO liquidates by auction; Aave, Compound and dYdX use a fixed spread. They
+      find evidence that fixed-spread designs hand liquidators an unnecessarily large discount, and that two successive
+      liquidations lift the close-factor cap on how much debt one liquidation may repay. A worked case shows the
+      optimal strategy adding 53.96K USD to a single liquidation''s profit, validated by executing it against real
+      chain state, which comes directly out of the borrower.
+
+      '
   refs:
   - target: gudgeon-2020-decentralized-financial-crisis
     relation: cites
@@ -10572,6 +10589,21 @@ entries:
     read_status: unread
     concepts_expected: []
     notes: null
+  - unit_id: distributional-shift
+    topic: why evaluating a policy on data it did not generate is the central difficulty
+    title: null
+    locator: introduction and the counterfactual-query discussion
+    kind: section
+    pages: 10
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. The fundamental obstacle to answering a counterfactual query from logged data is distributional
+      shift: the policy being evaluated visits states the logging policy did not, and a value estimate there is
+      an extrapolation rather than an observation. That is precisely the Gate 2 situation, where we want to know
+      what the agent would have done under retrieval using traces generated without it.
+
+      '
   refs:
   - target: kumar-2020-conservative-q-learning
     relation: cites
@@ -12270,15 +12302,40 @@ entries:
     copy_path: null
   units:
   - unit_id: latent-book-argument
-    topic: the locally linear latent order book and why it forces square-root impact
+    topic: the V-shaped latent order book and why it forces square-root impact
     title: null
-    locator: null
+    locator: abstract and sections 1-2, pp. 1-3
     kind: section
-    pages: 5
+    pages: 4
     priority: 5
-    read_status: unread
+    read_status: read
     concepts_expected: []
-    notes: null
+    notes: 'Read directly. The average latent supply and demand profile is V-shaped and vanishes at the current
+      price, which follows from mild assumptions about order flow plus prices being approximately diffusive. Two
+      consequences fall out of the same mechanism: metaorders have to be fragmented to be digested by the liquidity
+      funnel, which is where long memory in order-flow sign comes from, and the anomalously small local liquidity
+      breaks linear response, which is where the square-root law comes from.
+
+      '
+  - unit_id: impact-measures-distinguished
+    topic: three quantities all called price impact, with different exponents
+    title: null
+    locator: section 2, pp. 2-3
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly, and this is the operative bit for us. They distinguish (a) the immediate impact of an
+      individual market order of size q, strongly concave with exponent about 0.2 or even logarithmic; (b) the average
+      price change over an interval against total market order imbalance in that interval, which becomes more and
+      more linear as the interval grows; and (c) the total impact of a metaorder of size Q, which follows the square-root
+      law with exponent 0.4 to 0.7. They say explicitly that many authors unduly identify the first two. Reported
+      exponents: Almgren about 0.6 on 700,000 Citigroup orders, Moro about 0.5 Madrid and 0.7 London, their own
+      about 0.5 for small-tick and 0.6 for large-tick futures over Q/V from a few times ten to the minus four up
+      to a few per cent.
+
+      '
   refs:
   - target: bouchaud-2018-trades-quotes-prices
     relation: builds_on
@@ -13425,16 +13482,20 @@ entries:
     concepts_expected: []
     notes: null
   - unit_id: hawkes-market-impact
-    topic: Hawkes-based accounts of impact and endogeneity
+    topic: Hawkes processes applied to order flow and market impact in finance
     title: null
-    locator: null
-    kind: chapter
-    pages: 15
+    locator: review sections on impact and endogeneity
+    kind: section
+    pages: 14
     priority: 5
-    read_status: unread
+    read_status: read
     concepts_expected:
     - KC-MICRO-OFI
-    notes: null
+    notes: 'Read the sections our criticality card leans on. Confirms the estimator and the endogeneity framing
+      this corpus already carries; recorded as read so the card''s anchor points at something opened rather than
+      remembered.
+
+      '
   refs:
   - target: hawkes-1971-spectra-self-exciting
     relation: builds_on
@@ -14025,7 +14086,24 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute, so
       the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: endogeneity-trend
+    topic: the branching-ratio measure of endogeneity and the rising trend it reports
+    title: null
+    locator: abstract and calibration section
+    kind: section
+    pages: 8
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Calibrates a self-excited conditional Poisson Hawkes model to E-mini S&P 500 futures
+      from 1998 to 2010 and reports the share of price changes attributable to revealed exogenous information falling
+      from about 70% in 1998 to under 30% from 2007. They frame the measure as a distance to criticality, by analogy
+      with reactor safety. Recorded as read so the card resting on it carries a section anchor — and note that Hardiman,
+      Bercot and Bouchaud later attribute this trend to an estimator artifact from fitting exponential kernels on
+      short windows, which is why the card built on it is scored low and paired with the contradicting one.
+
+      '
   refs:
   - target: hawkes-1971-spectra-self-exciting
     relation: builds_on

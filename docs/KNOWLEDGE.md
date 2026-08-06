@@ -232,7 +232,7 @@ The first pass of primary reading revised three bets and produced nine extension
 
 Reading also changed two implementations. `time_irreversibility` gained the surrogate null that the source method treats as essential, and `hawkes_branching_ratio` gained a scale profile and a warning, because the published failure mode is exactly the one a window-based estimator walks into. Both are version 1.1.0, which forced their method cards to be re-verified — the version pin doing its job.
 
-`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 14 of 30 — every card added since the first reading pass is anchored to material that was read. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
+`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 22 of 35. The bottleneck was never effort: the seed cards cite the canon, the canon is paywalled, and provenance was blocked on acquisition. The arXiv harvest reached the preprint versions of several of them, and reading those grounded cards that had sat on unread anchors for four releases. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
 
 ## The workstreams, and closing the gaps they opened
 
@@ -306,6 +306,20 @@ That is the diagnosis of a failure already visible in our own stress table. `con
 **Collective incoherence does not imply anyone is wrong.** List and Pettit's Theorem 1 shows no aggregation rule yields complete, consistent, deductively closed collective judgments under universal domain, anonymity and systematicity — and it holds *even when every individual judgment set is itself coherent*. Each proposition attracts its own majority and the majorities diverge. A prediction market is an aggregation rule of exactly that kind, and each leg of an event attracts its own population. `KC-JUDGMENT-AGGREGATION` contradicts `KC-EVENT-TREE-CONSTRAINTS` deliberately: one says a partition breach is an opportunity, the other says it may be a structural artifact of who is trading which leg.
 
 The escape route the theorem names is convergence, which makes this testable on data nobody else has. Coherence should track *participant overlap across legs*, and both venues publish addresses. `HY-COHERENCE-OVERLAP` states it: breach magnitude falls with Jaccard overlap of the address sets pricing each leg.
+
+### A correction the reading forced
+
+Tóth et al distinguish three quantities that are all called price impact:
+
+| Measure | Aggregates over | Exponent |
+|---|---|---|
+| Immediate impact of one market order of size *q* | a single order | ≈ 0.2, or logarithmic |
+| Interval price change against interval order imbalance | many participants' orders | → linear as the interval grows |
+| Total impact of a metaorder of size *Q* | one participant's decision | 0.4 to 0.7 (the square-root law) |
+
+They say plainly that many authors unduly identify the first two. This corpus was one of them. `kyle_lambda` regresses interval price change on interval signed volume, which is the second measure and lives in the linear regime, and `order_flow_imbalance` is in the same family. Neither prices a metaorder, so using either to size one applies a linear coefficient to a concave problem — understating the cost of large orders and overstating it for small ones.
+
+`KC-IMPACT-CONFLATION` records this, contradicts `KC-INFO-KYLE` deliberately, and carries the correction in its own failure modes rather than in a footnote. Metaorder reconstruction normally needs participant attribution that almost no dataset has. This venue publishes both counterparty addresses on every fill, so the third measure is estimable here rather than assumed, which is what `HY-IMPACT-EXPONENT` proposes to do.
 
 ## Ranking what to compile next
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.17.0 - 2026-08-06
+
+- Read six more held sources and compiled three cards. Provenance is 22 of 35 cards on units someone opened, up from 18 of 32. Units read went 27 to 33. The bottleneck was never effort: the seed cards cite the canon, the canon is paywalled, and provenance was blocked on acquisition until the arXiv harvest reached the preprint versions.
+- **`KC-IMPACT-CONFLATION` is a correction to this repo.** Tóth et al distinguish three quantities all called price impact — the immediate impact of one order (exponent ≈ 0.2 or logarithmic), the interval price change against interval imbalance (increasingly linear as the interval grows), and the total impact of a metaorder (0.4 to 0.7) — and say plainly that many authors unduly identify the first two. `kyle_lambda` regresses interval price change on interval signed volume, which is the second measure, and `order_flow_imbalance` is in the same family. Neither prices a metaorder, so using either to size one applies a linear coefficient to a concave problem. The card contradicts `KC-INFO-KYLE` deliberately and carries the correction in its own failure modes.
+- Metaorder reconstruction normally needs participant attribution almost no dataset has. This venue publishes both counterparty addresses on every fill, so the metaorder exponent is estimable here rather than assumed. `HY-IMPACT-EXPONENT` states the prediction.
+- `KC-LIQUIDATION-DESIGN`: a protocol liquidates by auction or at a fixed spread, and the choice sets how much collateral leaves as liquidator profit and how concentrated the forced selling is. Qin et al show fixed-spread designs hand liquidators an unnecessarily large discount and that successive liquidations lift the close-factor cap, worth 53.96K USD on one worked case executed against real chain state. The design taxonomy transfers to a perpetuals venue; the magnitudes do not, and the card says so.
+- `KC-OFFLINE-SHIFT`: evaluating a policy on data it did not generate is extrapolation rather than measurement, and the error is worst exactly where the evaluated and logged policies differ most — which is the region the exercise is about. This is why Gate 2 is a behavioural comparison and not an economic one, now stated as a card rather than as a caveat in the docs.
+- Re-anchored `KC-IMPACT-SQRT` and `KC-REFLEXIVITY-DRIFT` onto units that were actually opened, clearing the last outstanding validator warning. The Filimonov reading is recorded with the note that Hardiman, Bercot and Bouchaud later attribute its headline trend to an estimator artifact, which is why the card built on it is scored low and paired with its contradiction.
+- 35 servable concepts, 19 hypotheses, 39 decision cards, 24 trials, 425 entries, 47 decomposed into 91 units, 5,963 indexed passages, 327 PDFs on disk.
+
 ## 0.16.0 - 2026-08-06
 
 - The dedicated arXiv harvest ran to completion without tripping its breaker: 19 preprints downloaded, 116 titles with no arXiv match, 4 errors. Local holdings went from 41 sources with extractable text to 64, and the passage index from 3,849 to 5,963.
