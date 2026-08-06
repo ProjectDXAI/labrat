@@ -16,6 +16,11 @@
 - `digest --full <id>` / `--full-all`, and a `digest_full_text` flag on a bibliography
   entry, to bring a whole source into the packet. The `source` tier is never reached by
   an escalation trigger: whether a 200k-token course pages in is an operator decision.
+- `scripts/acquire.py` and `make acquire`: ranks what to acquire by what the knowledge
+  store currently cannot support — cards resting on it, confidence held without evidence,
+  live contradictions it could settle, problems it blocks from reaching a decision — and
+  separately lists the buckets we hold almost nothing from, which produce no cards to
+  block and so never surface in a gap analysis driven by existing cards.
 - `make web` / `make web-data` and the corpus explorer under `web/`, documented in
   `docs/EXPLORER.md`.
 

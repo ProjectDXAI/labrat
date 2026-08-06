@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -18,6 +18,7 @@ help:
 	@echo "  make test                     runs every smoke path and self-test"
 	@echo "  make web-data [LAB=dir]       export the corpus bundle the explorer reads"
 	@echo "  make web                      export, then run the explorer at localhost:3000"
+	@echo "  make acquire [LAB=dir]        rank what to acquire against what the store cannot support"
 
 install:
 	@$(PYTHON) -m pip install -e .
@@ -227,3 +228,6 @@ web: web-data
 	@test -d web/node_modules || (cd web && npm install)
 	@echo ">>> explorer on http://127.0.0.1:3000 (loopback only; do not deploy this)"
 	@cd web && npm run dev
+
+acquire:
+	@$(PYTHON) scripts/acquire.py --lab $(LAB) --limit 20

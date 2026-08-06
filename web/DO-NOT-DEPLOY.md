@@ -8,8 +8,10 @@ for anyone but its author.
 Guards in place:
 
 - `public/corpus.json` is gitignored, so the data is never committed.
-- `npm run dev` and `npm run start` bind to `127.0.0.1`, so nothing is served to the
-  local network.
+- `npm run dev` and `npm run start` bind to `0.0.0.0`, so the explorer is reachable from
+  other machines on this LAN. That is deliberate and it is a LAN, not the internet: do
+  not port-forward it, and do not run it on a network you do not control. Set
+  `HOST=127.0.0.1 npm run dev` to go back to loopback only.
 - There is no deployment configuration in this directory, and none should be added.
 
 If you ever do need to put any of this somewhere public, the licence terms recorded by
