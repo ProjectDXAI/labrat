@@ -142,3 +142,75 @@ methods:
       - "Identical result after subdividing segments and repeating points."
       - "Zero area for a straight path."
     notes: "Normalize channels before comparing areas across instruments, or the area measures scale."
+
+  # Workstream bindings. Each exists because a workstream problem had no servable
+  # concept and no way to compute evidence for one.
+  - method_id: batch_priority_fill
+    implementation_version: "1.0.0"
+    concept_ids: [KC-BATCH-PRIORITY]
+    default_params: {}
+    data_requirements: [l2_book, trade_prints, sequence_metadata]
+    status: implemented
+    synthetic_tests:
+      - "A batch arriving aggressive-first, cancel-second, post-only-last executes in exactly the reverse order."
+      - "A cancel that arrived after an aggressive order still executes before it."
+      - "A batch of one category reproduces arrival order and reports no protection."
+    notes: >
+      Takes the batch as given. Reconstructing batch boundaries from the feed is the hard part and
+      lives upstream; a wrong reconstruction permutes categories and invalidates every number here.
+
+  - method_id: depth_realization
+    implementation_version: "1.0.0"
+    concept_ids: [KC-PHANTOM-DEPTH]
+    default_params: {side: buy}
+    data_requirements: [l2_book, trade_prints, sequence_metadata]
+    status: implemented
+    synthetic_tests:
+      - "A sweep that consumes everything displayed reads a realization of 1.0 and zero slippage."
+      - "A top level half of which fails to execute reads 0.75 executable with exactly 0.05 of slippage."
+      - "The deepest level reached is excluded, since it is partially consumed by design."
+    notes: >
+      Measures the shortfall, not its cause. Separating a margin failure from a cancel needs the
+      account state behind each resting order, which this pipeline does not capture.
+
+  - method_id: event_tree_constraints
+    implementation_version: "1.0.0"
+    concept_ids: [KC-EVENT-TREE-CONSTRAINTS]
+    default_params: {require_exhaustive: true}
+    data_requirements: [event_tree, market_probability]
+    status: implemented
+    synthetic_tests:
+      - "A negative-risk event becomes one enforced partition; an undeclared grouping is skipped with a reason."
+      - "A single-market event is skipped rather than treated as a degenerate constraint."
+      - "Output rows drop into prediction_market_consistency unchanged and recover a planted breach."
+    notes: >
+      `require_exhaustive` defaults to true deliberately. Turning it off manufactures partitions from
+      groupings that were never exclusive, and no amount of price data reveals the error afterwards.
+
+  - method_id: betting_eprocess
+    implementation_version: "1.0.0"
+    concept_ids: [KC-ANYTIME-ATTRIBUTION]
+    default_params: {alpha: 0.05, lo: 0.0, hi: 1.0, grid: 201}
+    data_requirements: [decision_log, matured_outcomes]
+    status: implemented
+    synthetic_tests:
+      - "Fixed bet of one against a null of one half gives exactly 1.5^wins x 0.5^losses."
+      - "Mean capital over every equiprobable null path is exactly one, at every sequence length."
+      - "An all-wins stream crosses the 5% threshold at the eighth observation and not before."
+    notes: >
+      Pair with `ledger.py analyze`, which is fixed-sample and clustered. This is what to read while
+      a batch is still accumulating; that is what to read once it has matured and frozen.
+
+  - method_id: counterparty_markout
+    implementation_version: "1.0.0"
+    concept_ids: [KC-COUNTERPARTY-INFO]
+    default_params: {prior_strength: 10.0, min_counterparties: 4}
+    data_requirements: [trade_prints, counterparty_ids, mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "Perfectly persistent rankings recover a rank correlation of exactly one."
+      - "Perfectly inverted rankings recover minus one."
+      - "A one-fill counterparty is pulled strictly between its own value and the pooled mean."
+    notes: >
+      Report `prior_strength` with the correlation. The shrinkage is what stops a two-fill address
+      topping the ranking, and it is a choice rather than an estimate.

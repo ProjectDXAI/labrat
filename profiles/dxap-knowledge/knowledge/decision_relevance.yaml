@@ -284,3 +284,104 @@ decision_relevance:
     minimum_required_confidence: 0.5
     important_side_effects:
       - "Signatures are blind to urgency; pair with an explicit speed measure before acting in fast markets."
+
+  # Workstream decision cards.
+  - decision_relevance_id: DR-BATCH-PASSIVE
+    concept_id: KC-BATCH-PRIORITY
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The intended entry is passive on a venue that batches, the order carries no GTC or IOC so it
+      lands in the first category, and reconstructed batches show cancels and aggressive orders
+      coinciding often enough that the ordering has bitten in the recent past.
+    evidence_that_would_argue_against_action: >
+      Batch boundaries cannot be reconstructed with confidence, the intended holding period is long
+      enough that intra-batch ordering averages out, or the measured advantage disappears once
+      proposer identity is controlled for.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Encourages resting rather than crossing; check that the passive order fills often enough to be a strategy rather than an intention."
+      - "The conclusion inverts on a continuous venue, where a late cancel loses. It must not be carried across."
+
+  - decision_relevance_id: DR-PHANTOM-SIZING
+    concept_id: KC-PHANTOM-DEPTH
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      Recent sweeps in this instrument show executable fractions below one at levels they passed
+      through, the shortfall rises with volatility, and the book snapshots feeding the estimate are
+      free of sequence gaps.
+    evidence_that_would_argue_against_action: >
+      The shortfall is the same in calm and volatile conditions, which points at ordinary cancellation;
+      or it is smaller than a tick, in which case no sizing decision can act on it.
+    minimum_required_confidence: 0.45
+    important_side_effects:
+      - "Discounting displayed depth shrinks intended size, which can turn a marginal edge into an abstention. That is the point, but it should be recorded as such."
+
+  - decision_relevance_id: DR-PHANTOM-ABSTAIN
+    concept_id: KC-PHANTOM-DEPTH
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The trade needs more depth than the corrected estimate of executable size supports, and the
+      correction is largest in exactly the volatility state now in force.
+    evidence_that_would_argue_against_action: >
+      The size could be worked over several batches rather than swept at once, which changes the
+      question from executable depth to schedule.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Abstaining on depth grounds has an opportunity cost that is invisible unless the abstention is logged with its reason."
+
+  - decision_relevance_id: DR-EVENT-TREE-ENTRY
+    concept_id: KC-EVENT-TREE-CONSTRAINTS
+    decision_type: entry
+    evidence_that_would_support_action: >
+      A partition derived from the event metadata departs from one by more than the settlement-aware
+      cost hurdle, every member is quoted at the same instant, none has resolved, and the relation is
+      one the protocol does not enforce — so the breach has somewhere to persist.
+    evidence_that_would_argue_against_action: >
+      The members' resolution criteria do not actually partition the outcome space, the quotes are not
+      simultaneous, the depth behind them will not absorb the intended size, or the relation is
+      protocol-enforced and the apparent gap is a stale quote rather than an opportunity.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Every leg is a position that must be carried to resolution; the capital cost of doing so is not in the consistency check."
+
+  - decision_relevance_id: DR-ANYTIME-RETIRE
+    concept_id: KC-ANYTIME-ATTRIBUTION
+    decision_type: exit
+    evidence_that_would_support_action: >
+      The capital process against the null that this strategy still clears its costs has crossed the
+      threshold, the observations entered in maturation order, and the unit of analysis is the unit
+      that was randomized.
+    evidence_that_would_argue_against_action: >
+      The process crosses only when wakes rather than branch-days are counted, the outcomes were
+      reordered, or the crossing coincides with a regime the strategy was not claimed to survive.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Retirement is hard to reverse in practice: the strategy stops generating the data that would show it recovered."
+
+  - decision_relevance_id: DR-ANYTIME-ABSTAIN
+    concept_id: KC-ANYTIME-ATTRIBUTION
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The anytime interval on the effect still contains zero, so the honest position is that the
+      treatment has not been shown to do anything and the decision should not lean on it.
+    evidence_that_would_argue_against_action: >
+      The interval is wide because the design has too little power rather than because the effect is
+      absent, which is an argument for changing the experiment, not for suspending judgement forever.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Waiting is itself a choice with a cost; the number of decisions taken under the unresolved treatment should be counted."
+
+  - decision_relevance_id: DR-COUNTERPARTY-ENTRY
+    concept_id: KC-COUNTERPARTY-INFO
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The counterparties resting at the level we intend to take have training-window mark-outs near or
+      below the pooled mean, their profiles rest on enough fills to survive shrinkage, and the ranking
+      showed out-of-sample persistence in the most recent evaluation.
+    evidence_that_would_argue_against_action: >
+      The addresses at that level are unseen or thin, the persistence measured last period was near
+      zero, or the ranking is plausibly proxying for speed and for the market states those
+      counterparties choose to trade in.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Systematically declining to trade against flagged addresses changes their behaviour and ours, so the measured persistence degrades once it is acted on."

@@ -885,6 +885,512 @@ def prediction_market_consistency(
 
 
 # --------------------------------------------------------------------------------------
+# Workstream methods — venue mechanics read directly, then made computable
+# --------------------------------------------------------------------------------------
+
+
+# Action categories inside a HyperCore consensus batch, in execution order. Read from
+# the venue documentation: orders carrying neither GTC nor IOC go first, then cancels,
+# then orders carrying GTC or IOC, with proposer order breaking ties inside a category.
+AGGRESSIVE_TIFS = {"gtc", "ioc", "fok"}
+
+
+def _batch_category(action: dict[str, Any]) -> int:
+    kind = str(action.get("kind") or "order").lower()
+    if kind == "cancel":
+        return 1
+    tif = str(action.get("tif") or "").lower()
+    return 2 if tif in AGGRESSIVE_TIFS else 0
+
+
+@method(
+    name="batch_priority_fill",
+    version="1.0.0",
+    summary="Execution order inside a consensus batch sorted by action type, and how far it departs from arrival-time priority.",
+    inputs={
+        "actions": "list of {action_id, kind: order|cancel, tif: alo|gtc|ioc|null, arrival_index, proposer_index}",
+        "own_action_id": "optional id of our own action, to report its displacement explicitly",
+    },
+    outputs={
+        "execution_order": "action ids in the order the venue applies them",
+        "arrival_order": "the counterfactual order a continuous-time venue would apply",
+        "displacement": "per action, arrival rank minus batch rank; positive means it executes earlier than arrival-time priority predicts",
+        "escaped_cancels": "cancels that execute before an aggressive order which arrived first — the maker protection the batch structure creates",
+        "queue_jumps": "non-aggressive orders that execute before actions which arrived first",
+        "own": "the displacement row for own_action_id, if given",
+    },
+    as_of_contract="Every action must belong to one batch, observed at or before the decision timestamp. Actions from a later batch are a different system state and must not be mixed in.",
+    failure_modes=[
+        "The category hierarchy is the venue's, not a general result. On a venue with genuine arrival-time priority every displacement is zero and this method says nothing.",
+        "Proposer order is taken as given. Reconstructing it from a public feed is the hard part and this method does not do it — a wrong proposer order permutes ties within a category but never moves an action across categories.",
+        "`escaped_cancels` counts a structural opportunity, not a realized saving. Whether the aggressive order would have matched that specific resting order needs price and size, which this method does not take.",
+        "Assumes one batch. Two batches per block means an action can lose to an action that arrived later in the previous batch, which this cannot see.",
+    ],
+    concepts=["KC-BATCH-PRIORITY"],
+)
+def batch_priority_fill(actions: list[dict[str, Any]], own_action_id: str | None = None) -> dict[str, Any]:
+    if not actions:
+        return {"refused": "empty batch"}
+    rows = []
+    for index, action in enumerate(actions):
+        rows.append(
+            {
+                "action_id": action.get("action_id", f"a{index}"),
+                "category": _batch_category(action),
+                "arrival_index": action.get("arrival_index", index),
+                "proposer_index": action.get("proposer_index", index),
+                "kind": str(action.get("kind") or "order").lower(),
+                "tif": (str(action.get("tif")).lower() if action.get("tif") else None),
+            }
+        )
+
+    batch_sorted = sorted(rows, key=lambda r: (r["category"], r["proposer_index"], r["action_id"]))
+    arrival_sorted = sorted(rows, key=lambda r: (r["arrival_index"], r["action_id"]))
+    batch_rank = {r["action_id"]: i for i, r in enumerate(batch_sorted)}
+    arrival_rank = {r["action_id"]: i for i, r in enumerate(arrival_sorted)}
+
+    displacement = [
+        {
+            "action_id": r["action_id"],
+            "category": r["category"],
+            "arrival_rank": arrival_rank[r["action_id"]],
+            "batch_rank": batch_rank[r["action_id"]],
+            "displacement": arrival_rank[r["action_id"]] - batch_rank[r["action_id"]],
+        }
+        for r in batch_sorted
+    ]
+
+    # The claim the batch structure makes: a cancel beats an aggressive order that
+    # arrived before it. On a continuous venue that cancel is too late.
+    escaped = []
+    for cancel in (r for r in rows if r["category"] == 1):
+        for aggressive in (r for r in rows if r["category"] == 2):
+            if aggressive["arrival_index"] < cancel["arrival_index"]:
+                escaped.append({"cancel": cancel["action_id"], "beaten_order": aggressive["action_id"]})
+
+    jumps = []
+    for passive in (r for r in rows if r["category"] == 0):
+        for other in rows:
+            if other["action_id"] == passive["action_id"]:
+                continue
+            if other["arrival_index"] < passive["arrival_index"] and batch_rank[other["action_id"]] > batch_rank[passive["action_id"]]:
+                jumps.append({"order": passive["action_id"], "overtook": other["action_id"]})
+
+    own = next((row for row in displacement if row["action_id"] == own_action_id), None) if own_action_id else None
+    return {
+        "execution_order": [r["action_id"] for r in batch_sorted],
+        "arrival_order": [r["action_id"] for r in arrival_sorted],
+        "displacement": displacement,
+        "escaped_cancels": escaped,
+        "queue_jumps": jumps,
+        "own": own,
+        "batch_size": len(rows),
+        "reordered": any(row["displacement"] != 0 for row in displacement),
+    }
+
+
+@method(
+    name="depth_realization",
+    version="1.0.0",
+    summary="How much of the displayed depth an aggressive order actually consumed, and the slippage attributable to the shortfall.",
+    inputs={
+        "displayed": "levels the sweep walked, best first: [{price, size, order_count?}]",
+        "fills": "the fills that resulted: [{price, size}]",
+        "side": "buy (consuming asks) or sell (consuming bids)",
+    },
+    outputs={
+        "levels": "per level: displayed size, filled size, realization ratio, mean order size, and whether the level was fully tested",
+        "executable_fraction": "filled over displayed across fully tested levels only",
+        "phantom_size": "displayed size at fully tested levels that did not execute",
+        "expected_vwap": "the price the displayed book predicted for this quantity",
+        "realized_vwap": "the price actually paid",
+        "slippage": "realized minus expected, signed against the aggressor",
+    },
+    as_of_contract="`displayed` must be the last book snapshot strictly before the order was sent. Using the post-trade book makes the shortfall vanish by construction.",
+    failure_modes=[
+        "The deepest level the sweep reached is only partially consumed by design, so it is excluded from `executable_fraction`. Including it reports phantom depth on every sweep that ever stopped.",
+        "Cannot separate a margin failure from an ordinary cancel that landed in the same batch. Both look like depth that was there and then was not. Separating them needs the account state behind each resting order.",
+        "A stale snapshot manufactures phantom depth. Sequence gaps must be ruled out before the number means anything.",
+        "`mean_order_size` is reported where the feed carries an order count, but this method does not test whether composition predicts the shortfall — that needs depletion times across many levels, not one sweep.",
+        "Silent about hidden liquidity: a sweep that fills MORE than displayed reports a realization above one rather than an error.",
+    ],
+    concepts=["KC-PHANTOM-DEPTH"],
+)
+def depth_realization(
+    displayed: list[dict[str, Any]],
+    fills: list[dict[str, Any]],
+    side: str = "buy",
+) -> dict[str, Any]:
+    if side not in {"buy", "sell"}:
+        return {"refused": "side must be buy or sell"}
+    if not displayed:
+        return {"refused": "no displayed levels"}
+
+    filled_by_price: dict[float, float] = {}
+    for fill in fills or []:
+        price = float(fill["price"])
+        filled_by_price[price] = filled_by_price.get(price, 0.0) + float(fill["size"])
+    total_filled = sum(filled_by_price.values())
+
+    # A level is fully tested only if the sweep reached past it, which we know because
+    # some quantity executed at a worse price. Walk best-first and track that.
+    levels: list[dict[str, Any]] = []
+    consumed_so_far = 0.0
+    for index, level in enumerate(displayed):
+        price = float(level["price"])
+        size = float(level["size"])
+        filled = filled_by_price.get(price, 0.0)
+        deeper_filled = total_filled - consumed_so_far - filled
+        count = level.get("order_count")
+        levels.append(
+            {
+                "price": price,
+                "displayed": size,
+                "filled": filled,
+                "realization": (filled / size) if size > 0 else None,
+                "order_count": count,
+                "mean_order_size": (size / count) if count else None,
+                "fully_tested": deeper_filled > 1e-12,
+                "depth_index": index,
+            }
+        )
+        consumed_so_far += filled
+
+    tested = [row for row in levels if row["fully_tested"]]
+    tested_displayed = sum(row["displayed"] for row in tested)
+    tested_filled = sum(row["filled"] for row in tested)
+
+    # What the book said this quantity would cost, walked best-first for the size we got.
+    remaining = total_filled
+    expected_notional = 0.0
+    for level in displayed:
+        if remaining <= 1e-12:
+            break
+        take = min(remaining, float(level["size"]))
+        expected_notional += take * float(level["price"])
+        remaining -= take
+    expected_vwap = (expected_notional / total_filled) if total_filled > 0 else None
+    realized_vwap = (
+        sum(price * size for price, size in filled_by_price.items()) / total_filled if total_filled > 0 else None
+    )
+    slippage = None
+    if expected_vwap is not None and realized_vwap is not None:
+        slippage = (realized_vwap - expected_vwap) if side == "buy" else (expected_vwap - realized_vwap)
+
+    return {
+        "levels": levels,
+        "levels_fully_tested": len(tested),
+        "executable_fraction": (tested_filled / tested_displayed) if tested_displayed > 0 else None,
+        "phantom_size": max(0.0, tested_displayed - tested_filled),
+        "expected_vwap": expected_vwap,
+        "realized_vwap": realized_vwap,
+        "slippage": slippage,
+        "filled_size": total_filled,
+        "unfilled_beyond_book": remaining if remaining > 1e-12 else 0.0,
+    }
+
+
+@method(
+    name="event_tree_constraints",
+    version="1.0.0",
+    summary="Derives the logical constraint set from prediction-market event metadata, and marks which constraints the protocol enforces.",
+    inputs={
+        "markets": "list of {market_id, event_id, outcome?, negative_risk?, exhaustive?, tracked_coin?, probability?}",
+        "require_exhaustive": "when true (default) an event is only treated as a partition if it declares exhaustive or negative_risk",
+    },
+    outputs={
+        "partitions": "constraint rows in the shape prediction_market_consistency consumes, each carrying enforced and settlement",
+        "enforced": "partitions the token layer settles atomically — where mispricing cannot persist",
+        "unenforced": "partitions that hold only by convention — the surface where a violation can survive",
+        "cross_venue_links": "tracked coin to market ids, the join to the perpetual instrument",
+        "skipped": "events excluded, with the reason",
+    },
+    as_of_contract="Metadata must be the snapshot in force at the decision timestamp. Events are re-scoped and markets are added mid-life, so a later grouping is not the grouping that was tradable.",
+    failure_modes=[
+        "Event grouping is a venue convention, not a logical guarantee. Markets sharing an event id need not be mutually exclusive, and this method cannot read the resolution criteria that decide it. With require_exhaustive off, it will manufacture partitions that were never partitions.",
+        "`enforced` reflects the negative-risk conversion and complete-set merge only. A constraint can be economically tight without being protocol-enforced, and this method will call it unenforced.",
+        "Derives partitions, not implications. Implication structure needs a threshold or nesting field the snapshot schema does not carry, and inventing it from question text is exactly the natural-language step this is meant to avoid.",
+        "A market that resolves early leaves a stale member in its partition, which reads as a breach that no trade can capture.",
+    ],
+    concepts=["KC-EVENT-TREE-CONSTRAINTS"],
+)
+def event_tree_constraints(
+    markets: list[dict[str, Any]],
+    require_exhaustive: bool = True,
+) -> dict[str, Any]:
+    if not markets:
+        return {"refused": "no markets"}
+
+    by_event: dict[str, list[dict[str, Any]]] = {}
+    for market in markets:
+        event_id = str(market.get("event_id") or "")
+        if not event_id:
+            continue
+        by_event.setdefault(event_id, []).append(market)
+
+    partitions: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    for event_id in sorted(by_event):
+        members = sorted(by_event[event_id], key=lambda m: str(m.get("market_id")))
+        if len(members) < 2:
+            skipped.append({"event_id": event_id, "reason": "single market: nothing to constrain"})
+            continue
+        negative_risk = any(bool(m.get("negative_risk")) for m in members)
+        exhaustive = negative_risk or all(bool(m.get("exhaustive")) for m in members)
+        if require_exhaustive and not exhaustive:
+            skipped.append(
+                {"event_id": event_id, "reason": "not declared exhaustive and not negative-risk: grouping is not a partition"}
+            )
+            continue
+        partitions.append(
+            {
+                "event_id": event_id,
+                "members": [str(m.get("market_id")) for m in members],
+                "total": 1.0,
+                "enforced": negative_risk,
+                "settlement": "atomic" if negative_risk else "legwise",
+                "basis": "negative-risk conversion" if negative_risk else "declared exhaustive outcome set",
+            }
+        )
+
+    links: dict[str, list[str]] = {}
+    for market in markets:
+        coin = market.get("tracked_coin")
+        if coin:
+            links.setdefault(str(coin), []).append(str(market.get("market_id")))
+    for coin in links:
+        links[coin] = sorted(links[coin])
+
+    return {
+        "partitions": partitions,
+        "enforced": [row for row in partitions if row["enforced"]],
+        "unenforced": [row for row in partitions if not row["enforced"]],
+        "cross_venue_links": links,
+        "skipped": skipped,
+        "events_seen": len(by_event),
+    }
+
+
+@method(
+    name="betting_eprocess",
+    version="1.0.0",
+    summary="Anytime-valid test and confidence sequence for a bounded mean, by betting: valid under continuous peeking.",
+    inputs={
+        "observations": "bounded outcomes in time order (paired differences, per-decision net edge, win indicators)",
+        "null_mean": "the mean under the null, on the same scale as the observations",
+        "alpha": "error level; the test rejects when the capital process reaches 1/alpha (default 0.05)",
+        "lo": "lower bound of the observation range (default 0.0)",
+        "hi": "upper bound of the observation range (default 1.0)",
+        "lambda_fixed": "optional constant betting fraction on the rescaled scale; omit for the predictable plug-in",
+        "grid": "confidence-sequence grid resolution (default 201; 0 skips the interval)",
+    },
+    outputs={
+        "e_value": "the capital process after every observation; reject when it reaches 1/alpha",
+        "rejected": "whether the process ever crossed, at any point in the sequence",
+        "crossed_at": "1-indexed observation where it first crossed — the detection delay",
+        "confidence_sequence": "[lower, upper] for the mean, valid at all times simultaneously",
+        "running_mean": "the sample mean, for comparison only — it has no anytime guarantee",
+    },
+    as_of_contract="Observations must arrive in the order they matured, and the bet at step t may use only observations before t. A bet fitted on the whole sequence destroys the guarantee entirely.",
+    failure_modes=[
+        "Ville's inequality bounds the probability that the process EVER crosses, which is what makes peeking safe. That guarantee is about the null being true, not about the null being the right null.",
+        "Requires genuinely bounded observations. Passing an unbounded series with guessed lo/hi silently breaks the supermartingale property, and nothing here can detect it.",
+        "Order matters and is not checked. Sorting the observations, or feeding matured outcomes before unmatured ones, invalidates the result while looking identical.",
+        "Anytime-validity costs power against a fixed-sample test at the same alpha. When the sample size is genuinely fixed in advance, this is the wrong tool.",
+        "The confidence sequence is a grid inversion, so its endpoints are accurate only to the grid step.",
+    ],
+    concepts=["KC-ANYTIME-ATTRIBUTION"],
+)
+def betting_eprocess(
+    observations: list[float],
+    null_mean: float,
+    alpha: float = 0.05,
+    lo: float = 0.0,
+    hi: float = 1.0,
+    lambda_fixed: float | None = None,
+    grid: int = 201,
+) -> dict[str, Any]:
+    if hi <= lo:
+        return {"refused": "hi must exceed lo"}
+    if not observations:
+        return {"refused": "no observations"}
+    if not 0.0 < alpha < 1.0:
+        return {"refused": "alpha must be in (0, 1)"}
+
+    scaled = [(float(value) - lo) / (hi - lo) for value in observations]
+    if any(value < -1e-9 or value > 1 + 1e-9 for value in scaled):
+        return {"refused": "observations fall outside [lo, hi]; the supermartingale property does not hold"}
+    m0 = (float(null_mean) - lo) / (hi - lo)
+    if not 0.0 < m0 < 1.0:
+        return {"refused": "null_mean must lie strictly inside (lo, hi)"}
+
+    def capital(values: list[float], mean: float, sign: float) -> tuple[float, int | None]:
+        """Capital from betting that the true mean exceeds (sign=+1) or falls below (sign=-1) `mean`."""
+        # Positivity requires lambda in (-1/(1-mean), 1/mean); half of that keeps the
+        # process well conditioned. The bound is what stops a single observation from
+        # wiping the capital to zero or below.
+        limit = 0.5 * min(1.0 / mean, 1.0 / (1.0 - mean))
+        wealth, crossed = 1.0, None
+        running_sum, running_sq, seen = 0.0, 0.0, 0
+        threshold = 1.0 / alpha
+        for index, value in enumerate(values):
+            if lambda_fixed is not None:
+                bet = sign * float(lambda_fixed)
+            elif seen == 0:
+                bet = 0.0
+            else:
+                mu = running_sum / seen
+                var = max(running_sq / seen - mu * mu, 1e-4)
+                bet = sign * (abs(mu - mean) / (var + (mu - mean) ** 2))
+                if (mu - mean) * sign < 0:
+                    bet = 0.0
+            bet = max(-limit, min(limit, bet))
+            wealth *= 1.0 + bet * (value - mean)
+            if wealth >= threshold and crossed is None:
+                crossed = index + 1
+            running_sum += value
+            running_sq += value * value
+            seen += 1
+        return wealth, crossed
+
+    up, up_cross = capital(scaled, m0, +1.0)
+    down, down_cross = capital(scaled, m0, -1.0)
+    e_value = max(up, down)
+    crossed_at = min([c for c in (up_cross, down_cross) if c is not None], default=None)
+
+    # The grid inversion re-bets against every candidate mean, which only makes sense
+    # for the predictable plug-in. A constant bet chosen for one null is not a sensible
+    # bet against every other, so the fixed-lambda path reports no interval.
+    interval: list[float] | None = None
+    if grid and grid >= 3 and lambda_fixed is None:
+        step = 1.0 / (grid - 1)
+        kept = []
+        for i in range(grid):
+            candidate = min(max(i * step, 1e-6), 1 - 1e-6)
+            hi_cap, _ = capital(scaled, candidate, +1.0)
+            lo_cap, _ = capital(scaled, candidate, -1.0)
+            if max(hi_cap, lo_cap) < 1.0 / alpha:
+                kept.append(candidate)
+        if kept:
+            interval = [lo + min(kept) * (hi - lo), lo + max(kept) * (hi - lo)]
+
+    return {
+        "e_value": e_value,
+        "e_value_above": up,
+        "e_value_below": down,
+        "rejected": crossed_at is not None,
+        "crossed_at": crossed_at,
+        "threshold": 1.0 / alpha,
+        "confidence_sequence": interval,
+        "running_mean": lo + (sum(scaled) / len(scaled)) * (hi - lo),
+        "n": len(scaled),
+    }
+
+
+@method(
+    name="counterparty_markout",
+    version="1.0.0",
+    summary="Ranks counterparties by shrunk mark-out in a training window and tests whether the ranking survives out of sample.",
+    inputs={
+        "fills": "list of {counterparty, markout, window: train|test} — markout signed so that positive means the counterparty's flow was informed",
+        "prior_strength": "pseudo-observations pulling a thin counterparty toward the global mean (default 10)",
+        "min_counterparties": "minimum counterparties present in both windows (default 4)",
+    },
+    outputs={
+        "profiles": "per counterparty: train count, shrunk train mark-out, test count, raw test mark-out",
+        "rank_correlation": "Spearman correlation between the train ranking and test mark-out",
+        "top_minus_bottom": "test mark-out of the top training tertile minus the bottom",
+        "global_markout": "the pooled mean, the benchmark a counterparty must beat",
+    },
+    as_of_contract="The train window must close strictly before the test window opens. Assigning windows after seeing the outcomes is the whole experiment, backwards.",
+    failure_modes=[
+        "Shrinkage is what stops a two-fill address topping the ranking, and its strength is a choice, not an estimate. Report it alongside the correlation.",
+        "One address is not one participant. Addresses split and pool, so persistence can be broken by rotation rather than by absence of information.",
+        "Spearman on few counterparties is unstable; the method refuses below `min_counterparties` rather than returning a confident number on five points.",
+        "Selection: counterparties present in both windows are the ones that kept trading, which is not a random subset.",
+        "Says nothing about causality. A counterparty whose flow marks out well may be fast rather than informed, and the fix is a different experiment, not a different statistic.",
+    ],
+    concepts=["KC-COUNTERPARTY-INFO"],
+)
+def counterparty_markout(
+    fills: list[dict[str, Any]],
+    prior_strength: float = 10.0,
+    min_counterparties: int = 4,
+) -> dict[str, Any]:
+    train: dict[str, list[float]] = {}
+    test: dict[str, list[float]] = {}
+    for fill in fills or []:
+        bucket = train if str(fill.get("window", "train")).lower() == "train" else test
+        bucket.setdefault(str(fill.get("counterparty")), []).append(float(fill.get("markout", 0.0)))
+
+    all_train = [value for values in train.values() for value in values]
+    if not all_train:
+        return {"refused": "no training fills"}
+    global_markout = _mean(all_train)
+
+    shared = sorted(set(train) & set(test))
+    if len(shared) < min_counterparties:
+        return {
+            "refused": f"need at least {min_counterparties} counterparties in both windows, got {len(shared)}",
+            "global_markout": global_markout,
+        }
+
+    profiles = []
+    for counterparty in shared:
+        values = train[counterparty]
+        n = len(values)
+        shrunk = (sum(values) + prior_strength * global_markout) / (n + prior_strength)
+        profiles.append(
+            {
+                "counterparty": counterparty,
+                "train_n": n,
+                "train_markout_raw": _mean(values),
+                "train_markout_shrunk": shrunk,
+                "test_n": len(test[counterparty]),
+                "test_markout": _mean(test[counterparty]),
+            }
+        )
+
+    def ranks(values: list[float]) -> list[float]:
+        order = sorted(range(len(values)), key=lambda i: values[i])
+        out = [0.0] * len(values)
+        position = 0
+        while position < len(order):
+            end = position
+            while end + 1 < len(order) and values[order[end + 1]] == values[order[position]]:
+                end += 1
+            average = (position + end) / 2.0 + 1.0
+            for i in range(position, end + 1):
+                out[order[i]] = average
+            position = end + 1
+        return out
+
+    train_ranks = ranks([row["train_markout_shrunk"] for row in profiles])
+    test_ranks = ranks([row["test_markout"] for row in profiles])
+    n = len(profiles)
+    mean_rank = (n + 1) / 2.0
+    numerator = sum((a - mean_rank) * (b - mean_rank) for a, b in zip(train_ranks, test_ranks))
+    denominator = math.sqrt(
+        sum((a - mean_rank) ** 2 for a in train_ranks) * sum((b - mean_rank) ** 2 for b in test_ranks)
+    )
+    correlation = (numerator / denominator) if denominator > 0 else None
+
+    ordered = sorted(profiles, key=lambda row: row["train_markout_shrunk"])
+    tertile = max(1, n // 3)
+    bottom = _mean([row["test_markout"] for row in ordered[:tertile]])
+    top = _mean([row["test_markout"] for row in ordered[-tertile:]])
+
+    return {
+        "profiles": sorted(profiles, key=lambda row: -row["train_markout_shrunk"]),
+        "rank_correlation": correlation,
+        "top_minus_bottom": top - bottom,
+        "global_markout": global_markout,
+        "counterparties": n,
+        "prior_strength": prior_strength,
+    }
+
+
+# --------------------------------------------------------------------------------------
 # Self-test
 # --------------------------------------------------------------------------------------
 
@@ -1071,6 +1577,128 @@ def self_test() -> dict[str, Any]:
     )
     assert conj_atomic["violations"][0]["settlement"] == "legwise", "no token operation enforces a conjunction bound"
     checks.append("prediction_market_consistency: breaches cost-gated, and atomic settlement applied only where the token layer enforces the constraint")
+
+    # ---- Workstream methods -----------------------------------------------------------
+
+    # A batch where every action arrives in the worst possible order for the hierarchy:
+    # the aggressive order first, the cancel second, the post-only order last.
+    batch = batch_priority_fill(
+        [
+            {"action_id": "A", "kind": "order", "tif": "gtc", "arrival_index": 0, "proposer_index": 0},
+            {"action_id": "B", "kind": "cancel", "arrival_index": 1, "proposer_index": 1},
+            {"action_id": "C", "kind": "order", "tif": "alo", "arrival_index": 2, "proposer_index": 2},
+        ],
+        own_action_id="C",
+    )
+    assert batch["execution_order"] == ["C", "B", "A"], batch["execution_order"]
+    assert batch["arrival_order"] == ["A", "B", "C"], batch["arrival_order"]
+    assert batch["own"]["displacement"] == 2, batch["own"]
+    assert {row["action_id"]: row["displacement"] for row in batch["displacement"]} == {"C": 2, "B": 0, "A": -2}
+    assert len(batch["escaped_cancels"]) == 1, batch["escaped_cancels"]
+    assert len(batch["queue_jumps"]) == 2, batch["queue_jumps"]
+    # Control: a batch of one category is arrival-time priority again, and says nothing.
+    uniform = batch_priority_fill(
+        [{"action_id": name, "kind": "order", "tif": "ioc", "arrival_index": i, "proposer_index": i} for i, name in enumerate("XYZ")]
+    )
+    assert not uniform["reordered"] and not uniform["escaped_cancels"], uniform
+    assert batch_priority_fill([])["refused"]
+    checks.append("batch_priority_fill: type hierarchy inverts arrival order, cancel beats an earlier aggressive order, single-category batch is unchanged")
+
+    book = [{"price": 100.0, "size": 10.0, "order_count": 2}, {"price": 100.1, "size": 10.0}, {"price": 100.2, "size": 10.0}]
+    clean = depth_realization(book, [{"price": 100.0, "size": 10.0}, {"price": 100.1, "size": 10.0}], side="buy")
+    assert clean["executable_fraction"] == 1.0, clean
+    assert clean["phantom_size"] == 0.0 and abs(clean["slippage"]) < 1e-9, clean
+    assert clean["levels_fully_tested"] == 1, "only the level the sweep passed through is tested"
+    assert clean["levels"][0]["mean_order_size"] == 5.0, clean["levels"][0]
+    phantom = depth_realization(
+        book,
+        [{"price": 100.0, "size": 5.0}, {"price": 100.1, "size": 10.0}, {"price": 100.2, "size": 5.0}],
+        side="buy",
+    )
+    assert abs(phantom["executable_fraction"] - 0.75) < 1e-9, phantom["executable_fraction"]
+    assert abs(phantom["phantom_size"] - 5.0) < 1e-9, phantom["phantom_size"]
+    assert abs(phantom["expected_vwap"] - 100.05) < 1e-9, phantom["expected_vwap"]
+    assert abs(phantom["realized_vwap"] - 100.10) < 1e-9, phantom["realized_vwap"]
+    assert abs(phantom["slippage"] - 0.05) < 1e-9, phantom["slippage"]
+    assert depth_realization([], [])["refused"]
+    checks.append("depth_realization: full consumption reads 1.0, a half-empty top level reads 0.75 with exactly 0.05 of slippage, untested levels excluded")
+
+    tree = event_tree_constraints(
+        [
+            {"market_id": "m1", "event_id": "e1", "negative_risk": True, "tracked_coin": "BTC"},
+            {"market_id": "m2", "event_id": "e1", "negative_risk": True, "tracked_coin": "BTC"},
+            {"market_id": "m3", "event_id": "e1", "negative_risk": True, "tracked_coin": "BTC"},
+            {"market_id": "m4", "event_id": "e2"},
+            {"market_id": "m5", "event_id": "e2"},
+            {"market_id": "m6", "event_id": "e3"},
+            {"market_id": "m7", "event_id": "e4", "exhaustive": True},
+            {"market_id": "m8", "event_id": "e4", "exhaustive": True},
+        ]
+    )
+    assert [row["event_id"] for row in tree["partitions"]] == ["e1", "e4"], tree["partitions"]
+    assert [row["event_id"] for row in tree["enforced"]] == ["e1"], tree["enforced"]
+    assert [row["event_id"] for row in tree["unenforced"]] == ["e4"], tree["unenforced"]
+    assert {row["event_id"] for row in tree["skipped"]} == {"e2", "e3"}, tree["skipped"]
+    assert tree["cross_venue_links"] == {"BTC": ["m1", "m2", "m3"]}, tree["cross_venue_links"]
+    permissive = event_tree_constraints(
+        [{"market_id": "m4", "event_id": "e2"}, {"market_id": "m5", "event_id": "e2"}], require_exhaustive=False
+    )
+    assert len(permissive["partitions"]) == 1 and not permissive["partitions"][0]["enforced"], permissive
+    # The derived rows must drop straight into the consistency check without translation.
+    composed = prediction_market_consistency(
+        markets={"m1": 0.5, "m2": 0.4, "m3": 0.3},
+        partitions=tree["enforced"],
+        cost=0.02,
+        settlement="atomic",
+    )
+    assert composed["violations"] and abs(composed["violations"][0]["gap"] - 0.2) < 1e-9, composed["violations"]
+    assert composed["tradable"] and composed["violations"][0]["settlement"] == "atomic", composed
+    checks.append("event_tree_constraints: negative-risk event is an enforced partition, an undeclared grouping is skipped, and the output feeds the consistency check unchanged")
+
+    # Fixed bet, so the capital process is exactly 1.5^wins x 0.5^losses.
+    won = betting_eprocess([1.0] * 4, null_mean=0.5, lambda_fixed=1.0, grid=0)
+    assert abs(won["e_value"] - 1.5 ** 4) < 1e-12, won["e_value"]
+    crossing = betting_eprocess([1.0] * 12, null_mean=0.5, alpha=0.05, lambda_fixed=1.0, grid=0)
+    assert crossing["crossed_at"] == 8, crossing["crossed_at"]  # 1.5^7 = 17.09 < 20 <= 1.5^8 = 25.63
+    alternating = betting_eprocess([1.0, 0.0] * 8, null_mean=0.5, lambda_fixed=1.0, grid=0)
+    assert not alternating["rejected"] and alternating["e_value"] < 1.0, alternating
+    # Ville's inequality rests on the process being a martingale under the null: the
+    # average capital over every equiprobable path must be exactly 1, at every length.
+    from itertools import product as _product
+
+    for length in (4, 6):
+        paths = list(_product([0.0, 1.0], repeat=length))
+        average = _mean([betting_eprocess(list(p), null_mean=0.5, lambda_fixed=1.0, grid=0)["e_value_above"] for p in paths])
+        assert abs(average - 1.0) < 1e-9, (length, average)
+    flat = betting_eprocess([0.5] * 60, null_mean=0.5)
+    assert not flat["rejected"], flat
+    low, high = flat["confidence_sequence"]
+    assert low <= 0.5 <= high and (high - low) < 0.6, flat["confidence_sequence"]
+    biased = betting_eprocess([0.8] * 40, null_mean=0.5, grid=0)
+    assert biased["rejected"] and biased["crossed_at"] is not None, biased
+    assert betting_eprocess([1.5], null_mean=0.5)["refused"], "out-of-range observations must be refused"
+    assert betting_eprocess([0.5] * 10, null_mean=1.5)["refused"]
+    checks.append("betting_eprocess: exact 1.5^n capital, crossing at n=8, mean capital exactly 1 over all null paths, and a shrinking anytime interval")
+
+    persistent = (
+        [{"counterparty": f"cp{i}", "markout": float(i), "window": "train"} for i in range(1, 7) for _ in range(20)]
+        + [{"counterparty": f"cp{i}", "markout": float(i), "window": "test"} for i in range(1, 7) for _ in range(5)]
+    )
+    forward = counterparty_markout(persistent)
+    assert abs(forward["rank_correlation"] - 1.0) < 1e-12, forward["rank_correlation"]
+    assert abs(forward["top_minus_bottom"] - 4.0) < 1e-12, forward["top_minus_bottom"]
+    assert abs(forward["global_markout"] - 3.5) < 1e-12, forward["global_markout"]
+    reversed_fills = [row for row in persistent if row["window"] == "train"] + [
+        {"counterparty": f"cp{i}", "markout": float(7 - i), "window": "test"} for i in range(1, 7) for _ in range(5)
+    ]
+    assert abs(counterparty_markout(reversed_fills)["rank_correlation"] + 1.0) < 1e-12
+    thin = counterparty_markout(
+        persistent + [{"counterparty": "whale", "markout": 100.0, "window": "train"}, {"counterparty": "whale", "markout": 0.0, "window": "test"}]
+    )
+    whale = next(row for row in thin["profiles"] if row["counterparty"] == "whale")
+    assert thin["global_markout"] < whale["train_markout_shrunk"] < 100.0, whale
+    assert counterparty_markout([{"counterparty": "a", "markout": 1.0, "window": "train"}])["refused"]
+    checks.append("counterparty_markout: perfect and inverted rank persistence recovered exactly, a one-fill counterparty shrunk toward the pooled mean")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 

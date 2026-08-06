@@ -58,7 +58,7 @@ What makes the concept testable here: market context, causal story, ex-ante pred
 
 A binding from a concept to a versioned, tested implementation in `methods.py`. The version is pinned: if the implementation changes version, validation fails until someone re-verifies the card. A silent numerical change under a stable card is how a knowledge base quietly becomes wrong.
 
-Shipped implementations, each with a closed-form self-test: `order_flow_imbalance`, `kyle_lambda`, `avellaneda_stoikov_quotes`, `almgren_chriss_schedule`, `kalman_local_level`, `cusum_changepoint`, `continuation_hazard`, `lmsr_binary`. Every one declares its as-of contract — what it is allowed to see relative to the decision timestamp — and its known numerical failure modes.
+Shipped implementations, each with a closed-form self-test: `order_flow_imbalance`, `kyle_lambda`, `avellaneda_stoikov_quotes`, `almgren_chriss_schedule`, `kalman_local_level`, `cusum_changepoint`, `continuation_hazard`, `lmsr_binary`, the four frontier probes below, and the five workstream methods below that. Every one declares its as-of contract — what it is allowed to see relative to the decision timestamp — and its known numerical failure modes.
 
 ### Decision-relevance card
 
@@ -108,10 +108,10 @@ The **offline half runs in this repo**: `knowledge.py evaluate` scores retrieval
 
 | Policy | hit | precision | correct abstention | counterevidence | tokens |
 |---|---|---|---|---|---|
-| `raw_similarity` | 1.00 | 0.24 | 0.00 | 0.00 | 3.14k |
-| `filtered_only` | 1.00 | 0.80 | 1.00 | 0.00 | 0.99k |
-| `decision_value` | 0.90 | 1.00 | 1.00 | 1.00 | 0.63k |
-| `conservative_abstain` | 0.40 | 1.00 | 1.00 | 1.00 | 0.66k |
+| `raw_similarity` | 1.00 | 0.23 | 0.00 | 0.00 | 3.41k |
+| `filtered_only` | 1.00 | 0.83 | 1.00 | 0.00 | 1.04k |
+| `decision_value` | 0.93 | 1.00 | 1.00 | 0.92 | 0.73k |
+| `conservative_abstain` | 0.50 | 1.00 | 1.00 | 0.86 | 0.80k |
 
 Plain similarity retrieval has a perfect hit rate and answers *every* inapplicable context, including one timestamped before its sources were written. It looks like it is working. That is the point of the control arm.
 
@@ -137,10 +137,10 @@ On the shipped seed:
 
 | Policy | robustness | worst case | violations | note |
 |---|---|---|---|---|
-| `decision_value` | **0.92** | 0.92 (near-duplicates) | 0 | |
-| `filtered_only` | 0.75 | 0.75 | 0 | serves 12 duplicate restatements — no diversity control |
-| `decision_value_wide` | 0.70 | 0.70 | 0 | serves 9 duplicates |
-| `raw_similarity` | 0.00 | — | **388** | recommends calculations on data that is not there |
+| `decision_value` | **0.94** | 0.94 (tool loss) | 0 | degrades rather than switching off |
+| `decision_value_wide` | 0.79 | 0.79 (near-duplicates) | 0 | serves 9 duplicate restatements |
+| `filtered_only` | 0.74 | 0.74 | 0 | serves 16 duplicates — no diversity control |
+| `raw_similarity` | 0.00 | — | **549** | recommends calculations on data that is not there |
 | `conservative_abstain` | 0.00 | 0.00 (tool loss) | 0 | silently switches itself off when tools vanish |
 
 The last row is the finding worth having: an over-cautious threshold looks safe on clean trials and removes the knowledge layer entirely the moment the environment degrades — indistinguishable, from the outside, from having no corpus at all.
@@ -220,6 +220,8 @@ V = payoff x sqrt(novelty) x testability x maturity - effort - already_done_risk
 
 because a novel-work proposal fails most often by being unoriginal rather than by being wrong.
 
+Fifteen of the eighteen now name a first computation that exists, up from six, because the workstream methods above were written to be the first step of the proposals that had none. Three still do not: `EXT-ORDER-COUNT-QUEUE`, `EXT-LVR-DISCRETE` and `EXT-VENUE-LAG-NULL`. Their scores were left alone. Writing an implementation and then raising the score of the proposal it serves would let the ranking reward whatever happened to get built, which is backwards.
+
 ### What reading changed
 
 The first pass of primary reading revised three bets and produced nine extensions. Two of the revisions were corrections to my own claims:
@@ -230,7 +232,25 @@ The first pass of primary reading revised three bets and produced nine extension
 
 Reading also changed two implementations. `time_irreversibility` gained the surrogate null that the source method treats as essential, and `hawkes_branching_ratio` gained a scale profile and a warning, because the published failure mode is exactly the one a window-based estimator walks into. Both are version 1.1.0, which forced their method cards to be re-verified — the version pin doing its job.
 
-`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 4 of 20. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
+`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 9 of 25 — every card added since the first reading pass is anchored to material that was read. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
+
+## The workstreams, and closing the gaps they opened
+
+Reading the venue documentation and our own ingest schema added four problems to the map — batch type-priority, phantom depth, logical arbitrage under atomic settlement, and agent attribution — and then left them uncovered. `knowledge status` said so plainly: four problems with no servable concept. Five cards and five methods close them, each anchored to a unit someone actually opened rather than to a remembered result.
+
+| Problem | Concept | Method | What it computes |
+|---|---|---|---|
+| `PB-BATCH-PRIORITY` | `KC-BATCH-PRIORITY` | `batch_priority_fill` | Execution order under the venue's type hierarchy against the arrival-time counterfactual, and the cancels that beat an aggressive order which arrived first |
+| `PB-PHANTOM-LIQUIDITY` | `KC-PHANTOM-DEPTH` | `depth_realization` | Executable fraction at levels a sweep passed through, and the slippage attributable to the shortfall |
+| `PB-LOGICAL-ARB` | `KC-EVENT-TREE-CONSTRAINTS` | `event_tree_constraints` | The partition set derived from event metadata, split into what the token layer enforces and what it leaves free |
+| `PB-AGENT-ATTRIBUTION` | `KC-ANYTIME-ATTRIBUTION` | `betting_eprocess` | A capital process and confidence sequence that survive continuous peeking |
+| `PB-ADVERSE-ENTRY` (second channel) | `KC-COUNTERPARTY-INFO` | `counterparty_markout` | Shrunk per-address mark-out, and whether the ranking persists out of sample |
+
+Three of these use observables the published literature has not had. Counterparty addresses on every fill turn trade classification from an inference problem into a lookup. Order counts per book level distinguish a level held by one large order from an equally deep level held by twenty small ones. A documented intra-batch ordering rule replaces the continuous-time priority that every order-book model assumes.
+
+`KC-BATCH-PRIORITY` contradicts `KC-MICRO-QUEUE` outright, and that is the point: continuous-time queue position says a late cancel loses, and on a batching venue it wins. Both cards are servable, scoped by `market_types`, and the trial `T-NEG-BATCH-ON-CONTINUOUS` checks that the batching card stays out of a continuous-matching context — a case a retriever matching on queueing vocabulary gets exactly backwards.
+
+`betting_eprocess` sits beside `ledger.py analyze` rather than replacing it. The ledger is fixed-sample, clustered, and refuses to run before the batch freezes; that is what to read once outcomes have matured. The e-process is what to read while they are still accumulating and someone is looking every day anyway. Its guarantee is Ville's inequality: under the null the capital process is a non-negative martingale with mean one, so the chance it *ever* reaches 1/α is at most α, at any stopping time the observer likes. The self-test checks that property directly by averaging the capital over every equiprobable null path.
 
 ## Ranking what to compile next
 
@@ -279,7 +299,7 @@ Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-secon
 | `knowledge.py extensions [--verbose]` | Rank proposed new work; refuse anything not grounded in a unit that has been read |
 | `knowledge.py compile-queue [--limit n]` | Rank what to read and compile next |
 | `knowledge.py vocab` | Card vocabularies and the gate's conditions |
-| `methods.py list / show / run / self-test` | The deterministic method registry |
+| `methods.py list / show / run / self-test` | The deterministic method registry — 17 methods, 20 closed-form checks |
 | `ledger.py record / ladder / analyze / utility / assign` | Attribution and randomized analysis |
 | `graphops.py self-test` | PageRank, betweenness, co-citation, coupling, communities, MMR, coverage |
 | `corpus.py self-test` / `knowledge.py self-test` | Gates, filters and merge logic on adversarial input |

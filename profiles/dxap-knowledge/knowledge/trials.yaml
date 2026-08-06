@@ -268,3 +268,106 @@ trials:
       uncertainties: ["cost of moving an automated market maker's quoted probability"]
       state_notes: ["bilateral dealer quote, no automated maker behind it"]
       question: "What does it cost to move the scoring-rule price to 0.75?"
+
+  # ------------------------------------------------------------------
+  # Workstream contexts. These exist to test that the venue-specific
+  # concepts serve where the venue mechanics hold and stay quiet where
+  # they do not.
+  # ------------------------------------------------------------------
+  - trial_id: T-BATCH-PASSIVE
+    applicable: true
+    gold_concept_ids: [KC-BATCH-PRIORITY]
+    counterevidence_concept_ids: [KC-MICRO-QUEUE]
+    note: >
+      Passive placement on a batching venue. Counterevidence must be the continuous-time queue
+      argument, which is what the batch structure contradicts.
+    context:
+      context_id: ctx-batch-passive
+      timestamp: "2026-08-04T11:15:00Z"
+      market_type: perp_dex
+      instrument: "HYPE-PERP"
+      decision_type: entry
+      horizon: seconds
+      observables_available: [l2_book, trade_prints, sequence_metadata, mid_price_series, fee_schedule, position_state]
+      tools_available: [batch_priority_fill, order_flow_imbalance]
+      latency_budget_seconds: 2.0
+      uncertainties: ["whether a resting order here is protected by the intra-batch ordering or exposed the way a continuous venue would expose it"]
+      state_notes: ["flat position", "intending to rest rather than cross", "one to two batches per block on this venue"]
+      question: "Do I rest this order or cross the spread?"
+
+  - trial_id: T-SWEEP-DEPTH
+    applicable: true
+    gold_concept_ids: [KC-PHANTOM-DEPTH]
+    note: "Sizing an aggressive order against displayed depth on a venue that re-checks margin at match."
+    context:
+      context_id: ctx-sweep-depth
+      timestamp: "2026-08-04T13:02:00Z"
+      market_type: perp_dex
+      instrument: "ETH-PERP"
+      decision_type: sizing
+      horizon: seconds
+      observables_available: [l2_book, trade_prints, sequence_metadata, mid_price_series, fee_schedule, position_state]
+      tools_available: [depth_realization, almgren_chriss_schedule]
+      latency_budget_seconds: 3.0
+      uncertainties: ["how much of the displayed depth will actually execute", "volatility has risen over the last few minutes"]
+      state_notes: ["intending to take size that walks two or three levels", "book looks deep on screen"]
+      question: "How large can I go through this book without paying more than the screen suggests?"
+
+  - trial_id: T-EVENT-PARTITION
+    applicable: true
+    gold_concept_ids: [KC-EVENT-TREE-CONSTRAINTS]
+    counterevidence_concept_ids: [KC-PRED-LIQUIDITY-MOVE]
+    note: >
+      A multi-outcome event whose prices do not sum to one. Counterevidence must raise the
+      possibility that the move is liquidity rather than belief.
+    context:
+      context_id: ctx-event-partition
+      timestamp: "2026-08-04T16:40:00Z"
+      market_type: prediction_market
+      instrument: "election-outcome-set"
+      decision_type: entry
+      horizon: days
+      observables_available: [market_probability, event_tree, liquidity_and_volume, fee_schedule]
+      tools_available: [event_tree_constraints, prediction_market_consistency]
+      latency_budget_seconds: 10.0
+      uncertainties: ["whether these markets are genuinely exclusive and exhaustive", "whether the gap survives the cost of assembling the set"]
+      state_notes: ["five markets under one event id", "quoted probabilities sum to 1.08"]
+      question: "Is this outcome set mispriced against itself?"
+
+  - trial_id: T-ATTRIBUTION-MONITOR
+    applicable: true
+    gold_concept_ids: [KC-ANYTIME-ATTRIBUTION]
+    note: "Deciding whether a treatment has done anything, while the batch is still accumulating."
+    context:
+      context_id: ctx-attribution-monitor
+      timestamp: "2026-08-04T20:00:00Z"
+      market_type: any
+      instrument: "portfolio"
+      decision_type: abstain
+      horizon: days
+      observables_available: [decision_log, matured_outcomes, position_state]
+      tools_available: [betting_eprocess]
+      latency_budget_seconds: 60.0
+      uncertainties: ["the results have been inspected daily since the trial opened", "whether the apparent improvement is the treatment or the extra deliberation it causes"]
+      state_notes: ["randomized at the branch-day level", "roughly forty branch-days matured so far"]
+      question: "Has the retrieval treatment actually changed anything yet?"
+
+  - trial_id: T-NEG-BATCH-ON-CONTINUOUS
+    applicable: false
+    gold_concept_ids: []
+    note: >
+      The batch-priority concept is true of one venue and false of continuous ones. A retriever that
+      matches on queueing vocabulary will serve it here, and be exactly wrong.
+    context:
+      context_id: ctx-neg-batch-continuous
+      timestamp: "2026-08-04T14:30:00Z"
+      market_type: clob_equities
+      instrument: "large-cap-a"
+      decision_type: entry
+      horizon: seconds
+      observables_available: [l2_book, trade_prints, sequence_metadata, mid_price_series]
+      tools_available: [batch_priority_fill]
+      latency_budget_seconds: 2.0
+      uncertainties: ["whether a late cancel protects a resting order the way it does on the on-chain venue"]
+      state_notes: ["continuous matching with genuine arrival-time priority", "no consensus batches"]
+      question: "Will my cancel beat the aggressive order that is already on its way?"

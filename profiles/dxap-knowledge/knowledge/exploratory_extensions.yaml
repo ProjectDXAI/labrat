@@ -312,7 +312,7 @@ extensions:
     first_experiment: >
       Simulate strategies with known decay profiles and known cost noise, run the candidate e-process, and
       measure detection delay against a fixed-window test at matched false-retirement rates.
-    first_computation: null
+    first_computation: betting_eprocess
     would_be_novel_because: >
       Anytime-valid methods are being adopted for experimentation platforms, not for strategy monitoring, and
       the composite-null-with-cost formulation does not appear in either literature.
@@ -398,7 +398,7 @@ extensions:
       Reconstruct batches from the feed, classify each action by category, and measure realized fill
       and mark-out conditional on category and intra-batch rank against the continuous-time
       prediction from queue position alone.
-    first_computation: null
+    first_computation: batch_priority_fill
     would_be_novel_because: >
       The batched-matching literature argues about whether exchanges should batch. Nobody has written
       the queueing model for a venue that already does, with a published type hierarchy rather than
@@ -438,7 +438,7 @@ extensions:
     first_experiment: >
       Compare intended against realized consumption for aggressive orders that walk the book, and
       test whether the shortfall rises with the leverage of the accounts resting at those levels.
-    first_computation: null
+    first_computation: depth_realization
     would_be_novel_because: >
       The microstructure literature treats displayed depth as executable, or discounts it for hidden
       liquidity and spoofing. A margin-driven failure channel is specific to a venue where positions
@@ -517,7 +517,7 @@ extensions:
     first_experiment: >
       Build the constraint graph for one large event tree, classify each edge as enforced or free,
       and compare the frequency and persistence of violations across the two classes.
-    first_computation: prediction_market_consistency
+    first_computation: event_tree_constraints
     would_be_novel_because: >
       It inverts the usual scanning approach. Instead of searching prices for anomalies, it derives
       from the protocol where anomalies are even possible.
@@ -557,7 +557,7 @@ extensions:
     first_experiment: >
       Generate sham cards from real ones by substituting a different market type and horizon, run
       both arms over identical historical contexts, and compare tool-call rates and action changes.
-    first_computation: null
+    first_computation: betting_eprocess
     would_be_novel_because: >
       Retrieval evaluations for LLM agents report accuracy against labels. The placebo control is
       standard in clinical work and essentially absent here.
@@ -604,7 +604,7 @@ extensions:
     first_experiment: >
       Rank addresses by realized mark-out of their aggressive flow over a training period, then test
       whether the ranking predicts mark-out out of sample on the fills we take against them.
-    first_computation: order_flow_imbalance
+    first_computation: counterparty_markout
     would_be_novel_because: >
       Counterparty-attributed studies exist for a handful of regulator-access equity datasets and
       have never been run on a continuously trading crypto venue with public attribution.
@@ -645,7 +645,7 @@ extensions:
       Group one week of snapshots by event id, treat each group as a partition, run the consistency
       check with atomic settlement, and measure how often the partition fails to sum to one beyond
       the cost hurdle.
-    first_computation: prediction_market_consistency
+    first_computation: event_tree_constraints
     would_be_novel_because: >
       Published prediction-market arbitrage studies hand-select related markets. Deriving the
       relation set from the venue's own event structure makes the scan exhaustive rather than

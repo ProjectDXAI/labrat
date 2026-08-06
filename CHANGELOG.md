@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0 - 2026-08-06
+
+- Closed the four workstream problems the venue reads opened and then left uncovered. `knowledge status` had been reporting `PB-BATCH-PRIORITY`, `PB-PHANTOM-LIQUIDITY`, `PB-LOGICAL-ARB` and `PB-AGENT-ATTRIBUTION` as problems with no servable concept; five concept cards, five method bindings, five hypotheses and seven decision cards now cover them. Every problem in the map has a servable concept, and `make smoke-knowledge` asserts it rather than leaving it to be noticed.
+- Five deterministic methods, each with closed-form self-tests. `batch_priority_fill` applies HyperCore's intra-batch type hierarchy and reports displacement against the arrival-time counterfactual, plus the cancels that beat an aggressive order which arrived first. `depth_realization` measures executable against displayed depth at the levels a sweep passed through, excluding the deepest level because it is partially consumed by design. `event_tree_constraints` derives the partition set from Polymarket event metadata and splits it into what the token layer enforces and what it leaves free, in the exact shape `prediction_market_consistency` consumes. `betting_eprocess` gives an anytime-valid test and confidence sequence via Ville's inequality. `counterparty_markout` ranks counterparties by shrunk mark-out and measures out-of-sample rank persistence.
+- `betting_eprocess` is checked against the property it rests on: the mean capital over every equiprobable null path is exactly one, at every sequence length. A fixed bet reproduces 1.5^wins x 0.5^losses exactly, and an all-wins stream crosses the 5% threshold at the eighth observation and not before.
+- `KC-BATCH-PRIORITY` contradicts `KC-MICRO-QUEUE` outright: continuous-time queue position says a late cancel loses, and on a batching venue it wins. Both are servable and scoped by market type, and the new trial `T-NEG-BATCH-ON-CONTINUOUS` checks that the batching card stays out of a continuous-matching context — a case a retriever matching on queueing vocabulary gets exactly backwards.
+- Nineteen labelled trials, up from fourteen. `decision_value` keeps precision at 1.00 and correct abstention at 1.00, and its stress robustness rose to 0.94 with zero integrity violations; `raw_similarity` now commits 549.
+- Fifteen of the eighteen exploratory extensions name a first computation that exists, up from six. Their scores were deliberately left alone: raising the score of a proposal because an implementation was written for it would let the ranking reward whatever happened to get built.
+- Provenance rose from 4 of 20 cards on units someone opened to 9 of 25. Every card added in this release is anchored to venue documentation or to our own schema, both read directly.
+
 ## 0.8.0 - 2026-08-06
 
 - Added `docs/WORKSTREAMS.md`: working notes on the three workstreams, what the warehouse captures, ranked next actions, corpus hygiene priorities, the access gap, and the rules the repo enforces — written to be picked up on a local machine.

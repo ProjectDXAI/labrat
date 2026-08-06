@@ -185,9 +185,9 @@ Three things make this more than a vector database:
 
 - **The SERVABLE gate.** A card is retrievable only with a mechanism, its assumptions, required observables, an expected signature, failure modes, counterevidence, and resolvable source anchors. No contradicting concept and no alternative explanation means the card does not serve — a retrieval layer that can only confirm is worse than none.
 - **Structural filters before similarity.** Market type, horizon, observables actually available, decision type, and point-in-time source availability, so a 2025 book cannot inform a 2024 decision. Then a decision-value re-rank, diversity control, explicit abstention, and a one-hop expansion that must carry counterevidence.
-- **Deterministic tools, not recalled arithmetic.** Eight versioned methods with as-of contracts and closed-form self-tests. Method bindings pin the implementation version, so a numerical change fails validation until someone re-verifies the card.
+- **Deterministic tools, not recalled arithmetic.** Seventeen versioned methods with as-of contracts and closed-form self-tests. Method bindings pin the implementation version, so a numerical change fails validation until someone re-verifies the card.
 
-On the shipped seed, plain similarity retrieval scores a perfect hit rate — with precision 0.24, zero counterevidence, and an answer for *every* inapplicable context including one dated before its sources existed. It stays in the lab as the control arm.
+On the shipped seed, plain similarity retrieval scores a perfect hit rate — with precision 0.23, zero counterevidence, and an answer for *every* inapplicable context including one dated before its sources existed. It stays in the lab as the control arm.
 
 See [docs/KNOWLEDGE.md](docs/KNOWLEDGE.md) for the object model, the retrieval pipeline, and the three gates that separate "the retrieval layer works" from "this makes money".
 

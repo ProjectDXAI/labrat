@@ -787,3 +787,237 @@ concepts:
     confidence: 0.55
     problem_ids: [PB-ADVERSE-ENTRY, PB-ABSORPTION, PB-REGIME-BREAK]
     tags: [signatures, rough-paths, lead-lag, clock-free, read-directly]
+
+  # ----------------------------------------------------------------------------
+  # Workstream concepts. Each is anchored to a unit someone opened — venue
+  # documentation or our own schema — rather than to a remembered result. They
+  # exist because the problem map named four workstream failure modes that no
+  # card addressed, which `knowledge status` reported as uncovered.
+  # ----------------------------------------------------------------------------
+
+  - concept_id: KC-BATCH-PRIORITY
+    canonical_name: "Batch type-priority replaces arrival-time priority"
+    plain_description: >
+      On a venue that applies actions in consensus batches, the order in which actions take effect
+      is decided first by what kind of action each one is, and only then by anything resembling
+      arrival. Two orders sent milliseconds apart can be applied in the opposite order, and a cancel
+      sent after an aggressive order can still take effect before it.
+    mechanism: >
+      HyperCore sorts the actions inside a batch by a fixed hierarchy — orders carrying neither GTC
+      nor IOC first, then cancels, then orders carrying GTC or IOC — with proposer order breaking
+      ties inside each category. Price-time priority still governs the resting book, but the time
+      that matters is the batch boundary rather than the instant of arrival. The consequence is
+      structural rather than statistical: a maker's cancel is applied before every aggressive order
+      in the same batch, whenever it arrived, so a class of adverse fills that a continuous venue
+      would impose cannot occur here.
+    formal_equations: "execution rank = sort by (category, proposer index); category in {0: no GTC/IOC, 1: cancel, 2: GTC/IOC}; displacement = arrival rank - execution rank"
+    assumptions:
+      - "Actions are grouped into the batch we think they are; one or two batches per block means the boundary is short and misassignment is easy."
+      - "The published hierarchy is what the matcher applies, and it does not change without notice."
+      - "Proposer order within a category is not something we can predict or influence."
+    market_types: [perp_dex]
+    relevant_horizons: [tick, seconds]
+    required_observables: [l2_book, trade_prints, sequence_metadata]
+    required_data_resolution: "Action-level feed with enough sequencing information to reconstruct batch boundaries."
+    expected_empirical_signature: >
+      Realized fill and mark-out that depend on action category and on intra-batch rank, and that
+      are not explained by continuous-time queue position; specifically, a lower realized adverse
+      selection on resting orders than the continuous-time calculation predicts, concentrated in
+      the batches where a cancel and an aggressive order coincide.
+    alternative_explanations:
+      - "The batch interval is short relative to the horizon being traded, so the reordering averages out and the continuous model describes the outcome adequately after all."
+      - "Any measured maker advantage comes from latency to the proposer rather than from the category hierarchy, and would vanish under a different proposer."
+    known_failure_modes:
+      - "Batch boundaries are not published as such and must be reconstructed; a wrong reconstruction moves actions between batches and destroys the whole calculation."
+      - "The protection is an opportunity, not a saving: whether the aggressive order would have matched that specific resting order needs price and size, which the ordering alone does not give."
+      - "Applies to this venue only. Importing the conclusion to a continuous venue inverts it, because there the late cancel loses."
+      - "Two batches per block means an action can still lose to an action that arrived later in the previous batch."
+    source_passage_ids:
+      - "hyperliquid-api-docs#hypercore-order-book"
+    contradicting_concept_ids: [KC-MICRO-QUEUE]
+    supporting_concept_ids: []
+    implementation_status: implemented
+    confidence: 0.6
+    problem_ids: [PB-BATCH-PRIORITY, PB-FILL-UNCERTAINTY]
+    tags: [queueing, batch-auction, priority, fill-probability, onchain, read-directly]
+    workstream: hyperliquid_l4
+
+  - concept_id: KC-PHANTOM-DEPTH
+    canonical_name: "Displayed depth is an upper bound on executable depth"
+    plain_description: >
+      Resting size that is visible in the book may not execute, because the account behind it is
+      re-checked for margin at the moment it would match. Depth that fails that check disappears
+      exactly when it is needed, so slippage models built on the displayed book are biased in the
+      state where the estimate matters most.
+    mechanism: >
+      Margin is checked when an order is placed and again for the resting side at each match. An
+      account whose collateral has deteriorated since placement still displays its orders, but those
+      orders fail at match time. Because collateral deteriorates when prices move, the failures
+      concentrate in exactly the volatile states in which an aggressor is walking the book.
+    formal_equations: "executable fraction = filled / displayed over levels the sweep passed through; slippage_from_phantom = realized VWAP - VWAP the displayed book predicted"
+    assumptions:
+      - "The book snapshot used is the last one strictly before the order was sent, with no sequence gap."
+      - "The sweep is large enough to pass through at least one level, so that level is genuinely tested."
+      - "Displayed size is not systematically hidden or iceberged in the other direction."
+    market_types: [perp_dex]
+    relevant_horizons: [tick, seconds]
+    required_observables: [l2_book, trade_prints, sequence_metadata]
+    required_data_resolution: "Level-2 snapshots with per-level size, and the fills attributable to a single aggressive order."
+    expected_empirical_signature: >
+      Realized consumption below displayed size at levels the sweep passed through, rising with
+      volatility and with the leverage of the accounts resting at those levels, and distinct from
+      the pattern that ordinary cancellation produces.
+    alternative_explanations:
+      - "Ordinary cancellation in the same batch removes the size for reasons unrelated to margin, and looks identical from the feed alone."
+      - "The snapshot was stale or a sequence gap was missed, so the depth was never there at the decision time."
+      - "Self-trade prevention removed the resting order, which is neither a margin failure nor a cancel."
+    known_failure_modes:
+      - "The deepest level a sweep reaches is partially consumed by design; counting it as phantom reports phantom depth on every sweep that ever stopped."
+      - "Cannot separate a margin failure from a cancel without the account state behind each resting order, and that separation is the whole claim."
+      - "A sweep that fills more than displayed reads as a realization above one, which is hidden liquidity rather than an error."
+    source_passage_ids:
+      - "hyperliquid-api-docs#hypercore-order-book"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by its alternative explanations: the observable shortfall is shared by cancellation, stale data and self-trade prevention, and the margin channel is only one of them."
+    supporting_concept_ids: [KC-BATCH-PRIORITY]
+    implementation_status: implemented
+    confidence: 0.45
+    problem_ids: [PB-PHANTOM-LIQUIDITY, PB-IMPACT-TIMING]
+    tags: [phantom-liquidity, margin, depth, onchain, read-directly]
+    workstream: hyperliquid_l4
+
+  - concept_id: KC-EVENT-TREE-CONSTRAINTS
+    canonical_name: "The logical constraint set is metadata, and the protocol enforces part of it"
+    plain_description: >
+      Which prediction markets must be consistent with each other is already recorded in the venue's
+      event structure, so the constraint set can be enumerated rather than discovered by reading
+      questions. A subset of those constraints is enforced by the token layer, and mispricing cannot
+      persist there — which means the tradable surface is the unenforced complement, known in advance.
+    mechanism: >
+      Markets are keyed to an event, and outcomes within a negative-risk event are connected by a
+      conversion that exchanges one NO token for YES tokens in the event's other outcomes. That
+      conversion mechanically enforces the partition: a complete set can be assembled or dissolved
+      for collateral in a single transaction, so a partition that fails to sum to one is arbitrageable
+      without leg risk and is therefore competed away. Where no such conversion exists, the same
+      relation holds only by convention and a breach can survive.
+    formal_equations: "For an exhaustive outcome set O: sum_{o in O} P(o) = 1; enforced iff the token layer admits split/merge or the negative-risk conversion across O"
+    assumptions:
+      - "Markets sharing an event id are genuinely mutually exclusive and exhaustive, which the metadata asserts and the resolution criteria decide."
+      - "The grouping in force at the decision timestamp is the one used; events are re-scoped and markets are added mid-life."
+      - "All members are quoted at the same instant, so a stale leg is not manufacturing the breach."
+    market_types: [prediction_market]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [market_probability, event_tree]
+    required_data_resolution: "Market snapshots carrying event and series identifiers, quoted close enough together to be treated as simultaneous."
+    expected_empirical_signature: >
+      Partition sums that depart from one materially more often, and for materially longer, on
+      relations the protocol does not enforce than on relations it does; and a cross-venue link,
+      through the tracked instrument, whose consistency is not enforced at all.
+    alternative_explanations:
+      - "A gap that never closes is usually a resolution-criteria difference rather than a mispricing: the markets are not the partition the metadata says they are."
+      - "Apparent breaches concentrate in illiquid events where the quote is not executable in size, so the constraint is satisfied at any price anyone could actually trade."
+    known_failure_modes:
+      - "Event grouping is a venue convention. Treating every group as a partition manufactures constraints that never existed, and no amount of price data reveals the error."
+      - "A market that resolves early leaves a stale member whose price is pinned, which reads as a permanent breach that no trade captures."
+      - "Enforcement is about the token layer only. A constraint can be economically tight without being protocol-enforced, and this account calls it free."
+      - "Deriving implications, as opposed to partitions, needs a threshold or nesting field the snapshot schema does not carry."
+    source_passage_ids:
+      - "polymarket-clob-docs#conditional-token-framework"
+      - "dxai-hyperliquid-ingest#polymarket-snapshots"
+    contradicting_concept_ids: []
+    alternative_note: "The competing account is that apparent breaches are resolution-criteria differences rather than mispricings; it is the first explanation to rule out, not a card of its own."
+    supporting_concept_ids: [KC-XMKT-CONSISTENCY, KC-PRED-LIQUIDITY-MOVE]
+    implementation_status: implemented
+    confidence: 0.6
+    problem_ids: [PB-LOGICAL-ARB, PB-XMARKET]
+    tags: [prediction-market, conditional-tokens, arbitrage, polymarket-relevant, read-directly]
+    workstream: polymarket
+
+  - concept_id: KC-ANYTIME-ATTRIBUTION
+    canonical_name: "Monitoring an agent's edge without a stopping rule fixed in advance"
+    plain_description: >
+      An agent acts far faster than its outcomes mature, and whoever is watching will look at the
+      results continuously. A fixed-sample test read that way has no error guarantee left. A betting
+      process keeps its guarantee under continuous peeking, at a cost in power, which makes it the
+      right instrument for deciding whether retrieval — or any treatment — actually changed anything.
+    mechanism: >
+      Bet a fraction of a notional bankroll on each matured outcome against the null. Under the null
+      the bankroll is a non-negative martingale with mean one, so by Ville's inequality the chance it
+      ever reaches 1/alpha is at most alpha — at any stopping time, chosen however the observer likes.
+      The reciprocal of the bankroll inverts into a confidence sequence that is valid at every time
+      simultaneously, rather than at one sample size decided beforehand.
+    formal_equations: "K_t = prod_{i<=t} (1 + lambda_i (X_i - m_0)), lambda_i predictable; P(exists t: K_t >= 1/alpha | H_0) <= alpha; CS_t = {m : K_t(m) < 1/alpha}"
+    assumptions:
+      - "Observations are bounded and arrive in the order they matured."
+      - "The bet at each step uses only what was observable before that step."
+      - "The unit of observation is independent under the null at the level it is analysed — which for an agent means the branch or day, not the wake."
+    market_types: [any]
+    relevant_horizons: [days, weeks]
+    required_observables: [decision_log, matured_outcomes]
+    required_data_resolution: "Matured, arm-labelled outcomes at the unit of randomization, in maturation order."
+    expected_empirical_signature: >
+      A capital process that stays near one while the treatment does nothing and grows steadily once
+      it does, with a confidence sequence that narrows monotonically and needs no correction for
+      having been looked at.
+    alternative_explanations:
+      - "Any measured behaviour change may be the generic effect of giving the model more context to deliberate over, not the content of that context — which is what a sham arm, and only a sham arm, separates."
+      - "An agent's own account of which concept it used is a plausible narrative generated after the fact, and correlates with the decision without having caused it."
+    known_failure_modes:
+      - "The guarantee is about the null being true, not about the null being the right one. A well-specified test of the wrong quantity is still the wrong answer."
+      - "Anytime-validity costs power. When the sample size genuinely is fixed in advance, this is the more conservative and worse tool."
+      - "Observation order is load-bearing and unverifiable from the data: sorting the outcomes, or letting fast-maturing ones jump the queue, breaks the guarantee while the output looks identical."
+      - "Clustering: thousands of wakes inside one account path are not thousands of observations, and analysing them as such makes the process cross for reasons that have nothing to do with the treatment."
+    source_passage_ids:
+      - "ramdas-2023-game-theoretic-statistics#e-values-and-ville"
+      - "ramdas-2023-game-theoretic-statistics#open-problems"
+    contradicting_concept_ids: []
+    alternative_note: "The rival account is the deliberation confound rather than an opposing statistical claim; it is listed first among the alternative explanations because it is what the sham arm exists to measure."
+    supporting_concept_ids: []
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-AGENT-ATTRIBUTION]
+    tags: [attribution, anytime-valid, e-values, agentic, read-directly]
+    workstream: dxap_agents
+
+  - concept_id: KC-COUNTERPARTY-INFO
+    canonical_name: "Adverse selection is a property of the counterparty, not only of the state"
+    plain_description: >
+      When fills carry the identity of both sides, adverse selection can be attributed to who was on
+      the other side rather than inferred from market conditions. If a counterparty's flow marks out
+      the same way next month as it did last month, then identity carries information the market
+      state does not.
+    mechanism: >
+      Participants differ persistently in what they know and how fast they act. Flow from a
+      persistently informed participant marks out against whoever fills it, and that persistence is
+      what makes the history predictive. The empirical microstructure literature spends its effort
+      inferring this attribution from anonymous prints; a venue that publishes both addresses on
+      every fill removes the inference step and makes the classification rules themselves checkable.
+    formal_equations: "shrunk_i = (sum markout_i + k * global) / (n_i + k); persistence = Spearman(rank of shrunk train markout, test markout)"
+    assumptions:
+      - "One address behaves as one participant over the measurement window."
+      - "The training window closes strictly before the test window opens."
+      - "Mark-out is signed consistently, against arrival mid rather than fill price."
+    market_types: [perp_dex]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [trade_prints, counterparty_ids, mid_price_series]
+    required_data_resolution: "Fills with both counterparty identifiers and a mid-price series fine enough to measure mark-out at the intended horizon."
+    expected_empirical_signature: >
+      Out-of-sample rank persistence in counterparty mark-out well above zero, with adverse selection
+      concentrated in a small set of addresses rather than spread evenly across the population.
+    alternative_explanations:
+      - "The ranking reflects speed rather than information: fast participants mark out well because they are early, not because they know more."
+      - "Persistence is an artifact of which counterparties trade in which conditions, so identity is proxying for the market state it was supposed to add to."
+    known_failure_modes:
+      - "Addresses split, rotate and pool, so persistence can be broken by identity churn rather than by absence of information."
+      - "Counterparties present in both windows are the ones that kept trading, which is not a random subset of the population."
+      - "Shrinkage strength is a choice rather than an estimate; a different prior changes the ranking of thin counterparties and therefore the measured persistence."
+      - "Says nothing about causality, and the natural next step — avoiding those counterparties — changes their behaviour and ours."
+    source_passage_ids:
+      - "dxai-hyperliquid-ingest#clickhouse-schema"
+    contradicting_concept_ids: [KC-MICRO-MECHANICAL-FLOW]
+    supporting_concept_ids: [KC-MICRO-OFI]
+    implementation_status: implemented
+    confidence: 0.5
+    problem_ids: [PB-ADVERSE-ENTRY, PB-FILL-UNCERTAINTY]
+    tags: [adverse-selection, counterparty, onchain, ground-truth, read-directly]
+    workstream: hyperliquid_l4

@@ -183,3 +183,128 @@ hypotheses:
     invalidation_conditions:
       - "Impact is concave in this instrument, so the linear schedule trades too fast."
       - "Information arriving mid-schedule dominates, meaning the stopping problem matters more than the schedule."
+
+  - hypothesis_id: HY-BATCH-MAKER-PROTECTION
+    concept_id: KC-BATCH-PRIORITY
+    market_context: "Hyperliquid perpetuals, resting orders placed and cancelled within the same block, continuous trading."
+    causal_story: >
+      Cancels are applied before aggressive orders inside a batch, so a maker who cancels in the same
+      batch as an incoming aggressive order escapes a fill that a continuous-time venue would have
+      imposed. The adverse selection a resting order actually suffers should therefore be lower than
+      the continuous-time queue calculation predicts, by an amount that scales with how often a cancel
+      and an aggressive order land in the same batch.
+    ex_ante_prediction: >
+      Mean mark-out on passive fills is at least 20% less negative than the continuous-time queue-position
+      prediction for the same orders, and the gap grows with the share of batches containing both a
+      cancel and an aggressive order.
+    null_hypothesis: "Realized passive mark-out matches the continuous-time queue-position prediction; batch category adds nothing."
+    measurement_operator:
+      method_id: batch_priority_fill
+      params: {}
+      derived: "displacement and escaped-cancel count per batch; realized mark-out at 1s and 10s conditional on category and intra-batch rank"
+    eligible_universe: "Instruments with reconstructable batch boundaries and at least 500 passive fills in the window."
+    decision_timestamp_rule: "Batch composition reconstructed only from actions timestamped before the batch closes; no use of the resulting fills to infer the ordering."
+    outcome_horizons: [1s, 10s, 60s]
+    cost_model: "Maker fee and funding carry over the resting interval; the comparison is mark-out against arrival mid, so no spread is credited."
+    invalidation_conditions:
+      - "Mark-out is fully explained by continuous-time queue position, meaning the batch is too fine relative to the horizon to matter."
+      - "The advantage disappears once proposer identity is controlled for, meaning it was latency rather than the hierarchy."
+      - "Batch boundaries cannot be reconstructed accurately enough for the category assignment to be stable."
+
+  - hypothesis_id: HY-PHANTOM-DEPTH
+    concept_id: KC-PHANTOM-DEPTH
+    market_context: "Hyperliquid perpetuals, aggressive orders large enough to walk at least two levels."
+    causal_story: >
+      Resting orders are re-checked for margin at match time, so displayed size backed by deteriorating
+      collateral fails exactly when volatility rises. Slippage estimated from the displayed book is
+      therefore biased, and the bias is largest in the states where the estimate is being relied on.
+    ex_ante_prediction: >
+      Executable fraction at fully tested levels falls below 0.95 on average, and falls further in the
+      top volatility quintile than in the bottom, by at least 3 percentage points.
+    null_hypothesis: "Executable fraction is independent of volatility and statistically indistinguishable from one after accounting for ordinary cancellation."
+    measurement_operator:
+      method_id: depth_realization
+      params: {side: buy}
+      derived: "executable fraction and slippage per sweep, bucketed by trailing realized volatility"
+    eligible_universe: "Sweeps that passed through at least one level, with a gap-free book snapshot immediately prior."
+    decision_timestamp_rule: "The book snapshot must be the last one strictly before the order was sent; post-trade snapshots are excluded."
+    outcome_horizons: [immediate]
+    cost_model: "Slippage measured against the VWAP the displayed book predicted, taker fee excluded so the two legs are comparable."
+    invalidation_conditions:
+      - "The shortfall is the same in calm and volatile states, which points at ordinary cancellation rather than margin."
+      - "The shortfall vanishes once sequence gaps are excluded, meaning it was a data artifact."
+      - "The effect is smaller than the tick, so no execution decision could act on it."
+
+  - hypothesis_id: HY-ENFORCED-VS-FREE
+    concept_id: KC-EVENT-TREE-CONSTRAINTS
+    market_context: "Polymarket, multi-outcome events, quotes sampled at a common instant."
+    causal_story: >
+      Where the token layer enforces a partition, an atomic split or merge collapses any breach at low
+      cost, so breaches cannot persist. Where the relation holds only by convention, closing it requires
+      several independent executions and a breach can survive. Persistence should therefore separate
+      cleanly by enforcement class.
+    ex_ante_prediction: >
+      Cost-surviving partition breaches occur at least three times as often, and persist at least three
+      times as long, on unenforced relations as on protocol-enforced ones.
+    null_hypothesis: "Breach frequency and persistence are the same on enforced and unenforced relations."
+    measurement_operator:
+      method_id: event_tree_constraints
+      params: {require_exhaustive: true}
+      derived: "partitions by enforcement class, fed to prediction_market_consistency with settlement=atomic on the enforced class; breach duration until the sum returns within the hurdle"
+    eligible_universe: "Events with at least two markets, all quoted within the same snapshot, excluding markets already resolved."
+    decision_timestamp_rule: "Event grouping as recorded in the snapshot in force at the quote instant, not the grouping as it stands today."
+    outcome_horizons: [1h, 1d]
+    cost_model: "Legwise: round-trip cost per leg on unenforced relations. Atomic: one round trip plus the split or merge cost on enforced ones."
+    invalidation_conditions:
+      - "Breaches appear at similar rates on both classes, meaning the enforcement mechanism is not used in practice."
+      - "Most apparent breaches trace to resolution-criteria differences, so the grouping was never a partition."
+      - "Breaches concentrate in events too illiquid to trade in any size that pays for the transaction."
+
+  - hypothesis_id: HY-RETRIEVAL-ANYTIME
+    concept_id: KC-ANYTIME-ATTRIBUTION
+    market_context: "Branch-isolated paper accounts on Hyperliquid, randomized at the branch-day level, retrieval on versus off."
+    causal_story: >
+      If compiled retrieval improves decisions, the per-branch-day net outcome under treatment exceeds
+      the control mean. Because outcomes mature over days while the agent acts continuously, the
+      comparison will be inspected long before any pre-planned sample size is reached, so it must be
+      the kind of comparison that inspection does not invalidate.
+    ex_ante_prediction: >
+      The capital process against the null of no improvement reaches 20 within 60 matured branch-days,
+      and the anytime lower confidence bound on the treatment-minus-control mean clears zero and stays there.
+    null_hypothesis: "Mean net outcome per branch-day is no higher under retrieval than under control."
+    measurement_operator:
+      method_id: betting_eprocess
+      params: {alpha: 0.05}
+      derived: "per-branch-day paired net outcome, rescaled to [lo, hi] by the observed range, in maturation order"
+    eligible_universe: "Branch-days whose positions have all matured or been marked to market at the horizon, arm assigned before the day opened."
+    decision_timestamp_rule: "Arm assignment is deterministic from the branch-day seed and fixed before the first wake of that day; outcomes enter in maturation order only."
+    outcome_horizons: [1d, 7d]
+    cost_model: "Net of fees, funding and realized slippage; positions open at the horizon marked to market rather than dropped."
+    invalidation_conditions:
+      - "The sham arm moves the same way as the treatment arm, meaning the effect is deliberation rather than knowledge."
+      - "The process crosses only when wakes rather than branch-days are treated as the unit, which is a clustering artifact."
+      - "The interval is still wide after the planned rollout, meaning the design has too little power for the effect size that matters."
+
+  - hypothesis_id: HY-COUNTERPARTY-PERSISTENCE
+    concept_id: KC-COUNTERPARTY-INFO
+    market_context: "Hyperliquid perpetuals, fills with both counterparty addresses, one month training against the following month."
+    causal_story: >
+      Informed participation is a persistent trait rather than a market state, so mark-out attributable
+      to a counterparty in one period should predict mark-out attributable to the same counterparty in
+      the next, over and above anything the contemporaneous book state says.
+    ex_ante_prediction: >
+      Spearman rank correlation between shrunk training mark-out and out-of-sample mark-out exceeds 0.3,
+      and the top training tertile marks out at least 1 basis point worse for us than the bottom.
+    null_hypothesis: "Counterparty identity carries no out-of-sample information about mark-out once market state is controlled for."
+    measurement_operator:
+      method_id: counterparty_markout
+      params: {prior_strength: 10.0}
+      derived: "shrunk per-address mark-out in the training month, rank-compared against the following month"
+    eligible_universe: "Addresses with at least 20 aggressive fills in the training window and at least 5 in the test window."
+    decision_timestamp_rule: "Training window closes strictly before the test window opens; no address is included on the basis of its test-window activity."
+    outcome_horizons: [30s, 5m]
+    cost_model: "Mark-out against arrival mid; the actionable version nets the maker rebate we would forgo by declining to quote against a flagged address."
+    invalidation_conditions:
+      - "Rank correlation is indistinguishable from zero, so identity adds nothing to the market state."
+      - "The effect is entirely explained by speed, which a latency control removes."
+      - "Address churn is fast enough that the training ranking covers too little of the test volume to act on."
