@@ -202,9 +202,14 @@ Locations come from Unpaywall by DOI, and from arXiv directly where a preprint e
 | MIT OpenCourseWare | **CC BY-NC-SA, confirmed** on both the terms page and each course page. 5 courses, 109 PDFs, 37 MB downloaded |
 | Publisher landing pages that loaded | 20 read in full, none granting an open licence → `all_rights_reserved, confirmed` |
 | Publisher pages behind a bot wall | 20 returned 403 → unresolved, not assumed either way |
-| arXiv | The default grant is a licence **to arXiv** to distribute, not a licence to us. Read on the page and mapped to `author_hosted_free` → `reference_only` |
+| arXiv | The default grant is a licence **to arXiv** to distribute, not a licence to us. Read on the page and mapped to `author_hosted_free` → `reference_only`. Readable, downloadable as a study copy, not ingestable |
+| Course notes pages | Stanford EE364a and Berkeley CS285 serve slides publicly with no licence stated → `author_hosted_free`, harvested as study copies |
 
-That last row is the one worth internalizing. arXiv is the largest pool of freely readable material the corpus touches, and freely readable is not licensed. A paper there is ingestable only if its author chose a CC licence, which has to be checked per paper.
+The arXiv row is the one worth internalizing. arXiv is the largest pool of freely readable material the corpus touches, and freely readable is not licensed. A paper there is ingestable only if its author chose a CC licence, which has to be checked per paper. It is still perfectly readable, which is what `study` is for.
+
+Locating those copies did not go smoothly, and the failures are recorded because they are the interesting part. OpenAlex became a metered API mid-run and the first version cached its quota errors as "no such work". arXiv's Atom API refuses this environment outright, so the resolver reads the public search page instead — and then arXiv throttled that too, partway through a sweep, at which point a circuit breaker abandons the index after six consecutive failures and says so in the output. Grinding through two hundred more titles at eighty seconds each would have turned a block into two hundred silent misses.
+
+**Current haul: 295 PDFs, 176 MB, across 34 entries** — 5 MIT OpenCourseWare courses under CC BY-NC-SA (the only openly licensed material, and the only material `fetch` will take), plus study copies from publisher sites, institutional repositories and course pages. Every one of those study copies keeps the rights tag it arrived with.
 
 ## Running it as a labrat lab
 

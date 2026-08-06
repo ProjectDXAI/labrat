@@ -425,6 +425,7 @@ def cmd_identify(args: argparse.Namespace) -> int:
     resolved, quarantine, errors = [], [], []
     preprint_urls: dict[str, str | None] = {}
     preprint_pdfs: dict[str, str | None] = {}
+    arxiv_failures, arxiv_down = 0, False
     considered = 0
     for entry in entries:
         identifiers = entry.get("identifiers") or {}
@@ -452,12 +453,22 @@ def cmd_identify(args: argparse.Namespace) -> int:
         # for anything we recorded as a preprint. It is a second index, not a second
         # opinion: the same match rule applies to what it returns.
         preprintable = entry.get("form") in {"paper", "working_paper", "survey", "proceedings", "thesis"}
-        if (not best or entry.get("form") == "working_paper") and args.arxiv and preprintable:
+        if (not best or entry.get("form") == "working_paper") and args.arxiv and preprintable and not arxiv_down:
             try:
                 preprints = arxiv_search(entry.get("title") or "", cache)
+                arxiv_failures = 0
             except ApiError as error:
                 preprints = []
+                arxiv_failures += 1
                 errors.append({"id": entry["id"], "stage": "arxiv", "error": str(error)})
+                # A throttle that does not lift is a blocked index, and grinding through
+                # the remaining titles at eighty seconds each buys nothing. Stop asking,
+                # and say so, rather than turning a block into hundreds of silent misses.
+                if arxiv_failures >= args.arxiv_give_up:
+                    arxiv_down = True
+                    errors.append({"id": "-", "stage": "arxiv",
+                                   "error": f"abandoned after {arxiv_failures} consecutive failures; "
+                                            "remaining titles were not searched on arXiv"})
             if preprints:
                 matched_preprint, preprint_shortlist, preprint_reason = match(entry, preprints)
                 if matched_preprint:
@@ -520,6 +531,7 @@ def cmd_identify(args: argparse.Namespace) -> int:
         "resolved": len(resolved),
         "quarantined": len(quarantine),
         "api_errors": len(errors),
+        "arxiv_abandoned": arxiv_down,
         "with_open_licence_hint": sum(1 for r in resolved if r["_oa"].get("licence_status_hint")),
         "with_full_text_link": sum(1 for r in resolved if r["_oa"].get("full_text_links")),
         "out": str(out),
@@ -740,6 +752,51 @@ def cmd_study(args: argparse.Namespace) -> int:
         row = identified.get(entry["id"]) or {}
         oa_record = row.get("_oa") or {}
         direct = oa_record.get("direct_pdf")
+
+        # A course or notes page: many free PDFs behind one entry. Same reasoning as
+        # a single study copy, so it belongs here rather than behind the manifest.
+        index_url = (entry.get("acquisition") or {}).get("download_index")
+        if index_url:
+            considered += 1
+            status, body = http_get(index_url, timeout=45, accept="text/html")
+            if status != 200:
+                skipped.append({"id": entry["id"], "reason": f"notes index unreachable (http {status})"})
+                continue
+            origin = "/".join(index_url.split("/")[:3])
+            stem = index_url.rsplit("/", 1)[0] + "/"
+            links = sorted({
+                link if link.startswith("http") else (origin + link if link.startswith("/") else stem + link)
+                for link in re.findall(r'href="([^"]+\.pdf)"', body.decode("utf-8", errors="replace"))
+            })[: args.max_files]
+            folder = dest / entry["id"]
+            folder.mkdir(parents=True, exist_ok=True)
+            taken = 0
+            for link in links:
+                target = folder / link.rsplit("/", 1)[-1].split("?")[0]
+                if target.exists():
+                    taken += 1
+                    continue
+                code, blob = http_get(link, timeout=90, accept="application/pdf")
+                if code == 200 and blob.startswith(b"%PDF"):
+                    target.write_bytes(blob)
+                    taken += 1
+                time.sleep(0.25)
+            if not taken:
+                skipped.append({"id": entry["id"], "reason": "notes index had no retrievable PDFs"})
+                continue
+            total = sum(f.stat().st_size for f in folder.glob("*.pdf"))
+            got.append({"id": entry["id"], "path": str(folder), "bytes": total, "files": taken,
+                        "host": "course_page", "licence": None})
+            record.append({
+                "id": entry["id"],
+                "acquisition": {
+                    "state": "owned", "copy_path": str(folder), "source_url": index_url,
+                    "obtained_at": str(date.today()),
+                    "note": "Study copies of the notes the course serves publicly. Rights tag unchanged.",
+                },
+            })
+            continue
+
         doi = ((entry.get("identifiers") or {}).get("doi") or (row.get("identifiers") or {}).get("doi"))
 
         location: dict[str, Any] = {}
@@ -858,6 +915,7 @@ def main(argv: list[str] | None = None) -> int:
     identify.add_argument("--out", default="corpus/resolved.json")
     identify.add_argument("--openalex-fallback", action="store_true", help="Try OpenAlex when nothing else matched (metered API).")
     identify.add_argument("--no-arxiv", dest="arxiv", action="store_false", default=True, help="Skip the arXiv index.")
+    identify.add_argument("--arxiv-give-up", type=int, default=6, help="Consecutive arXiv failures before abandoning that index for the run.")
 
     licence = sub.add_parser("licence", help="Read the licence off the landing page and write verify findings.")
     licence.add_argument("--identified", default="corpus/resolved.json")
@@ -878,6 +936,7 @@ def main(argv: list[str] | None = None) -> int:
     study.add_argument("--delay", type=float, default=0.4)
     study.add_argument("--round", type=int, default=1)
     study.add_argument("--out", default="corpus/study-findings.yaml")
+    study.add_argument("--max-files", type=int, default=60, help="cap per multi-file source")
 
     sub.add_parser("self-test", help="Matching and licence-classification checks; no network.")
     args = parser.parse_args(argv)

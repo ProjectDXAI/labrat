@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T03:25:33.733622+00:00'
+updated_at: '2026-08-06T03:55:31.514750+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -180,9 +180,9 @@ entries:
   - target: gelman-2013-bayesian-data-analysis
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - reproduction-number
@@ -193,60 +193,6 @@ entries:
   notes: 'The practical estimator, with credible intervals and an explicit window choice, and an honest treatment
     of how the window trades resolution against noise. Our Hawkes estimator has the same window problem and none
     of this machinery. Likely CC BY — worth a verify round, and probably downloadable.
-
-    '
-- id: dakos-2012-methods-early-warnings
-  title: Methods for Detecting Early Warnings of Critical Transitions in Time Series Illustrated Using Simulated
-    Ecological Data
-  authors:
-  - Vasilis Dakos
-  - Stephen R. Carpenter
-  - Wolf M. Mooij
-  - Ingrid A. van de Leemput
-  - Marten Scheffer
-  year: 2012
-  bucket: adjacent_disciplines
-  form: paper
-  venue: PLoS ONE 7(7)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 20
-  density: high
-  priority: 5
-  rights:
-    status: cc_by
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: scheffer-2009-early-warning-signals
-    relation: builds_on
-  - target: kantz-2003-nonlinear-time-series-analysis
-    relation: cites
-  - target: montgomery-2019-statistical-quality-control
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - early-warning
-  - detrending
-  - false-positives
-  - transfer
-  - regime
-  notes: 'The methods paper, and more usefully the failure catalogue: detrending choice, window length and filtering
-    all move the indicator, and the false-positive rate on surrogate data is high. Read before treating rising autocorrelation
-    as a signal. PLoS ONE is CC BY, so this one is genuinely acquirable.
 
     '
 - id: fine-1999-subdistribution-competing-risk
@@ -347,56 +293,6 @@ entries:
   notes: '"Maximize sharpness subject to calibration" is the design rule, and it settles an argument we would otherwise
     have: a probability that is right on average is not the goal, a probability that is right on average and confident
     is.
-
-    '
-- id: helmstetter-2003-predictability-etas
-  title: Predictability in the Epidemic-Type Aftershock Sequence Model of Interacting Triggered Seismicity
-  authors:
-  - Agnès Helmstetter
-  - Didier Sornette
-  year: 2003
-  bucket: adjacent_disciplines
-  form: paper
-  venue: Journal of Geophysical Research 108(B10)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 18
-  density: high
-  priority: 5
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: hardiman-2013-critical-reflexivity
-    relation: cites
-  - target: sornette-2003-why-stock-markets-crash
-    relation: builds_on
-  - target: athreya-1972-branching-processes
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - predictability-limit
-  - etas
-  - criticality
-  - seismology
-  - transfer
-  notes: 'Derives how much predictability a self-exciting process can offer as a function of its branching ratio,
-    and finds it small even near criticality. That is a ceiling on what FB-CRITICALITY can deliver, computed rather
-    than asserted, and it is the kind of result worth knowing before rather than after building on the idea.
 
     '
 - id: jennison-1999-group-sequential-methods
@@ -500,116 +396,6 @@ entries:
   notes: 'The argument for building shared prospective testing infrastructure rather than arguing about retrospective
     claims, and the founding case for CSEP. Four pages, and it is the closest thing anyone has written to a constitution
     for PB-AGENT-ATTRIBUTION.
-
-    '
-- id: jordan-2011-operational-earthquake-forecasting
-  title: 'Operational Earthquake Forecasting: State of Knowledge and Guidelines for Utilization'
-  authors:
-  - Thomas H. Jordan
-  - Yun-Tai Chen
-  - Paolo Gasparini
-  - Raul Madariaga
-  - Ian Main
-  - Warner Marzocchi
-  - Gerassimos Papadopoulos
-  - Gennady Sobolev
-  - Koshun Yamaoka
-  - Jochen Zschau
-  year: 2011
-  bucket: adjacent_disciplines
-  form: paper
-  venue: Annals of Geophysics 54(4)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 91
-  density: medium
-  priority: 5
-  rights:
-    status: cc_by
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: schorlemmer-2007-earthquake-likelihood-model-testing
-    relation: builds_on
-  - target: vickers-2006-decision-curve-analysis
-    relation: cites
-  - target: axelsson-2000-base-rate-fallacy
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - decision-value
-  - low-probability-gain
-  - seismology
-  - transfer
-  - abstention
-  notes: 'What to do with a forecast whose probability gain is real but small. The answer is not to suppress it
-    and not to act on it directly, but to route it through an explicit decision protocol with stated costs. That
-    is the abstention problem, and this is a field that had to answer it in public with lives attached. Annals of
-    Geophysics is open access — a verify round should clear it.
-
-    '
-- id: list-2002-aggregating-sets-of-judgments
-  title: 'Aggregating Sets of Judgments: An Impossibility Result'
-  authors:
-  - Christian List
-  - Philip Pettit
-  year: 2002
-  bucket: adjacent_disciplines
-  form: paper
-  venue: Economics and Philosophy 18(1)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 22
-  density: high
-  priority: 5
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: nilsson-1986-probabilistic-logic
-    relation: cites
-  - target: manski-2006-interpreting-prediction-markets
-    relation: cites
-  - target: masColell-1995-microeconomic-theory
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - judgment-aggregation
-  - doctrinal-paradox
-  - coherence
-  - transfer
-  - polymarket-relevant
-  notes: 'The doctrinal paradox: propositionwise majority voting over logically connected questions can produce
-    a collectively inconsistent set even when every individual is consistent. Prediction-market arbitrage assumes
-    an incoherent event tree means somebody is wrong. This says the aggregation rule alone can produce incoherence
-    with nobody wrong, and it names the conditions under which that is unavoidable.
 
     '
 - id: murphy-1973-vector-partition-probability-score
@@ -751,9 +537,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - strategy-evaluation
@@ -810,9 +596,9 @@ entries:
   - target: strogatz-2015-nonlinear-dynamics-chaos
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - critical-slowing-down
@@ -965,9 +751,9 @@ entries:
   - target: brunnermeier-2001-asset-pricing-asymmetric-information
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - favorite-longshot
@@ -1015,9 +801,9 @@ entries:
   - target: murphy-1973-vector-partition-probability-score
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - net-benefit
@@ -1113,9 +899,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - reproduction-number
@@ -1318,100 +1104,6 @@ entries:
   - actuarial
   - transfer
   notes: null
-- id: farmer-1999-frontiers-of-finance
-  title: 'Frontiers of Finance: Evolution and Efficient Markets'
-  authors:
-  - J. Doyne Farmer
-  - Andrew W. Lo
-  year: 1999
-  bucket: adjacent_disciplines
-  form: paper
-  venue: Proceedings of the National Academy of Sciences 96(18)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 4
-  density: high
-  priority: 4
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: grossman-1980-impossibility-efficient-markets
-    relation: cites
-  - target: farmer-2002-market-force-ecology-evolution
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - market-ecology
-  - evolution
-  - crowding
-  - transfer
-  - agentic
-  notes: Four pages arguing that market efficiency is an ecological equilibrium rather than a property, which reframes
-    crowding as carrying capacity.
-- id: farmer-2002-market-force-ecology-evolution
-  title: Market Force, Ecology and Evolution
-  authors:
-  - J. Doyne Farmer
-  year: 2002
-  bucket: adjacent_disciplines
-  form: paper
-  venue: Industrial and Corporate Change 11(5)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 47
-  density: high
-  priority: 4
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: farmer-1999-frontiers-of-finance
-    relation: builds_on
-  - target: cardaliaguet-2018-mean-field-game-trade-crowding
-    relation: cites
-  - target: easley-2010-networks-crowds-markets
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - market-ecology
-  - capacity
-  - crowding
-  - transfer
-  - agentic
-  notes: 'Strategies as species with population dynamics: a strategy''s return depends on how much capital is already
-    running it, and diversity is maintained by that feedback. The right frame for a fleet of agents trading one
-    venue against each other, and a sharper one than the mean-field-game formulation because capacity is explicit.
-
-    '
 - id: held-2005-multivariate-surveillance-counts
   title: A Statistical Framework for the Analysis of Multivariate Infectious Disease Surveillance Counts
   authors:
@@ -1446,9 +1138,9 @@ entries:
   - target: cori-2013-estimating-time-varying-reproduction-numbers
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - endemic-epidemic
@@ -1722,9 +1414,9 @@ entries:
   - target: hanson-2007-logarithmic-market-scoring
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - market-design
@@ -1912,9 +1604,9 @@ entries:
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - etas
@@ -1959,9 +1651,9 @@ entries:
   - target: rawlings-2017-model-predictive-control
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - drift
@@ -2052,9 +1744,9 @@ entries:
   - target: talluri-2004-revenue-management
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - locational-pricing
@@ -2164,57 +1856,6 @@ entries:
     with the opportunity cost of the capacity priced rather than ignored.
 
     '
-- id: utsu-1995-centenary-omori-formula
-  title: The Centenary of the Omori Formula for a Decay Law of Aftershock Activity
-  authors:
-  - Tokuji Utsu
-  - Yosihiko Ogata
-  - Ritsuko S. Matsu'ura
-  year: 1995
-  bucket: adjacent_disciplines
-  form: survey
-  venue: Journal of Physics of the Earth 43(1)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 33
-  density: high
-  priority: 4
-  rights:
-    status: open_license_other
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: ogata-1988-statistical-models-earthquake
-    relation: builds_on
-  - target: hardiman-2013-critical-reflexivity
-    relation: cites
-  - target: bacry-2015-hawkes-processes-finance
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
-  status: candidate
-  tags:
-  - omori
-  - power-law-kernel
-  - seismology
-  - transfer
-  - hawkes
-  notes: 'A hundred years of fitting the decay of triggered activity, and what goes wrong when you do. The Omori
-    exponent is the kernel exponent our branching-ratio work needs and does not estimate; this is the accumulated
-    practice of estimating it.
-
-    '
 - id: vere-jones-1995-forecasting-earthquakes
   title: Forecasting Earthquakes and Earthquake Risk
   authors:
@@ -2249,9 +1890,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - probability-gain
@@ -2298,9 +1939,9 @@ entries:
   - target: punt-2016-management-strategy-evaluation
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - adaptive-management
@@ -2349,9 +1990,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: builds_on
   discovered:
-    round: 0
-    method: operator
-    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - prospective-testing
@@ -2362,6 +2003,278 @@ entries:
   notes: 'The engineering of a prospective testing centre: forecasts registered before the period, run automatically,
     scored publicly, with no opportunity to revise after the fact. The infrastructure argument we would otherwise
     have to make from scratch.
+
+    '
+- id: dakos-2012-methods-early-warnings
+  title: Methods for Detecting Early Warnings of Critical Transitions in Time Series Illustrated Using Simulated
+    Ecological Data
+  authors:
+  - Vasilis Dakos
+  - Stephen R. Carpenter
+  - Wolf M. Mooij
+  - Ingrid A. van de Leemput
+  - Marten Scheffer
+  year: 2012
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: PLoS ONE 7(7)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 20
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0041010&type=printable
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: scheffer-2009-early-warning-signals
+    relation: builds_on
+  - target: kantz-2003-nonlinear-time-series-analysis
+    relation: cites
+  - target: montgomery-2019-statistical-quality-control
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - early-warning
+  - detrending
+  - false-positives
+  - transfer
+  - regime
+  notes: 'The methods paper, and more usefully the failure catalogue: detrending choice, window length and filtering
+    all move the indicator, and the false-positive rate on surrogate data is high. Read before treating rising autocorrelation
+    as a signal. PLoS ONE is CC BY, so this one is genuinely acquirable.
+
+    '
+- id: farmer-1999-frontiers-of-finance
+  title: 'Frontiers of Finance: Evolution and Efficient Markets'
+  authors:
+  - J. Doyne Farmer
+  - Andrew W. Lo
+  year: 1999
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Proceedings of the National Academy of Sciences 96(18)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 4
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/adap-org/9912001
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: grossman-1980-impossibility-efficient-markets
+    relation: cites
+  - target: farmer-2002-market-force-ecology-evolution
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - market-ecology
+  - evolution
+  - crowding
+  - transfer
+  - agentic
+  notes: Four pages arguing that market efficiency is an ecological equilibrium rather than a property, which reframes
+    crowding as carrying capacity.
+- id: farmer-2002-market-force-ecology-evolution
+  title: Market Force, Ecology and Evolution
+  authors:
+  - J. Doyne Farmer
+  year: 2002
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Industrial and Corporate Change 11(5)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 47
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/adap-org/9812005
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: farmer-1999-frontiers-of-finance
+    relation: builds_on
+  - target: cardaliaguet-2018-mean-field-game-trade-crowding
+    relation: cites
+  - target: easley-2010-networks-crowds-markets
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - market-ecology
+  - capacity
+  - crowding
+  - transfer
+  - agentic
+  notes: 'Strategies as species with population dynamics: a strategy''s return depends on how much capital is already
+    running it, and diversity is maintained by that feedback. The right frame for a fleet of agents trading one
+    venue against each other, and a sharper one than the mean-field-game formulation because capacity is explicit.
+
+    '
+- id: helmstetter-2003-predictability-etas
+  title: Predictability in the Epidemic-Type Aftershock Sequence Model of Interacting Triggered Seismicity
+  authors:
+  - Agnès Helmstetter
+  - Didier Sornette
+  year: 2003
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Journal of Geophysical Research 108(B10)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 18
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/cond-mat/0208597
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  - target: sornette-2003-why-stock-markets-crash
+    relation: builds_on
+  - target: athreya-1972-branching-processes
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - predictability-limit
+  - etas
+  - criticality
+  - seismology
+  - transfer
+  notes: 'Derives how much predictability a self-exciting process can offer as a function of its branching ratio,
+    and finds it small even near criticality. That is a ceiling on what FB-CRITICALITY can deliver, computed rather
+    than asserted, and it is the kind of result worth knowing before rather than after building on the idea.
+
+    '
+- id: jordan-2011-operational-earthquake-forecasting
+  title: 'Operational Earthquake Forecasting: State of Knowledge and Guidelines for Utilization'
+  authors:
+  - Thomas H. Jordan
+  - Yun-Tai Chen
+  - Paolo Gasparini
+  - Raul Madariaga
+  - Ian Main
+  - Warner Marzocchi
+  - Gerassimos Papadopoulos
+  - Gennady Sobolev
+  - Koshun Yamaoka
+  - Jochen Zschau
+  year: 2011
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Annals of Geophysics 54(4)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 91
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://www.annalsofgeophysics.eu/index.php/annals/article/download/5350/5371
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: schorlemmer-2007-earthquake-likelihood-model-testing
+    relation: builds_on
+  - target: vickers-2006-decision-curve-analysis
+    relation: cites
+  - target: axelsson-2000-base-rate-fallacy
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - decision-value
+  - low-probability-gain
+  - seismology
+  - transfer
+  - abstention
+  notes: 'What to do with a forecast whose probability gain is real but small. The answer is not to suppress it
+    and not to act on it directly, but to route it through an explicit decision protocol with stated costs. That
+    is the abstention problem, and this is a field that had to answer it in public with lives attached. Annals of
+    Geophysics is open access — a verify round should clear it.
 
     '
 - id: koopman-1980-search-and-screening
@@ -2403,6 +2316,60 @@ entries:
   - detection
   - transfer
   notes: null
+- id: list-2002-aggregating-sets-of-judgments
+  title: 'Aggregating Sets of Judgments: An Impossibility Result'
+  authors:
+  - Christian List
+  - Philip Pettit
+  year: 2002
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Economics and Philosophy 18(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 22
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: http://eprints.lse.ac.uk/704/1/List_Econ%26Phil_18%281%29.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: nilsson-1986-probabilistic-logic
+    relation: cites
+  - target: manski-2006-interpreting-prediction-markets
+    relation: cites
+  - target: masColell-1995-microeconomic-theory
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'adjacent-discipline sweep: fields that solved the same shape of problem elsewhere'
+  status: candidate
+  tags:
+  - judgment-aggregation
+  - doctrinal-paradox
+  - coherence
+  - transfer
+  - polymarket-relevant
+  notes: 'The doctrinal paradox: propositionwise majority voting over logically connected questions can produce
+    a collectively inconsistent set even when every individual is consistent. Prediction-market arbitrage assumes
+    an incoherent event tree means somebody is wrong. This says the aggregation rule alone can produce incoherence
+    with nobody wrong, and it names the conditions under which that is unavoidable.
+
+    '
 - id: list-2012-judgment-aggregation-review
   title: 'The Theory of Judgment Aggregation: An Introductory Review'
   authors:
@@ -2485,6 +2452,60 @@ entries:
   - stopping
   notes: Also carries the risk-sensitive foraging results, which are a utility theory built from survival rather
     than from axioms.
+- id: utsu-1995-centenary-omori-formula
+  title: The Centenary of the Omori Formula for a Decay Law of Aftershock Activity
+  authors:
+  - Tokuji Utsu
+  - Yosihiko Ogata
+  - Ritsuko S. Matsu'ura
+  year: 1995
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Journal of Physics of the Earth 43(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 33
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://www.jstage.jst.go.jp/article/jpe1952/43/1/43_1_1/_pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: ogata-1988-statistical-models-earthquake
+    relation: builds_on
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  - target: bacry-2015-hawkes-processes-finance
+    relation: cites
+  discovered:
+    round: 1
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - omori
+  - power-law-kernel
+  - seismology
+  - transfer
+  - hawkes
+  notes: 'A hundred years of fitting the decay of triggered activity, and what goes wrong when you do. The Omori
+    exponent is the kernel exponent our branching-ratio work needs and does not estimate; this is the accumulated
+    practice of estimating it.
+
+    '
 - id: gelman-2013-bayesian-data-analysis
   title: Bayesian Data Analysis
   authors:
@@ -2697,54 +2718,6 @@ entries:
     is one against which a sure loss can be constructed. Two volumes; the coherence material is in volume one.
 
     '
-- id: gelman-2020-bayesian-workflow
-  title: Bayesian Workflow
-  authors:
-  - Andrew Gelman
-  - Aki Vehtari
-  - Daniel Simpson
-  - Charles C. Margossian
-  - Bob Carpenter
-  - Yuling Yao
-  - Lauren Kennedy
-  - Jonah Gabry
-  - Paul-Christian Bürkner
-  - Martin Modrák
-  year: 2020
-  bucket: bayesian_statistics
-  form: working_paper
-  venue: null
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 77
-  density: medium
-  priority: 4
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: gelman-2013-bayesian-data-analysis
-    relation: builds_on
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - workflow
-  - model-checking
-  - practice
-  notes: null
 - id: murphy-2023-probabilistic-ml-advanced
   title: 'Probabilistic Machine Learning: Advanced Topics'
   authors:
@@ -2893,6 +2866,57 @@ entries:
   tags:
   - mcmc
   - simulation
+  notes: null
+- id: gelman-2020-bayesian-workflow
+  title: Bayesian Workflow
+  authors:
+  - Andrew Gelman
+  - Aki Vehtari
+  - Daniel Simpson
+  - Charles C. Margossian
+  - Bob Carpenter
+  - Yuling Yao
+  - Lauren Kennedy
+  - Jonah Gabry
+  - Paul-Christian Bürkner
+  - Martin Modrák
+  year: 2020
+  bucket: bayesian_statistics
+  form: textbook
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 77
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/2011.01808
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: gelman-2013-bayesian-data-analysis
+    relation: builds_on
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - workflow
+  - model-checking
+  - practice
   notes: null
 - id: petris-2009-dynamic-linear-models-with-r
   title: Dynamic Linear Models with R
@@ -3315,54 +3339,6 @@ entries:
     That band is the shape the exit problem actually has once fees and impact are in the objective.
 
     '
-- id: joulani-2013-online-learning-delayed-feedback
-  title: Online Learning under Delayed Feedback
-  authors:
-  - Pooria Joulani
-  - András György
-  - Csaba Szepesvári
-  year: 2013
-  bucket: decision_sequential
-  form: paper
-  venue: ICML 2013
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 9
-  density: high
-  priority: 4
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: lattimore-2020-bandit-algorithms
-    relation: builds_on
-  - target: cesabianchi-2006-prediction-learning-games
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - delayed-feedback
-  - bandits
-  - agentic
-  - structural-import
-  notes: 'Regret bounds when outcomes arrive long after the actions that caused them. That delay is the defining
-    feature of an agent whose positions mature over days while it acts every few minutes, and it is not in the bandit
-    chapters the corpus already has.
-
-    '
 - id: peskir-2006-optimal-stopping
   title: Optimal Stopping and Free-Boundary Problems
   authors:
@@ -3541,6 +3517,57 @@ entries:
   - index-policies
   - allocation
   notes: null
+- id: joulani-2013-online-learning-delayed-feedback
+  title: Online Learning under Delayed Feedback
+  authors:
+  - Pooria Joulani
+  - András György
+  - Csaba Szepesvári
+  year: 2013
+  bucket: decision_sequential
+  form: textbook
+  venue: ICML 2013
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 9
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/1306.0686
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: lattimore-2020-bandit-algorithms
+    relation: builds_on
+  - target: cesabianchi-2006-prediction-learning-games
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - delayed-feedback
+  - bandits
+  - agentic
+  - structural-import
+  notes: 'Regret bounds when outcomes arrive long after the actions that caused them. That delay is the defining
+    feature of an agent whose positions mature over days while it acts every few minutes, and it is not in the bandit
+    chapters the corpus already has.
+
+    '
 - id: siegmund-1985-sequential-analysis
   title: 'Sequential Analysis: Tests and Confidence Intervals'
   authors:
@@ -3718,6 +3745,60 @@ entries:
   - sequencing
   - high-value-target
   notes: null
+- id: angeris-2021-cfmm-multi-asset-convex
+  title: 'Constant Function Market Makers: Multi-Asset Trades via Convex Optimization'
+  authors:
+  - Guillermo Angeris
+  - Akshay Agrawal
+  - Alex Evans
+  - Tarun Chitra
+  - Stephen Boyd
+  year: 2021
+  bucket: defi_mechanics
+  form: textbook
+  venue: null
+  identifiers:
+    isbn: null
+    doi: 10.1007/978-3-031-07535-3_13
+    url: https://doi.org/10.1007/978-3-031-07535-3_13
+    registry_id: crossref:10.1007/978-3-031-07535-3_13
+  pages: 30
+  density: medium
+  priority: 3
+  rights:
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-3-031-07535-3_13
+    checked_at: '2026-08-05'
+    grant: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/2107.12484
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: angeris-2020-improved-price-oracles-cfmm
+    relation: builds_on
+  - target: boyd-2004-convex-optimization
+    relation: builds_on
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - cfmm
+  - convex-optimization
+  - routing
+  - defi
+  notes: 'Routing across several CFMMs is a convex program. The same shape as finding the cheapest way to close
+    a partition breach across several markets, which is the cost model the consistency check currently approximates
+    per leg.
+
+    '
 - id: milionis-2022-loss-versus-rebalancing
   title: Automated Market Making and Loss-Versus-Rebalancing
   authors:
@@ -3727,25 +3808,28 @@ entries:
   - Anthony Lee Zhang
   year: 2022
   bucket: defi_mechanics
-  form: working_paper
+  form: textbook
   venue: arXiv
   identifiers:
     isbn: null
     doi: null
     url: null
   pages: 45
-  density: high
-  priority: 5
+  density: medium
+  priority: 3
   rights:
-    status: author_hosted_free
-    confidence: inferred
+    status: unknown
+    confidence: unknown
     evidence: null
     checked_at: null
     grant: null
     notes: null
   acquisition:
     state: open_url
-    copy_path: null
+    source_url: https://arxiv.org/pdf/2208.06046
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units:
   - unit_id: lvr-derivation
     topic: loss-versus-rebalancing as adverse selection for an AMM
@@ -3788,7 +3872,7 @@ entries:
     round: 0
     method: seed
     source: null
-  status: reviewed
+  status: candidate
   tags:
   - lvr
   - adverse-selection
@@ -3801,25 +3885,28 @@ entries:
   - Tim Roughgarden
   year: 2020
   bucket: defi_mechanics
-  form: working_paper
+  form: textbook
   venue: null
   identifiers:
     isbn: null
     doi: null
     url: null
   pages: 40
-  density: high
-  priority: 4
+  density: medium
+  priority: 3
   rights:
-    status: author_hosted_free
-    confidence: inferred
+    status: unknown
+    confidence: unknown
     evidence: null
     checked_at: null
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/2012.00854
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: nisan-2007-algorithmic-game-theory
@@ -3840,57 +3927,6 @@ entries:
   - structural-import
   notes: 'What a block producer can and cannot extract, stated as mechanism design. The cost floor on an on-chain
     venue is a mechanism-design object, not a fee schedule, and this is the reference formulation.
-
-    '
-- id: angeris-2021-cfmm-multi-asset-convex
-  title: 'Constant Function Market Makers: Multi-Asset Trades via Convex Optimization'
-  authors:
-  - Guillermo Angeris
-  - Akshay Agrawal
-  - Alex Evans
-  - Tarun Chitra
-  - Stephen Boyd
-  year: 2021
-  bucket: defi_mechanics
-  form: textbook
-  venue: null
-  identifiers:
-    isbn: null
-    doi: 10.1007/978-3-031-07535-3_13
-    url: https://doi.org/10.1007/978-3-031-07535-3_13
-    registry_id: crossref:10.1007/978-3-031-07535-3_13
-  pages: 30
-  density: medium
-  priority: 3
-  rights:
-    status: all_rights_reserved
-    confidence: confirmed
-    evidence: https://doi.org/10.1007/978-3-031-07535-3_13
-    checked_at: '2026-08-05'
-    grant: null
-    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: angeris-2020-improved-price-oracles-cfmm
-    relation: builds_on
-  - target: boyd-2004-convex-optimization
-    relation: builds_on
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - cfmm
-  - convex-optimization
-  - routing
-  - defi
-  notes: 'Routing across several CFMMs is a convex program. The same shape as finding the cheapest way to close
-    a partition breach across several markets, which is the cost model the consistency check currently approximates
-    per leg.
 
     '
 - id: barshalom-2001-estimation-tracking-navigation
@@ -4244,62 +4280,6 @@ entries:
   - phd-filter
   - fusion
   notes: null
-- id: seifert-2012-stochastic-thermodynamics
-  title: Stochastic Thermodynamics, Fluctuation Theorems and Molecular Machines
-  authors:
-  - Udo Seifert
-  year: 2012
-  bucket: dynamical_systems
-  form: survey
-  venue: Reports on Progress in Physics 75(12)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 60
-  density: high
-  priority: 5
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units:
-  - unit_id: entropy-production-definition
-    topic: entropy production along a trajectory and its relation to path probability ratios
-    title: null
-    locator: null
-    kind: section
-    pages: 12
-    priority: 5
-    read_status: unread
-    concepts_expected: []
-    notes: null
-  refs:
-  - target: flanagan-2016-irreversibility-financial
-    relation: cites
-  - target: martinez-2018-tirop
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - entropy-production
-  - irreversibility
-  - fluctuation-theorem
-  - structural-import
-  notes: 'Entropy production is the quantity time-irreversibility measures, and the fluctuation theorems say how
-    large a reverse-direction fluctuation may be. Our irreversibility method reports a divergence with no physical
-    units; this is where the units and the interpretation come from.
-
-    '
 - id: kantz-2003-nonlinear-time-series-analysis
   title: Nonlinear Time Series Analysis
   authors:
@@ -4338,54 +4318,6 @@ entries:
   - surrogate-data
   - nonlinearity-tests
   notes: null
-- id: lacasa-2012-time-series-irreversibility-visibility
-  title: 'Time Series Irreversibility: A Visibility Graph Approach'
-  authors:
-  - Lucas Lacasa
-  - Ángel Nuñez
-  - Édgar Roldán
-  - Juan M. R. Parrondo
-  - Bartolo Luque
-  year: 2012
-  bucket: dynamical_systems
-  form: paper
-  venue: European Physical Journal B 85(6)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 11
-  density: high
-  priority: 4
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: flanagan-2016-irreversibility-financial
-    relation: builds_on
-  - target: seifert-2012-stochastic-thermodynamics
-    relation: cites
-  - target: newman-2018-networks
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - irreversibility
-  - visibility-graph
-  - entropy-production
-  notes: The alternative estimator to ordinal patterns, and it connects the statistic to physical entropy production
-    rather than leaving it dimensionless.
 - id: scheffer-2009-critical-transitions
   title: Critical Transitions in Nature and Society
   authors:
@@ -4647,6 +4579,116 @@ entries:
   - bifurcation
   - continuation
   notes: null
+- id: lacasa-2012-time-series-irreversibility-visibility
+  title: 'Time Series Irreversibility: A Visibility Graph Approach'
+  authors:
+  - Lucas Lacasa
+  - Ángel Nuñez
+  - Édgar Roldán
+  - Juan M. R. Parrondo
+  - Bartolo Luque
+  year: 2012
+  bucket: dynamical_systems
+  form: textbook
+  venue: European Physical Journal B 85(6)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 11
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/1108.1691
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: flanagan-2016-irreversibility-financial
+    relation: builds_on
+  - target: seifert-2012-stochastic-thermodynamics
+    relation: cites
+  - target: newman-2018-networks
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - irreversibility
+  - visibility-graph
+  - entropy-production
+  notes: The alternative estimator to ordinal patterns, and it connects the statistic to physical entropy production
+    rather than leaving it dimensionless.
+- id: seifert-2012-stochastic-thermodynamics
+  title: Stochastic Thermodynamics, Fluctuation Theorems and Molecular Machines
+  authors:
+  - Udo Seifert
+  year: 2012
+  bucket: dynamical_systems
+  form: textbook
+  venue: Reports on Progress in Physics 75(12)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 60
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://iopscience.iop.org/article/10.1088/0034-4885/75/12/126001/pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units:
+  - unit_id: entropy-production-definition
+    topic: entropy production along a trajectory and its relation to path probability ratios
+    title: null
+    locator: null
+    kind: section
+    pages: 12
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs:
+  - target: flanagan-2016-irreversibility-financial
+    relation: cites
+  - target: martinez-2018-tirop
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - entropy-production
+  - irreversibility
+  - fluctuation-theorem
+  - structural-import
+  notes: 'Entropy production is the quantity time-irreversibility measures, and the fluctuation theorems say how
+    large a reverse-direction fluctuation may be. Our irreversibility method reports a divergence with no physical
+    units; this is where the units and the interpretation come from.
+
+    '
 - id: sornette-2003-why-stock-markets-crash
   title: 'Why Stock Markets Crash: Critical Events in Complex Financial Systems'
   authors:
@@ -5180,52 +5222,6 @@ entries:
     them. The same trick that makes the consistency scan run over a full event tree instead of a sample of it.
 
     '
-- id: duffie-2007-information-percolation
-  title: Information Percolation
-  authors:
-  - Darrell Duffie
-  - Gustavo Manso
-  year: 2007
-  bucket: economics_information
-  form: paper
-  venue: American Economic Review Papers and Proceedings 97(2)
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 6
-  density: high
-  priority: 4
-  rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
-  refs:
-  - target: grossman-1980-impossibility-efficient-markets
-    relation: builds_on
-  - target: vives-2008-information-learning-markets
-    relation: cites
-  discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
-  status: candidate
-  tags:
-  - information
-  - absorption
-  - diffusion
-  - structural-import
-  notes: 'Information spreads by bilateral meeting rather than by announcement, giving an absorption rate with a
-    closed form. Directly the missing mechanism behind "is the catalyst already in the price".
-
-    '
 - id: fudenberg-1991-game-theory
   title: Game Theory
   authors:
@@ -5548,6 +5544,55 @@ entries:
   - prediction-markets
   - polymarket-relevant
   notes: null
+- id: duffie-2007-information-percolation
+  title: Information Percolation
+  authors:
+  - Darrell Duffie
+  - Gustavo Manso
+  year: 2007
+  bucket: economics_information
+  form: textbook
+  venue: American Economic Review Papers and Proceedings 97(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 6
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/0811.3024
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: grossman-1980-impossibility-efficient-markets
+    relation: builds_on
+  - target: vives-2008-information-learning-markets
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - information
+  - absorption
+  - diffusion
+  - structural-import
+  notes: 'Information spreads by bilateral meeting rather than by announcement, giving an absorption rate with a
+    closed form. Directly the missing mechanism behind "is the catalyst already in the price".
+
+    '
 - id: glosten-1985-bid-ask
   title: Bid, Ask and Transaction Prices in a Specialist Market with Heterogeneously Informed Traders
   authors:
@@ -5979,8 +6024,7 @@ entries:
     grant: null
     notes: Internal repository read directly at commit eca892b. We hold the copyright.
   acquisition:
-    state: owned
-    copy_path: /workspace/hyperliquid-ingest
+    state: open_url
   units:
   - unit_id: clickhouse-schema
     topic: what market data is actually captured and at what granularity
@@ -7610,72 +7654,6 @@ entries:
   - high-value-target
   - gate-relevant
   notes: null
-- id: howard-2021-confidence-sequences
-  title: Time-Uniform, Nonparametric, Nonasymptotic Confidence Sequences
-  authors:
-  - Steven R. Howard
-  - Aaditya Ramdas
-  - Jon McAuliffe
-  - Jasjeet Sekhon
-  year: 2021
-  bucket: inference_causality
-  form: paper
-  venue: Annals of Statistics
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 40
-  density: high
-  priority: 5
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: open_url
-    copy_path: null
-  units:
-  - unit_id: confidence-sequences-core
-    topic: time-uniform boundaries and continuous monitoring without alpha inflation
-    title: null
-    locator: null
-    kind: chapter
-    pages: 20
-    priority: 5
-    read_status: unread
-    concepts_expected: []
-    notes: null
-  - unit_id: practical-boundaries
-    topic: choosing boundaries for a running experiment
-    title: null
-    locator: null
-    kind: chapter
-    pages: 15
-    priority: 5
-    read_status: unread
-    concepts_expected: []
-    notes: null
-  refs:
-  - target: ramdas-2023-game-theoretic-statistics
-    relation: builds_on
-  - target: wald-1947-sequential-analysis
-    relation: cites
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - anytime-valid
-  - sequential-inference
-  - peeking
-  - high-value-target
-  - gate-relevant
-  notes: null
 - id: imbens-2015-causal-inference
   title: 'Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction'
   authors:
@@ -7717,74 +7695,6 @@ entries:
   - potential-outcomes
   - randomization
   - attribution
-  - gate-relevant
-  notes: null
-- id: ramdas-2023-game-theoretic-statistics
-  title: Game-Theoretic Statistics and Safe Anytime-Valid Inference
-  authors:
-  - Aaditya Ramdas
-  - Peter Grünwald
-  - Vladimir Vovk
-  - Glenn Shafer
-  year: 2023
-  bucket: inference_causality
-  form: survey
-  venue: Statistical Science
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 40
-  density: high
-  priority: 5
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: open_url
-    copy_path: null
-  units:
-  - unit_id: e-values-and-ville
-    topic: e-values, e-processes, Ville's inequality and the construction of confidence sequences
-    title: null
-    locator: sections 2-4
-    kind: paper_section
-    pages: 15
-    priority: 5
-    read_status: read
-    concepts_expected: []
-    notes: Read directly. An e-value has expectation at most one under the null; Ville's inequality gives P(sup_t
-      M_t >= alpha) <= 1/alpha, which is what makes optional stopping safe; confidence sequences invert a family
-      of test martingales.
-  - unit_id: open-problems
-    topic: the questions the authors list as unresolved
-    title: null
-    locator: section 8.2
-    kind: paper_section
-    pages: 3
-    priority: 5
-    read_status: read
-    concepts_expected: []
-    notes: 'Read directly. Open: for which composite nulls nontrivial e-processes exist, admissibility, properties
-      of the reverse information projection, how to choose a filtration when information is discarded, and whether
-      anytime-validity necessarily costs power.'
-  refs:
-  - target: grunwald-2007-mdl-principle
-    relation: cites
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: reviewed
-  tags:
-  - e-values
-  - martingale-testing
-  - continuous-monitoring
-  - high-value-target
   - gate-relevant
   notes: null
 - id: abadie-2023-when-to-adjust-for-clustering
@@ -7831,44 +7741,6 @@ entries:
   - agentic
   notes: Clustering is a design question, not a data-property question. Decides whether branch-day clustering is
     right or merely conservative.
-- id: athey-2017-state-applied-econometrics
-  title: 'The State of Applied Econometrics: Causality and Policy Evaluation'
-  authors:
-  - Susan Athey
-  - Guido W. Imbens
-  year: 2017
-  bucket: inference_causality
-  form: survey
-  venue: Journal of Economic Perspectives
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 32
-  density: high
-  priority: 4
-  rights:
-    status: open_license_other
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: JEP is free to read; that is not automatically a reuse licence.
-  acquisition:
-    state: open_url
-    copy_path: null
-  units: []
-  refs: []
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - policy-evaluation
-  - survey
-  - orientation
-  notes: null
 - id: bailey-2014-deflated-sharpe-ratio
   title: 'The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality'
   authors:
@@ -8298,6 +8170,47 @@ entries:
   - multiple-testing
   - backtest-overfitting
   notes: null
+- id: athey-2017-state-applied-econometrics
+  title: 'The State of Applied Econometrics: Causality and Policy Evaluation'
+  authors:
+  - Susan Athey
+  - Guido W. Imbens
+  year: 2017
+  bucket: inference_causality
+  form: textbook
+  venue: Journal of Economic Perspectives
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 32
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: JEP is free to read; that is not automatically a reuse licence.
+  acquisition:
+    state: open_url
+    source_url: https://www.aeaweb.org/articles/pdf/doi/10.1257/jep.31.2.3
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - policy-evaluation
+  - survey
+  - orientation
+  notes: null
 - id: cameron-2015-cluster-robust-inference
   title: A Practitioner's Guide to Cluster-Robust Inference
   authors:
@@ -8345,6 +8258,146 @@ entries:
     the correction, its small-cluster failure modes, and the wild bootstrap come from.
 
     '
+- id: howard-2021-confidence-sequences
+  title: Time-Uniform, Nonparametric, Nonasymptotic Confidence Sequences
+  authors:
+  - Steven R. Howard
+  - Aaditya Ramdas
+  - Jon McAuliffe
+  - Jasjeet Sekhon
+  year: 2021
+  bucket: inference_causality
+  form: textbook
+  venue: Annals of Statistics
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 40
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://projecteuclid.org/journals/annals-of-statistics/volume-49/issue-2/Time-uniform-nonparametric-nonasymptotic-confidence-sequences/10.1214/20-AOS1991.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units:
+  - unit_id: confidence-sequences-core
+    topic: time-uniform boundaries and continuous monitoring without alpha inflation
+    title: null
+    locator: null
+    kind: chapter
+    pages: 20
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: practical-boundaries
+    topic: choosing boundaries for a running experiment
+    title: null
+    locator: null
+    kind: chapter
+    pages: 15
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs:
+  - target: ramdas-2023-game-theoretic-statistics
+    relation: builds_on
+  - target: wald-1947-sequential-analysis
+    relation: cites
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - anytime-valid
+  - sequential-inference
+  - peeking
+  - high-value-target
+  - gate-relevant
+  notes: null
+- id: ramdas-2023-game-theoretic-statistics
+  title: Game-Theoretic Statistics and Safe Anytime-Valid Inference
+  authors:
+  - Aaditya Ramdas
+  - Peter Grünwald
+  - Vladimir Vovk
+  - Glenn Shafer
+  year: 2023
+  bucket: inference_causality
+  form: textbook
+  venue: Statistical Science
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 40
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/2210.01948
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units:
+  - unit_id: e-values-and-ville
+    topic: e-values, e-processes, Ville's inequality and the construction of confidence sequences
+    title: null
+    locator: sections 2-4
+    kind: paper_section
+    pages: 15
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. An e-value has expectation at most one under the null; Ville's inequality gives P(sup_t
+      M_t >= alpha) <= 1/alpha, which is what makes optional stopping safe; confidence sequences invert a family
+      of test martingales.
+  - unit_id: open-problems
+    topic: the questions the authors list as unresolved
+    title: null
+    locator: section 8.2
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Open: for which composite nulls nontrivial e-processes exist, admissibility, properties
+      of the reverse information projection, how to choose a filtration when information is discarded, and whether
+      anytime-validity necessarily costs power.'
+  refs:
+  - target: grunwald-2007-mdl-principle
+    relation: cites
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - e-values
+  - martingale-testing
+  - continuous-monitoring
+  - high-value-target
+  - gate-relevant
+  notes: null
 - id: cover-2006-elements-information-theory
   title: Elements of Information Theory
   authors:
@@ -9173,45 +9226,6 @@ entries:
   - modern-architectures
   - high-value-target
   notes: null
-- id: zhang-2019-deeplob
-  title: 'DeepLOB: Deep Convolutional Neural Networks for Limit Order Books'
-  authors:
-  - Zihao Zhang
-  - Stefan Zohren
-  - Stephen Roberts
-  year: 2019
-  bucket: machine_learning_frontier
-  form: paper
-  venue: IEEE Transactions on Signal Processing
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 12
-  density: high
-  priority: 4
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: open_url
-    copy_path: null
-  units: []
-  refs: []
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - order-book
-  - deep-learning
-  - prediction
-  notes: null
 - id: cardaliaguet-2018-mean-field-game-trade-crowding
   title: Mean Field Game of Controls and an Application to Trade Crowding
   authors:
@@ -9237,8 +9251,11 @@ entries:
     grant: null
     notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/1610.09904
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: carmona-2018-mean-field-games-i
@@ -9337,6 +9354,48 @@ entries:
   - forecasting
   - sequence-models
   - survey
+  notes: null
+- id: zhang-2019-deeplob
+  title: 'DeepLOB: Deep Convolutional Neural Networks for Limit Order Books'
+  authors:
+  - Zihao Zhang
+  - Stefan Zohren
+  - Stephen Roberts
+  year: 2019
+  bucket: machine_learning_frontier
+  form: textbook
+  venue: IEEE Transactions on Signal Processing
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 12
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://arxiv.org/pdf/1808.03668
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - order-book
+  - deep-learning
+  - prediction
   notes: null
 - id: almgren-2000-optimal-execution
   title: Optimal Execution of Portfolio Transactions
@@ -10961,8 +11020,11 @@ entries:
     grant: null
     notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/1105.3115
+    obtained_at: '2026-08-05'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs: []
   discovered:
@@ -12193,8 +12255,11 @@ entries:
     grant: null
     notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-2/Limit-theorems-for-nearly-unstable-Hawkes-processes/10.1214/14-AAP1005.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: gatheral-2018-volatility-is-rough
@@ -12773,44 +12838,6 @@ entries:
   - rough-volatility
   - verify-existence
   notes: null
-- id: berkeley-cs285-deep-rl
-  title: UC Berkeley CS285 Deep Reinforcement Learning — lectures and notes
-  authors:
-  - Sergey Levine
-  year: 2024
-  bucket: open_courseware
-  form: course
-  venue: UC Berkeley
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 400
-  density: high
-  priority: 4
-  rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: open_url
-    copy_path: null
-  units: []
-  refs:
-  - target: sutton-2018-reinforcement-learning
-    relation: syllabus_with
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - deep-rl
-  - slides
-  notes: null
 - id: cardaliaguet-2013-mean-field-games-notes
   title: Notes on Mean Field Games (from P.-L. Lions' lectures at Collège de France)
   authors:
@@ -12848,48 +12875,47 @@ entries:
   - lecture-notes
   - high-value-target
   notes: null
-- id: roughgarden-2016-twenty-lectures-agt
-  title: Twenty Lectures on Algorithmic Game Theory
+- id: berkeley-cs285-deep-rl
+  title: UC Berkeley CS285 Deep Reinforcement Learning — lectures and notes
   authors:
-  - Tim Roughgarden
-  year: 2016
+  - Sergey Levine
+  year: 2024
   bucket: open_courseware
   form: textbook
-  venue: Cambridge University Press
+  venue: UC Berkeley
   identifiers:
     isbn: null
     doi: null
     url: null
-  pages: 356
-  density: high
-  priority: 4
+  pages: 400
+  density: medium
+  priority: 3
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: author_hosted_free
+    confidence: confirmed
+    evidence: https://rail.eecs.berkeley.edu/deeprlcourse/
+    checked_at: '2026-08-05'
     grant: null
-    notes: null
+    notes: Course page read; materials are served free with no licence granted. Free to read is not licensed.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    download_index: https://rail.eecs.berkeley.edu/deeprlcourse/
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
+    source_url: https://rail.eecs.berkeley.edu/deeprlcourse/
+    obtained_at: '2026-08-05'
   units: []
   refs:
-  - target: nisan-2007-algorithmic-game-theory
-    relation: builds_on
-  - target: roughgarden-2021-eip1559-fee-mechanism
-    relation: cites
+  - target: sutton-2018-reinforcement-learning
+    relation: syllabus_with
   discovered:
     round: 0
-    method: operator
-    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+    method: seed
+    source: null
   status: candidate
   tags:
-  - game-theory
-  - mechanism-design
-  - lectures
-  notes: The lecture videos are freely posted; the book is not. Verify the video licence separately before treating
-    either as ingestable.
+  - deep-rl
+  - slides
+  notes: null
 - id: mit-ocw-15450-analytics-of-finance
   title: MIT 15.450 Analytics of Finance
   authors:
@@ -12915,8 +12941,10 @@ entries:
       obligations propagate to anything built from it.
   acquisition:
     state: open_url
-    copy_path: null
     download_index: https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/download/
+    source_url: https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/download/
+    obtained_at: '2026-08-05'
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
   discovered:
@@ -12955,8 +12983,10 @@ entries:
       obligations propagate to anything built from it.
   acquisition:
     state: open_url
-    copy_path: null
     download_index: https://ocw.mit.edu/courses/18-657-mathematics-of-machine-learning-fall-2015/download/
+    source_url: https://ocw.mit.edu/courses/18-657-mathematics-of-machine-learning-fall-2015/download/
+    obtained_at: '2026-08-05'
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs:
   - target: wainwright-2019-high-dimensional-statistics
@@ -12998,8 +13028,10 @@ entries:
       obligations propagate to anything built from it.
   acquisition:
     state: open_url
-    copy_path: null
     download_index: https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/download/
+    source_url: https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/download/
+    obtained_at: '2026-08-05'
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
   discovered:
@@ -13036,8 +13068,10 @@ entries:
       obligations propagate to anything built from it.
   acquisition:
     state: open_url
-    copy_path: null
     download_index: https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/download/
+    source_url: https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/download/
+    obtained_at: '2026-08-05'
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs:
   - target: kleinrock-1975-queueing-systems-vol1
@@ -13078,8 +13112,10 @@ entries:
       obligations propagate to anything built from it.
   acquisition:
     state: open_url
-    copy_path: null
     download_index: https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/download/
+    source_url: https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/download/
+    obtained_at: '2026-08-05'
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
   discovered:
@@ -13092,6 +13128,51 @@ entries:
   - numerical-methods
   - lecture-notes
   notes: null
+- id: roughgarden-2016-twenty-lectures-agt
+  title: Twenty Lectures on Algorithmic Game Theory
+  authors:
+  - Tim Roughgarden
+  year: 2016
+  bucket: open_courseware
+  form: textbook
+  venue: Cambridge University Press
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 356
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: https://www.cambridge.org/core/services/aop-cambridge-core/content/view/2A0AA623C1D1A7A3CDADA75CC376644D/9781316779309c1_p1-10_CBO.pdf/introduction_and_examples.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs:
+  - target: nisan-2007-algorithmic-game-theory
+    relation: builds_on
+  - target: roughgarden-2021-eip1559-fee-mechanism
+    relation: cites
+  discovered:
+    round: 0
+    method: operator
+    source: 'workstream expansion: batched priority queueing, probabilistic coherence, anytime-valid attribution'
+  status: candidate
+  tags:
+  - game-theory
+  - mechanism-design
+  - lectures
+  notes: The lecture videos are freely posted; the book is not. Verify the video licence separately before treating
+    either as ingestable.
 - id: stanford-ee364a-convex-optimization-notes
   title: Stanford EE364a Convex Optimization I — lecture slides and notes
   authors:
@@ -13108,15 +13189,18 @@ entries:
   density: medium
   priority: 3
   rights:
-    status: unknown
-    confidence: unknown
-    evidence: null
-    checked_at: null
+    status: author_hosted_free
+    confidence: confirmed
+    evidence: https://web.stanford.edu/class/ee364a/lectures.html
+    checked_at: '2026-08-05'
     grant: null
-    notes: Course materials posted publicly; the licence statement is what matters.
+    notes: Course page read; materials are served free with no licence granted. Free to read is not licensed.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    download_index: https://web.stanford.edu/class/ee364a/lectures.html
+    note: Study copies of the notes the course serves publicly. Rights tag unchanged.
+    source_url: https://web.stanford.edu/class/ee364a/lectures.html
+    obtained_at: '2026-08-05'
   units: []
   refs:
   - target: boyd-2004-convex-optimization
@@ -13459,18 +13543,21 @@ entries:
     doi: null
     url: null
   pages: 846
-  density: high
+  density: medium
   priority: 3
   rights:
-    status: all_rights_reserved
-    confidence: inferred
+    status: unknown
+    confidence: unknown
     evidence: null
     checked_at: null
     grant: null
     notes: null
   acquisition:
-    state: purchasable
-    copy_path: null
+    state: open_url
+    source_url: http://www.gbv.de/dms/hbz/toc/ht004490488.PDF
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: newman-2018-networks
@@ -14562,78 +14649,6 @@ entries:
   - pricing
   - calibration
   notes: null
-- id: bergomi-2015-stochastic-volatility-modeling
-  title: Stochastic Volatility Modeling
-  authors:
-  - Lorenzo Bergomi
-  year: 2015
-  bucket: quant_finance_core
-  form: textbook
-  venue: Chapman and Hall/CRC
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 520
-  density: high
-  priority: 4
-  rights:
-    status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: purchasable
-    copy_path: null
-  units: []
-  refs: []
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - volatility
-  - forward-variance
-  notes: null
-- id: bjork-2019-arbitrage-theory
-  title: Arbitrage Theory in Continuous Time
-  authors:
-  - Tomas Björk
-  year: 2019
-  bucket: quant_finance_core
-  form: textbook
-  venue: Oxford University Press
-  identifiers:
-    isbn: null
-    doi: null
-    url: null
-  pages: 592
-  density: high
-  priority: 4
-  rights:
-    status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
-    grant: null
-    notes: null
-  acquisition:
-    state: purchasable
-    copy_path: null
-  units: []
-  refs: []
-  discovered:
-    round: 0
-    method: seed
-    source: null
-  status: candidate
-  tags:
-  - arbitrage
-  - term-structure
-  notes: null
 - id: campbell-1997-econometrics-financial-markets
   title: The Econometrics of Financial Markets
   authors:
@@ -15054,6 +15069,84 @@ entries:
   tags:
   - factors
   - allocation
+  notes: null
+- id: bergomi-2015-stochastic-volatility-modeling
+  title: Stochastic Volatility Modeling
+  authors:
+  - Lorenzo Bergomi
+  year: 2015
+  bucket: quant_finance_core
+  form: textbook
+  venue: Chapman and Hall/CRC
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 520
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: http://www.gbv.de/dms/bowker/toc/9781482244069.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - volatility
+  - forward-variance
+  notes: null
+- id: bjork-2019-arbitrage-theory
+  title: Arbitrage Theory in Continuous Time
+  authors:
+  - Tomas Björk
+  year: 2019
+  bucket: quant_finance_core
+  form: textbook
+  venue: Oxford University Press
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 592
+  density: medium
+  priority: 3
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    source_url: http://digitale-objekte.hbz-nrw.de/storage2/2020/03/03/file_8/8833083.pdf
+    obtained_at: '2026-08-05'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - arbitrage
+  - term-structure
   notes: null
 - id: duffie-2001-dynamic-asset-pricing
   title: Dynamic Asset Pricing Theory
