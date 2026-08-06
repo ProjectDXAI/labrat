@@ -101,6 +101,16 @@
 
 ### Fixed
 
+- Courseware is indexed as teaching material only. Problem sets, solution keys and exams
+  are dropped from a course folder, which was about a fifth of it by page count and diluted
+  every retrieval over a course: a BM25 hit on "renewal process" in an answer key is not
+  the lecture that explains it. The files stay on disk, because a graded problem with a
+  published solution is good raw material for a capability evaluation later. The filter
+  applies inside course folders only, so a standalone entry that happens to be a solution
+  manual is still indexed.
+- Removed five MIT OCW course folders that existed as two identical copies, one under
+  `study/` and one under `sources/`. Verified by checksum before deleting; 37 MB.
+
 - `corpus.py reading` skipped `compiled` and `abandoned` units but not `read` ones. Since reading
   raises no score, every unit anyone had opened sat permanently at the top of "what to read next" —
   the first twelve rows of the real queue were all already read. Read units now leave the queue, and

@@ -112,6 +112,28 @@ def passage_paths(root: Path) -> dict[str, Path]:
     return {"dir": base, "passages": base / "passages.jsonl", "index": base / "index.json"}
 
 
+# Problem sets, their solutions and exams are not reading material. A course folder is
+# roughly a fifth of these by page count, and they dilute every retrieval over the course:
+# a BM25 hit on "renewal process" in an exam answer key is not the lecture that explains
+# it. They stay on disk, because a graded problem with a published solution is good raw
+# material for a capability evaluation later; they just do not belong in the reading corpus.
+COURSEWARE_EXERCISE = re.compile(
+    # No \b before the short tokens: these filenames separate words with underscores,
+    # which regex counts as a word character, so \bmid\d never fires on MIT6_262S11_mid10.
+    # The short tokens need start-of-name as well as a separator: these files are named
+    # both `MIT6_262S11_mid10` and plain `mid10`, and a separator-only pattern misses the
+    # second. \b is no help because underscore counts as a word character.
+    r"(sol(ution)?s?\b|assn|pset|(?:^|[_\-])ps\d|(?:^|[_\-])hw\d|homework|problem[-_ ]?set"
+    r"|midterm|(?:^|[_\-])mid\d|final\d|(?:^|[_\-])exam(?![a-z])|quiz)",
+    re.IGNORECASE,
+)
+
+
+def is_exercise_file(path: Path) -> bool:
+    """Problem set, solution key or exam rather than teaching material."""
+    return bool(COURSEWARE_EXERCISE.search(path.stem))
+
+
 def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) -> list[Path]:
     """Every local file we hold for an entry, whether a single paper or a course folder.
 
@@ -126,10 +148,15 @@ def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) 
             found.append(single)
         folder = base / entry_id
         if folder.is_dir():
+            # The exercise filter belongs to course folders only. A standalone entry that
+            # happens to be a solution manual is a document someone catalogued on purpose.
             # Web documentation is held as markdown, not PDF: an exchange's docs site is
             # the primary source and printing it to PDF only loses the anchors.
             for pattern in ("*.pdf", "*.md", "*.txt"):
-                found.extend(sorted(folder.glob(pattern)))
+                found.extend(
+                    path for path in sorted(folder.glob(pattern))
+                    if not is_exercise_file(path)
+                )
 
     # Keyed on name and size, not resolved path. Several course folders exist as two
     # real copies, one under study/ and one under sources/, with different inodes and
@@ -574,6 +601,24 @@ def self_test() -> dict[str, Any]:
         files = source_files(root, "course", root / "study", root / "sources")
         assert len(files) == 2, files
     checks.append("source_files: one document held in two places is indexed once")
+
+    # Problem sets and exams are dropped from a course folder, and only from a course
+    # folder: a standalone entry that happens to be a solution manual is a document
+    # somebody catalogued deliberately, not clutter.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        folder = root / "study" / "course"
+        folder.mkdir(parents=True)
+        for name in ("lec01.pdf", "assn01.pdf", "assn01_sol.pdf", "mid10.pdf",
+                     "LecNote.pdf", "examples.pdf"):
+            (folder / name).write_bytes(name.encode())
+        kept = {p.name for p in source_files(root, "course", root / "study", root / "sources")}
+        # `examples.pdf` is worked examples, not an exam paper.
+        assert kept == {"lec01.pdf", "LecNote.pdf", "examples.pdf"}, kept
+        (root / "study" / "manual_solutions.pdf").write_bytes(b"x")
+        standalone = source_files(root, "manual_solutions", root / "study", root / "sources")
+        assert len(standalone) == 1, standalone
+    checks.append("source_files: course exercises dropped, a standalone solution manual kept")
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
