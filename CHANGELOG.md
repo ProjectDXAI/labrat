@@ -17,7 +17,7 @@
   or more unrelated domains, each recording the structure, the correspondence, what it buys, the
   sources actually read to reach it, and an `agent_seed` written for whoever builds there next.
   Validation requires two domains, refuses a `read` or `tension` finding that names no source read,
-  and refuses a `tension` that states no open question. 19 findings so far.
+  and refuses a `tension` that states no open question. 25 findings so far.
 - The reading round behind them. Bun, Bouchaud and Potters give backtest optimism in closed form —
   `R_in²/(1−q) = R_true² = (1−q) R_out²` for a completely general population covariance — and show
   the optimally cleaned spectrum is narrower than the *true* one, so recovering the population
