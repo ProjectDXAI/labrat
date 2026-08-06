@@ -1,0 +1,381 @@
+# Exploratory extensions: new work we could do, grounded in material actually read.
+#
+# The hard rule, enforced by `labrat knowledge extensions`: every extension must
+# cite a corpus unit whose `read_status` is `read` or `compiled`. An extension
+# grounded in a source nobody has opened is refused. This exists because the
+# cheapest way to invent a research programme is to imagine what a paper probably
+# says; the discipline is to propose only from what was read.
+#
+# Each entry names what the source leaves open IN ITS OWN TERMS, what specific
+# advantage we have that the original authors did not, the claim that would be new
+# if it held, and the first experiment that could kill it.
+#
+# Ranked by the same scoring as frontier_bets, with one addition: `already_done_risk`
+# is subtracted, because the most likely failure of a novel-work proposal is that it
+# is not novel.
+
+extensions:
+
+  - extension_id: EXT-CRITICAL-SCALE
+    title: "The moving quantity is the correlation timescale, not the branching ratio"
+    domain: point_processes
+    grounded_in:
+      - "hardiman-2013-critical-reflexivity#empirical-criticality"
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+    what_the_source_leaves_open: >
+      Across fourteen years of E-mini data the branching ratio fluctuates about one and does not
+      trend, while the high-frequency cutoff of the kernel falls exponentially and the authors note
+      that the scale over which market events are correlated has steadily decreased. They state
+      plainly that a mechanism explaining why markets sit precisely at criticality is still lacking,
+      and they do not develop the cutoff as a state variable in its own right.
+    our_advantage: >
+      Their laboratory was a single equity-index futures contract on session-bound exchanges, which
+      forced an explicit intraday seasonality weight. Perpetual crypto venues trade continuously,
+      so the largest confound in their estimator simply does not exist. On-chain venues additionally
+      publish labelled liquidation events, which supplies the cascade ground truth their study lacked.
+    proposed_work: >
+      Estimate the correlation timescale rather than the branching ratio, per instrument and venue,
+      and test whether its contraction precedes cascades. Treat n as an approximately fixed structural
+      constant near one and the timescale as the state.
+    novel_claim: >
+      Cascade risk on a perpetual venue is carried by the contraction of the kernel's correlation
+      timescale, not by movement in the branching ratio, which is pinned. If true it inverts the
+      variable most reflexivity work reports.
+    first_experiment: >
+      Compute the scale profile of the Fano-based estimator across aggregation factors for a set of
+      instruments, extract the scale at which n saturates, and regress liquidation-cascade occurrence
+      on changes in that scale against a volatility control.
+    first_computation: hawkes_branching_ratio
+    would_be_novel_because: >
+      The published debate is entirely about whether n rises. Nobody has treated the cutoff as the
+      tradable state, and nobody has run the estimate on a continuously trading venue with labelled
+      cascades.
+    already_done_risk: 2
+    kill_condition: >
+      The saturation scale is unstable under reasonable estimator choices, or it adds nothing over
+      trailing realized volatility in predicting labelled cascades.
+    payoff: 5
+    novelty: 4
+    testability: 4
+    maturity: 4
+    effort: 3
+
+  - extension_id: EXT-FANO-EXPONENT
+    title: "Recovering the kernel exponent from the scale profile of a cheap dispersion estimator"
+    domain: point_processes
+    grounded_in:
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+    what_the_source_leaves_open: >
+      Their estimate requires maximum likelihood with a parameterized power-law kernel fitted over
+      two-month windows. They demonstrate that cheap short-window estimators are biased but do not
+      offer a cheap estimator that is not.
+    our_advantage: >
+      Nothing about data — this one is pure theory plus simulation, and it is small enough to finish.
+      We already have a dispersion-based estimator that is orders of magnitude cheaper than their MLE
+      and that reports its own scale profile.
+    proposed_work: >
+      Derive how the Fano-based estimate n(w) grows with aggregation scale w when the true kernel is a
+      power law with exponent epsilon, then invert that relation to read epsilon off the profile.
+      Verify by simulating Hawkes processes with known kernels and checking recovery.
+    novel_claim: >
+      The shape of the dispersion-versus-scale curve is a sufficient statistic for the kernel exponent,
+      making an online estimate of kernel shape available at counting cost rather than at MLE cost.
+    first_experiment: >
+      Simulate power-law Hawkes processes at known epsilon and n, compute the scale profile, and check
+      whether the fitted slope of n(w) against log w recovers epsilon within a useful tolerance.
+    first_computation: hawkes_branching_ratio
+    would_be_novel_because: >
+      The literature treats dispersion estimators as a cautionary tale rather than as a source of
+      information about kernel shape. The bias they warn about is itself the signal.
+    already_done_risk: 3
+    kill_condition: >
+      The mapping is not identifiable, or the variance of the profile at realistic sample sizes swamps
+      the exponent's effect.
+    payoff: 3
+    novelty: 4
+    testability: 5
+    maturity: 5
+    effort: 2
+
+  - extension_id: EXT-IRREVERSIBILITY-PNL
+    title: "Answering the irreversibility-to-predictability question with a decision ledger"
+    domain: stochastic_thermodynamics
+    grounded_in:
+      - "flanagan-2016-irreversibility-financial#empirical-ranking"
+      - "martinez-2018-tirop#method"
+    what_the_source_leaves_open: >
+      The authors find that every equity they study is irreversible, that the degree varies across
+      names and over time, and that it is essentially uncorrelated with volatility. They then state
+      the open problem directly: the promising relation between irreversibility and predictability
+      still needs to be assessed in a quantifiable way. They stop at the statistic.
+    our_advantage: >
+      They had prices; we have an attribution ledger with realized net-of-cost outcomes per decision.
+      The question they could only pose descriptively becomes an ordinary regression for us, because
+      we can put realized profit on the left-hand side instead of an abstract notion of predictability.
+    proposed_work: >
+      Rank instrument-venue-hour cells by surrogate-significant irreversibility, then test whether the
+      ranking predicts realized net edge in the ledger. Include a cost model so the answer is about
+      profit rather than about correlation.
+    novel_claim: >
+      Irreversibility is an allocator: it identifies where research effort and risk capital find edge,
+      even though it says nothing about direction. If it holds, the screen replaces intuition in
+      choosing what to work on.
+    first_experiment: >
+      Compute significance-tested irreversibility per cell over matched windows, split cells at the
+      median, and compare realized net edge across the two groups with cluster-robust inference.
+    first_computation: time_irreversibility
+    would_be_novel_because: >
+      The published work stops at ranking instruments by a statistic. Connecting that ranking to
+      realized, cost-adjusted trading outcomes is exactly the step the authors name as missing.
+    already_done_risk: 2
+    kill_condition: >
+      No difference in realized edge across the ranking once volatility and spread are controlled, or
+      the irreversibility ranking is unstable between adjacent windows.
+    payoff: 4
+    novelty: 4
+    testability: 5
+    maturity: 4
+    effort: 2
+
+  - extension_id: EXT-FLOW-IRREVERSIBILITY
+    title: "Irreversibility of order flow rather than of price"
+    domain: stochastic_thermodynamics
+    grounded_in:
+      - "flanagan-2016-irreversibility-financial#empirical-ranking"
+      - "hardiman-2013-critical-reflexivity#empirical-criticality"
+    what_the_source_leaves_open: >
+      Published irreversibility work is computed on price or return series. The mechanism that would
+      generate an arrow of time — events triggering further events — lives in the flow, and the
+      Hawkes literature establishes that this triggering is the dominant feature of flow. Nobody joins
+      the two.
+    our_advantage: >
+      Full event-level order flow on venues where the same instrument trades continuously, and a
+      branching-ratio estimator already implemented against the same data.
+    proposed_work: >
+      Measure irreversibility on signed order flow and on queue-change series rather than on price, and
+      test whether flow irreversibility exceeds price irreversibility and tracks the branching ratio.
+    novel_claim: >
+      Flow carries the arrow of time and price inherits a diluted version of it, so flow irreversibility
+      is both larger and more informative — and it should be a monotone function of endogeneity, linking
+      an information-theoretic statistic to a point-process parameter.
+    first_experiment: >
+      Compute irreversibility on matched price and signed-flow series over identical windows, and
+      correlate the flow statistic with the scale-resolved branching ratio on the same windows.
+    first_computation: time_irreversibility
+    would_be_novel_because: >
+      It would be the first quantitative bridge between the endogeneity literature and the
+      irreversibility literature, two bodies of work that describe the same phenomenon in different
+      vocabularies and do not cite each other.
+    already_done_risk: 3
+    kill_condition: >
+      Flow irreversibility is no larger than price irreversibility, or shows no relation to the
+      branching ratio across instruments.
+    payoff: 4
+    novelty: 5
+    testability: 4
+    maturity: 3
+    effort: 3
+
+  - extension_id: EXT-LVR-DISCRETE
+    title: "Loss-versus-rebalancing under block time and jumps"
+    domain: defi_mechanics
+    grounded_in:
+      - "milionis-2022-loss-versus-rebalancing#assumptions-and-open-problems"
+      - "milionis-2022-loss-versus-rebalancing#lvr-derivation"
+    what_the_source_leaves_open: >
+      The result assumes a continuous price process, an infinitely deep reference exchange, and passive
+      liquidity providers. The authors state that discrete or jump processes alter the calculation, and
+      list gas races among arbitrageurs, multi-asset pools and strategic provider behaviour as work left
+      undone.
+    our_advantage: >
+      The venues we trade settle in discrete blocks with an explicit ordering auction, so the discrete
+      case is not an edge case for us — it is the only case. We can observe block times, priority fees
+      and the realized arbitrage directly.
+    proposed_work: >
+      Derive the correction to instantaneous loss-versus-rebalancing when arbitrage can only be exercised
+      at block boundaries and the reference price can jump between them, and check the correction against
+      realized provider profit and loss.
+    novel_claim: >
+      Discrete block time makes the arbitrageur's option Bermudan rather than American, which changes the
+      volatility scaling of provider losses; the continuous formula is a bound rather than an estimate, and
+      the gap is a function of block time and of the fee auction.
+    first_experiment: >
+      Reconstruct realized arbitrage against a reference venue at block granularity, compare realized
+      provider loss to the continuous-time prediction, and test whether the residual scales with block time.
+    first_computation: null
+    would_be_novel_because: >
+      The continuous result is the reference point in the field, and the discrete correction is named as
+      future work by its own authors rather than being solved elsewhere.
+    already_done_risk: 3
+    kill_condition: >
+      Realized losses match the continuous prediction within noise at observed block times, meaning the
+      correction is negligible in practice.
+    payoff: 4
+    novelty: 4
+    testability: 4
+    maturity: 3
+    effort: 4
+
+  - extension_id: EXT-LVR-CRITICALITY
+    title: "Provider losses as a function of endogeneity rather than of volatility"
+    domain: defi_mechanics
+    grounded_in:
+      - "milionis-2022-loss-versus-rebalancing#lvr-derivation"
+      - "hardiman-2013-critical-reflexivity#empirical-criticality"
+    what_the_source_leaves_open: >
+      Loss-versus-rebalancing is expressed through volatility and marginal liquidity. Volatility is treated
+      as exogenous. The Hawkes literature says volatility is largely produced by self-excitation, and the
+      nearly-unstable limit connects that self-excitation to the roughness of the volatility process.
+    our_advantage: >
+      We hold both literatures and have estimators for both quantities running against the same data.
+    proposed_work: >
+      Substitute an endogeneity-driven volatility for the exogenous sigma in the loss expression and test
+      whether provider losses are better explained by the branching ratio and its correlation scale than by
+      realized volatility alone.
+    novel_claim: >
+      A liquidity provider is short a claim on market endogeneity, not merely on volatility. Two periods with
+      identical realized volatility but different endogeneity should produce systematically different provider
+      losses, which the standard formula cannot express.
+    first_experiment: >
+      Partition periods into matched realized-volatility buckets, split each by measured endogeneity, and
+      compare realized provider loss across the split.
+    first_computation: hawkes_branching_ratio
+    would_be_novel_because: >
+      It joins automated market making to the point-process account of volatility. The two fields currently
+      share no vocabulary and no citations.
+    already_done_risk: 2
+    kill_condition: >
+      Within volatility-matched buckets, endogeneity has no relationship to provider loss.
+    payoff: 4
+    novelty: 5
+    testability: 3
+    maturity: 3
+    effort: 4
+
+  - extension_id: EXT-SIGNATURE-VS-CLOCK
+    title: "A decisive test of clock-free features against volume-clock resampling"
+    domain: rough_paths
+    grounded_in:
+      - "chevyrev-2016-signature-method-primer#s2"
+    what_the_source_leaves_open: >
+      The invariance of the signature under reparametrization is stated as a theorem, and the loss of speed
+      information is acknowledged. Neither the benefit nor the cost of that trade is quantified for any
+      application where the sampling clock is itself contested.
+    our_advantage: >
+      Market data is the canonical case of a contested clock — wall time, trade time and volume time each
+      have advocates — and we can construct the same window under all three samplings and compare directly.
+    proposed_work: >
+      Build matched feature sets on identical windows under three clocks: raw wall-clock features, volume-clock
+      resampled features, and signature features. Compare predictive performance and, separately, stability
+      across the samplings.
+    novel_claim: >
+      Signature features dissolve the clock question rather than answering it, and their advantage should be
+      largest exactly where sampling is most irregular — which is a testable interaction, not a general claim
+      of superiority.
+    first_experiment: >
+      Compute the price-versus-flow Levy area on the same window sampled three ways, confirm the invariance
+      empirically, and compare out-of-sample mark-out prediction against volume-clock features.
+    first_computation: path_signature
+    would_be_novel_because: >
+      Signature methods enter finance as generic inputs to neural networks. Testing the invariance property
+      itself as the source of advantage, against the volume-clock practice it would replace, is not something
+      the applied literature has isolated.
+    already_done_risk: 4
+    kill_condition: >
+      Volume-clock features match or beat signature features everywhere, including in the most irregular
+      sampling regimes.
+    payoff: 3
+    novelty: 3
+    testability: 5
+    maturity: 5
+    effort: 3
+
+  - extension_id: EXT-COMPOSITE-EDGE-EPROCESS
+    title: "An e-process for the null that an edge does not clear its costs"
+    domain: sequential_inference
+    grounded_in:
+      - "ramdas-2023-game-theoretic-statistics#open-problems"
+    what_the_source_leaves_open: >
+      The authors list as open questions which null hypotheses admit nontrivial e-processes, how filtrations
+      should be chosen when information is discarded, and whether anytime-validity necessarily costs power.
+      Composite nulls with nuisance parameters are exactly where they say the theory is incomplete.
+    our_advantage: >
+      Our operational question is a composite null with a nuisance parameter — whether net edge exceeds a cost
+      that is itself estimated — and we generate the data continuously, so the construction has an immediate
+      user rather than being a theoretical exercise.
+    proposed_work: >
+      Construct and validate an e-process for the null that per-decision net edge is at most the estimated
+      round-trip cost, with the cost treated as a nuisance, and characterize its power against realistic decay.
+    novel_claim: >
+      Strategy retirement can be made a decision with a stated error rate under continuous monitoring, with the
+      cost floor absorbed into the null rather than estimated separately and ignored.
+    first_experiment: >
+      Simulate strategies with known decay profiles and known cost noise, run the candidate e-process, and
+      measure detection delay against a fixed-window test at matched false-retirement rates.
+    first_computation: null
+    would_be_novel_because: >
+      Anytime-valid methods are being adopted for experimentation platforms, not for strategy monitoring, and
+      the composite-null-with-cost formulation does not appear in either literature.
+    already_done_risk: 3
+    kill_condition: >
+      The construction is so conservative at realistic sample sizes that it never fires before a fixed-window
+      test would.
+    payoff: 3
+    novelty: 4
+    testability: 4
+    maturity: 3
+    effort: 3
+
+  - extension_id: EXT-VENUE-LAG-NULL
+    title: "Validating a lead-lag null where the mechanical lag is known"
+    domain: random_matrix_theory
+    grounded_in:
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+    what_the_source_leaves_open: >
+      The general lesson of the Hardiman critique is that an estimator can manufacture a plausible result when
+      its assumptions are wrong, and that the way to catch it is to run the estimator on data with known
+      ground truth. Lead-lag estimation across venues has no such standard validation.
+    our_advantage: >
+      Cross-venue crypto supplies a known mechanical lag: an on-chain venue cannot update faster than its block
+      time, so the direction and approximate size of the lag are known in advance. That gives ground truth for
+      validating a lead-lag null model before applying it where truth is unknown.
+    proposed_work: >
+      Build the time-lagged correlation matrix across venues, compare its spectrum against the circular-law null,
+      and check whether the outliers recover the known mechanical lag before trusting the method on pairs where
+      no mechanical lag exists.
+    novel_claim: >
+      A lead-lag null model can be calibrated on mechanically-determined lags, turning an untestable method into
+      a tested one. Existing work derives the null analytically but validates it only against synthetic data.
+    first_experiment: >
+      Estimate the lagged cross-correlation matrix across venue pairs with known block-time asymmetry and check
+      whether spectral outliers appear where the mechanical lag predicts and nowhere else.
+    first_computation: null
+    would_be_novel_because: >
+      Time-lagged correlation matrices have been treated with random matrix theory before, so the method is not
+      new; validating it against a mechanically known lag, and only then applying it, is the part that is missing.
+    already_done_risk: 4
+    kill_condition: >
+      No spectral outlier appears at the known mechanical lag, which would mean the method cannot detect a lag
+      we are certain exists.
+    payoff: 3
+    novelty: 3
+    testability: 4
+    maturity: 4
+    effort: 3
+
+# Extensions we considered and are not proposing, with the reason. Kept so the same
+# ideas do not resurface as if they were new.
+declined:
+  - name: reproduce_the_reflexivity_trend_debate
+    reason: >
+      Re-running the Filimonov-Sornette versus Hardiman disagreement on our data settles a question about an
+      estimator, not about our markets. The disagreement is already resolved in the literature by a synthetic
+      demonstration; repeating it buys nothing.
+  - name: general_signature_deep_learning
+    reason: >
+      Feeding signatures into a neural network is the standard applied approach and is therefore neither novel
+      nor diagnostic. The invariance property, isolated, is the part worth testing.
+  - name: new_amm_curve_design
+    reason: >
+      Designing a better market-making curve is a protocol-design problem, not a trading problem, and we are not
+      positioned to deploy one. Understanding losses on existing curves is.

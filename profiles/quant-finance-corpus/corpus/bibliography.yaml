@@ -17,9 +17,7 @@
 #
 # `refs` entries without an id are frontier targets: works the mapped literature
 # points at that we have not catalogued yet.
-# Page counts are estimates.
-
-updated_at: seed
+# Page counts are estimates.updated_at: seed
 entries:
 - id: harris-2003-trading-exchanges
   title: 'Trading and Exchanges: Market Microstructure for Practitioners'
@@ -4292,6 +4290,20 @@ entries:
   - target: Levin, Lyons & Ni — Learning from the past, predicting the statistics for the future
     relation: cites
     bucket: machine_learning_frontier
+  units:
+  - unit_id: s2
+    topic: the definition of the signature and its invariance under time reparametrization
+    title: null
+    locator: sections 1-2
+    kind: paper_section
+    pages: 15
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. The signature is the sequence of iterated integrals; it is invariant under any
+      reparametrization of time, which means pure timing information is discarded — the property is simultaneously
+      the advantage and the blind spot.
+  status: reviewed
 - id: villani-2009-optimal-transport
   title: 'Optimal Transport: Old and New'
   authors:
@@ -5189,6 +5201,32 @@ entries:
   refs:
   - target: grunwald-2007-mdl-principle
     relation: cites
+  units:
+  - unit_id: e-values-and-ville
+    topic: e-values, e-processes, Ville's inequality and the construction of confidence sequences
+    title: null
+    locator: sections 2-4
+    kind: paper_section
+    pages: 15
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. An e-value has expectation at most one under the null; Ville's inequality gives
+      P(sup_t M_t >= alpha) <= 1/alpha, which is what makes optional stopping safe; confidence sequences
+      invert a family of test martingales.
+  - unit_id: open-problems
+    topic: the questions the authors list as unresolved
+    title: null
+    locator: section 8.2
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Open: for which composite nulls nontrivial e-processes exist, admissibility,
+      properties of the reverse information projection, how to choose a filtration when information is
+      discarded, and whether anytime-validity necessarily costs power.'
+  status: reviewed
 - id: vovk-2005-algorithmic-learning-random-world
   title: Algorithmic Learning in a Random World
   authors:
@@ -5863,6 +5901,19 @@ entries:
     priority: 5
     read_status: unread
     concepts_expected: []
+  - unit_id: assumptions-and-open-problems
+    topic: the assumptions the result rests on and the extensions the authors leave undone
+    title: null
+    locator: model assumptions and discussion
+    kind: paper_section
+    pages: 8
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. Assumes a continuous price process, an infinitely deep reference exchange and
+      passive providers; the authors state that discrete or jump processes alter the calculation, and
+      list gas races, multi-asset pools and strategic provider behaviour as future work.
+  status: reviewed
 - id: daian-2020-flash-boys-2
   title: 'Flash Boys 2.0: Frontrunning, Transaction Reordering, and Consensus Instability in Decentralized
     Exchanges'
@@ -6217,7 +6268,6 @@ entries:
     relation: syllabus_with
   - target: gatheral-2018-volatility-is-rough
     relation: syllabus_with
-
 - id: fernholz-stochastic-portfolio-theory
   title: Stochastic Portfolio Theory
   authors:
@@ -6226,7 +6276,10 @@ entries:
   bucket: quant_finance_core
   form: monograph
   venue: Springer
-  identifiers: {isbn: null, doi: null, url: null}
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
   pages: 177
   density: high
   priority: 5
@@ -6237,7 +6290,9 @@ entries:
     checked_at: null
     grant: null
     notes: null
-  acquisition: {state: purchasable, copy_path: null}
+  acquisition:
+    state: purchasable
+    copy_path: null
   units:
   - unit_id: excess-growth
     topic: the excess growth rate and where relative outperformance comes from
@@ -6280,7 +6335,311 @@ entries:
   - target: cover-2006-elements-information-theory
     relation: syllabus_with
     note: null
-  discovered: {round: 0, method: seed, source: null}
+  discovered:
+    round: 0
+    method: seed
+    source: null
   status: candidate
-  tags: [stochastic-portfolio-theory, relative-arbitrage, diversity, pathwise, high-value-target]
+  tags:
+  - stochastic-portfolio-theory
+  - relative-arbitrage
+  - diversity
+  - pathwise
+  - high-value-target
   notes: null
+- id: hardiman-2013-critical-reflexivity
+  title: 'Critical reflexivity in financial markets: a Hawkes process analysis'
+  authors:
+  - Stephen J. Hardiman
+  - Nicolas Bercot
+  - Jean-Philippe Bouchaud
+  year: 2013
+  bucket: mathematical_foundations
+  form: paper
+  venue: European Physical Journal B
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1302.1405
+  pages: 9
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: arXiv preprint read directly at ar5iv; the per-paper licence still needs checking.
+  acquisition:
+    state: open_url
+    copy_path: null
+  units:
+  - unit_id: estimator-and-bias
+    topic: MLE with a power-law kernel, and why fitting an exponential kernel on short windows biases
+      the branching ratio
+    title: null
+    locator: sections 2-3 and figure 2
+    kind: paper_section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-HAWKES-CRITICALITY
+    notes: Read directly. Their figure 2 shows synthetic critical (n=1) power-law data fitted by the exponential/30-minute
+      procedure returning a spuriously sub-critical and rising n.
+  - unit_id: empirical-criticality
+    topic: E-mini S&P branching ratio across 1998-2011 and the two-regime power-law kernel
+    title: null
+    locator: section 4
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-HAWKES-CRITICALITY
+    notes: Read directly. n fluctuates about 1 throughout; kernel exponents about -1.15 below 10^3 s and
+      -1.45 from 10^3 to 10^6 s; the cutoff tau_0 falls exponentially over the period.
+  refs:
+  - target: bacry-2015-hawkes-processes-finance
+    relation: cites
+    note: null
+  - target: filimonov-2012-quantifying-reflexivity
+    relation: responds_to
+    note: null
+  - target: hawkes-1971-spectra-self-exciting
+    relation: builds_on
+    note: null
+  - target: jaisson-2015-nearly-unstable-hawkes
+    relation: syllabus_with
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: arxiv.org/abs/1302.1405
+  status: reviewed
+  tags:
+  - hawkes
+  - criticality
+  - reflexivity
+  - branching-ratio
+  - read-directly
+  - high-value-target
+  notes: 'Directly read. States the open problem in its own words: a mechanism explaining why markets
+    sit precisely at criticality is still lacking.'
+- id: filimonov-2012-quantifying-reflexivity
+  title: 'Quantifying reflexivity in financial markets: toward a prediction of flash crashes'
+  authors:
+  - Vladimir Filimonov
+  - Didier Sornette
+  year: 2012
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review E
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: Not read directly. Known through the Hardiman critique; treat its claims as contested until
+      read.
+  acquisition:
+    state: library
+    copy_path: null
+  refs:
+  - target: hawkes-1971-spectra-self-exciting
+    relation: builds_on
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: cited by hardiman-2013-critical-reflexivity
+  status: candidate
+  tags:
+  - hawkes
+  - reflexivity
+  - contested
+  - contradiction-queue
+  notes: The exponential-kernel, 30-minute-window estimate of rising reflexivity that Hardiman et al argue
+    is an artifact. Kept as the contradicting source.
+- id: flanagan-2016-irreversibility-financial
+  title: 'Irreversibility of financial time series: a graph-theoretical approach'
+  authors:
+  - Ryan Flanagan
+  - Lucas Lacasa
+  year: 2016
+  bucket: dynamical_systems
+  form: paper
+  venue: Physics Letters A
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1601.01980
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    copy_path: null
+  units:
+  - unit_id: empirical-ranking
+    topic: irreversibility across 35 NYSE and Nasdaq equities 1998-2012, and its relation to volatility
+    title: null
+    locator: results section
+    kind: paper_section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-IRREVERSIBILITY
+    notes: Read directly. Every company studied is irreversible; the degree varies across names and fluctuates
+      over time; irreversibility is essentially uncorrelated with volatility (r^2 about 0.06). Windows
+      of 5000 points with an O(1/n^2) finite-size correction.
+  refs:
+  - target: 'Lacasa et al — Time series irreversibility: a visibility graph approach'
+    relation: builds_on
+    bucket: dynamical_systems
+    note: null
+  - target: martinez-2018-tirop
+    relation: syllabus_with
+    note: null
+  - target: cover-2006-elements-information-theory
+    relation: cites
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: arxiv.org/abs/1601.01980
+  status: reviewed
+  tags:
+  - irreversibility
+  - entropy-production
+  - market-efficiency
+  - read-directly
+  - high-value-target
+  notes: 'Directly read. States the gap our bet targets: the promising relation between irreversibility
+    and predictability still needs to be assessed in a quantifiable way.'
+- id: martinez-2018-tirop
+  title: Detection of time reversibility in time series by ordinal patterns analysis
+  authors:
+  - Johann H. Martínez
+  - José L. Herrera-Diestra
+  - Mario Chavez
+  year: 2018
+  bucket: signal_processing
+  form: paper
+  venue: Chaos
+  identifiers:
+    isbn: null
+    doi: 10.1063/1.5055855
+    url: https://arxiv.org/abs/1809.04377
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    copy_path: null
+  units:
+  - unit_id: method
+    topic: comparing forward and time-reversed ordinal pattern distributions by Jensen-Shannon divergence,
+      against a surrogate population
+    title: null
+    locator: method section
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-IRREVERSIBILITY
+    notes: 'Read at abstract and method level. The surrogate population is the part our implementation
+      was missing: the raw divergence alone has no null.'
+  refs:
+  - target: flanagan-2016-irreversibility-financial
+    relation: syllabus_with
+    note: null
+  - target: 'Bandt & Pompe — Permutation entropy: a natural complexity measure for time series'
+    relation: builds_on
+    bucket: signal_processing
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: arxiv.org/abs/1809.04377
+  status: reviewed
+  tags:
+  - irreversibility
+  - ordinal-patterns
+  - surrogates
+  - read-directly
+  notes: Authorship verified from the source page after an incorrect recollection; the seed rule against
+    invented metadata earned its keep here.
+- id: biely-2008-time-lagged-correlation-ensembles
+  title: 'Random matrix ensembles of time-lagged correlation matrices: derivation of eigenvalue spectra
+    and analysis of financial time-series'
+  authors:
+  - Christoly Biely
+  - Stefan Thurner
+  year: 2008
+  bucket: high_dim_statistics
+  form: paper
+  venue: Quantitative Finance
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 12
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: Located by search, not read in full. Existence alone downgrades the novelty of the non-Hermitian
+      bet.
+  acquisition:
+    state: library
+    copy_path: null
+  refs:
+  - target: bai-2010-spectral-analysis-random-matrices
+    relation: cites
+    note: null
+  - target: potters-2020-first-course-random-matrix-theory
+    relation: syllabus_with
+    note: null
+  discovered:
+    round: 0
+    method: search
+    source: search for non-Hermitian lead-lag spectra
+  status: candidate
+  tags:
+  - random-matrix-theory
+  - lead-lag
+  - non-hermitian
+  - circular-law
+  - prior-art
+  notes: 'Prior art for the lead-lag RMT bet: time-lagged correlation matrices already treated as asymmetric
+    random matrices with a circular-symmetric spectrum.'

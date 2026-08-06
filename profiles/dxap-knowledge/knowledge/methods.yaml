@@ -101,3 +101,44 @@ methods:
       - "Moving the price costs a positive amount bounded by the subsidy."
       - "Extreme inventory does not overflow the exponential."
     notes: "Only applies to scoring-rule venues. On a CLOB prediction market this misprices the cost of moving the market."
+
+  - method_id: hawkes_branching_ratio
+    implementation_version: "1.1.0"
+    concept_ids: [KC-HAWKES-CRITICALITY]
+    default_params: {min_windows: 20, scales: [1, 5, 20]}
+    data_requirements: [trade_prints]
+    status: implemented
+    synthetic_tests:
+      - "Recovers a branching ratio from counts constructed with a known Fano factor."
+      - "Underdispersed counts are flagged rather than returned as a negative ratio."
+      - "A series whose dispersion grows with aggregation raises the scale warning."
+    notes: >
+      Version 1.1.0 exists because the 1.0.0 card was written before the primary sources were read.
+      Always read `scale_profile` before quoting the headline number: the published failure is an
+      estimator that measured window-local reflexivity and reported it as a trend in the market.
+
+  - method_id: time_irreversibility
+    implementation_version: "1.1.0"
+    concept_ids: [KC-IRREVERSIBILITY]
+    default_params: {embedding: 3, surrogates: 200, seed: 1337}
+    data_requirements: [mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "A symmetric triangle wave is not significant against the surrogate null."
+      - "A sawtooth is significant."
+      - "Surrogate count of zero disables the test rather than silently returning a bare divergence."
+    notes: >
+      The surrogate population came from reading the source method; version 1.0.0 reported a raw
+      divergence with no null, which the published work treats as the essential ingredient.
+
+  - method_id: path_signature
+    implementation_version: "1.0.0"
+    concept_ids: [KC-SIGNATURE-PATH]
+    default_params: {}
+    data_requirements: [mid_price_series, signed_volume]
+    status: implemented
+    synthetic_tests:
+      - "Exact Levy area for the unit triangle."
+      - "Identical result after subdividing segments and repeating points."
+      - "Zero area for a straight path."
+    notes: "Normalize channels before comparing areas across instruments, or the area measures scale."

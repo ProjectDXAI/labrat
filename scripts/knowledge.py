@@ -129,6 +129,7 @@ def knowledge_paths(root: Path) -> dict[str, Path]:
         "problems": root / "problems.yaml",
         "trials": root / "trials.yaml",
         "bets": root / "frontier_bets.yaml",
+        "extensions": root / "exploratory_extensions.yaml",
         "policies": root / "policies.yaml",
         "queues": root / "queues",
         "packets": root / "packets",
@@ -150,6 +151,7 @@ def load_store(paths: dict[str, Path]) -> dict[str, Any]:
         "problems": load_list(paths["problems"], "problems"),
         "trials": load_list(paths["trials"], "trials"),
         "bets": load_list(paths["bets"], "bets"),
+        "extensions": load_list(paths["extensions"], "extensions"),
         "policies": (load_yaml(paths["policies"], {}) or {}).get("policies") or {},
         "utility": load_json(paths["utility"], {}),
     }
@@ -982,6 +984,92 @@ def rank_bets(store: dict[str, Any]) -> list[dict[str, Any]]:
     return scored
 
 
+
+EXTENSION_REQUIRED = [
+    "extension_id", "title", "domain", "grounded_in", "what_the_source_leaves_open",
+    "our_advantage", "proposed_work", "novel_claim", "first_experiment", "kill_condition",
+]
+
+
+def read_units(sources: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Every source unit anyone has actually opened, keyed as `entry-id#unit-id`."""
+    opened: dict[str, dict[str, Any]] = {}
+    for entry in sources.values():
+        for unit in entry.get("units") or []:
+            if unit.get("read_status") in {"read", "compiled"}:
+                opened[f"{entry['id']}#{unit['unit_id']}"] = unit
+    return opened
+
+
+def validate_extensions(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """The grounding rule: an extension must cite a unit that has been read.
+
+    Proposing new work from a source nobody opened is the cheapest and least
+    honest thing this repository could do, so it is refused rather than warned
+    about. An extension may cite an unread source alongside a read one, but at
+    least one grounding must be a unit whose read_status says someone opened it.
+    """
+    opened = read_units(sources)
+    rows: list[dict[str, Any]] = []
+    for extension in store.get("extensions") or []:
+        errors: list[str] = []
+        for field in EXTENSION_REQUIRED:
+            if extension.get(field) in (None, "", [], {}):
+                errors.append(f"missing required field '{field}'")
+
+        grounded = list(extension.get("grounded_in") or [])
+        read_anchors = [anchor for anchor in grounded if anchor in opened]
+        if grounded and not read_anchors and sources:
+            errors.append(
+                "not grounded in anything that has been read: "
+                f"{', '.join(grounded)} — mark the unit read_status once someone has actually opened it"
+            )
+        for anchor in grounded:
+            source_id = str(anchor).split("#")[0]
+            if sources and source_id not in sources:
+                errors.append(f"grounding source '{source_id}' is not in the bibliography")
+
+        method_id = extension.get("first_computation")
+        if method_id and methods_module is not None and method_id not in methods_module.REGISTRY:
+            errors.append(f"first_computation '{method_id}' has no implementation")
+
+        rows.append(
+            {
+                "extension_id": extension.get("extension_id"),
+                "ok": not errors,
+                "errors": errors,
+                "read_groundings": read_anchors,
+                "runnable_now": bool(method_id),
+            }
+        )
+    return {
+        "ok": all(row["ok"] for row in rows),
+        "extensions": rows,
+        "count": len(rows),
+        "units_read": len(opened),
+    }
+
+
+def score_extension(extension: dict[str, Any]) -> dict[str, Any]:
+    """Same shape as a bet, minus the risk that the work is already done.
+
+    A novel-work proposal fails most often by being unoriginal rather than by
+    being wrong, so that risk is priced separately from effort.
+    """
+    base = score_bet(extension)
+    already_done = float(extension.get("already_done_risk") or 3)
+    return {
+        "score": round(base["score"] - 0.4 * already_done, 3),
+        "components": {**base["components"], "already_done_risk": already_done},
+    }
+
+
+def rank_extensions(store: dict[str, Any]) -> list[dict[str, Any]]:
+    scored = [{**extension, **score_extension(extension)} for extension in store.get("extensions") or []]
+    scored.sort(key=lambda row: (-row["score"], row["extension_id"]))
+    return scored
+
+
 # --------------------------------------------------------------------------------------
 # Robustness: does a policy survive the trial set being wrong about the world?
 # --------------------------------------------------------------------------------------
@@ -1365,6 +1453,22 @@ def compile_queue(
 # --------------------------------------------------------------------------------------
 
 
+def _cards_on_read_units(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """How much of the compiled knowledge rests on a source someone actually opened.
+
+    Not a gate — the original cards were written from working knowledge and that is
+    a legitimate way to seed a store. But the number should be visible, because a
+    knowledge base whose anchors have never been opened is a well-organized memory.
+    """
+    opened = read_units(sources) if sources else {}
+    grounded, ungrounded = [], []
+    for concept in store.get("concepts") or []:
+        anchors = [str(ref if isinstance(ref, str) else parse_passage_ref(ref)["source_id"]) for ref in concept.get("source_passage_ids") or []]
+        anchors = [f"{parse_passage_ref(ref)['source_id']}#{parse_passage_ref(ref)['anchor']}" for ref in concept.get("source_passage_ids") or []]
+        (grounded if any(anchor in opened for anchor in anchors) else ungrounded).append(concept["concept_id"])
+    return {"grounded": grounded, "ungrounded": ungrounded}
+
+
 def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
     validation = validate_store(store, sources)
     servable = servable_concepts(store, sources)
@@ -1403,6 +1507,9 @@ def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) ->
         "implementations_available": sorted(methods_module.REGISTRY) if methods_module else [],
         "trials": len(store["trials"]),
         "frontier_bets": len(store.get("bets") or []),
+        "exploratory_extensions": len(store.get("extensions") or []),
+        "cards_anchored_to_read_units": _cards_on_read_units(store, sources)["grounded"],
+        "cards_anchored_only_to_unread": _cards_on_read_units(store, sources)["ungrounded"],
         "bets_runnable_now": sum(1 for bet in (store.get("bets") or []) if bet.get("first_computation")),
         "policies": sorted(store["policies"]),
     }
@@ -1612,6 +1719,12 @@ def cmd_status(args: argparse.Namespace) -> int:
         print(f"  concepts with no method binding: {', '.join(payload['concepts_without_method'])}")
     if payload["concepts_without_hypothesis"]:
         print(f"  concepts with no hypothesis: {', '.join(payload['concepts_without_hypothesis'])}")
+    grounded = len(payload["cards_anchored_to_read_units"])
+    print(
+        f"  provenance: {grounded}/{payload['counts']['concepts']} cards anchored to a source unit someone has opened; "
+        f"{len(payload['cards_anchored_only_to_unread'])} rest on unread anchors"
+    )
+    print(f"  bets={payload['frontier_bets']} extensions={payload['exploratory_extensions']}")
     return 0
 
 
@@ -1681,6 +1794,35 @@ def cmd_bets(args: argparse.Namespace) -> int:
         if args.verbose:
             print(f"        prediction: {' '.join(str(bet['sharp_prediction']).split())[:160]}")
             print(f"        falsifier:  {' '.join(str(bet['falsifier']).split())[:160]}")
+    return 0 if validation["ok"] else 1
+
+
+def cmd_extensions(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+    validation = validate_extensions(store, sources)
+    ranked = rank_extensions(store)
+
+    if args.json:
+        print(json.dumps({"validation": validation, "ranked": ranked}, indent=2))
+        return 0 if validation["ok"] else 1
+
+    for row in validation["extensions"]:
+        for message in row["errors"]:
+            print(f"ERROR  {row['extension_id']}: {message}")
+    print(
+        f"{len(ranked)} proposed extensions, all grounded in {validation['units_read']} source units "
+        f"that have actually been read\n"
+    )
+    for index, extension in enumerate(ranked, 1):
+        print(f"{index:>2}. {extension['score']:>6}  {extension['extension_id']:<26} {extension['title']}")
+        print(f"          grounded in: {', '.join(extension.get('grounded_in') or [])}")
+        print(f"          run: {extension.get('first_computation') or 'no implementation yet'}")
+        if args.verbose:
+            print(f"          leaves open: {' '.join(str(extension['what_the_source_leaves_open']).split())[:170]}")
+            print(f"          novel claim: {' '.join(str(extension['novel_claim']).split())[:170]}")
+            print(f"          kill:        {' '.join(str(extension['kill_condition']).split())[:170]}")
     return 0 if validation["ok"] else 1
 
 
@@ -1770,6 +1912,10 @@ def build_parser() -> argparse.ArgumentParser:
     bets_cmd.add_argument("--verbose", action="store_true")
     bets_cmd.add_argument("--json", action="store_true")
 
+    extensions_cmd = sub.add_parser("extensions", help="Rank proposed new work; refuse anything not grounded in a source unit that has been read.")
+    extensions_cmd.add_argument("--verbose", action="store_true")
+    extensions_cmd.add_argument("--json", action="store_true")
+
     stress_cmd = sub.add_parser("stress", help="Score policies under perturbation: reworded contexts, missing observables, distractors, duplicates, tool loss.")
     stress_cmd.add_argument("--policy", default=None)
     stress_cmd.add_argument("--json", action="store_true")
@@ -1797,6 +1943,7 @@ def main(argv: list[str] | None = None) -> int:
         "retrieve": cmd_retrieve,
         "evaluate": cmd_evaluate,
         "bets": cmd_bets,
+        "extensions": cmd_extensions,
         "stress": cmd_stress,
         "compile-queue": cmd_compile_queue,
         "vocab": cmd_vocab,

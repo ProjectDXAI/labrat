@@ -204,6 +204,34 @@ Four of the eleven ship with their first computation already implemented in `met
 
 The file also records what is deliberately *not* a bet — topological data analysis, quantum portfolio optimization, deterministic chaos prediction, fractal-market narratives, agent-based simulation as evidence — with the reason, so the same suggestions do not get relitigated every quarter.
 
+## Exploratory extensions: proposing new work, only from what was read
+
+`knowledge/exploratory_extensions.yaml` proposes work that would be *new* — extending a line of research into our domain rather than importing it. One rule makes it different from the bets file, and it is enforced rather than encouraged:
+
+> **Every extension must cite a corpus unit whose `read_status` is `read` or `compiled`.** An extension grounded in a source nobody has opened is refused by `knowledge extensions`.
+
+The cheapest way to invent a research programme is to imagine what a paper probably says. The gate exists because that failure is invisible from the outside — the proposal reads exactly the same either way.
+
+Each entry names what the source leaves open *in its own terms*, what specific advantage we have that the original authors lacked, the claim that would be new if it held, and the first experiment that could kill it. Scoring adds one term to the bets formula:
+
+```
+V = payoff x sqrt(novelty) x testability x maturity - effort - already_done_risk
+```
+
+because a novel-work proposal fails most often by being unoriginal rather than by being wrong.
+
+### What reading changed
+
+The first pass of primary reading revised three bets and produced nine extensions. Two of the revisions were corrections to my own claims:
+
+- **`FB-CRITICALITY`'s prediction was wrong as written.** Hardiman, Bercot and Bouchaud measure the branching ratio fluctuating about one across fourteen years of E-mini data, and demonstrate that the published claim of *rising* reflexivity is an artifact of fitting exponential kernels on thirty-minute windows. What moves is the correlation timescale. The bet survived; its prediction was rewritten, and the surviving question became `EXT-CRITICAL-SCALE`.
+- **`FB-NONHERMITIAN` was less novel than scored.** Time-lagged correlation matrices have already been treated as asymmetric random matrices. Novelty cut from 5 to 3; the residual opening — validating the null against a mechanically known lag — became `EXT-VENUE-LAG-NULL`.
+- **`FB-IRREVERSIBILITY` was strengthened.** Flanagan and Lacasa find every series they measure is irreversible and essentially uncorrelated with volatility, and state the irreversibility-to-predictability link as an open question. The prediction was refined from presence to rank, and closing their open question with a decision ledger became the top-ranked extension.
+
+Reading also changed two implementations. `time_irreversibility` gained the surrogate null that the source method treats as essential, and `hawkes_branching_ratio` gained a scale profile and a warning, because the published failure mode is exactly the one a window-based estimator walks into. Both are version 1.1.0, which forced their method cards to be re-verified — the version pin doing its job.
+
+`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 4 of 20. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
+
 ## Ranking what to compile next
 
 ```bash
@@ -248,6 +276,7 @@ Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-secon
 | `knowledge.py evaluate [--policy p]` | Score policies against the labelled trials |
 | `knowledge.py stress [--policy p]` | Re-score under five perturbations, with integrity violations |
 | `knowledge.py bets [--verbose]` | Rank the frontier research bets; refuse any that is not refutable and grounded |
+| `knowledge.py extensions [--verbose]` | Rank proposed new work; refuse anything not grounded in a unit that has been read |
 | `knowledge.py compile-queue [--limit n]` | Rank what to read and compile next |
 | `knowledge.py vocab` | Card vocabularies and the gate's conditions |
 | `methods.py list / show / run / self-test` | The deterministic method registry |

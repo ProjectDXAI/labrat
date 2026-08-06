@@ -244,3 +244,43 @@ decision_relevance:
     minimum_required_confidence: 0.65
     important_side_effects:
       - "A one-legged fill converts a hedged position into an outright one, which is the usual way this loses money."
+
+  - decision_relevance_id: DR-CRITICALITY-ABSTAIN
+    concept_id: KC-HAWKES-CRITICALITY
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      Scale-local endogeneity is elevated relative to its own recent distribution at the same
+      aggregation scale and with the same seasonality treatment, and the scale profile is stable
+      rather than rising, so the reading is not a window artifact.
+    evidence_that_would_argue_against_action: >
+      The scale profile rises with aggregation, meaning the base estimate understates endogeneity
+      and the comparison across time is not like for like; or the seasonality weight has changed.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Because the published estimate sits near one at all times, an abstention rule keyed to a level rather than to a change may abstain permanently."
+
+  - decision_relevance_id: DR-IRREVERSIBILITY-SIZING
+    concept_id: KC-IRREVERSIBILITY
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      The instrument's asymmetry is significant against surrogates and ranks high relative to the
+      other instruments measured over the same window length.
+    evidence_that_would_argue_against_action: >
+      The divergence is not significant, the window is far shorter than the thousands of points the
+      published work uses, or the asymmetry coincides with a known session artifact.
+    minimum_required_confidence: 0.45
+    important_side_effects:
+      - "The link from asymmetry to profitability is unestablished; treat this as a research allocator, not a position sizer, until our own ledger says otherwise."
+
+  - decision_relevance_id: DR-SIGNATURE-ENTRY
+    concept_id: KC-SIGNATURE-PATH
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The price-versus-flow Levy area has the sign consistent with flow leading price, on normalized
+      channels, and holds across two different samplings of the same window.
+    evidence_that_would_argue_against_action: >
+      The area is small relative to its distribution on shuffled channels, or a common driver
+      plausibly explains both channels moving.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Signatures are blind to urgency; pair with an explicit speed measure before acting in fast markets."

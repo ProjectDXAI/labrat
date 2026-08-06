@@ -33,13 +33,16 @@ bets:
       abstention and sizing can be conditioned on it rather than on realized volatility,
       which is a lagging shadow of the same quantity.
     sharp_prediction: >
-      Liquidation cascades and gap moves are preceded by a rise in the branching ratio of
-      trade or liquidation arrivals, on a horizon longer than the rise in realized
-      volatility. Conditioning position size on n outperforms conditioning on trailing
-      volatility over the same lookback.
+      REVISED after reading Hardiman, Bercot and Bouchaud directly. Their fourteen-year E-mini
+      estimate has n fluctuating about one throughout, so the original form of this prediction —
+      that n rises before cascades — is probably false as stated, and the published claim that
+      reflexivity has been rising is an artifact of fitting exponential kernels on short windows.
+      What moves is the correlation timescale, not the branching ratio. The surviving prediction:
+      the scale at which the estimator saturates contracts before cascades, and conditioning on
+      that scale beats conditioning on trailing volatility. Tracked as EXT-CRITICAL-SCALE.
     falsifier: >
-      n has no lead over realized volatility, or its rises are not followed by more cascades
-      than base rate, or intraday seasonality accounts for all of its variation.
+      The saturation scale is unstable under reasonable estimator choices, or it adds nothing over
+      trailing realized volatility, or intraday seasonality accounts for its variation.
     problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-INVENTORY-FUNDING]
     minimum_data: "Event timestamps (trades, or better, liquidations) for a few weeks, at one venue."
     first_computation: hawkes_branching_ratio
@@ -56,7 +59,8 @@ bets:
     novelty: 4
     testability: 5
     effort: 2
-    sources: [bacry-2015-hawkes-processes-finance, jaisson-2015-nearly-unstable-hawkes, gatheral-2018-volatility-is-rough, hawkes-1971-spectra-self-exciting]
+    read_status_note: "Primary sources read 2026-08. The bet survived; its prediction did not, and was rewritten."
+    sources: [hardiman-2013-critical-reflexivity, filimonov-2012-quantifying-reflexivity, bacry-2015-hawkes-processes-finance, jaisson-2015-nearly-unstable-hawkes, gatheral-2018-volatility-is-rough, hawkes-1971-spectra-self-exciting]
 
   - bet_id: FB-JOINT-BOUNDS
     title: "Sharp logical bounds across correlated prediction markets"
@@ -103,8 +107,12 @@ bets:
       than a signal, it answers a question we currently answer by intuition: which instruments,
       venues and hours are even worth hunting in.
     sharp_prediction: >
-      Instrument-venue-hour cells ranked by irreversibility contain the cells where flow-based
-      signals subsequently show out-of-sample edge; reversible cells contain almost none.
+      REFINED after reading Flanagan and Lacasa directly: every series they measured is
+      irreversible, so presence is not the signal and the original phrasing "reversible cells
+      contain almost none" is not achievable. The prediction is about RANK — cells ranking high on
+      surrogate-significant irreversibility contain the cells where flow-based signals subsequently
+      show out-of-sample net edge. The authors state the irreversibility-to-predictability link as
+      an explicitly open question, which is what makes this worth doing rather than repeating.
     falsifier: >
       The ranking has no relationship to realized signal performance, or irreversibility is
       entirely explained by known deterministic seasonality such as funding settlements.
@@ -125,7 +133,8 @@ bets:
     novelty: 5
     testability: 4
     effort: 2
-    sources: [cover-2006-elements-information-theory, mackay-2003-information-theory-inference, sornette-2003-why-stock-markets-crash]
+    read_status_note: "Primary sources read 2026-08. Confirmed: uncorrelated with volatility, and the predictability link is open in the authors' own words."
+    sources: [flanagan-2016-irreversibility-financial, martinez-2018-tirop, cover-2006-elements-information-theory, mackay-2003-information-theory-inference, sornette-2003-why-stock-markets-crash]
 
   - bet_id: FB-SIGNATURE
     title: "Path signatures for clock-free order-book features, and the Levy area as a lead-lag measure"
@@ -215,18 +224,21 @@ bets:
     minimum_data: "Synchronized returns for tens of instruments over months."
     first_computation: null
     why_underexploited: >
-      Symmetric RMT is a standard tool on every quant desk. The non-Hermitian case is textbook
-      mathematics that has barely crossed into finance because the natural object — a directed,
-      asymmetric relationship matrix — is less familiar than a covariance.
+      CORRECTED after searching the literature: this is less unexploited than first scored. Biely and
+      Thurner derived the eigenvalue spectra of time-lagged correlation matrices as asymmetric random
+      matrices and applied them to financial series. The residual opening is not the method but its
+      validation — nobody calibrates it against a lag that is known mechanically. Novelty cut from 5
+      to 3 and the surviving work moved to EXT-VENUE-LAG-NULL.
     unexpected_connection: >
       The same spectra describe stability of large ecosystems and neural networks. The question
       "which few directed links are real amid overwhelming noise" is identical.
     maturity: 4
     payoff: 3
-    novelty: 5
+    novelty: 3
     testability: 4
     effort: 3
-    sources: [potters-2020-first-course-random-matrix-theory, bai-2010-spectral-analysis-random-matrices, ledoit-2004-well-conditioned-covariance]
+    read_status_note: "Prior art located by search 2026-08; novelty downgraded from 5 to 3 as a result."
+    sources: [biely-2008-time-lagged-correlation-ensembles, potters-2020-first-course-random-matrix-theory, bai-2010-spectral-analysis-random-matrices, ledoit-2004-well-conditioned-covariance]
 
   - bet_id: FB-PATHWISE-PORTFOLIO
     title: "Pathwise relative arbitrage without estimating drift"

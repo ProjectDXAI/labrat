@@ -628,3 +628,162 @@ concepts:
     confidence: 0.8
     problem_ids: [PB-COST-DRAG, PB-ADVERSE-ENTRY]
     tags: [cost, fees, funding, abstention, turnover]
+
+  # ----------------------------------------------------------------------------
+  # Compiled from directly-read primary material (2026-08). Anchors below point at
+  # sections actually read, not at recalled chapter numbers.
+  # ----------------------------------------------------------------------------
+  - concept_id: KC-HAWKES-CRITICALITY
+    canonical_name: "Order flow sits near criticality, and the branching ratio measures how near"
+    plain_description: >
+      Most market events are triggered by other market events rather than by outside information.
+      The share that is internally triggered is the branching ratio of a self-exciting process, and
+      in the one market where it has been measured carefully over many years it sits at or just
+      below one — the boundary beyond which activity would be explosive.
+    mechanism: >
+      Each event raises the intensity of future events through a decay kernel. If the kernel
+      integrates to n, then on average each event begets n further events, and a shock is amplified
+      by a factor 1/(1-n). At n near one the same external shock that is absorbed in a calm market
+      propagates through many generations of triggered activity, which is what a cascade is.
+    formal_equations: "lambda(t) = mu + integral phi(t-s) dN(s); n = integral phi; asymptotic Fano factor Var(N_T)/E[N_T] -> (1-n)^-2"
+    assumptions:
+      - "The kernel's mass lies inside the observation window, or the estimate is scale-local rather than global."
+      - "Intraday seasonality has been removed; unmodelled activity cycles are read as self-excitation."
+      - "The process is stationary within the estimation period."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [trade_prints]
+    required_data_resolution: "Event timestamps at sub-second precision, aggregated into count windows."
+    expected_empirical_signature: >
+      Counts far more dispersed than Poisson, with dispersion that keeps growing as windows are
+      aggregated — the signature of a power-law kernel with mass at long lags. Reported kernel
+      exponents are near -1.15 below about a thousand seconds and near -1.45 above it.
+    alternative_explanations:
+      - "Unremoved intraday seasonality produces exactly the same overdispersion with no self-excitation at all."
+      - "A common exogenous driver arriving in bursts mimics endogenous triggering."
+    known_failure_modes:
+      - "Fitting an exponential kernel on short windows returns a spuriously low and apparently rising branching ratio; this artifact produced a published claim that market reflexivity has been increasing."
+      - "Because n is pinned near one across fourteen years of E-mini data, treating it as a freely varying regime indicator is probably wrong; what changed over that period was the correlation timescale, not the branching ratio."
+      - "The estimate is blind to direction: an upward and a downward cascade are indistinguishable."
+    source_passage_ids:
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+      - "hardiman-2013-critical-reflexivity#empirical-criticality"
+      - "bacry-2015-hawkes-processes-finance#hawkes-market-impact"
+    contradicting_concept_ids: [KC-REFLEXIVITY-DRIFT]
+    supporting_concept_ids: [KC-MICRO-OFI]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-INVENTORY-FUNDING]
+    tags: [hawkes, criticality, endogeneity, cascade, read-directly]
+
+  - concept_id: KC-REFLEXIVITY-DRIFT
+    canonical_name: "Reflexivity varies over time and rises before instability"
+    plain_description: >
+      The competing account: the endogenous share of activity is not a constant of the market but a
+      state that drifts, rising with automation and spiking before dislocations, which would make it
+      a tradable early-warning signal.
+    mechanism: >
+      If the branching ratio genuinely moves, then periods of elevated self-excitation are periods
+      in which the market is closer to its stability boundary, and the approach can be observed
+      before the dislocation rather than only after it.
+    formal_equations: "n_t estimated on rolling short windows with an exponential kernel; alarm when n_t approaches 1"
+    assumptions:
+      - "The estimator recovers the true branching ratio rather than a window-local one."
+      - "The kernel is short-memoried enough that a thirty-minute window contains its mass."
+    market_types: [clob_equities, clob_futures, clob_crypto]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [trade_prints]
+    required_data_resolution: "Event timestamps within rolling windows of tens of minutes."
+    expected_empirical_signature: "A rolling branching ratio that trends upward across years and spikes before known dislocations."
+    alternative_explanations:
+      - "The upward trend is an artifact of a shrinking high-frequency cutoff interacting with a fixed short window and a misspecified kernel."
+    known_failure_modes:
+      - "Reproducing the trend on synthetic data generated at constant criticality shows the method can manufacture the result it reports."
+    source_passage_ids:
+      - "filimonov-2012-quantifying-reflexivity"
+      - "hardiman-2013-critical-reflexivity#estimator-and-bias"
+    contradicting_concept_ids: [KC-HAWKES-CRITICALITY]
+    supporting_concept_ids: []
+    implementation_status: specified
+    confidence: 0.3
+    problem_ids: [PB-REGIME-BREAK]
+    tags: [hawkes, reflexivity, contested, early-warning]
+
+  - concept_id: KC-IRREVERSIBILITY
+    canonical_name: "Time-asymmetry of a price series, and what it does and does not imply"
+    plain_description: >
+      A series whose statistics differ when played backwards has an arrow of time. Every equity
+      series that has been measured this way shows some asymmetry, so its presence is not the
+      finding; the differences between instruments and across periods are.
+    mechanism: >
+      Reversible dynamics arise from equilibrium-like processes where no direction is preferred.
+      Asymmetry requires a directed mechanism — order flow that begets order flow, slow build and
+      fast unwind, or asymmetric response to gains and losses — so the degree of asymmetry is a
+      summary of how much directed structure the process carries.
+    formal_equations: "JS divergence between ordinal pattern distributions of x_t and of its reversal, judged against a surrogate population"
+    assumptions:
+      - "The window is long enough that the finite-length bias is small; published work uses windows of thousands of points."
+      - "The comparison is made against surrogates, not against zero."
+    market_types: [any]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [mid_price_series]
+    required_data_resolution: "A regularly sampled series, thousands of points per estimate."
+    expected_empirical_signature: >
+      Divergence clearly above a shuffled null, varying substantially across instruments and
+      fluctuating over time, and essentially uncorrelated with volatility.
+    alternative_explanations:
+      - "Deterministic session structure — auctions, funding settlements, daily cycles — produces asymmetry with no exploitable content."
+      - "Ordinary linear autocorrelation can move the statistic without any genuine time asymmetry, because the shuffled null destroys correlation too."
+    known_failure_modes:
+      - "The link from asymmetry to predictability is asserted in the literature but not established; the authors who measured it say so explicitly."
+      - "Short windows manufacture apparent asymmetry through sampling noise alone."
+      - "Ordinal patterns are blind to magnitude, so an asymmetry that lives in sizes rather than in orderings is invisible."
+    source_passage_ids:
+      - "flanagan-2016-irreversibility-financial#empirical-ranking"
+      - "martinez-2018-tirop#method"
+    contradicting_concept_ids: []
+    alternative_note: "Kept honest by its alternative explanations rather than by an opposing card; no published account argues markets are time-reversible."
+    supporting_concept_ids: [KC-HAWKES-CRITICALITY]
+    implementation_status: implemented
+    confidence: 0.45
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG]
+    tags: [irreversibility, entropy-production, screening, read-directly]
+
+  - concept_id: KC-SIGNATURE-PATH
+    canonical_name: "Path signatures: features that do not depend on the clock"
+    plain_description: >
+      The iterated integrals of a path summarize what the path did in a way that is unchanged if the
+      path is traversed faster, slower or unevenly. For market data, where the sampling clock is a
+      modelling choice rather than a fact, that invariance removes a hidden degree of freedom.
+    mechanism: >
+      The signature is the collection of iterated integrals of a path, and it is invariant under
+      reparametrization of time. The antisymmetric part of the second level is the signed area
+      enclosed by a pair of coordinates, which measures hysteresis between them: whether one channel
+      systematically leads the other around the loop within the window.
+    formal_equations: "S(X)^{i,j}_{a,b} = double integral dX^i dX^j; Levy area A^{ij} = (S^{ij} - S^{ji})/2; S(X o psi) = S(X) for any reparametrization psi"
+    assumptions:
+      - "Channels are on comparable scales, or the largest-variance channel dominates every area."
+      - "Speed genuinely is nuisance; when it is not, time must be added as an explicit channel."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [mid_price_series, signed_volume]
+    required_data_resolution: "Aligned channels at event or fine time granularity within a window."
+    expected_empirical_signature: >
+      Signatures computed on the same window sampled two different ways agree exactly, while
+      conventional lagged features disagree; the price-versus-flow Levy area changes sign between
+      regimes where flow leads price and regimes where it follows.
+    alternative_explanations:
+      - "A non-zero Levy area can be produced by a common driver moving both channels with different response speeds, with neither leading the other causally."
+    known_failure_modes:
+      - "Invariance to speed is also blindness to speed: two windows with identical shape and very different urgency have identical signatures."
+      - "Truncation at level two sees only pairwise hysteresis; genuinely higher-order structure needs deeper levels, at a cost growing as d^k."
+      - "Unnormalized channels make the area a scale artifact rather than a relationship."
+    source_passage_ids:
+      - "chevyrev-2016-signature-method-primer#s2"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by its alternative explanation and failure modes; the invariance itself is a theorem, not a contested claim."
+    supporting_concept_ids: [KC-MICRO-OFI]
+    implementation_status: implemented
+    confidence: 0.55
+    problem_ids: [PB-ADVERSE-ENTRY, PB-ABSORPTION, PB-REGIME-BREAK]
+    tags: [signatures, rough-paths, lead-lag, clock-free, read-directly]

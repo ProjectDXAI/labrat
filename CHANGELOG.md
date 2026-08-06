@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 - 2026-08-05
+
+- Added `knowledge/exploratory_extensions.yaml` and `labrat knowledge extensions`: nine proposals for new work extending read literature into our domain, each naming what the source leaves open in its own terms, our specific advantage over the original authors, the novel claim and the experiment that would kill it. The validator refuses any extension not grounded in a corpus unit whose `read_status` is `read` or `compiled`.
+- Read primary sources directly and revised accordingly: `FB-CRITICALITY`'s prediction was rewritten after Hardiman, Bercot and Bouchaud show the branching ratio pinned near one for fourteen years and the published rising-reflexivity claim to be an estimator artifact; `FB-NONHERMITIAN` had its novelty cut from 5 to 3 after prior art was located; `FB-IRREVERSIBILITY` was refined from presence to rank after Flanagan and Lacasa show every series they measure is irreversible.
+- `time_irreversibility` 1.1.0 adds the deterministic surrogate null the source method treats as essential, and `hawkes_branching_ratio` 1.1.0 adds a scale profile and an explicit warning about the window-scale artifact. Both version bumps forced their method cards to be re-verified.
+- Compiled four concept cards from directly-read material, including a contradiction pair drawn from a live disagreement in the literature, with anchors pointing at sections actually read.
+- Added six corpus entries with real read units, including one whose authorship was corrected against the source after a misremembering.
+- `knowledge status` now reports provenance: how many cards rest on units someone opened versus unread anchors.
+
 ## 0.6.0 - 2026-08-05
 
 - Added `knowledge/frontier_bets.yaml` and `labrat knowledge bets`: eleven ranked hypotheses about which advanced-mathematics imports are most likely to pay, each required to carry a sharp prediction, a falsifier, the minimum data and a first computation. Validation refuses a bet that is unfalsifiable, cites a source outside the bibliography, or names an unimplemented computation. Scored by payoff x sqrt(novelty) x testability x maturity - effort.

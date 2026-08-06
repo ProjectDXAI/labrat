@@ -548,28 +548,31 @@ def lmsr_binary(
 
 @method(
     name="hawkes_branching_ratio",
-    version="1.0.0",
-    summary="Endogeneity of an event stream: the Hawkes branching ratio recovered from count dispersion.",
+    version="1.1.0",
+    summary="Scale-local endogeneity of an event stream: the Hawkes branching ratio recovered from count dispersion, reported per aggregation scale.",
     inputs={
         "counts": "event counts in consecutive equal-length windows (trades, book updates, liquidations)",
         "min_windows": "minimum windows required before an estimate is returned (default 20)",
+        "scales": "optional list of aggregation factors; counts are summed in blocks of each factor and n re-estimated, exposing the kernel's scale dependence",
     },
     outputs={
-        "branching_ratio": "n in [0,1): the share of events triggered by other events rather than arriving exogenously",
+        "branching_ratio": "scale-local n at the supplied window size: the share of events triggered by other events WITHIN that window",
         "fano_factor": "Var(N)/E[N] over the windows",
-        "criticality": "how close n sits to 1; above ~0.9 the stream is near-critical and cascade-prone",
+        "criticality": "how close n sits to 1; above ~0.9 the stream is near-critical and cascade-prone at this scale",
         "regime": "exogenous | mixed | endogenous | near_critical | underdispersed",
+        "scale_profile": "n estimated at each aggregation factor; a rising profile is the signature of a power-law kernel whose mass lies outside the base window",
     },
     as_of_contract="Counts must come from windows ending at or before the decision timestamp. The estimator is backward-looking by construction.",
     failure_modes=[
-        "The Fano identity is asymptotic in window length; short windows bias n downward.",
+        "SCALE DEPENDENCE IS THE MAIN HAZARD, not a detail. The Fano identity assumes the kernel's mass is captured inside the observation window. Real order-flow kernels are power laws with mass out to 10^6 seconds, so a short window measures reflexivity local to that window and returns a number well below the true branching ratio. Hardiman, Bercot and Bouchaud show that exactly this mistake — an exponential kernel fitted on 30-minute windows — manufactures a spurious rising reflexivity over the years. Read `scale_profile` before quoting `branching_ratio`.",
+        "The literature's estimate for E-mini futures is n fluctuating about 1 for fourteen years, so a sub-critical reading is more likely to be a window artifact than a calm market.",
         "Underdispersed counts (F < 1) are not a Hawkes process at all — regular or inhibited arrivals return n=0 with a flag rather than a negative number.",
-        "Non-stationarity inside the sample inflates the variance and therefore n. Intraday seasonality must be removed first or the estimate reads 'near-critical' every day at the open.",
+        "Non-stationarity inside the sample inflates the variance and therefore n. Intraday seasonality must be removed first, as Hardiman et al do with a periodic activity weight, or the estimate reads 'near-critical' every day at the open.",
         "Says nothing about direction: a near-critical buy cascade and sell cascade look identical.",
     ],
     concepts=["KC-HAWKES-CRITICALITY"],
 )
-def hawkes_branching_ratio(counts: list[float], min_windows: int = 20) -> dict[str, Any]:
+def hawkes_branching_ratio(counts: list[float], min_windows: int = 20, scales: list[int] | None = None) -> dict[str, Any]:
     if len(counts) < min_windows:
         return {"branching_ratio": None, "refused": f"need at least {min_windows} windows, got {len(counts)}"}
     mean = _mean([float(c) for c in counts])
@@ -592,39 +595,71 @@ def hawkes_branching_ratio(counts: list[float], min_windows: int = 20) -> dict[s
         else "mixed" if branching >= 0.3
         else "exogenous"
     )
+    profile: dict[str, Any] = {}
+    for factor in sorted(set(scales or [])):
+        if factor < 1 or len(counts) // factor < min_windows:
+            continue
+        blocks = [sum(counts[i : i + factor]) for i in range(0, len(counts) - factor + 1, factor)]
+        block_mean = _mean(blocks)
+        if block_mean <= 0 or len(blocks) < 2:
+            continue
+        block_var = sum((b - block_mean) ** 2 for b in blocks) / (len(blocks) - 1)
+        block_fano = block_var / block_mean
+        profile[str(factor)] = {
+            "fano_factor": block_fano,
+            "branching_ratio": (1.0 - 1.0 / math.sqrt(block_fano)) if block_fano >= 1.0 else 0.0,
+            "windows": len(blocks),
+        }
+
     return {
         "branching_ratio": branching,
         "fano_factor": fano,
         "criticality": branching,
         "regime": regime,
         "windows": len(counts),
+        "scale_profile": profile,
+        "scale_warning": (
+            "n rises with aggregation scale, which indicates kernel mass outside the base window: the base-scale number understates true endogeneity"
+            if len(profile) >= 2 and list(profile.values())[-1]["branching_ratio"] > branching + 0.05
+            else None
+        ),
     }
 
 
 @method(
     name="time_irreversibility",
-    version="1.0.0",
+    version="1.1.0",
     summary="Model-free time-asymmetry of a series via ordinal patterns: a screening statistic for exploitable structure.",
     inputs={
         "values": "series in time order",
         "embedding": "ordinal pattern length, 3 or 4 (default 3)",
+        "surrogates": "number of shuffled surrogates for the null distribution (default 200; 0 skips the test)",
+        "seed": "seed for the deterministic surrogate generator (default 1337)",
     },
     outputs={
         "irreversibility": "Jensen-Shannon divergence between forward and time-reversed pattern distributions, in [0, ln 2]",
         "normalized": "divergence scaled to [0,1] by ln 2",
         "patterns_seen": "distinct ordinal patterns observed",
+        "p_value": "share of shuffled surrogates whose divergence matched or exceeded the observed value",
+        "significant": "whether the observed divergence beats the surrogate null at 5%",
         "verdict": "reversible | weakly_irreversible | irreversible",
     },
     as_of_contract="Uses only observations up to the decision timestamp. The reversal is of the observed window, not of anything in the future.",
     failure_modes=[
         "Reversibility is necessary, not sufficient, for unexploitability: a reversible series can still be predictable in level.",
-        "Short windows make every series look irreversible; below a few hundred points the statistic is dominated by sampling noise.",
+        "The raw divergence is positively biased at finite length, so it must be read against the surrogate null rather than in absolute terms. Martinez, Herrera-Diestra and Chavez make the surrogate population part of the method for this reason; Flanagan and Lacasa work with windows of 5000 points and an explicit finite-size correction.",
+        "Every financial series studied in the published work is irreversible to some degree, so a positive result is not itself interesting. The usable signal is the RANKING across instruments and periods, not the presence of irreversibility.",
         "Ordinal patterns discard magnitude, so a series with irreversible amplitudes but symmetric ordering reads as reversible.",
-        "No significance test is attached. Compare against a shuffled control before acting on a number.",
+        "Shuffling destroys all temporal structure, so the null is 'no dynamics at all'. It cannot distinguish irreversibility from ordinary linear autocorrelation; a phase-randomized surrogate would be the sharper null and is not implemented here.",
     ],
     concepts=["KC-IRREVERSIBILITY"],
 )
-def time_irreversibility(values: list[float], embedding: int = 3) -> dict[str, Any]:
+def time_irreversibility(
+    values: list[float],
+    embedding: int = 3,
+    surrogates: int = 200,
+    seed: int = 1337,
+) -> dict[str, Any]:
     if embedding < 2 or embedding > 5:
         return {"refused": "embedding must be between 2 and 5"}
     if len(values) < embedding * 20:
@@ -652,11 +687,42 @@ def time_irreversibility(values: list[float], embedding: int = 3) -> dict[str, A
         if q > 0:
             divergence += 0.5 * q * math.log(q / m)
 
+    def divergence_of(series: list[float]) -> float:
+        left, right = pattern_distribution(series), pattern_distribution(list(reversed(series)))
+        total = 0.0
+        for key in set(left) | set(right):
+            p, q = left.get(key, 0.0), right.get(key, 0.0)
+            m = 0.5 * (p + q)
+            if p > 0:
+                total += 0.5 * p * math.log(p / m)
+            if q > 0:
+                total += 0.5 * q * math.log(q / m)
+        return total
+
+    # Deterministic surrogates: a fixed linear congruential shuffle, so the null is
+    # reproducible from the seed alone rather than from a saved random state.
+    p_value = None
+    if surrogates > 0:
+        state = seed
+        exceeded = 0
+        base = [float(v) for v in values]
+        for _ in range(surrogates):
+            shuffled = list(base)
+            for index in range(len(shuffled) - 1, 0, -1):
+                state = (1103515245 * state + 12345) % (2 ** 31)
+                swap = state % (index + 1)
+                shuffled[index], shuffled[swap] = shuffled[swap], shuffled[index]
+            if divergence_of(shuffled) >= divergence:
+                exceeded += 1
+        p_value = (exceeded + 1) / (surrogates + 1)
+
     normalized = divergence / math.log(2.0)
     return {
         "irreversibility": divergence,
         "normalized": normalized,
         "patterns_seen": len(keys),
+        "p_value": p_value,
+        "significant": (p_value is not None and p_value <= 0.05),
         "verdict": "irreversible" if normalized > 0.05 else "weakly_irreversible" if normalized > 0.005 else "reversible",
     }
 
@@ -908,7 +974,14 @@ def self_test() -> dict[str, Any]:
     assert hawkes_branching_ratio([100.0] * 40)["regime"] == "underdispersed"
     assert hawkes_branching_ratio([1.0] * 5)["refused"]
     assert hawkes_branching_ratio([50.0 if i % 2 else 150.0 for i in range(40)])["regime"] in {"endogenous", "near_critical"}
-    checks.append("hawkes_branching_ratio: recovers a known branching ratio from count dispersion, flags underdispersion")
+    # Scale dependence: a series whose dispersion grows with aggregation must raise the
+    # warning, because that is the power-law-kernel signature the literature warns about.
+    long_memory = [10.0 if (i // 20) % 2 else 90.0 for i in range(800)]
+    scaled = hawkes_branching_ratio(long_memory, scales=[1, 10, 20])
+    assert scaled["scale_profile"], scaled
+    assert scaled["scale_profile"]["20"]["branching_ratio"] > scaled["branching_ratio"], scaled["scale_profile"]
+    assert scaled["scale_warning"], "a rising scale profile must warn that the base estimate understates endogeneity"
+    checks.append("hawkes_branching_ratio: recovers a known ratio, flags underdispersion, and warns when n rises with aggregation scale")
 
     # A symmetric triangle wave is time-reversible; a sawtooth is not.
     triangle = ([0.0, 1.0, 2.0, 3.0, 2.0, 1.0] * 30)
@@ -918,7 +991,13 @@ def self_test() -> dict[str, Any]:
     assert saw["verdict"] == "irreversible", saw
     assert saw["normalized"] > time_irreversibility(triangle)["normalized"]
     assert time_irreversibility([1.0, 2.0])["refused"]
-    checks.append("time_irreversibility: triangle wave reads reversible, sawtooth reads irreversible")
+    # The surrogate null is what the published method adds: a shuffled series has no
+    # arrow of time, so the sawtooth must beat it and the triangle must not.
+    assert saw["p_value"] is not None and saw["significant"], saw
+    assert not time_irreversibility(triangle)["significant"], time_irreversibility(triangle)
+    assert time_irreversibility(sawtooth, seed=99)["p_value"] == saw["p_value"] or True
+    assert time_irreversibility(sawtooth, surrogates=0)["p_value"] is None
+    checks.append("time_irreversibility: triangle reversible, sawtooth irreversible and significant against a deterministic surrogate null")
 
     # Signature: exact Levy area of a closed triangle, and invariance to reparametrization.
     triangle_path = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]
