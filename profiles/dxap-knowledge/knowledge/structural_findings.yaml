@@ -684,6 +684,72 @@ findings:
       appearing in what should be a stable spectrum as a diagnostic that the reversibility assumption
       has failed, not as a numerical nuisance to take the real part of.
 
+  - finding_id: FIND-STABLE-SORT-LAUNDERS-BIAS
+    title: "A corrective re-sort inherits the bias it was meant to remove, through its ties"
+    status: read
+    structure: "Two-stage ordering where the second stage is stable and its key is degenerate on most inputs."
+    domains: [defi_mechanics, queueing_networks, economics_information]
+    correspondence: >
+      Sui's Mysticeti derives a total order by linearizing the committed sub-DAG, breaking same-round
+      ties by validator index — worth about an 89% same-round ordering win to the lower-indexed side
+      on a 13-validator network with no attacker running. A gas-price re-sort then runs on top,
+      which is the stated reason the arrangement is fair. But that re-sort is stable, and because
+      ordinary transactions pay the reference gas price, equal fees are the common case rather than
+      an edge case. On every tie the stable sort preserves its input order, so the consensus-stage
+      bias passes through the fairness mechanism untouched and costs the beneficiary nothing.
+    what_it_buys: >
+      A general failure mode, and one that is invisible to the obvious tests. Each stage is correct
+      in isolation: the linearization is deterministic as it must be, and the re-sort does exactly
+      what a price-priority rule should. The defect is only in the composition, and only on the
+      inputs that dominate in practice. Wherever a system corrects an ordering by re-sorting, the
+      question is not whether the sort is right but what fraction of comparisons are ties and what
+      decides them — and a key that is nearly constant in production makes a corrective sort into
+      an identity function that looks like a correction. This is directly the shape of our venue:
+      within a category, proposer order breaks ties, so any downstream price-time rule applied to a
+      consensus batch inherits proposer order on every equal-priced pair.
+    sources_read:
+      - "arXiv 2607.13378 — Mirzaei and Amiri, transaction-ordering bias and MEV in Mysticeti, abstract and section 1"
+    agent_seed: >
+      Any time code re-sorts to impose fairness or priority, measure the tie rate of the sort key on
+      real data before trusting it, and treat a high tie rate as the finding rather than as a detail.
+      Where ties are common, the tiebreak IS the policy — so make it explicit and, if it should carry
+      no information, make it unpredictable per invocation rather than a stable field like an index
+      or an identifier. Concretely, prefer a keyed random tiebreak seeded per commit to relying on
+      sort stability, and write the test that asserts the output order is uncorrelated with the input
+      order among tied elements. A stable sort is the correct default almost everywhere and exactly
+      wrong here, which is why this survives review.
+
+  - finding_id: FIND-ADVANTAGE-FROM-ABSTENTION
+    title: "In a scheduled system, declining to act can be a stronger move than acting"
+    status: read
+    structure: "A position determined by relative arrival within a round, where non-participation changes the reference set rather than forfeiting a turn."
+    domains: [defi_mechanics, decision_sequential, queueing_networks]
+    correspondence: >
+      A Mysticeti validator raises its ordering-win rate from roughly 89% to above 94% over
+      one-second windows by broadcasting on fewer rounds — speaking only when speaking is worth it.
+      The action is legitimate, violates no protocol rule, and is indistinguishable from ordinary
+      unavailability, so there is nothing to detect and nothing to penalize. The advantage comes
+      from silence changing which competitors are present in the rounds it does join, not from
+      anything it does in those rounds.
+    what_it_buys: >
+      It breaks the assumption that a participant's strategy space is the set of actions. Where
+      position depends on the composition of a round rather than on absolute time, the null action
+      is a real move, and a model that enumerates only what an agent can do will miss the strongest
+      one. It also explains a detection problem that would otherwise look like a data-quality issue:
+      strategic silence and downtime produce the same observations, so no monitoring built on
+      observed behaviour can separate them, and the separation has to come from what happens in the
+      rounds where the participant IS present.
+    sources_read:
+      - "arXiv 2607.13378 — Mirzaei and Amiri, transaction-ordering bias and MEV in Mysticeti, section 1 summary of section 4.4"
+    agent_seed: >
+      When modelling an agent in a batched or scheduled venue, put "do nothing this round" in the
+      action space as a first-class choice with its own expected value, not as the absence of a
+      decision. Build the backtest so abstention is scored — most harnesses silently skip empty
+      rounds, which makes the strategy unrepresentable and its advantage unmeasurable. On the
+      detection side, do not try to distinguish deliberate silence from unavailability by looking at
+      the silence; measure conditional performance in the rounds where the participant did act, since
+      a selective participant should show systematically better placement there than a continuous one.
+
 # Patterns worth watching for, recorded so they are noticed when they recur.
 recurring_shapes:
   - shape: "A nuisance parameter turns out to select the model class"
@@ -704,6 +770,14 @@ recurring_shapes:
 
   - shape: "An invariant enforced by the mechanism rather than by the participants"
     instances: [FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE, FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE, FIND-BARRIERS-FROM-MARGINALS-ALONE]
+
+  - shape: "Each stage correct, the composition wrong, and only on the common input"
+    instances: [FIND-STABLE-SORT-LAUNDERS-BIAS]
+    why_it_matters: "Unit tests on either stage pass; the defect needs the tie rate on production data to become visible at all."
+
+  - shape: "The null action is a move, and the model does not have a slot for it"
+    instances: [FIND-ADVANTAGE-FROM-ABSTENTION]
+    why_it_matters: "A strategy space built from available actions omits abstention, so the best strategy can be one the model cannot express."
     why_it_matters: "Enforced invariants bound where anything interesting can happen, and they are enumerable from the mechanism in advance."
 
   - shape: "A penalty fixed by the geometry of the estimation rather than by its content"

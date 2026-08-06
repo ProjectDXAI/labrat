@@ -21642,3 +21642,55 @@ entries:
       is also characterized twice over: the smallest exponential family containing the symmetric kernels, and the
       smallest mixture family containing the memoryless ones. Reversibility itself is checkable in time polynomial
       in the number of states via the Kolmogorov cycle criterion.'
+- id: mirzaei-2026-ordering-bias-dag-bft
+  title: 'Fair on the Surface: Transaction-Ordering Bias and MEV in Mysticeti DAG-based BFT Protocol'
+  authors:
+  - Iliya Mirzaei
+  - Mohammad Javad Amiri
+  year: 2026
+  bucket: defi_mechanics
+  form: paper
+  priority: 5
+  status: reviewed
+  pages: 13
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2607.13378
+  tags:
+  - consensus
+  - transaction-ordering
+  - mev
+  - bft
+  - dag
+  - priority
+  - onchain
+  - hyperliquid-relevant
+  units:
+  - unit_id: tiebreak-and-stable-sort
+    topic: where ordering bias enters a two-stage consensus-then-resort pipeline
+    title: null
+    locator: abstract and section 1, pp. 1-2
+    kind: paper_section
+    pages: 2
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. Two stages, each leaking an advantage. Linearizing the committed sub-DAG orders same-round
+      blocks by VALIDATOR INDEX, so on a 13-validator network with no attacker the lower-indexed side wins same-round
+      ordering about 89% of the time. The gas-price re-sort meant to erase this is a STABLE sort, and because ordinary
+      transactions pay the reference gas price, ties are the common case — so the biased incoming order survives
+      the mechanism intended to remove it, at no extra cost to the attacker. The authors' fix is to replace the
+      static index tiebreaker with an unpredictable per-commit random key.
+  - unit_id: strategic-silence
+    topic: raising an ordering win rate by declining to act
+    title: null
+    locator: section 1 summary of section 4.4, p. 2
+    kind: paper_section
+    pages: 1
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. A validator amplifies its head start by choosing not to broadcast on most rounds, pushing
+      its ordering-win rate above 94% over one-second windows. This violates no protocol rule and is not distinguishable
+      from ordinary unavailability. Advantage obtained by abstaining rather than by acting.

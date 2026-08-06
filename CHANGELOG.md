@@ -36,7 +36,14 @@
   Wolfer and Watanabe show the reversible Markov kernels form both an exponential and a mixture
   family, and that reversibility is exactly the condition under which eigenvalue perturbation is
   dimension-free — losing it swaps Weyl's inequality for a bound exponential in the dimension, which
-  ties the irreversibility reading to the random-matrix one.
+  ties the irreversibility reading to the random-matrix one. Mirzaei and Amiri show a two-stage
+  ordering pipeline where each stage is correct and the composition is not: Sui linearizes a
+  committed sub-DAG by validator index, worth an 89% same-round ordering win with no attacker, and
+  the gas-price re-sort meant to erase that is a *stable* sort whose key is tied whenever
+  transactions pay the reference price — which is the common case, so the bias passes through the
+  mechanism intended to remove it at no cost. The same paper shows a validator raising its win rate
+  above 94% by declining to broadcast, an advantage obtained by abstention and indistinguishable
+  from ordinary downtime.
 - Rights are metadata rather than a gate. The corpus taxonomy records `mode: exploratory`, and
   nothing in the reading or compiling path consults rights status. The manifest machinery is
   unchanged, so a redistributable build remains possible if it is ever wanted.
