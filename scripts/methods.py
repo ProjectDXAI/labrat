@@ -1390,6 +1390,135 @@ def counterparty_markout(
     }
 
 
+@method(
+    name="molchan_error_diagram",
+    version="1.0.0",
+    summary="Alarm-threshold selection by the error diagram: fraction of time in alarm against fraction of events missed.",
+    inputs={
+        "scores": "the alarm statistic per period, in time order",
+        "events": "1 if a target event occurred in that period, else 0",
+        "thresholds": "optional explicit thresholds; defaults to the distinct score values",
+        "cost_ratio": "weight on alarm time relative to misses (default 1.0, the unweighted Molchan loss)",
+    },
+    outputs={
+        "curve": "per threshold: tau (share of periods in alarm), nu (share of events missed), loss, probability_gain",
+        "best": "the threshold minimising the loss, with its tau, nu and gain",
+        "skill": "whether the minimum loss beats 1.0, which is the no-skill value",
+        "gain_at_min_alarm": "probability gain at the tightest threshold — the number that looks impressive and means least",
+    },
+    as_of_contract="Scores must be computable from information available before the period they alarm on. A score using the period's own outcome inverts the whole diagram.",
+    failure_modes=[
+        "PROBABILITY GAIN IS NOT AN OBJECTIVE. It is maximised as alarm time goes to zero, so optimising it selects a rule that almost never fires and predicts almost nothing. Helmstetter and Sornette say this plainly and it is the exact failure our own conservative_abstain policy shows: excellent on clean trials, switched off the moment conditions degrade. Minimise the loss, then read the gain.",
+        "A loss at or above 1.0 is no skill. The Poisson benchmark sits at 1.0 by construction, so a rule at 0.95 is barely distinguishable from alarming at random.",
+        "tau counts time in alarm, not trades taken. When entering is cheap and being wrong is expensive, weight the two errors with cost_ratio rather than accepting the unweighted sum.",
+        "Both error rates are estimated on the same sample that chose the threshold. The minimising threshold is optimistically biased and needs a held-out period.",
+        "Says nothing about magnitude. A rule that catches every event and every non-event of the same size scores identically to one that catches only the large ones.",
+    ],
+    concepts=["KC-ALARM-LOSS"],
+)
+def molchan_error_diagram(
+    scores: list[float],
+    events: list[int],
+    thresholds: list[float] | None = None,
+    cost_ratio: float = 1.0,
+) -> dict[str, Any]:
+    n = min(len(scores), len(events))
+    if n < 4:
+        return {"refused": "need at least 4 periods"}
+    scores, events = [float(s) for s in scores[:n]], [int(bool(e)) for e in events[:n]]
+    total_events = sum(events)
+    if total_events == 0:
+        return {"refused": "no target events; the error diagram is undefined"}
+    base_rate = total_events / n
+
+    grid = sorted(set(thresholds if thresholds is not None else scores))
+    curve = []
+    for threshold in grid:
+        alarms = [1 if score >= threshold else 0 for score in scores]
+        tau = sum(alarms) / n
+        caught = sum(1 for alarm, event in zip(alarms, events) if alarm and event)
+        nu = 1.0 - caught / total_events
+        # Probability gain: how much likelier a target is inside an alarm than at random.
+        gain = ((caught / sum(alarms)) / base_rate) if sum(alarms) else None
+        curve.append({
+            "threshold": threshold, "tau": tau, "nu": nu,
+            "loss": cost_ratio * tau + nu, "probability_gain": gain, "caught": caught,
+        })
+
+    best = min(curve, key=lambda row: (row["loss"], row["tau"]))
+    firing = [row for row in curve if row["tau"] > 0]
+    tightest = min(firing, key=lambda row: row["tau"]) if firing else None
+    return {
+        "curve": curve,
+        "best": best,
+        "skill": best["loss"] < 1.0,
+        "no_skill_loss": 1.0,
+        "base_rate": base_rate,
+        "gain_at_min_alarm": tightest["probability_gain"] if tightest else None,
+        "gain_at_best": best["probability_gain"],
+    }
+
+
+@method(
+    name="cascade_forecast",
+    version="1.0.0",
+    summary="Expected future activity of a self-exciting stream, counting the events that will be triggered by events not yet observed.",
+    inputs={
+        "observed_counts": "event counts in consecutive equal windows up to now",
+        "branching_ratio": "n, the mean number of events each event triggers, in [0, 1)",
+        "horizon_windows": "how many windows ahead to forecast (default 1)",
+        "decay": "share of a parent's triggering that lands within one window (default 0.5)",
+    },
+    outputs={
+        "bare_forecast": "extrapolating only the direct offspring of what has been observed",
+        "renormalised_forecast": "including the cascade of offspring of events not yet observed",
+        "amplification": "renormalised over bare — the factor the naive forecast is short by",
+        "branching_multiplier": "1/(1-n), the total-descendants factor for a subcritical branching process",
+    },
+    as_of_contract="Counts must end at or before the decision timestamp. The forecast is for windows strictly after the last observed one.",
+    failure_modes=[
+        "Diverges as n approaches 1. Near criticality the multiplier 1/(1-n) is enormous and dominated by estimation error in n, so a confident forecast there is an artifact of a point estimate.",
+        "The single-parameter decay is a crude stand-in for a kernel. Real order-flow kernels are power laws whose mass sits outside any one window, which is the same failure mode hawkes_branching_ratio carries.",
+        "Helmstetter and Sornette's own finding cuts against over-reading the level: the bare forecast is wrong in absolute terms but its RELATIVE evolution carries nearly the same information for restricted targets. If the decision only needs 'is activity rising', the naive version is adequate and cheaper.",
+        "Assumes stationary n over the horizon. A regime change inside the horizon breaks it, and that is exactly when someone will want to use it.",
+        "Refuses n outside [0, 1). A supercritical stream has no finite expected descendant count and the question is malformed rather than hard.",
+    ],
+    concepts=["KC-CASCADE-HORIZON"],
+)
+def cascade_forecast(
+    observed_counts: list[float],
+    branching_ratio: float,
+    horizon_windows: int = 1,
+    decay: float = 0.5,
+) -> dict[str, Any]:
+    if not observed_counts:
+        return {"refused": "no observed counts"}
+    n = float(branching_ratio)
+    if not 0.0 <= n < 1.0:
+        return {"refused": "branching_ratio must be in [0, 1); a supercritical stream has no finite expectation"}
+    if horizon_windows < 1:
+        return {"refused": "horizon_windows must be at least 1"}
+    if not 0.0 < decay <= 1.0:
+        return {"refused": "decay must be in (0, 1]"}
+
+    recent = float(observed_counts[-1])
+    # Bare: only the direct offspring of what we have already seen.
+    bare = sum(recent * n * decay * ((1 - decay) ** step) for step in range(horizon_windows))
+    # Renormalised: each of those offspring triggers its own, to all generations.
+    # For a subcritical branching process the total descendants of one event is 1/(1-n).
+    multiplier = 1.0 / (1.0 - n)
+    renormalised = bare * multiplier
+    return {
+        "bare_forecast": bare,
+        "renormalised_forecast": renormalised,
+        "amplification": (renormalised / bare) if bare else None,
+        "branching_multiplier": multiplier,
+        "base_window_count": recent,
+        "warning": ("n above 0.9: the multiplier is dominated by estimation error in n"
+                    if n > 0.9 else None),
+    }
+
+
 # --------------------------------------------------------------------------------------
 # Self-test
 # --------------------------------------------------------------------------------------
@@ -1699,6 +1828,48 @@ def self_test() -> dict[str, Any]:
     assert thin["global_markout"] < whale["train_markout_shrunk"] < 100.0, whale
     assert counterparty_markout([{"counterparty": "a", "markout": 1.0, "window": "train"}])["refused"]
     checks.append("counterparty_markout: perfect and inverted rank persistence recovered exactly, a one-fill counterparty shrunk toward the pooled mean")
+
+    # A rule that fires on exactly the four event periods and nothing else: tau = 4/20,
+    # nu = 0, loss = 0.2, and the gain is the reciprocal of the base rate.
+    scores = [0.0] * 16
+    events = [0] * 20
+    for index in (2, 7, 11, 18):
+        events[index] = 1
+    perfect = [1.0 if events[i] else 0.0 for i in range(20)]
+    diagram = molchan_error_diagram(perfect, events)
+    assert abs(diagram["best"]["tau"] - 0.2) < 1e-12, diagram["best"]
+    assert diagram["best"]["nu"] == 0.0 and abs(diagram["best"]["loss"] - 0.2) < 1e-12, diagram["best"]
+    assert abs(diagram["best"]["probability_gain"] - 5.0) < 1e-12, diagram["best"]
+    assert diagram["skill"]
+    # A rule that alarms on one event period only: gain is still 5, and it misses three
+    # quarters of the events. This is the number that looks impressive and means least.
+    single = [1.0 if i == 2 else 0.0 for i in range(20)]
+    tight = molchan_error_diagram(single, events)
+    assert abs(tight["gain_at_min_alarm"] - 5.0) < 1e-12, tight["gain_at_min_alarm"]
+    assert abs(tight["best"]["nu"] - 0.75) < 1e-12, tight["best"]
+    assert abs(tight["best"]["loss"] - 0.8) < 1e-12, tight["best"]
+    assert tight["best"]["loss"] > diagram["best"]["loss"], "the near-silent rule must lose on the diagram it wins on gain"
+    # A rule with no relation to the events cannot beat the no-skill line by much.
+    flat = molchan_error_diagram([0.5] * 20, events)
+    assert abs(flat["best"]["loss"] - 1.0) < 1e-12, flat["best"]
+    assert not flat["skill"], flat
+    assert molchan_error_diagram([1.0, 2.0], [0, 1])["refused"]
+    assert molchan_error_diagram([1.0] * 8, [0] * 8)["refused"]
+    checks.append("molchan_error_diagram: exact tau/nu/loss on a perfect rule, a near-silent rule keeps its gain and loses on loss, a constant score scores exactly no skill")
+
+    # Total descendants of one event in a subcritical branching process is 1/(1-n).
+    cascade = cascade_forecast([100.0], branching_ratio=0.5, horizon_windows=1, decay=1.0)
+    assert abs(cascade["bare_forecast"] - 50.0) < 1e-12, cascade
+    assert abs(cascade["branching_multiplier"] - 2.0) < 1e-12, cascade
+    assert abs(cascade["renormalised_forecast"] - 100.0) < 1e-12, cascade
+    assert abs(cascade["amplification"] - 2.0) < 1e-12, cascade
+    near = cascade_forecast([100.0], branching_ratio=0.95, decay=1.0)
+    assert abs(near["branching_multiplier"] - 20.0) < 1e-9 and near["warning"], near
+    calm = cascade_forecast([100.0], branching_ratio=0.0, decay=1.0)
+    assert calm["bare_forecast"] == 0.0 and calm["branching_multiplier"] == 1.0, calm
+    assert cascade_forecast([100.0], branching_ratio=1.0)["refused"]
+    assert cascade_forecast([], branching_ratio=0.5)["refused"]
+    checks.append("cascade_forecast: 1/(1-n) recovered exactly, amplification doubles at n=0.5, near-critical warned, supercritical refused")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 

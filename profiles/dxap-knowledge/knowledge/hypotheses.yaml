@@ -308,3 +308,77 @@ hypotheses:
       - "Rank correlation is indistinguishable from zero, so identity adds nothing to the market state."
       - "The effect is entirely explained by speed, which a latency control removes."
       - "Address churn is fast enough that the training ranking covers too little of the test volume to act on."
+
+  - hypothesis_id: HY-ALARM-LOSS
+    concept_id: KC-ALARM-LOSS
+    market_context: "Any regime or changepoint detector we run, evaluated on a held-out period disjoint from the one that chose its threshold."
+    causal_story: >
+      A threshold picked to maximise probability gain moves toward silence, because gain rises
+      as the alarm set shrinks. A threshold picked to minimise alarm time plus missed events has
+      an interior optimum, so it selects a rule that actually fires.
+    ex_ante_prediction: >
+      Thresholds chosen on the Molchan loss produce a lower out-of-sample loss than thresholds
+      chosen on probability gain, by at least 0.1, and the gain-selected threshold alarms on
+      under 2% of periods while missing over half the events.
+    null_hypothesis: "The two selection criteria pick thresholds with indistinguishable out-of-sample loss."
+    measurement_operator:
+      method_id: molchan_error_diagram
+      params: {cost_ratio: 1.0}
+      derived: "loss and probability gain per threshold on train and on held-out test"
+    eligible_universe: "Any detector producing a scalar score per period, with at least 30 target events in each period."
+    decision_timestamp_rule: "Scores computed strictly from information before the period they alarm on; the threshold fixed on the training period before the test period opens."
+    outcome_horizons: [1d, 7d]
+    cost_model: "cost_ratio expresses the cost of time in alarm against the cost of a miss; the unweighted sum is reported alongside the trading-relevant weighting."
+    invalidation_conditions:
+      - "Both criteria select the same threshold, meaning the loss surface is flat and the choice does not matter."
+      - "The loss-selected rule beats gain in sample and not out of sample, meaning the difference was threshold overfitting."
+      - "Minimum loss is at or above 1.0, meaning the detector has no skill and the selection criterion is moot."
+
+  - hypothesis_id: HY-CASCADE-SHORTFALL
+    concept_id: KC-CASCADE-HORIZON
+    market_context: "Hyperliquid perpetuals, trade-count forecasting over horizons of minutes to an hour."
+    causal_story: >
+      Activity over the horizon is dominated by events triggered by events that have not
+      happened yet, so a forecast extrapolating only from observed events is short by roughly
+      the total-descendants factor of the branching process.
+    ex_ante_prediction: >
+      Realised counts exceed the bare extrapolation by a factor that rises with the estimated
+      branching ratio, and the renormalised forecast's mean absolute error is at least 20% lower
+      than the bare forecast's at horizons of 15 minutes and beyond.
+    null_hypothesis: "The bare and renormalised forecasts have indistinguishable error at every horizon."
+    measurement_operator:
+      method_id: cascade_forecast
+      params: {decay: 0.5}
+      derived: "bare against renormalised forecast error by horizon, bucketed by the branching ratio estimated on the observation window"
+    eligible_universe: "Instruments with gap-free trade prints and enough windows to estimate a branching ratio."
+    decision_timestamp_rule: "The branching ratio and the observed counts both come from windows ending at or before the forecast origin."
+    outcome_horizons: [5m, 15m, 1h]
+    cost_model: "None directly; this is a forecast-accuracy claim, and any trading use has to clear the cost floor separately."
+    invalidation_conditions:
+      - "The advantage disappears at horizons under a few minutes, which the source predicts and which would bound where this is worth using."
+      - "The renormalised forecast wins only where the branching ratio is near one, where its multiplier is dominated by estimation error rather than by the mechanism."
+      - "Relative direction of activity is all the downstream decision uses, in which case the correction changes no decision and is not worth its parameter."
+
+  - hypothesis_id: HY-COHERENCE-OVERLAP
+    concept_id: KC-JUDGMENT-AGGREGATION
+    market_context: "Polymarket multi-outcome events with at least three legs and identifiable participants per leg."
+    causal_story: >
+      Incoherence across an event tree arises when the populations pricing each leg diverge, since
+      each leg's price aggregates only the beliefs of whoever traded it. Where the same
+      participants price every leg, the aggregation converges and the logical constraint holds.
+    ex_ante_prediction: >
+      Partition breach magnitude falls monotonically with participant overlap across legs, and
+      events in the bottom overlap tertile show cost-surviving breaches at least twice as often
+      as events in the top tertile.
+    null_hypothesis: "Breach magnitude is independent of participant overlap across the legs."
+    measurement_operator:
+      description: "Jaccard overlap of the address sets trading each leg over the window, against the partition gap from event_tree_constraints fed to prediction_market_consistency."
+      params: {settlement: atomic}
+    eligible_universe: "Events whose legs are all quoted in the same snapshot, with at least 20 distinct addresses per leg."
+    decision_timestamp_rule: "Overlap measured on the window ending at the quote instant; no use of trading that happens after the breach is observed."
+    outcome_horizons: [1h, 1d]
+    cost_model: "Atomic settlement cost on protocol-enforced partitions, legwise round-trip cost otherwise."
+    invalidation_conditions:
+      - "Overlap is uniformly high across events, so there is no variation to test against."
+      - "Breach magnitude tracks depth or spread rather than overlap, which makes it a liquidity story and not an aggregation one."
+      - "Address churn is fast enough that measured overlap is mostly noise."

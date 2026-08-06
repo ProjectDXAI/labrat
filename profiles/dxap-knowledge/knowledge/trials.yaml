@@ -371,3 +371,63 @@ trials:
       uncertainties: ["whether a late cancel protects a resting order the way it does on the on-chain venue"]
       state_notes: ["continuous matching with genuine arrival-time priority", "no consensus batches"]
       question: "Will my cancel beat the aggressive order that is already on its way?"
+
+  - trial_id: T-ALARM-THRESHOLD
+    applicable: true
+    gold_concept_ids: [KC-ALARM-LOSS]
+    counterevidence_concept_ids: [KC-DETECT-CUSUM]
+    note: >
+      Choosing an alarm threshold. The gold card is the one that says the objective is wrong,
+      not the one that supplies another detector.
+    context:
+      context_id: ctx-alarm-threshold
+      timestamp: "2026-08-05T09:00:00Z"
+      market_type: any
+      instrument: "portfolio"
+      decision_type: abstain
+      horizon: days
+      observables_available: [mid_price_series, matured_outcomes, position_state]
+      tools_available: [molchan_error_diagram, cusum_changepoint]
+      latency_budget_seconds: 30.0
+      uncertainties: ["the detector shows a probability gain of 18 at its tightest threshold", "it has fired four times this year"]
+      state_notes: ["threshold was chosen to maximise probability gain", "no held-out period was used"]
+      question: "Is this regime detector good enough to act on?"
+
+  - trial_id: T-CASCADE-HORIZON
+    applicable: true
+    gold_concept_ids: [KC-CASCADE-HORIZON]
+    counterevidence_concept_ids: [KC-HAWKES-CRITICALITY]
+    note: "Forecasting activity over a horizon where triggering compounds."
+    context:
+      context_id: ctx-cascade-horizon
+      timestamp: "2026-08-05T13:30:00Z"
+      market_type: perp_dex
+      instrument: "BTC-PERP"
+      decision_type: sizing
+      horizon: minutes
+      observables_available: [trade_prints, mid_price_series, l2_book, fee_schedule]
+      tools_available: [cascade_forecast, hawkes_branching_ratio]
+      latency_budget_seconds: 5.0
+      uncertainties: ["how much activity to expect over the next half hour", "flow has been begetting flow for the last few minutes"]
+      state_notes: ["sizing an order to work over thirty minutes", "trade counts elevated versus the trailing hour"]
+      question: "How much activity should I plan this order against?"
+
+  - trial_id: T-NEG-ALARM-NO-OUTCOMES
+    applicable: false
+    gold_concept_ids: []
+    note: >
+      The error diagram needs realised outcomes to score against. Without them there is nothing
+      to compute, and a retriever matching on detector vocabulary will serve it anyway.
+    context:
+      context_id: ctx-neg-alarm-no-outcomes
+      timestamp: "2026-08-05T10:00:00Z"
+      market_type: any
+      instrument: "new-listing"
+      decision_type: entry
+      horizon: days
+      observables_available: [mid_price_series]
+      tools_available: [molchan_error_diagram]
+      latency_budget_seconds: 20.0
+      uncertainties: ["whether this detector will work on an instrument with no history"]
+      state_notes: ["instrument listed yesterday", "no matured outcomes exist yet"]
+      question: "What alarm threshold should I use here?"

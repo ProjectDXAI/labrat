@@ -1185,9 +1185,20 @@ def apply_findings_entry(existing: dict[str, Any], incoming: dict[str, Any]) -> 
     changes: list[str] = []
     merged = json.loads(json.dumps(existing))
 
+    stated = incoming.get("_stated")
+    stated_nested = incoming.get("_stated_nested") or {}
+
+    def was_written(field: str, key: str | None = None) -> bool:
+        """Did the scout write this, or is it merge_defaults talking?"""
+        if stated is None:
+            return True  # called directly, e.g. from a test; take the payload at face value
+        if key is None:
+            return field in stated
+        return key in (stated_nested.get(field) or set())
+
     for field in ("title", "authors", "year", "bucket", "form", "venue", "pages", "density", "priority", "notes", "status"):
         value = incoming.get(field)
-        if value in (None, [], ""):
+        if value in (None, [], "") or not was_written(field):
             continue
         if merged.get(field) != value:
             merged[field] = value
@@ -1195,13 +1206,13 @@ def apply_findings_entry(existing: dict[str, Any], incoming: dict[str, Any]) -> 
 
     for field in ("identifiers", "acquisition"):
         for key, value in (incoming.get(field) or {}).items():
-            if value in (None, ""):
+            if value in (None, "") or not was_written(field, key):
                 continue
             if (merged.get(field) or {}).get(key) != value:
                 merged.setdefault(field, {})[key] = value
                 changes.append(f"{field}.{key}")
 
-    incoming_rights = incoming.get("rights") or {}
+    incoming_rights = {k: v for k, v in (incoming.get("rights") or {}).items() if was_written("rights", k)}
     if incoming_rights:
         current = merged.get("rights") or {}
         incoming_conf = incoming_rights.get("confidence")
@@ -1221,6 +1232,33 @@ def apply_findings_entry(existing: dict[str, Any], incoming: dict[str, Any]) -> 
         if tag not in merged.get("tags", []):
             merged.setdefault("tags", []).append(tag)
             changes.append("tags")
+
+    # Units: a reading round's whole payload. Merge by unit_id, and let read_status
+    # advance but never silently regress — a scout who did not open something must not
+    # be able to un-read what someone else opened.
+    incoming_units = incoming.get("units") or []
+    if incoming_units and was_written("units"):
+        by_id = {unit.get("unit_id"): unit for unit in (merged.get("units") or [])}
+        order = {status: rank for rank, status in enumerate(READ_STATUS)}
+        for unit in incoming_units:
+            unit_id = unit.get("unit_id")
+            if not unit_id:
+                continue
+            current = by_id.get(unit_id)
+            if current is None:
+                merged.setdefault("units", []).append(unit)
+                by_id[unit_id] = unit
+                changes.append(f"units.{unit_id}.added")
+                continue
+            for key, value in unit.items():
+                if value in (None, "", []) or key == "unit_id":
+                    continue
+                if key == "read_status":
+                    if order.get(value, -1) <= order.get(current.get("read_status"), -1) and value != "abandoned":
+                        continue
+                if current.get(key) != value:
+                    current[key] = value
+                    changes.append(f"units.{unit_id}.{key}")
 
     existing_refs = {json.dumps(parse_ref(r), sort_keys=True) for r in merged.get("refs") or []}
     for raw_ref in incoming.get("refs") or []:
@@ -1255,7 +1293,19 @@ def close_round(
 
     findings_file = findings_path or Path(request.get("findings_path") or (directory / "findings.yaml"))
     findings = load_yaml(findings_file, {}) or {}
-    incoming_entries = [merge_defaults(e) for e in (findings.get("entries") or [])]
+    # merge_defaults fills the shape, so remember which keys the scout actually wrote.
+    # Without this a finding that mentions only `units` silently resets acquisition
+    # state to the default, which is a real edit nobody asked for.
+    incoming_entries = []
+    for raw in (findings.get("entries") or []):
+        stated = {key for key, value in raw.items() if value not in (None, [], {}, "")}
+        nested = {
+            field: {k for k, v in (raw.get(field) or {}).items() if v not in (None, "")}
+            for field in ("identifiers", "acquisition", "rights")
+        }
+        entry = merge_defaults(raw)
+        entry["_stated"], entry["_stated_nested"] = stated, nested
+        incoming_entries.append(entry)
     confirmed_before = sum(1 for e in entries if (e.get("rights") or {}).get("confidence") == "confirmed")
     eligible_before = build_manifest(entries, taxonomy)["include_pages"]
     graph_before = build_graph(entries)
@@ -1288,6 +1338,8 @@ def close_round(
                 "method": incoming.get("discovered", {}).get("method") or request.get("mode", "expand"),
                 "source": incoming.get("discovered", {}).get("source"),
             }
+            incoming.pop("_stated", None)
+            incoming.pop("_stated_nested", None)
             entries.append(incoming)
             index = index_entries(entries)
             added.append(incoming["id"])
@@ -1692,6 +1744,30 @@ def self_test() -> dict[str, Any]:
     assert queue[0]["action"] == "map_first", queue
     assert entry_units(merge_defaults({"id": "n", "title": "N", "pages": 10}))[0]["unit_id"] == "whole"
     checks.append("units: compiled units leave the queue, undecomposed sources fall back to one whole unit")
+
+    # Units are a reading round's entire payload, and they were silently dropped once.
+    stored = merge_defaults({"id": "u", "title": "T",
+                             "units": [{"unit_id": "ch1", "topic": "a", "read_status": "unread"}],
+                             "acquisition": {"state": "owned", "copy_path": "/tmp/u.pdf"}})
+    reading = {"id": "u",
+               "units": [{"unit_id": "ch1", "read_status": "read", "locator": "pp. 3-9"},
+                         {"unit_id": "ch2", "topic": "b", "read_status": "read"}],
+               "_stated": {"id", "units"}, "_stated_nested": {}}
+    merged_units, unit_changes = apply_findings_entry(stored, reading)
+    by_id = {u["unit_id"]: u for u in merged_units["units"]}
+    assert by_id["ch1"]["read_status"] == "read" and by_id["ch1"]["locator"] == "pp. 3-9", by_id["ch1"]
+    assert by_id["ch2"]["read_status"] == "read", "a new unit must be added, not ignored"
+    assert any(c.startswith("units.") for c in unit_changes), unit_changes
+    # A finding that says nothing about acquisition must not reset it to the default.
+    assert merged_units["acquisition"]["state"] == "owned", merged_units["acquisition"]
+    assert merged_units["acquisition"]["copy_path"] == "/tmp/u.pdf"
+    # read_status may advance and must not regress.
+    regressed, _ = apply_findings_entry(merged_units,
+                                        {"id": "u", "units": [{"unit_id": "ch1", "read_status": "unread"}],
+                                         "_stated": {"id", "units"}, "_stated_nested": {}})
+    assert {u["unit_id"]: u["read_status"] for u in regressed["units"]}["ch1"] == "read", \
+        "a scout who did not open it must not be able to un-read it"
+    checks.append("merge: units merge by unit_id, read_status advances but never regresses, and an unmentioned field is not reset to its default")
 
     return {"ok": True, "checks": checks}
 

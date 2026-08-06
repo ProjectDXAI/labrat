@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T04:36:00.474613+00:00'
+updated_at: '2026-08-06T06:51:12.191921+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -105,18 +105,19 @@ entries:
   venue: Theoretical Population Biology 9(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/0040-5809(76)90040-x
+    url: https://doi.org/10.1016/0040-5809(76)90040-x
+    registry_id: crossref:10.1016/0040-5809(76)90040-x
   pages: 8
   density: high
   priority: 5
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/0040-5809(76)90040-x
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -180,9 +181,9 @@ entries:
   - target: gelman-2013-bayesian-data-analysis
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - reproduction-number
@@ -537,9 +538,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - strategy-evaluation
@@ -572,18 +573,19 @@ entries:
   venue: Nature 461(7260)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1038/nature08227
+    url: https://doi.org/10.1038/nature08227
+    registry_id: crossref:10.1038/nature08227
   pages: 8
   density: high
   priority: 5
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1038/nature08227
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -596,9 +598,9 @@ entries:
   - target: strogatz-2015-nonlinear-dynamics-chaos
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - critical-slowing-down
@@ -751,9 +753,9 @@ entries:
   - target: brunnermeier-2001-asset-pricing-asymmetric-information
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - favorite-longshot
@@ -801,9 +803,9 @@ entries:
   - target: murphy-1973-vector-partition-probability-score
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - net-benefit
@@ -899,9 +901,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - reproduction-number
@@ -976,18 +978,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-0-387-68560-1
+    url: https://doi.org/10.1007/978-0-387-68560-1
+    registry_id: crossref:10.1007/978-0-387-68560-1
   pages: 540
   density: high
   priority: 4
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-0-387-68560-1
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1138,9 +1141,9 @@ entries:
   - target: cori-2013-estimating-time-varying-reproduction-numbers
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - endemic-epidemic
@@ -1414,9 +1417,9 @@ entries:
   - target: hanson-2007-logarithmic-market-scoring
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - market-design
@@ -1582,18 +1585,19 @@ entries:
   venue: Annals of the Institute of Statistical Mathematics 50(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1023/a:1003403601725
+    url: https://doi.org/10.1023/a:1003403601725
+    registry_id: crossref:10.1023/a:1003403601725
   pages: 32
   density: high
   priority: 4
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1023/a:1003403601725
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1604,9 +1608,9 @@ entries:
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - etas
@@ -1627,18 +1631,19 @@ entries:
   venue: Safety Science 27(2-3)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/s0925-7535(97)00052-0
+    url: https://doi.org/10.1016/s0925-7535(97)00052-0
+    registry_id: crossref:10.1016/s0925-7535(97)00052-0
   pages: 31
   density: high
   priority: 4
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/s0925-7535(97)00052-0
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1651,9 +1656,9 @@ entries:
   - target: rawlings-2017-model-predictive-control
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - drift
@@ -1720,18 +1725,19 @@ entries:
   venue: Kluwer Academic
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4613-1683-1
+    url: https://doi.org/10.1007/978-1-4613-1683-1
+    registry_id: crossref:10.1007/978-1-4613-1683-1
   pages: 355
   density: high
   priority: 4
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4613-1683-1
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1744,9 +1750,9 @@ entries:
   - target: talluri-2004-revenue-management
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - locational-pricing
@@ -1817,18 +1823,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/b139000
+    url: https://doi.org/10.1007/b139000
+    registry_id: crossref:10.1007/b139000
   pages: 710
   density: high
   priority: 4
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/b139000
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1866,18 +1873,19 @@ entries:
   venue: International Journal of Forecasting 11(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/0169-2070(95)00621-4
+    url: https://doi.org/10.1016/0169-2070(95)00621-4
+    registry_id: crossref:10.1016/0169-2070(95)00621-4
   pages: 18
   density: high
   priority: 4
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/0169-2070(95)00621-4
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1890,9 +1898,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - probability-gain
@@ -1915,18 +1923,19 @@ entries:
   venue: Annual Review of Ecology and Systematics 9
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1146/annurev.es.09.110178.001105
+    url: https://doi.org/10.1146/annurev.es.09.110178.001105
+    registry_id: crossref:10.1146/annurev.es.09.110178.001105
   pages: 31
   density: high
   priority: 4
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1146/annurev.es.09.110178.001105
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -1939,9 +1948,9 @@ entries:
   - target: punt-2016-management-strategy-evaluation
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - adaptive-management
@@ -1990,9 +1999,9 @@ entries:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: builds_on
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - prospective-testing
@@ -2020,25 +2029,41 @@ entries:
   venue: PLoS ONE 7(7)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1371/journal.pone.0041010
+    url: https://doi.org/10.1371/journal.pone.0041010
+    registry_id: crossref:10.1371/journal.pone.0041010
   pages: 20
   density: medium
   priority: 3
   rights:
-    status: unknown
-    confidence: unknown
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1371/journal.pone.0041010
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: open_url
     source_url: https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0041010&type=printable
     obtained_at: '2026-08-05'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: methods-and-false-positives
+    topic: the early-warning indicator toolbox and the significance testing it requires
+    title: null
+    locator: results and discussion, pp. 5-18
+    kind: section
+    pages: 14
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Detrending choice is a first-class analysis decision rather than preprocessing, and the
+      paper is explicit that the binding problem is identifying false positives: that a trend in an indicator is
+      not chance. Some indicators carry built-in significance tests; the BDS test on detrended residuals checks
+      whether structure remains at all, which guards against reading model misspecification as an approaching transition.
+
+      '
   refs:
   - target: scheffer-2009-early-warning-signals
     relation: builds_on
@@ -2047,9 +2072,9 @@ entries:
   - target: montgomery-2019-statistical-quality-control
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - early-warning
@@ -2091,16 +2116,26 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: evolutionary-efficiency
+    topic: efficiency as an ecological equilibrium rather than a property
+    title: null
+    locator: whole paper
+    kind: paper_section
+    pages: 4
+    priority: 3
+    read_status: read
+    concepts_expected: []
+    notes: null
   refs:
   - target: grossman-1980-impossibility-efficient-markets
     relation: cites
   - target: farmer-2002-market-force-ecology-evolution
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - market-ecology
@@ -2138,7 +2173,21 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: capacity-and-diversity
+    topic: strategy carrying capacity and the effect of deployed capital on returns
+    title: null
+    locator: sections 3-4
+    kind: section
+    pages: 20
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. The maximum profit level of a strategy is its carrying capacity, and returns decline
+      with the capital already deployed in it because of market friction. Excess volatility rises both with the
+      diversity of perceived values and with total capital, since disagreement is what generates the trading.
+
+      '
   refs:
   - target: farmer-1999-frontiers-of-finance
     relation: builds_on
@@ -2147,9 +2196,9 @@ entries:
   - target: easley-2010-networks-crowds-markets
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - market-ecology
@@ -2191,7 +2240,39 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: unobserved-cascade
+    topic: why forecasting from observed events alone under-predicts, and the renormalised alternative
+    title: null
+    locator: sections 4-5.2, pp. 9-12
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Activity over a horizon beyond a few minutes is dominated by events triggered by events
+      not yet observed, so summing the bare propagators of past activity systematically under-predicts. The renormalised
+      forecast integrates over the unobserved cascade. They show the under-prediction explicitly against a realised
+      M=7 sequence.
+
+      '
+  - unit_id: predictability-limits
+    topic: prediction gain against alarm fraction, and the loss function that should be optimised instead
+    title: null
+    locator: sections 5.3-5.5 and Table 2, pp. 13-15
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Prediction gain 21 at 1% alarm fraction for M>=6, degrading fast as the target fraction
+      rises, because a significant share of events stay uncorrelated with past activity. Probability gain cannot
+      be the optimisation target because it is maximised at zero alarm time. They use the Molchan-Kagan loss, the
+      sum of alarm fraction and missed fraction, minimised around 10% alarm duration, with values 0.6-0.9 across
+      parameters against 1.0 for a Poisson process with no skill. Also: the bare-propagator forecast is wrong in
+      level but its relative evolution carries nearly the same information for restricted targets.
+
+      '
   refs:
   - target: hardiman-2013-critical-reflexivity
     relation: cites
@@ -2200,9 +2281,9 @@ entries:
   - target: athreya-1972-branching-processes
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - predictability-limit
@@ -2234,25 +2315,42 @@ entries:
   venue: Annals of Geophysics 54(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.4401/ag-5350
+    url: https://doi.org/10.4401/ag-5350
+    registry_id: crossref:10.4401/ag-5350
   pages: 91
   density: medium
   priority: 3
   rights:
-    status: unknown
-    confidence: unknown
-    evidence: null
-    checked_at: null
+    status: cc_by
+    confidence: confirmed
+    evidence: https://doi.org/10.4401/ag-5350
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'CC BY 4.0 stated on the landing page. Read: "fgeophysics.eu/public/site/images/simonevecchi/logo-open-access-6fb3640d97847237673727bd52afffe0.png"
+      alt="" width="23" height="35"></a> &nbsp;<a href="https://creativecommons.org/"'
   acquisition:
     state: open_url
     source_url: https://www.annalsofgeophysics.eu/index.php/annals/article/download/5350/5371
     obtained_at: '2026-08-05'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: probability-gain-and-decisions
+    topic: high probability gain with low absolute probability, and what a decision protocol does with it
+    title: null
+    locator: sections II.C-II.D
+    kind: section
+    pages: 12
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. New information can yield high probability gains while absolute probabilities stay low,
+      which is the situation a decision protocol has to handle rather than suppress. Phenomenological methods achieve
+      gains of only 2-4 against time-independent reference forecasts, and the authors flag inadequate declustering
+      as an unresolved threat to even that.
+
+      '
   refs:
   - target: schorlemmer-2007-earthquake-likelihood-model-testing
     relation: builds_on
@@ -2261,9 +2359,9 @@ entries:
   - target: axelsson-2000-base-rate-fallacy
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - decision-value
@@ -2327,25 +2425,56 @@ entries:
   venue: Economics and Philosophy 18(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/s0266267102001098
+    url: https://doi.org/10.1017/s0266267102001098
+    registry_id: crossref:10.1017/s0266267102001098
   pages: 22
   density: medium
   priority: 3
   rights:
-    status: unknown
-    confidence: unknown
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1017/s0266267102001098
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: open_url
     source_url: http://eprints.lse.ac.uk/704/1/List_Econ%26Phil_18%281%29.pdf
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: impossibility-theorem
+    topic: the discursive paradox and the impossibility result it illustrates
+    title: null
+    locator: sections 2-3 and Theorem 1, pp. 92-101
+    kind: section
+    pages: 10
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Theorem 1: no judgment aggregation function produces complete, consistent and deductively
+      closed collective judgments while satisfying universal domain, anonymity and systematicity. The result holds
+      even when every individual set is itself complete, consistent and deductively closed, and the authors note
+      the theorem is strengthened by that stipulation. The mechanism is that each premise attracts a majority but
+      the majorities diverge, so their intersection is a minority.
+
+      '
+  - unit_id: escape-routes
+    topic: which condition to relax, and what each relaxation costs
+    title: null
+    locator: section 4, pp. 101-108
+    kind: section
+    pages: 8
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Relaxing universal domain via convergence works when the intersection of the majorities
+      on all propositions is itself a majority. The other routes relax anonymity or systematicity, the latter giving
+      premise-based against conclusion-based procedures.
+
+      '
   refs:
   - target: nilsson-1986-probabilistic-logic
     relation: cites
@@ -2380,18 +2509,19 @@ entries:
   venue: Synthese 187(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/s11229-011-0025-3
+    url: https://doi.org/10.1007/s11229-011-0025-3
+    registry_id: crossref:10.1007/s11229-011-0025-3
   pages: 29
   density: high
   priority: 3
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/s11229-011-0025-3
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -2482,7 +2612,21 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: p-value-estimation
+    topic: how the decay exponent is estimated in practice and what it does and does not depend on
+    title: null
+    locator: sections on p-value estimates
+    kind: section
+    pages: 12
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. The decay exponent is estimated per sequence rather than assumed universal, and the cited
+      studies find no dependence of p or c on the magnitude cutoff, which is what makes a per-window estimate meaningful
+      at all.
+
+      '
   refs:
   - target: ogata-1988-statistical-models-earthquake
     relation: builds_on
@@ -2491,9 +2635,9 @@ entries:
   - target: bacry-2015-hawkes-processes-finance
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 1
+    method: seed
+    source: null
   status: candidate
   tags:
   - omori
@@ -2608,18 +2752,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4757-4286-2
+    url: https://doi.org/10.1007/978-1-4757-4286-2
+    registry_id: crossref:10.1007/978-1-4757-4286-2
   pages: 617
   density: high
   priority: 4
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4757-4286-2
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -3129,9 +3274,9 @@ entries:
   - target: charnov-1976-marginal-value-theorem
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - optimal-stopping
@@ -3397,18 +3542,19 @@ entries:
   venue: Artificial Intelligence 101(1-2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/s0004-3702(98)00023-x
+    url: https://doi.org/10.1016/s0004-3702(98)00023-x
+    registry_id: crossref:10.1016/s0004-3702(98)00023-x
   pages: 36
   density: high
   priority: 4
   rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/s0004-3702(98)00023-x
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -3419,9 +3565,9 @@ entries:
   - target: kochenderfer-2022-algorithms-decision-making
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - pomdp
@@ -3873,9 +4019,9 @@ entries:
   - target: qin-2021-empirical-study-defi-liquidations
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - oracle
@@ -3900,18 +4046,20 @@ entries:
   venue: null
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2139/ssrn.4301150
+    url: https://doi.org/10.2139/ssrn.4301150
+    registry_id: crossref:10.2139/ssrn.4301150
   pages: 55
   density: high
   priority: 5
   rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: cc_by
+    confidence: confirmed
+    evidence: https://arxiv.org/abs/2212.06888
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'CC BY 4.0 stated on the landing page. Read: "html (experimental)</a></li><li><a href="/src/2212.06888"
+      class="abs-button download-eprint">tex source </a></li></ul> <div class="abs-license"><a href="http://creativecommons.org/"'
   acquisition:
     state: not_acquired
     copy_path: null
@@ -3924,9 +4072,9 @@ entries:
   - target: gueant-2016-financial-mathematics-market-liquidity
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - perpetuals
@@ -3976,9 +4124,9 @@ entries:
   - target: daian-2020-flash-boys-2
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - liquidation
@@ -4027,9 +4175,9 @@ entries:
   - target: roughgarden-2021-eip1559-fee-mechanism
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - mev
@@ -4076,9 +4224,9 @@ entries:
   - target: vives-2008-information-learning-markets
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - amm
@@ -4101,18 +4249,20 @@ entries:
   venue: null
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.2112.07386
+    url: https://doi.org/10.48550/arXiv.2112.07386
+    registry_id: arxiv:2112.07386
   pages: 50
   density: high
   priority: 4
   rights:
     status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://arxiv.org/abs/2112.07386
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'arXiv non-exclusive distribution licence stated on the landing page. Read: "arXiv perpetual non-exclusive
+      licence: the author grants arXiv the right to distribute. No licence is granted to us."'
   acquisition:
     state: not_acquired
     copy_path: null
@@ -4123,9 +4273,9 @@ entries:
   - target: aoyagi-2021-coexisting-exchange-platforms
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - liquidity
@@ -4170,9 +4320,9 @@ entries:
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - systemic-risk
@@ -4218,9 +4368,9 @@ entries:
   - target: kelkar-2020-order-fairness-byzantine
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - pbs
@@ -4263,9 +4413,9 @@ entries:
   - target: foucault-2013-market-liquidity
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - amm
@@ -4286,18 +4436,20 @@ entries:
   venue: null
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.2305.14604
+    url: https://doi.org/10.48550/arXiv.2305.14604
+    registry_id: arxiv:2305.14604
   pages: 30
   density: high
   priority: 4
   rights:
     status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://arxiv.org/abs/2305.14604
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'arXiv non-exclusive distribution licence stated on the landing page. Read: "arXiv perpetual non-exclusive
+      licence: the author grants arXiv the right to distribute. No licence is granted to us."'
   acquisition:
     state: not_acquired
     copy_path: null
@@ -4308,9 +4460,9 @@ entries:
   - target: adams-2021-uniswap-v3-core
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - lvr
@@ -4358,9 +4510,9 @@ entries:
   - target: eskandari-2021-sok-oracles
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - survey
@@ -4402,9 +4554,9 @@ entries:
   - target: eskandari-2021-sok-oracles
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - amm
@@ -4769,18 +4921,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4757-2341-0
+    url: https://doi.org/10.1007/978-1-4757-2341-0
+    registry_id: crossref:10.1007/978-1-4757-2341-0
   pages: 559
   density: high
   priority: 4
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4757-2341-0
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -5141,18 +5294,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4612-1140-2
+    url: https://doi.org/10.1007/978-1-4612-1140-2
+    registry_id: crossref:10.1007/978-1-4612-1140-2
   pages: 462
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4612-1140-2
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -5221,18 +5375,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4757-3978-7
+    url: https://doi.org/10.1007/978-1-4757-3978-7
+    registry_id: crossref:10.1007/978-1-4757-3978-7
   pages: 632
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4757-3978-7
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -5716,18 +5871,19 @@ entries:
   venue: Artificial Intelligence 28(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/0004-3702(86)90031-7
+    url: https://doi.org/10.1016/0004-3702(86)90031-7
+    registry_id: crossref:10.1016/0004-3702(86)90031-7
   pages: 17
   density: high
   priority: 5
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/0004-3702(86)90031-7
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -5939,18 +6095,19 @@ entries:
   venue: Handbook of Defeasible Reasoning and Uncertainty Management Systems, Volume 5
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-94-017-1737-3_8
+    url: https://doi.org/10.1007/978-94-017-1737-3_8
+    registry_id: crossref:10.1007/978-94-017-1737-3_8
   pages: 60
   density: high
   priority: 4
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-94-017-1737-3_8
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -7196,9 +7353,9 @@ entries:
   - target: cftc-event-contracts-guidance
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - prediction-market
@@ -7333,18 +7490,20 @@ entries:
   venue: null
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1807.04938
+    url: https://doi.org/10.48550/arXiv.1807.04938
+    registry_id: arxiv:1807.04938
   pages: 14
   density: high
   priority: 3
   rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: cc_by
+    confidence: confirmed
+    evidence: https://arxiv.org/abs/1807.04938
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'CC BY 4.0 stated on the landing page. Read: "nload-pdf">view pdf</a></li><li><a href="/src/1807.04938"
+      class="abs-button download-eprint">tex source </a></li></ul> <div class="abs-license"><a href="http://creativecommons.org/"'
   acquisition:
     state: not_acquired
     copy_path: null
@@ -7395,9 +7554,9 @@ entries:
   - target: sec-2005-regulation-nms
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - regulation
@@ -7481,9 +7640,9 @@ entries:
   - target: hyperliquid-api-docs
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - venue
@@ -7715,18 +7874,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-3-642-33483-2
+    url: https://doi.org/10.1007/978-3-642-33483-2
+    registry_id: crossref:10.1007/978-3-642-33483-2
   pages: 648
   density: high
   priority: 5
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-3-642-33483-2
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -7990,18 +8150,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4419-0661-8
+    url: https://doi.org/10.1007/978-1-4419-0661-8
+    registry_id: crossref:10.1007/978-1-4419-0661-8
   pages: 551
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4419-0661-8
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -8067,18 +8228,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/0-387-34471-3
+    url: https://doi.org/10.1007/0-387-34471-3
+    registry_id: crossref:10.1007/0-387-34471-3
   pages: 417
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/0-387-34471-3
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -8309,18 +8471,20 @@ entries:
   venue: ICML
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1103.4601
+    url: https://doi.org/10.48550/arXiv.1103.4601
+    registry_id: arxiv:1103.4601
   pages: 8
   density: high
   priority: 5
   rights:
     status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://arxiv.org/abs/1103.4601
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: 'arXiv non-exclusive distribution licence stated on the landing page. Read: "arXiv perpetual non-exclusive
+      licence: the author grants arXiv the right to distribute. No licence is granted to us."'
   acquisition:
     state: open_url
     copy_path: null
@@ -9351,9 +9515,9 @@ entries:
   - target: fernholz-stochastic-portfolio-theory
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - universal-portfolio
@@ -10342,18 +10506,19 @@ entries:
   venue: Journal of Financial Markets 8(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/j.finmar.2004.11.001
+    url: https://doi.org/10.1016/j.finmar.2004.11.001
+    registry_id: crossref:10.1016/j.finmar.2004.11.001
   pages: 47
   density: high
   priority: 5
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/j.finmar.2004.11.001
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -10366,9 +10531,9 @@ entries:
   - target: biais-1995-empirical-analysis-limit-order-book
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - survey
@@ -11058,18 +11223,19 @@ entries:
   venue: Finance and Stochastics 23(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/s00780-019-00382-7
+    url: https://doi.org/10.1007/s00780-019-00382-7
+    registry_id: crossref:10.1007/s00780-019-00382-7
   pages: 32
   density: high
   priority: 5
   rights:
-    status: subscription_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/s00780-019-00382-7
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -11082,9 +11248,9 @@ entries:
   - target: cardaliaguet-2018-mean-field-game-trade-crowding
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - execution
@@ -12078,18 +12244,19 @@ entries:
   venue: Econophysics of Order-Driven Markets
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-88-470-1766-5_4
+    url: https://doi.org/10.1007/978-88-470-1766-5_4
+    registry_id: crossref:10.1007/978-88-470-1766-5_4
   pages: 16
   density: high
   priority: 3
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-88-470-1766-5_4
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -12100,9 +12267,9 @@ entries:
   - target: abergel-2016-limit-order-books
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - market-making
@@ -12279,18 +12446,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-3-642-65371-1
+    url: https://doi.org/10.1007/978-3-642-65371-1
+    registry_id: crossref:10.1007/978-3-642-65371-1
   pages: 290
   density: high
   priority: 5
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-3-642-65371-1
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -12836,9 +13004,9 @@ entries:
   - target: ogata-1988-statistical-models-earthquake
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - point-process
@@ -13133,9 +13301,9 @@ entries:
   - target: hasbrouck-2007-empirical-market-microstructure
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - microstructure-noise
@@ -13558,18 +13726,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-3-540-71050-9
+    url: https://doi.org/10.1007/978-3-540-71050-9
+    registry_id: crossref:10.1007/978-3-540-71050-9
   pages: 973
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-3-540-71050-9
+    checked_at: '2026-08-06'
     grant: null
-    notes: A widely circulated author PDF exists; verify the permission.
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -13702,9 +13871,9 @@ entries:
   - target: acemoglu-2015-systemic-risk-financial-networks
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - contagion
@@ -13874,9 +14043,9 @@ entries:
   - target: jensen-1998-self-organized-criticality
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - percolation
@@ -14651,9 +14820,9 @@ entries:
   - target: punt-2016-management-strategy-evaluation
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - distributionally-robust
@@ -14793,18 +14962,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4614-0237-4
+    url: https://doi.org/10.1007/978-1-4614-0237-4
+    registry_id: crossref:10.1007/978-1-4614-0237-4
   pages: 485
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4614-0237-4
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -15289,18 +15459,19 @@ entries:
   venue: Birkhäuser
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4612-0017-8
+    url: https://doi.org/10.1007/978-1-4612-0017-8
+    registry_id: crossref:10.1007/978-1-4612-0017-8
   pages: 233
   density: high
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4612-0017-8
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -15769,9 +15940,9 @@ entries:
   - target: sarkka-2013-bayesian-filtering-smoothing
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - regime-switching
@@ -16596,18 +16767,19 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4939-2614-5
+    url: https://doi.org/10.1007/978-1-4939-2614-5
+    registry_id: crossref:10.1007/978-1-4939-2614-5
   pages: 719
   density: medium
   priority: 3
   rights:
     status: all_rights_reserved
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-1-4939-2614-5
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: purchasable
     copy_path: null
@@ -16847,18 +17019,19 @@ entries:
   venue: MIT Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/0166-5316(85)90016-1
+    url: https://doi.org/10.1016/0166-5316(85)90016-1
+    registry_id: crossref:10.1016/0166-5316(85)90016-1
   pages: 200
   density: high
   priority: 5
   rights:
-    status: licensed_purchase_required
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1016/0166-5316(85)90016-1
+    checked_at: '2026-08-06'
     grant: null
-    notes: null
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: not_acquired
     copy_path: null
@@ -17058,9 +17231,9 @@ entries:
   - target: takagi-1986-analysis-polling-systems
     relation: cites
   discovered:
-    round: 0
-    method: operator
-    source: 'workstream expansion: defi mechanics, regulated prediction markets, frontier closes'
+    round: 4
+    method: seed
+    source: null
   status: candidate
   tags:
   - queueing
@@ -17834,18 +18007,19 @@ entries:
   venue: Prentice Hall
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-3-031-02525-9
+    url: https://doi.org/10.1007/978-3-031-02525-9
+    registry_id: crossref:10.1007/978-3-031-02525-9
   pages: 452
   density: high
   priority: 4
   rights:
-    status: author_hosted_free
-    confidence: inferred
-    evidence: null
-    checked_at: null
+    status: all_rights_reserved
+    confidence: confirmed
+    evidence: https://doi.org/10.1007/978-3-031-02525-9
+    checked_at: '2026-08-06'
     grant: null
-    notes: A PDF has circulated from author pages; verify before use.
+    notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
     state: open_url
     copy_path: null

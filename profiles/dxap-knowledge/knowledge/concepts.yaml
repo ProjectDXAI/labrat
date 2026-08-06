@@ -1021,3 +1021,232 @@ concepts:
     problem_ids: [PB-ADVERSE-ENTRY, PB-FILL-UNCERTAINTY]
     tags: [adverse-selection, counterparty, onchain, ground-truth, read-directly]
     workstream: hyperliquid_l4
+
+  # ----------------------------------------------------------------------------
+  # Transfers from adjacent disciplines. Each rests on a unit read directly from
+  # a copy we hold, and each states the import rather than the analogy: what the
+  # other field established, and what it forces us to change.
+  # ----------------------------------------------------------------------------
+
+  - concept_id: KC-CASCADE-HORIZON
+    canonical_name: "Forecasting a self-exciting stream from what has been observed under-predicts it"
+    plain_description: >
+      Over any horizon longer than the immediate, most of the coming activity in a
+      self-exciting stream will be triggered by activity that has not happened yet.
+      Extrapolating from the events already on the tape therefore misses the larger part of
+      what is coming, and the shortfall grows with how close the stream is to criticality.
+    mechanism: >
+      In a branching process each event has offspring, and those offspring have offspring.
+      Summing the direct contribution of observed events counts only the first generation.
+      The expected total descendants of one event is 1/(1-n) for branching ratio n, so a
+      forecast that stops at the first generation is short by that factor. The correction is
+      not a fudge: it integrates over the events that will occur inside the horizon and
+      trigger further events before the horizon ends.
+    formal_equations: "E[descendants of one event] = 1/(1-n); renormalised rate = bare rate x 1/(1-n) for subcritical n"
+    assumptions:
+      - "The branching ratio is stable over the forecast horizon."
+      - "n is genuinely below one; above it the expectation does not exist and the question is malformed."
+      - "The triggering kernel's mass is mostly inside the horizon being forecast."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [minutes, hours]
+    required_observables: [trade_prints, mid_price_series]
+    required_data_resolution: "Event counts in consecutive equal windows, enough of them to estimate the branching ratio."
+    expected_empirical_signature: >
+      Realised activity over a horizon that exceeds a naive extrapolation of observed
+      activity, by a factor that grows as the branching ratio rises, and a discrepancy that
+      widens with the horizon rather than staying constant.
+    alternative_explanations:
+      - "Exogenous arrivals rose over the horizon for reasons unrelated to triggering, which produces the same shortfall with no cascade in it."
+      - "The branching ratio was underestimated on the observation window, so the naive forecast was miscalibrated rather than structurally short."
+    known_failure_modes:
+      - "Near criticality the multiplier is dominated by estimation error in n, so a confident renormalised number there is an artifact of a point estimate rather than a forecast."
+      - "The source's own result cuts against over-reading the level: the naive forecast is wrong in absolute terms but its relative evolution carries nearly the same information for restricted targets. When the decision only needs the direction of activity, the correction buys nothing and costs a parameter."
+      - "A single decay parameter is a crude stand-in for a power-law kernel whose mass sits outside any one window, which is the same failure the branching-ratio estimator already carries."
+    source_passage_ids:
+      - "helmstetter-2003-predictability-etas#unobserved-cascade"
+      - "athreya-1972-branching-processes#criticality-and-extinction"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by its own source: the paper shows both that the correction matters for the level and that it does not matter for many decisions."
+    supporting_concept_ids: [KC-HAWKES-CRITICALITY]
+    implementation_status: implemented
+    confidence: 0.6
+    problem_ids: [PB-REGIME-BREAK, PB-ABSORPTION]
+    tags: [branching, cascade, forecasting, transfer, seismology, read-directly]
+
+  - concept_id: KC-ALARM-LOSS
+    canonical_name: "Probability gain is not an objective; the error diagram is"
+    plain_description: >
+      A rule that fires only in the most certain case has an enormous probability gain and
+      predicts almost nothing. Optimising gain therefore selects silence. The quantity to minimise is the
+      sum of the time spent in alarm and the share of events missed, and a value at or above
+      one means no skill at all.
+    mechanism: >
+      Probability gain is the ratio of the event rate inside an alarm to the base rate. It is
+      maximised as alarm time goes to zero because the tightest threshold selects only the
+      most certain case. The Molchan error diagram plots the alarm fraction against the miss
+      fraction across thresholds; their weighted sum is a loss with a real minimum, and a
+      random rule sits at exactly one by construction, which gives an absolute rather than a
+      relative reading of skill.
+    formal_equations: "gain = P(event | alarm) / P(event); loss = c x tau + nu, where tau = share of periods in alarm and nu = share of events missed; no skill => loss = 1"
+    assumptions:
+      - "The alarm statistic uses only information available before the period it alarms on."
+      - "The cost of time in alarm and the cost of a miss are expressible on a common scale."
+      - "The threshold is chosen on a period disjoint from the one used to report the loss."
+    market_types: [any]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [mid_price_series, matured_outcomes]
+    required_data_resolution: "An alarm statistic and a realised event indicator over the same periods."
+    expected_empirical_signature: >
+      A loss curve with an interior minimum at a moderate alarm fraction rather than at the
+      extremes, and a probability gain that is highest exactly where the loss is worst.
+    alternative_explanations:
+      - "A rule can minimise the loss by alarming almost always when events are common, which is a base-rate artifact rather than skill and shows up as a loss just under one."
+    known_failure_modes:
+      - "Both error rates are estimated on the sample that chose the threshold, so the minimising threshold is optimistically biased and needs a held-out period before it is quoted."
+      - "The unweighted sum treats an hour of alarm and a missed event as equal, which is almost never the trade a trading decision faces. The weighting is a choice and must be stated with the result."
+      - "The diagram is silent about magnitude: a rule that catches every event scores the same whether the events it catches are the large ones or the small ones."
+      - "This is the diagnosis of our own over-cautious retrieval policy, which scores perfectly on clean trials and switches itself off under tool loss. A threshold tuned on gain rather than on loss produces exactly that behaviour."
+    source_passage_ids:
+      - "helmstetter-2003-predictability-etas#predictability-limits"
+      - "jordan-2011-operational-earthquake-forecasting#probability-gain-and-decisions"
+    contradicting_concept_ids: []
+    alternative_note: "The competing practice is to report probability gain alone, which this card exists to refuse; it is a convention rather than an opposing theory."
+    supporting_concept_ids: [KC-DETECT-CUSUM, KC-COST-FLOOR]
+    implementation_status: implemented
+    confidence: 0.75
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-THESIS-DECAY]
+    tags: [alarm, error-diagram, abstention, transfer, seismology, read-directly]
+
+  - concept_id: KC-JUDGMENT-AGGREGATION
+    canonical_name: "A market set can be collectively incoherent with every participant coherent"
+    plain_description: >
+      When logically connected questions are priced by overlapping but different groups of
+      people, the collective prices can violate the logic even though no individual violates
+      it. Incoherence across an event tree is therefore not proof that somebody is wrong, and
+      the size of a breach is not a measure of how much anyone has mispriced.
+    mechanism: >
+      List and Pettit prove that no aggregation rule produces complete, consistent and
+      deductively closed collective judgments while treating all propositions even-handedly,
+      accepting any profile of individual views and weighting participants equally. The
+      result holds even when every individual judgment set is itself complete, consistent and
+      deductively closed. The driver is that each proposition attracts its own majority and
+      those majorities diverge, so their intersection is a minority. A prediction market is
+      an aggregation rule of exactly this kind, and each market in an event attracts its own
+      population.
+    formal_equations: "No F satisfying universal domain, anonymity and systematicity yields collective judgment sets that are complete, consistent and deductively closed (List and Pettit, Theorem 1)"
+    assumptions:
+      - "The markets in the set are genuinely logically connected, which the metadata asserts and the resolution criteria decide."
+      - "Participants are identifiable across the legs well enough to measure overlap."
+      - "Prices reflect the beliefs of whoever is actually trading each leg, not of a common marginal trader."
+    market_types: [prediction_market]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [market_probability, event_tree, counterparty_ids]
+    required_data_resolution: "Quotes for every leg of an event at a common instant, and participant identity per leg."
+    expected_empirical_signature: >
+      Partition and implication breaches that shrink as participant overlap across the legs
+      rises, and persist where the populations pricing each leg are close to disjoint. The
+      escape route the theorem names is convergence, so coherence should track overlap rather
+      than tracking depth or spread.
+    alternative_explanations:
+      - "Breaches trace to resolution-criteria differences, so the legs were never logically connected and no aggregation result is needed to explain it."
+      - "Breaches are execution artifacts: stale quotes, unsynchronised snapshots, or depth too thin to trade, all of which look like incoherence and are not."
+      - "The population pricing each leg is the same but the breach survives because closing it is unprofitable after costs, which is a cost story rather than an aggregation story."
+    known_failure_modes:
+      - "The theorem is about aggregating judgments, and a market aggregates money-weighted bets rather than one-person-one-vote. Anonymity in the theorem's sense is exactly what a market does not satisfy, so this is a licence to expect incoherence rather than a derivation of its size."
+      - "One address is not one participant, so measured overlap is a lower bound and its error is not random."
+      - "It offers no direction: it says the breach need not imply anyone is wrong, not which leg is mispriced."
+    source_passage_ids:
+      - "list-2002-aggregating-sets-of-judgments#impossibility-theorem"
+      - "list-2002-aggregating-sets-of-judgments#escape-routes"
+    contradicting_concept_ids: [KC-EVENT-TREE-CONSTRAINTS]
+    supporting_concept_ids: [KC-XMKT-CONSISTENCY, KC-COUNTERPARTY-INFO]
+    implementation_status: specified
+    confidence: 0.55
+    problem_ids: [PB-LOGICAL-ARB, PB-XMARKET, PB-STALE-PROBABILITY]
+    tags: [judgment-aggregation, coherence, prediction-market, transfer, read-directly]
+    workstream: polymarket
+
+  - concept_id: KC-EARLY-WARNING-FRAGILITY
+    canonical_name: "Critical slowing down is real and its false-positive rate is the binding constraint"
+    plain_description: >
+      Variance and autocorrelation rise as a system approaches a tipping point, which makes
+      them generic leading indicators requiring no model of the mechanism. The problem is not
+      whether the effect exists but whether a rise in an indicator is distinguishable from
+      chance, and the answer depends on choices that look like preprocessing.
+    mechanism: >
+      Near a bifurcation the recovery rate from perturbation goes to zero, so the system's
+      state carries further forward in time and its fluctuations grow. Both effects are
+      measurable without knowing what the system is. But the indicators are computed on
+      detrended, windowed data, and the detrending method and window length change the
+      answer, so a trend in an indicator has to be tested against a null rather than read off.
+    formal_equations: "lag-1 autocorrelation and variance of the detrended residual within a rolling window; trend tested against a surrogate or by a BDS test on the residuals"
+    assumptions:
+      - "The transition being approached is a bifurcation rather than a shock, since a shock arrives with no warning of this kind."
+      - "The window is long enough to estimate the indicator and short enough that the system has not already changed."
+      - "Detrending removed the trend and not the signal, which is a judgment and not a default."
+    market_types: [any]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [mid_price_series]
+    required_data_resolution: "A regularly sampled series long enough for a rolling window plus a null distribution."
+    expected_empirical_signature: >
+      A rising indicator trend that survives its own significance test, and residuals that a
+      BDS test still finds structure in, since a rise on residuals with no remaining structure
+      points at model misspecification rather than at an approaching transition.
+    alternative_explanations:
+      - "The rise is an artifact of the detrending model rather than of the system, which the source treats as the first thing to rule out."
+      - "Non-stationary volatility produces rising variance with no change in recovery rate and therefore no approaching transition."
+    known_failure_modes:
+      - "The false-positive rate is the binding constraint, and the source is explicit about it: the methods proliferate faster than the tests that would tell you when they are wrong."
+      - "Detrending choice and window length both move the indicator, so a result quoted without them is not reproducible."
+      - "A shock is not a bifurcation. Most sharp market moves are the former and this says nothing about them."
+    source_passage_ids:
+      - "dakos-2012-methods-early-warnings#methods-and-false-positives"
+    contradicting_concept_ids: [KC-REGIME-PERSISTENCE]
+    supporting_concept_ids: [KC-DETECT-CUSUM, KC-FILTER-STATE]
+    implementation_status: specified
+    confidence: 0.45
+    problem_ids: [PB-REGIME-BREAK, PB-THESIS-DECAY]
+    tags: [critical-slowing-down, early-warning, false-positives, transfer, read-directly]
+
+  - concept_id: KC-STRATEGY-CAPACITY
+    canonical_name: "A strategy has a carrying capacity, and its return declines toward it"
+    plain_description: >
+      The return of a strategy falls as capital is deployed into it, because the trading that
+      captures the edge is the same trading that moves the price against itself. There is a
+      size at which total profit peaks, and past it more capital buys less profit rather than
+      more.
+    mechanism: >
+      A strategy's profit is the edge per unit times the size deployed, minus the impact of
+      deploying it. Impact grows with size, so profit is concave and has a maximum. Farmer
+      calls that maximum the carrying capacity, borrowing from population ecology, where the
+      same shape arises for the same reason: a population consuming a finite resource depresses
+      the resource it lives on.
+    formal_equations: "profit(size) = edge x size - impact(size) x size; capacity = argmax profit, where marginal edge equals marginal impact"
+    assumptions:
+      - "Impact rises with size over the relevant range, which is the empirical case rather than an axiom."
+      - "The edge is not replenished by the trading that consumes it within the horizon."
+      - "Other capital in the same strategy competes for the same edge, so capacity is shared and not per-account."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [days, weeks]
+    required_observables: [trade_prints, position_state, mid_price_series]
+    required_data_resolution: "Realised returns against deployed size across a range wide enough to see curvature."
+    expected_empirical_signature: >
+      Return per unit falling with deployed size, and total profit peaking at an interior
+      size, with the peak moving down as other participants run the same strategy.
+    alternative_explanations:
+      - "Returns fell because the edge decayed for unrelated reasons over the same period that size grew, which is confounded with capacity by construction and needs the size variation to be exogenous."
+      - "Falling returns reflect worse execution at larger size rather than a genuine capacity limit, which is an implementation problem with a different fix."
+    known_failure_modes:
+      - "Capacity is shared across everyone running the strategy and is therefore not observable from our own returns alone."
+      - "Estimating it requires size variation we mostly do not have, and the variation we do have was chosen in response to performance, which is the wrong direction of causality."
+      - "The ecological framing is an analogy carrying real mathematics, not a derivation. It predicts the shape and not the level."
+    source_passage_ids:
+      - "farmer-2002-market-force-ecology-evolution#capacity-and-diversity"
+      - "farmer-1999-frontiers-of-finance#evolutionary-efficiency"
+    contradicting_concept_ids: []
+    alternative_note: "Kept honest by its alternative explanations: edge decay and execution degradation both produce the same curve and are the first two things to rule out."
+    supporting_concept_ids: [KC-IMPACT-SQRT, KC-COST-FLOOR]
+    implementation_status: specified
+    confidence: 0.5
+    problem_ids: [PB-COST-DRAG, PB-IMPACT-TIMING]
+    tags: [capacity, crowding, market-ecology, transfer, read-directly]

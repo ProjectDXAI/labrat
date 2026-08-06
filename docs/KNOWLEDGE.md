@@ -108,10 +108,10 @@ The **offline half runs in this repo**: `knowledge.py evaluate` scores retrieval
 
 | Policy | hit | precision | correct abstention | counterevidence | tokens |
 |---|---|---|---|---|---|
-| `raw_similarity` | 1.00 | 0.23 | 0.00 | 0.00 | 3.41k |
-| `filtered_only` | 1.00 | 0.83 | 1.00 | 0.00 | 1.04k |
-| `decision_value` | 0.93 | 1.00 | 1.00 | 0.92 | 0.73k |
-| `conservative_abstain` | 0.50 | 1.00 | 1.00 | 0.86 | 0.80k |
+| `raw_similarity` | 1.00 | 0.23 | 0.00 | 0.00 | 3.55k |
+| `filtered_only` | 1.00 | 0.80 | 1.00 | 0.00 | 1.12k |
+| `decision_value` | 0.94 | 1.00 | 1.00 | 0.80 | 0.76k |
+| `conservative_abstain` | 0.50 | 1.00 | 1.00 | 0.75 | 0.81k |
 
 Plain similarity retrieval has a perfect hit rate and answers *every* inapplicable context, including one timestamped before its sources were written. It looks like it is working. That is the point of the control arm.
 
@@ -137,10 +137,10 @@ On the shipped seed:
 
 | Policy | robustness | worst case | violations | note |
 |---|---|---|---|---|
-| `decision_value` | **0.94** | 0.94 (tool loss) | 0 | degrades rather than switching off |
-| `decision_value_wide` | 0.79 | 0.79 (near-duplicates) | 0 | serves 9 duplicate restatements |
-| `filtered_only` | 0.74 | 0.74 | 0 | serves 16 duplicates — no diversity control |
-| `raw_similarity` | 0.00 | — | **549** | recommends calculations on data that is not there |
+| `decision_value` | **0.95** | 0.95 (tool loss) | 0 | degrades rather than switching off |
+| `decision_value_wide` | 0.81 | 0.81 (near-duplicates) | 0 | serves duplicate restatements |
+| `filtered_only` | 0.75 | 0.75 | 0 | no diversity control |
+| `raw_similarity` | 0.00 | — | **656** | recommends calculations on data that is not there |
 | `conservative_abstain` | 0.00 | 0.00 (tool loss) | 0 | silently switches itself off when tools vanish |
 
 The last row is the finding worth having: an over-cautious threshold looks safe on clean trials and removes the knowledge layer entirely the moment the environment degrades — indistinguishable, from the outside, from having no corpus at all.
@@ -232,7 +232,7 @@ The first pass of primary reading revised three bets and produced nine extension
 
 Reading also changed two implementations. `time_irreversibility` gained the surrogate null that the source method treats as essential, and `hawkes_branching_ratio` gained a scale profile and a warning, because the published failure mode is exactly the one a window-based estimator walks into. Both are version 1.1.0, which forced their method cards to be re-verified — the version pin doing its job.
 
-`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 9 of 25 — every card added since the first reading pass is anchored to material that was read. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
+`knowledge status` reports provenance plainly: how many cards are anchored to a unit someone opened, and how many rest on unread anchors. At the time of writing that is 14 of 30 — every card added since the first reading pass is anchored to material that was read. Seeding a store from working knowledge is legitimate; leaving it that way silently is not.
 
 ## The workstreams, and closing the gaps they opened
 
@@ -292,6 +292,20 @@ Everything we legitimately hold gets indexed, so search can find it. What may be
 The second row is the load-bearing one. A brief is written to be carried into an analysis, and from there into memos and artifacts. Text that may not be redistributed must not ride along inside it. `--quote-local` overrides this for personal reading and says so in a banner; it changes what is printed, not what the licence permits, and the `quotable` flag on every result stays false.
 
 Corpus-wide vocabulary is floored out of the ranking. A term carried by more than a quarter of passages cannot discriminate between them, and in a corpus that is entirely about order books, words like "orders" and "position" clear any generic stopword list while still being noise. When every word in a question is corpus-wide, the brief returns no passages and says why rather than ranking on page length.
+
+## What the adjacent disciplines actually changed
+
+Fifty-one entries in `adjacent_disciplines` were an argued reading list and nothing more: no units, no cards, nothing retrieval could serve. Seven of them are held on disk, so those were read and compiled. Two of the transfers corrected something this repo was already doing wrong.
+
+**Probability gain is not an objective.** Helmstetter and Sornette state it plainly: gain is maximised as alarm time goes to zero, so optimising it selects a rule that almost never fires and predicts almost nothing. They use the Molchan error diagram instead — alarm fraction plus missed fraction, with a Poisson benchmark sitting at exactly 1.0 so skill is absolute rather than relative. Their ETAS results land at 0.6 to 0.9 with the minimum near a 10% alarm fraction.
+
+That is the diagnosis of a failure already visible in our own stress table. `conservative_abstain` scores perfectly on clean trials and 0.00 robustness under tool loss, because a threshold tuned on how right it is when it fires selects silence. `molchan_error_diagram` is now in the registry, and `KC-ALARM-LOSS` says to report the loss first and the gain second.
+
+**Forecasting a self-exciting stream from observed events under-predicts it.** Activity over any horizon beyond the immediate is dominated by events triggered by events that have not happened yet. The correction is exact for a subcritical branching process: total descendants of one event is 1/(1−n), so a first-generation forecast is short by that factor. `cascade_forecast` implements it, and the card carries the source's own qualification — the naive forecast is wrong in level while its *relative* evolution carries nearly the same information, so for a decision that only needs the direction of activity the correction buys nothing and costs a parameter.
+
+**Collective incoherence does not imply anyone is wrong.** List and Pettit's Theorem 1 shows no aggregation rule yields complete, consistent, deductively closed collective judgments under universal domain, anonymity and systematicity — and it holds *even when every individual judgment set is itself coherent*. Each proposition attracts its own majority and the majorities diverge. A prediction market is an aggregation rule of exactly that kind, and each leg of an event attracts its own population. `KC-JUDGMENT-AGGREGATION` contradicts `KC-EVENT-TREE-CONSTRAINTS` deliberately: one says a partition breach is an opportunity, the other says it may be a structural artifact of who is trading which leg.
+
+The escape route the theorem names is convergence, which makes this testable on data nobody else has. Coherence should track *participant overlap across legs*, and both venues publish addresses. `HY-COHERENCE-OVERLAP` states it: breach magnitude falls with Jaccard overlap of the address sets pricing each leg.
 
 ## Ranking what to compile next
 

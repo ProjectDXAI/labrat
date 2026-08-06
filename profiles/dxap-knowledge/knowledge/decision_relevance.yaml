@@ -385,3 +385,88 @@ decision_relevance:
     minimum_required_confidence: 0.5
     important_side_effects:
       - "Systematically declining to trade against flagged addresses changes their behaviour and ours, so the measured persistence degrades once it is acted on."
+
+  # Decision cards for the transfers.
+  - decision_relevance_id: DR-ALARM-ABSTAIN
+    concept_id: KC-ALARM-LOSS
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The detector's minimum loss on a held-out period is at or above one, meaning it performs
+      no better than alarming at random, whatever its probability gain looks like at a tight
+      threshold.
+    evidence_that_would_argue_against_action: >
+      The loss is below one at a moderate alarm fraction and the weighting used reflects what
+      being in alarm actually costs us rather than the unweighted default.
+    minimum_required_confidence: 0.6
+    important_side_effects:
+      - "Applied to our own retrieval policies, this is the diagnosis of an over-cautious threshold rather than a reason to raise it further."
+
+  - decision_relevance_id: DR-ALARM-ENTRY
+    concept_id: KC-ALARM-LOSS
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The current period sits above a threshold selected by minimising the loss on a disjoint
+      period, and the probability gain at that threshold is quoted alongside the loss rather
+      than instead of it.
+    evidence_that_would_argue_against_action: >
+      The threshold was selected on the same sample being evaluated, or it was chosen to maximise
+      gain, in which case it fires so rarely that the sample supporting it is thin.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Lowering a threshold to reduce misses raises time in alarm, which has a real cost in attention and in premature entries."
+
+  - decision_relevance_id: DR-CASCADE-SIZING
+    concept_id: KC-CASCADE-HORIZON
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      The intended horizon is long enough for triggering to matter, the branching ratio is
+      comfortably below one, and the scale profile does not warn that the estimate is a window
+      artifact.
+    evidence_that_would_argue_against_action: >
+      The branching ratio is near one, where the multiplier is dominated by estimation error, or
+      the decision only needs the direction of activity, where the source says the naive forecast
+      carries nearly the same information.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Forecasting more activity is not forecasting a direction; higher expected volume is as consistent with being run over as with an opportunity."
+
+  - decision_relevance_id: DR-COHERENCE-ENTRY
+    concept_id: KC-JUDGMENT-AGGREGATION
+    decision_type: entry
+    evidence_that_would_support_action: >
+      A partition breach sits on an event whose legs are priced by largely disjoint populations,
+      the legs are genuinely logically connected, and the gap clears the settlement-aware hurdle.
+    evidence_that_would_argue_against_action: >
+      The same participants price every leg, in which case the aggregation has converged and a
+      residual gap is more likely a resolution-criteria difference or an execution artifact than
+      a mispricing.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "This licenses expecting incoherence, not trading it. It says nothing about which leg is wrong."
+
+  - decision_relevance_id: DR-EARLY-WARNING-HOLD
+    concept_id: KC-EARLY-WARNING-FRAGILITY
+    decision_type: hold
+    evidence_that_would_support_action: >
+      Indicator trends are rising, the trend survives its own significance test against a
+      surrogate, and residuals still carry structure so the rise is not an artifact of the
+      detrending model.
+    evidence_that_would_argue_against_action: >
+      The detrending choice or window length was tuned until the signal appeared, or the move
+      being anticipated is a shock rather than a bifurcation, which this says nothing about.
+    minimum_required_confidence: 0.45
+    important_side_effects:
+      - "Acting on a warning that has not been tested against a null converts a high false-positive rate directly into turnover."
+
+  - decision_relevance_id: DR-CAPACITY-SIZING
+    concept_id: KC-STRATEGY-CAPACITY
+    decision_type: sizing
+    evidence_that_would_support_action: >
+      Realised return per unit has fallen as deployed size rose, across enough size variation to
+      see curvature, and the fall is not explained by execution quality over the same period.
+    evidence_that_would_argue_against_action: >
+      Size variation was chosen in response to performance, which makes the observed relationship
+      run in the wrong direction, or the edge decayed for reasons unrelated to our own size.
+    minimum_required_confidence: 0.45
+    important_side_effects:
+      - "Capacity is shared with everyone running the same strategy, so our own returns understate how close the crowd is to the limit."
