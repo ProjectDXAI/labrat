@@ -24,11 +24,11 @@ python scripts/knowledge.py status
 ## Where the work stands
 
 ```
-465 bibliographic records · 67 decomposed into 118 units · 61 units read
-19 structural findings (17 read, 1 tension, 1 conjecture)
+468 bibliographic records · 70 decomposed into 125 units · 68 units read
+25 structural findings (23 read, 1 tension, 1 conjecture)
 43 concept cards, all servable (27 anchored to a read unit, 16 to unread anchors)
-22 methods · 11 frontier bets · 18 exploratory extensions
-61 units read but not yet compiled — the current backlog
+23 methods · 11 frontier bets · 18 exploratory extensions
+68 units read but not yet compiled — the current backlog
 ```
 
 Reading is the binding constraint, and it always has been. Every finding in the file came from opening something; none came from adding another entry to the bibliography.
@@ -38,13 +38,16 @@ Reading is the binding constraint, and it always has been. Every finding in the 
 The findings file is the output. Some of it bears on the trading work and some of it plainly does not, which is the intended shape. The patterns that keep recurring are recorded at the bottom of that file under `recurring_shapes`; the ones that have shown up more than once so far:
 
 - **One inequality underwriting several apparently separate capabilities** — a maximal inequality behind continuous monitoring, a dissipation identity behind model cost, an uncertainty relation behind precision.
-- **An invariant enforced by the mechanism rather than by the participants** — atomic settlement in the token layer, categorical priority in a consensus batch, and now convex-order barriers implied by two marginals with no model at all.
+- **An invariant enforced by the mechanism rather than by the participants** — atomic settlement in the token layer, categorical priority in a consensus batch, and convex-order barriers implied by two marginals with no model at all.
+- **The mechanism decides which strategies exist, before it decides which pay** — first-come-first-served makes frontrunning inexpressible rather than expensive; a CLOB carries combinatorial structure no tractable scoring-rule maker could quote.
 - **The same object under two names in two fields with no shared citations** — adverse selection and loss-versus-rebalancing; market-maker subsidy and learner regret; and, joining those, market-maker pricing and natural gradient descent.
 
 Two results worth naming here because they change how anything gets evaluated:
 
 - **Backtest optimism is a closed form.** `R_in² / (1−q) = R_true² = (1−q) R_out²` with `q = N/T`, for a completely general population covariance. The in-sample number understates realized risk by exactly `(1−q)²`, and at `q = 1` in-sample risk is zero while out-of-sample risk diverges. No holdout is needed to correct it — it is arithmetic on two integers any harness already knows.
 - **Quoting is harder than matching.** The LMSR cost function over permutations is `b log perm(B)`, so pricing is #P-hard while matching the same divisible bet language is polynomial. A CLOB can carry combinatorial structure no tractable scoring-rule maker could quote, and the incoherence it permits is what buys the tractability.
+- **A corrective re-sort inherits the bias it was meant to remove.** Sui linearizes a committed sub-DAG by validator index — an 89% same-round ordering win with no attacker — and the gas-price re-sort that supposedly fixes this is a *stable* sort whose key is tied whenever transactions pay the reference price. Both stages are individually correct. Our venue has the same shape: proposer order breaks ties inside a batch category, so any downstream price-time rule inherits it on every equal-priced pair.
+- **Irreversibility has a closed form, and it is what makes eigenvalues untrustworthy.** The nearest reversible chain is the arithmetic mean of a kernel and its time-reversal, so `D(P || P_m)` needs no surrogate null — implemented as `reversible_projection`. Reversibility is also exactly the condition under which eigenvalue perturbation is dimension-free, which joins the irreversibility reading to the random-matrix one.
 
 The one open tension, `FIND-EXPONENT-TENSION`, is unresolved on purpose: measured Hawkes kernel exponents on equity flow sit near 0.15–0.45, `H ≈ 0.1` implies `α ≈ 0.6`, and the scaling theorem needs `α > 1/2` to give roughness at all. The three cannot all be right about the same object.
 

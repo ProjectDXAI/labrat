@@ -750,6 +750,73 @@ findings:
       the silence; measure conditional performance in the rounds where the participant did act, since
       a selective participant should show systematically better placement there than a continuous one.
 
+  - finding_id: FIND-ORDERING-RULE-SELECTS-THE-ATTACK
+    title: "The ordering rule decides which strategies exist, not which ones are profitable"
+    status: read
+    structure: "A mechanism whose tiebreak resource — fee, arrival time, or index — determines the expressible strategy set."
+    domains: [defi_mechanics, economics_information, market_microstructure]
+    correspondence: >
+      Under fee-based ordering, position is purchasable, so frontrunning and sandwiching are
+      available to anyone willing to outbid. Under first-come-first-served, position is not for
+      sale, and Oz et al. observe that frontrunning becomes inexpressible without latency
+      integration with proposers or relays rather than merely expensive. What remains is
+      backrunning, which needs only to follow. Their empirical signature is the useful part: on
+      Algorand, arbitrage MEV extracted through backruns is UNIFORMLY DISTRIBUTED across block
+      positions, and they find no evidence of latency optimization between particular searchers and
+      proposers. A uniform position distribution is what "nobody is buying position" looks like.
+    what_it_buys: >
+      It turns a qualitative claim about venue design into a measurement. The distribution of a
+      participant's fills over positions within a batch is directly observable, and its shape says
+      which regime the venue is actually in: uniform means position is not being bought, concentrated
+      at the front means it is, and the concentration is a bound on what the advantage is worth.
+      That test needs no counterfactual and no model of the strategy. It also reframes venue choice —
+      the question is not which venue has cheaper priority but which strategies its ordering rule
+      makes representable at all, since the rest are unavailable to competitors too.
+    sources_read:
+      - "arXiv 2308.06513 — Oz, Rezabek, Gebele, Hoops and Matthes, MEV extraction on a first-come-first-served blockchain, abstract and section 1"
+    agent_seed: >
+      Before modelling execution on a venue, enumerate the strategies its ordering rule makes
+      expressible and drop the rest from the search space rather than pricing them at a high cost —
+      the distinction matters because an inexpressible strategy cannot be used against you either.
+      Then build the position-distribution diagnostic as a standing monitor: histogram own and
+      counterparty fills over position-within-batch, and test against uniform. A drift away from
+      uniform is the earliest observable sign that someone has bought positional advantage, and it
+      shows up before any effect on realized prices is large enough to notice.
+
+  - finding_id: FIND-LOAD-TRIGGERED-MODE-SWITCH
+    title: "A mechanism that changes rule under load lets whoever can generate load pick the rule"
+    status: read
+    structure: "A conditional policy whose trigger is an observable the adversary controls."
+    domains: [defi_mechanics, queueing_networks, decision_sequential]
+    correspondence: >
+      Algorand orders transactions by arrival time by default and switches to fee-based ordering once
+      block-space demand causes congestion. Oz et al. separately study network clogging as a viable
+      ordering technique on first-come-first-served networks. Composing the two: congestion is the
+      switch, clogging produces congestion, so a participant able to generate load selects which of
+      the two ordering rules is in force — and therefore selects whether position is purchasable. The
+      fee-ordering regime exists precisely as the defence against overload, and it is reachable on
+      demand by the party it was meant to constrain.
+    what_it_buys: >
+      A design principle stated as a failure. A fallback conditioned on a congestion signal is not a
+      safety net if the signal is something an adversary can produce, because then the system has two
+      operating modes and the adversary has the selector. The general test is to ask, of every
+      conditional policy, who can move the condition — and to treat any policy whose trigger is
+      adversary-controlled as though both branches were always available to that adversary. This
+      applies well beyond venues: rate limiters that relax under load, retrieval that falls back to a
+      cheaper path under pressure, and agents that degrade to a simpler policy when a budget runs
+      short all hand their selector to whoever can consume the budget.
+    sources_read:
+      - "arXiv 2308.06513 — Oz, Rezabek, Gebele, Hoops and Matthes, MEV extraction on a first-come-first-served blockchain, section 1"
+    agent_seed: >
+      Audit every conditional fallback in a system by asking who controls its trigger, and record the
+      answer next to the condition in the code. Where the trigger is adversary-reachable, the correct
+      analysis is not "normal mode with a rare degraded mode" but "the adversary chooses the mode
+      each round", so evaluate the policy under both branches at once and take the worse. Prefer
+      triggers on quantities an adversary cannot cheaply move, and where none exists, make the switch
+      hysteretic and slow so that holding the system in the favourable mode carries a sustained cost
+      rather than a one-off one. For agent systems specifically: a budget-exhaustion fallback is this
+      pattern, and the party who can burn the budget picks the policy.
+
 # Patterns worth watching for, recorded so they are noticed when they recur.
 recurring_shapes:
   - shape: "A nuisance parameter turns out to select the model class"
@@ -774,6 +841,14 @@ recurring_shapes:
   - shape: "Each stage correct, the composition wrong, and only on the common input"
     instances: [FIND-STABLE-SORT-LAUNDERS-BIAS]
     why_it_matters: "Unit tests on either stage pass; the defect needs the tie rate on production data to become visible at all."
+
+  - shape: "A conditional whose trigger the adversary controls"
+    instances: [FIND-LOAD-TRIGGERED-MODE-SWITCH]
+    why_it_matters: "Two modes plus an adversary-controlled selector is one mode: the worse of the two, always available."
+
+  - shape: "The mechanism decides which strategies exist, before it decides which pay"
+    instances: [FIND-ORDERING-RULE-SELECTS-THE-ATTACK, FIND-QUOTING-IS-HARDER-THAN-MATCHING]
+    why_it_matters: "Enumerating from the mechanism prunes the strategy space before any data is touched, and the pruning is symmetric — it binds competitors too."
 
   - shape: "The null action is a move, and the model does not have a slot for it"
     instances: [FIND-ADVANTAGE-FROM-ABSTENTION]

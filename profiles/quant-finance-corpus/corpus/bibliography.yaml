@@ -21694,3 +21694,60 @@ entries:
     notes: Read directly. A validator amplifies its head start by choosing not to broadcast on most rounds, pushing
       its ordering-win rate above 94% over one-second windows. This violates no protocol rule and is not distinguishable
       from ordinary unavailability. Advantage obtained by abstaining rather than by acting.
+- id: oz-2024-mev-first-come-first-served
+  title: A Study of MEV Extraction Techniques on a First-Come-First-Served Blockchain
+  authors:
+  - Burak Öz
+  - Filip Rezabek
+  - Jonas Gebele
+  - Felix Hoops
+  - Florian Matthes
+  year: 2024
+  bucket: defi_mechanics
+  form: paper
+  priority: 5
+  status: reviewed
+  pages: 15
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2308.06513
+  tags:
+  - mev
+  - transaction-ordering
+  - fcfs
+  - latency
+  - congestion
+  - onchain
+  - hyperliquid-relevant
+  refs:
+  - target: mirzaei-2026-ordering-bias-dag-bft
+    relation: related_to
+  units:
+  - unit_id: fcfs-limits-the-strategy-set
+    topic: which extraction strategies an ordering rule makes expressible at all
+    title: null
+    locator: abstract and section 1, pp. 1-2
+    kind: paper_section
+    pages: 2
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. Under first-come-first-served ordering, frontrunning and sandwiching are not merely expensive
+      but inexpressible without latency integration with proposers or relays, so users are structurally protected
+      from them. What survives is backrunning, and the authors find arbitrage MEV on Algorand extracted through
+      backruns UNIFORMLY DISTRIBUTED across block positions — the signature of no positional advantage having been
+      purchased. On-chain data reveal no latency optimization between specific searchers and proposers.
+  - unit_id: congestion-flips-the-rule
+    topic: an ordering mechanism with a load-dependent mode switch
+    title: null
+    locator: section 1, p. 1
+    kind: paper_section
+    pages: 1
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Algorand''s consensus nodes order by arrival time BY DEFAULT, and switch to fee-based
+      ordering once block-space demand causes congestion. The paper studies network clogging as a viable ordering
+      technique for FCFS networks. The two facts compose: an attacker who can generate load chooses which of the
+      two ordering rules is in force.'
