@@ -81,7 +81,7 @@ Not captured: own-order queue rank, individual order lifecycle events, fee sched
 
 ### Compile the backlog
 
-61 units are read and not yet compiled. That is now the largest gap in the system — material has been opened and the cards do not reflect it. `python scripts/knowledge.py compile-queue` ranks it.
+68 units are read and not yet compiled. That is now the largest gap in the system — material has been opened and the cards do not reflect it. `python scripts/knowledge.py compile-queue` ranks it.
 
 ### Read next
 
