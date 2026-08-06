@@ -421,12 +421,38 @@ python scripts/knowledge.py digest --context ctx.json --markdown
 python scripts/knowledge.py digest --context ctx.json --compare
 ```
 
-Each anchor is offered at four tiers: `card` (the card's own fields, no source text),
-`note` (the reading note recorded when someone read that unit), `excerpt` (quoted passage
-text from the held pages, capped), and `unit` (every page the unit spans). Three things
-decide which one it gets.
+### Units and pages are not the same thing
 
-**Rights cap it.** A `reference_only` source can be cited and paraphrased from our own
+A **unit** is a semantic reading target declared by hand in `bibliography.yaml`: a topic,
+a locator, a priority, a read status, and a note. This corpus has 105 of them across 59
+entries, median 15 declared pages.
+
+A **page** is a physical extracted PDF page in `corpus/passages/passages.jsonl`. There are
+5,963 of them across 64 entries, averaging about 372 tokens each, 2.2M tokens in total.
+
+The join between the two is the locator string, and it is weak: **only 11 of 105 units
+name a page range a parser can resolve.** The rest say "sections 3-4", "the empirical
+section", "whole paper". A unit with no resolvable range does not get a `unit` tier at
+all, because the fallback span is the entire entry and serving that under the name of one
+section is how a card claiming to rest on an empirical section arrives carrying 54 pages.
+Those anchors get an excerpt instead, and `locators_unresolved` counts them, because the
+fix is to write page numbers into the locator.
+
+### The five tiers
+
+| tier | what it is | typical size |
+| --- | --- | --- |
+| `card` | the concept card's own fields, no source text | 0 |
+| `note` | the reading note recorded when someone read that unit | ~40 tokens |
+| `excerpt` | quoted passage text from the resolved pages, capped at `excerpt_chars` | up to 5,000 tokens |
+| `unit` | every page the unit names, only when the locator resolves | 1–90k tokens |
+| `source` | every page of the entry | 100–200k tokens |
+
+Three things decide which one an anchor gets.
+
+**Rights cap it.** The four `ingest_*` classes that clear derivative use reach `source`.
+`ingest_check_terms` does not, because its whole meaning is that the terms were never
+read. A `reference_only` source can be cited and paraphrased from our own
 notes; its text does not enter the packet. The ceiling is taken from the stricter of the
 bibliography's derived rights and the class stamped on each extracted page, because when
 those two disagree it usually means one has not been re-checked. No trigger lifts a
@@ -452,10 +478,44 @@ will buy four notes instead of one full unit when that is the better packet. Wat
 work by tightening the budget on the same context:
 
 ```
-budget 6000   1 unit + 1 excerpt    1892 tokens
-budget 1200   2 excerpts             696 tokens
-budget  400   1 excerpt + 1 card     348 tokens
+budget 60000   1 excerpt + 1 excerpt    6,544 tokens
+budget  1200   2 excerpts                 696 tokens
+budget   400   1 excerpt + 1 card         348 tokens
 ```
+
+Identical text is bought once. Two anchors on the same entry — common, since most
+locators fall back to the whole entry — hold byte-identical passages, and nothing in a
+knapsack stops it buying both. The anchor with the most at stake carries the passage and
+the others record `shares_text_with`. On one real context that is the difference between
+31,699 and 53,398 tokens for the same material.
+
+### Bringing in a whole source
+
+The default is deliberately not the whole thing: `source` tier is never reached by a
+trigger. Escalation answers "the card is not enough here"; it has no opinion on whether a
+200,000-token course should be paged in. That is an operator decision, so it has to be
+stated.
+
+```bash
+python scripts/knowledge.py digest --context ctx.json --full he-2022-fundamentals-perpetual-futures
+python scripts/knowledge.py digest --context ctx.json --full-all
+```
+
+Or permanently, on the bibliography entry, for a source that should always arrive
+complete:
+
+```yaml
+- id: he-2022-fundamentals-perpetual-futures
+  digest_full_text: true
+```
+
+The licence still outranks the request. Asking for a `reference_only` source in full
+returns its note and a line in `refused_by_rights`.
+
+**What is actually reachable.** Of the 2.2M tokens extracted from this corpus, about
+800k across 8 entries sit under `ingest_noncommercial` or `ingest_attribution` and can be
+served whole. The other 1.4M across 56 entries is `reference_only` or `needs_review` and
+stops at the note, whatever any flag says.
 
 ### Two things the digest reports that are not tier choices
 

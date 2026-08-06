@@ -56,12 +56,28 @@ TIER_CARD = 0
 TIER_NOTE = 1
 TIER_EXCERPT = 2
 TIER_UNIT = 3
+TIER_SOURCE = 4
 
-TIER_NAMES = {TIER_CARD: "card", TIER_NOTE: "note", TIER_EXCERPT: "excerpt", TIER_UNIT: "unit"}
+TIER_NAMES = {
+    TIER_CARD: "card",
+    TIER_NOTE: "note",
+    TIER_EXCERPT: "excerpt",
+    TIER_UNIT: "unit",
+    TIER_SOURCE: "source",
+}
+TIER_ORDER = [TIER_NAMES[i] for i in sorted(TIER_NAMES)]
 
 # What each tier is worth relative to the card alone. Strongly diminishing: the whole
-# unit is rarely twice the packet that a well-chosen excerpt is, and it costs far more.
-TIER_GAIN = {TIER_CARD: 1.0, TIER_NOTE: 1.30, TIER_EXCERPT: 1.75, TIER_UNIT: 1.95}
+# unit is rarely twice the packet a well-chosen excerpt is, and it costs far more. The
+# source tier barely gains over the unit on value alone -- it is not chosen for its score,
+# it is chosen because someone said this source comes in whole.
+TIER_GAIN = {
+    TIER_CARD: 1.0,
+    TIER_NOTE: 1.30,
+    TIER_EXCERPT: 1.75,
+    TIER_UNIT: 1.95,
+    TIER_SOURCE: 2.05,
+}
 
 # The ceiling a rights class puts on tier. Not a preference and not overridable: a
 # trigger can ask for the text and still be refused it.
@@ -71,10 +87,10 @@ TIER_GAIN = {TIER_CARD: 1.0, TIER_NOTE: 1.30, TIER_EXCERPT: 1.75, TIER_UNIT: 1.9
 # not a permissive one. `needs_review` and `reference_only` stop at the note, because a
 # note is our own writing about the source rather than the source.
 RIGHTS_CEILING = {
-    "ingest_full": TIER_UNIT,
-    "ingest_attribution": TIER_UNIT,
-    "ingest_share_alike": TIER_UNIT,
-    "ingest_noncommercial": TIER_UNIT,
+    "ingest_full": TIER_SOURCE,
+    "ingest_attribution": TIER_SOURCE,
+    "ingest_share_alike": TIER_SOURCE,
+    "ingest_noncommercial": TIER_SOURCE,
     "ingest_check_terms": TIER_NOTE,
     "reference_only": TIER_NOTE,
     "needs_review": TIER_NOTE,
@@ -102,9 +118,15 @@ def unmapped_rights_classes() -> list[str]:
 
 
 DEFAULT_DIGEST_POLICY: dict[str, Any] = {
-    "budget_tokens": 6000,
+    # A modern context window is the real ceiling, not a number chosen to feel careful.
+    # 60k leaves a long-context model most of its window for the reasoning it was given
+    # the material for. Lower it when the packet feeds something smaller.
+    "budget_tokens": 60000,
     "confidence_floor": 0.6,
-    "excerpt_chars": 1400,
+    # An excerpt used to be 1400 characters, which is under a third of one extracted page
+    # and reads as a teaser rather than evidence. Roughly five pages is a passage someone
+    # could actually adjudicate a contradiction with.
+    "excerpt_chars": 20000,
     # A trigger raises the floor for one anchor; it never lowers it and never lifts the
     # rights ceiling. Weight is added to the anchor's value so the knapsack prefers to
     # spend on anchors that actually need the text.
@@ -116,6 +138,25 @@ DEFAULT_DIGEST_POLICY: dict[str, Any] = {
         "load_bearing": {"floor": TIER_EXCERPT, "weight": 0.4},
     },
 }
+
+
+def wants_full_text(entry: dict[str, Any] | None, requested: set[str]) -> bool:
+    """Whether this source is one we have said should come in whole.
+
+    A trigger can never reach the source tier on its own. Escalation answers "the card is
+    not enough here"; it has no opinion on whether a 200,000-token course should be paged
+    in. That is an operator decision, so it has to be stated: `--full <id>` on the command,
+    `--full-all` for everything the licences allow, or `digest_full_text: true` on the
+    bibliography entry for a source that should always arrive complete.
+    """
+    if not entry:
+        return False
+    if entry.get("id") in requested or "*" in requested:
+        return True
+    flag = entry.get("digest_full_text")
+    if flag is None:
+        flag = (entry.get("digest") or {}).get("full_text")
+    return bool(flag)
 
 
 def estimate_tokens(text: str) -> int:
@@ -194,6 +235,13 @@ def unit_passages(
 # --------------------------------------------------------------------------------------
 # Candidates
 # --------------------------------------------------------------------------------------
+
+
+def entry_passages(
+    entry_id: str, passages: dict[str, list[dict[str, Any]]]
+) -> list[dict[str, Any]]:
+    """Every extracted page of an entry, whatever any unit says."""
+    return passages.get(entry_id) or []
 
 
 def rights_ceiling(entry: dict[str, Any] | None, rows: list[dict[str, Any]]) -> tuple[int, str]:
@@ -275,6 +323,7 @@ def build_candidates(
     passages: dict[str, list[dict[str, Any]]],
     context: dict[str, Any],
     policy: dict[str, Any],
+    full_requests: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     """One candidate per (card, anchor), carrying every tier it could legally be served at."""
     cards = packet.get("cards") or []
@@ -302,13 +351,22 @@ def build_candidates(
                     unit = row
                     break
 
+            all_rows = entry_passages(source_id, passages)
             rows = unit_passages(source_id, unit, passages)
-            ceiling, binding_class = rights_ceiling(entry, rows)
+            # A locator that names no pages falls back to the whole entry. That is often
+            # the only sensible read, but it means the "unit" tier is not really a unit,
+            # and three units of one paper can each claim the same pages.
+            locator_unresolved = bool(rows) and locator_pages((unit or {}).get("locator")) is None
+            full_text = wants_full_text(entry, full_requests or set())
+            ceiling, binding_class = rights_ceiling(entry, all_rows or rows)
             triggers = fire_triggers(
                 card, _key(ref), unit, rows, packet, query_terms, anchor_card_count, policy
             )
 
-            options = _tier_options(card, unit, rows, ceiling, policy)
+            options = _tier_options(
+                card, unit, rows, all_rows, ceiling, policy, full_text,
+                locator_resolved=not locator_unresolved,
+            )
             floor = TIER_CARD
             for trigger in triggers:
                 want = policy["triggers"].get(trigger["trigger"], {}).get("floor", TIER_CARD)
@@ -334,12 +392,54 @@ def build_candidates(
                 # not hold it. That is a fetch instruction, not a policy decision.
                 "starved": wanted > best_available and floor <= ceiling,
                 "best_available": TIER_NAMES[best_available],
+                "locator_unresolved": locator_unresolved,
+                "full_text_requested": full_text,
+                # Anchors resolving to the same pages are the same tokens. Buying them
+                # twice is the most expensive mistake this allocator could make.
+                "text_key": f"{source_id}:{','.join(str(r.get('page')) for r in rows)}",
                 "base_value": float(card.get("score") or 0.0) + 0.1,
                 "trigger_weight": sum(t["weight"] for t in triggers),
                 "triggers": triggers,
                 "options": options,
                 "pages_available": len(rows),
             })
+
+    return _dedupe_shared_text(candidates)
+
+
+def _dedupe_shared_text(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Stop the allocator paying twice for one passage.
+
+    Ninety-four of this corpus's hundred-and-five units carry a locator with no page
+    numbers, and every anchor on an entry served whole offers that entire entry. Either
+    way two anchors can hold byte-identical text, and nothing in a knapsack stops it
+    buying both. Keying on the text rather than on the unit catches it at every tier: the
+    anchor with the most at stake carries the passage, the others drop that option and
+    record who is carrying it for them. Text they do not share, such as their own reading
+    note, they keep.
+    """
+    holders: dict[str, list[dict[str, Any]]] = {}
+    for candidate in candidates:
+        for option in candidate["options"]:
+            if option.get("text"):
+                holders.setdefault(option["text"], []).append(candidate)
+
+    carrier = {
+        text: max(group, key=lambda c: c["base_value"] + c["trigger_weight"])
+        for text, group in holders.items()
+        if len(group) > 1
+    }
+
+    for candidate in candidates:
+        kept = []
+        for option in candidate["options"]:
+            owner = carrier.get(option.get("text") or "")
+            if owner is not None and owner is not candidate:
+                candidate["shares_text_with"] = owner["concept_id"]
+                continue
+            kept.append(option)
+        candidate["options"] = kept
+        candidate["best_available"] = TIER_NAMES[max(o["tier"] for o in kept)]
     return candidates
 
 
@@ -359,8 +459,11 @@ def _tier_options(
     card: dict[str, Any],
     unit: dict[str, Any] | None,
     rows: list[dict[str, Any]],
+    all_rows: list[dict[str, Any]],
     ceiling: int,
     policy: dict[str, Any],
+    full_text: bool,
+    locator_resolved: bool = True,
 ) -> list[dict[str, Any]]:
     """Every tier this anchor can actually be served at, with its real token cost.
 
@@ -375,7 +478,7 @@ def _tier_options(
         options.append({"tier": TIER_NOTE, "text": note.strip(), "tokens": estimate_tokens(note)})
 
     if rows and ceiling >= TIER_EXCERPT:
-        cap = policy["excerpt_chars"]
+        cap = int(policy["excerpt_chars"])
         joined = "\n\n".join((row.get("text") or "").strip() for row in rows)
         excerpt = joined[:cap].rsplit(" ", 1)[0] if len(joined) > cap else joined
         if excerpt:
@@ -385,12 +488,29 @@ def _tier_options(
                 "tokens": estimate_tokens(excerpt),
                 "pages": [row.get("page") for row in rows[:3]],
             })
-        if ceiling >= TIER_UNIT and len(joined) > len(excerpt):
+        # `unit` means the pages this unit names. When the locator names none -- and
+        # ninety-four of this corpus's hundred-and-five units name none -- the span behind
+        # it is the whole entry, and serving that as a "unit" is how a card claiming to
+        # rest on one empirical section quietly arrives carrying fifty-four pages. The
+        # excerpt still gives a usable read of it; the whole thing needs asking for.
+        if ceiling >= TIER_UNIT and locator_resolved and len(joined) > len(excerpt):
             options.append({
                 "tier": TIER_UNIT,
                 "text": joined,
                 "tokens": estimate_tokens(joined),
                 "pages": [row.get("page") for row in rows],
+            })
+
+    # The whole source, only when someone asked for it by name and the licence allows it.
+    if full_text and ceiling >= TIER_SOURCE and all_rows:
+        whole = "\n\n".join((row.get("text") or "").strip() for row in all_rows)
+        biggest = max((o["tokens"] for o in options), default=0)
+        if estimate_tokens(whole) > biggest:
+            options.append({
+                "tier": TIER_SOURCE,
+                "text": whole,
+                "tokens": estimate_tokens(whole),
+                "pages": [row.get("page") for row in all_rows],
             })
     return options
 
@@ -485,8 +605,9 @@ def digest(
     context: dict[str, Any],
     policy: dict[str, Any],
     arm: str = "policy",
+    full_requests: set[str] | None = None,
 ) -> dict[str, Any]:
-    candidates = build_candidates(packet, sources, passages, context, policy)
+    candidates = build_candidates(packet, sources, passages, context, policy, full_requests)
     budget = int(policy["budget_tokens"])
 
     if arm == "policy":
@@ -516,6 +637,8 @@ def digest(
             "served_because": [t["trigger"] for t in candidate["triggers"]]
             if option["tier"] > TIER_CARD
             else [],
+            "locator_unresolved": candidate["locator_unresolved"],
+            "shares_text_with": candidate.get("shares_text_with"),
             "refused_by_rights": candidate["floor_refused_by_rights"],
             "text": option.get("text"),
         })
@@ -572,6 +695,12 @@ def digest(
         ],
         "refused_by_rights": refused,
         "starved": starved,
+        "full_text_served": sorted(
+            {row["source_id"] for row in included if row["tier"] == "source"}
+        ),
+        # Units whose locator names no pages fall back to the whole entry. Worth knowing:
+        # it is the difference between a chosen span and an accident.
+        "locators_unresolved": sum(1 for c in candidates if c["locator_unresolved"]),
         "passages": included,
     }
 
@@ -582,10 +711,12 @@ def compare_arms(
     passages: dict[str, list[dict[str, Any]]],
     context: dict[str, Any],
     policy: dict[str, Any],
+    full_requests: set[str] | None = None,
 ) -> dict[str, Any]:
     """Run all three arms so the policy has to show it is worth the tokens it spends."""
     runs = {
-        arm: digest(packet, sources, passages, context, policy, arm=arm)
+        arm: digest(packet, sources, passages, context, policy, arm=arm,
+                    full_requests=full_requests)
         for arm in ("never", "policy", "always")
     }
 
@@ -753,6 +884,9 @@ def _candidate(**over: Any) -> dict[str, Any]:
         "floor_refused_by_rights": False,
         "starved": False,
         "best_available": "unit",
+        "locator_unresolved": False,
+        "full_text_requested": False,
+        "text_key": "src:1,2,3",
         "base_value": 1.0,
         "trigger_weight": 0.0,
         "triggers": [],
@@ -843,8 +977,73 @@ def self_test() -> dict[str, Any]:
 
     # A tier with no material behind it must not be offered, or the knapsack buys nothing
     # cheaply and reports it as coverage.
-    options = _tier_options({}, None, [], TIER_UNIT, DEFAULT_DIGEST_POLICY)
+    options = _tier_options({}, None, [], [], TIER_UNIT, DEFAULT_DIGEST_POLICY, False)
     assert [o["tier"] for o in options] == [TIER_CARD], options
     checks.append("tiers: an unread anchor with no extracted text offers only the card")
+
+    # The whole source is an operator decision, never a trigger's. A ceiling that allows
+    # it still must not produce it unasked.
+    rows = [{"page": n, "text": "x" * 800, "use_class": "ingest_full"} for n in range(1, 9)]
+    unasked = _tier_options({}, {"notes": "n", "locator": "pp. 1-2"}, rows[:2], rows,
+                            TIER_SOURCE, {**DEFAULT_DIGEST_POLICY, "excerpt_chars": 500}, False)
+    assert max(o["tier"] for o in unasked) < TIER_SOURCE, unasked
+    asked = _tier_options({}, {"notes": "n", "locator": "pp. 1-2"}, rows[:2], rows,
+                          TIER_SOURCE, {**DEFAULT_DIGEST_POLICY, "excerpt_chars": 500}, True)
+    assert max(o["tier"] for o in asked) == TIER_SOURCE, asked
+    source_option = [o for o in asked if o["tier"] == TIER_SOURCE][0]
+    assert len(source_option["pages"]) == 8, source_option["pages"]
+    checks.append("source: the whole entry arrives only when it was asked for by name")
+
+    # A unit whose locator names no pages is not a unit. Serving the entry under that
+    # name is how "the empirical section" turns into fifty-four pages nobody asked for.
+    vague = _tier_options({}, {"notes": "n", "locator": "empirical section"}, rows, rows,
+                          TIER_SOURCE, {**DEFAULT_DIGEST_POLICY, "excerpt_chars": 500},
+                          False, locator_resolved=False)
+    assert max(o["tier"] for o in vague) == TIER_EXCERPT, vague
+    tight = {**DEFAULT_DIGEST_POLICY, "excerpt_chars": 500}
+    precise = _tier_options({}, {"notes": "n", "locator": "pp. 1-8"}, rows, rows,
+                            TIER_SOURCE, tight, False, locator_resolved=True)
+    assert max(o["tier"] for o in precise) == TIER_UNIT, precise
+    checks.append("units: a unit with no page range cannot serve the entry as its unit tier")
+
+    # And a licence still outranks the request.
+    refused = _tier_options({}, {"notes": "n", "locator": "pp. 1-2"}, rows[:2], rows,
+                            TIER_NOTE, {**DEFAULT_DIGEST_POLICY, "excerpt_chars": 500}, True)
+    assert max(o["tier"] for o in refused) == TIER_NOTE, refused
+    checks.append("source: asking for the whole entry does not defeat the rights ceiling")
+
+    # Opt-in is read from the entry as well as the command line.
+    assert wants_full_text({"id": "a", "digest_full_text": True}, set())
+    assert wants_full_text({"id": "a", "digest": {"full_text": True}}, set())
+    assert wants_full_text({"id": "a"}, {"a"})
+    assert not wants_full_text({"id": "a"}, {"b"})
+    assert not wants_full_text(None, {"a"})
+    checks.append("source: the opt-in reads the bibliography flag and the command line")
+
+    # Two anchors holding identical text must not both be paid for, at any tier.
+    def _with(text_by_tier: dict[int, str], **over: Any) -> dict[str, Any]:
+        return _candidate(
+            options=[{"tier": TIER_CARD, "text": None, "tokens": 0}]
+            + [
+                {"tier": tier, "text": body, "tokens": estimate_tokens(body)}
+                for tier, body in sorted(text_by_tier.items())
+            ],
+            **over,
+        )
+
+    whole = "the entire paper" * 400
+    shared = [
+        _with({TIER_NOTE: "note a", TIER_SOURCE: whole}, concept_id="KC-A", anchor="a", base_value=2.0),
+        _with({TIER_NOTE: "note b", TIER_SOURCE: whole}, concept_id="KC-B", anchor="b", base_value=0.5),
+    ]
+    deduped = _dedupe_shared_text(shared)
+    keeper = [c for c in deduped if c["concept_id"] == "KC-A"][0]
+    shadow = [c for c in deduped if c["concept_id"] == "KC-B"][0]
+    assert max(o["tier"] for o in keeper["options"]) == TIER_SOURCE, keeper["options"]
+    assert max(o["tier"] for o in shadow["options"]) == TIER_NOTE, shadow["options"]
+    assert shadow["shares_text_with"] == "KC-A"
+    # The shadow keeps its own note: that text is not shared, only the source was.
+    assert any(o.get("text") == "note b" for o in shadow["options"]), shadow["options"]
+    checks.append("dedupe: identical text is bought once at any tier, distinct notes survive")
 
     return {"ok": True, "checks": checks}

@@ -2038,9 +2038,12 @@ def cmd_digest(args: argparse.Namespace) -> int:
         digest_policy["budget_tokens"] = args.budget
 
     passages = digest_module.load_passages((corpus_dir or (lab_root / "corpus")).resolve())
+    full_requests = {"*"} if args.full_all else set(args.full or [])
 
     if args.compare:
-        report = digest_module.compare_arms(packet, sources, passages, context, digest_policy)
+        report = digest_module.compare_arms(
+            packet, sources, passages, context, digest_policy, full_requests
+        )
         if args.out:
             write_json(args.out, report)
             print(json.dumps({"comparison": str(args.out), **report["arms"]}, indent=2))
@@ -2048,7 +2051,10 @@ def cmd_digest(args: argparse.Namespace) -> int:
         print(json.dumps(report, indent=2))
         return 0
 
-    result = digest_module.digest(packet, sources, passages, context, digest_policy, arm=args.arm)
+    result = digest_module.digest(
+        packet, sources, passages, context, digest_policy, arm=args.arm,
+        full_requests=full_requests,
+    )
 
     if args.markdown:
         text = digest_module.render_digest(result)
@@ -2232,6 +2238,10 @@ def build_parser() -> argparse.ArgumentParser:
     digest_cmd.add_argument("--policy", default=None)
     digest_cmd.add_argument("--k", type=int, default=None)
     digest_cmd.add_argument("--budget", type=int, default=None, help="token ceiling for source text")
+    digest_cmd.add_argument("--full", action="append", default=None, metavar="SOURCE_ID",
+                            help="bring this source in whole when the licence allows; repeatable")
+    digest_cmd.add_argument("--full-all", action="store_true",
+                            help="bring every source in whole that the licences allow")
     digest_cmd.add_argument("--abstain-threshold", type=float, default=None,
                             help="override the retrieval abstain threshold for this run")
     digest_cmd.add_argument("--arm", choices=["policy", "never", "always"], default="policy",

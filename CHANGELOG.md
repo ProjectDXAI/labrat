@@ -13,8 +13,26 @@
   on tier agreement and cost share, so the triggers have to justify their tokens.
 - The digest reports two things separately from tier choice: anchors refused by a
   licence, and anchors that a trigger asked for and the lab does not hold.
+- `digest --full <id>` / `--full-all`, and a `digest_full_text` flag on a bibliography
+  entry, to bring a whole source into the packet. The `source` tier is never reached by
+  an escalation trigger: whether a 200k-token course pages in is an operator decision.
 - `make web` / `make web-data` and the corpus explorer under `web/`, documented in
   `docs/EXPLORER.md`.
+
+### Changed
+
+- Digest defaults raised for long-context use: budget 6k -> 60k tokens, excerpt cap
+  1,400 -> 20,000 characters. The old excerpt was under a third of one extracted page.
+- The four `ingest_*` classes that clear derivative use now reach the `source` tier.
+
+### Fixed
+
+- A unit whose locator names no pages no longer serves the whole entry as its `unit`
+  tier. Ninety-four of this corpus's hundred-and-five units are in that state, so a card
+  anchored to "the empirical section" was arriving with all 54 pages of the paper.
+  `locators_unresolved` now counts them.
+- Identical passages are bought once. Two anchors on one entry could each pay for the
+  same span; on one real context that was 53,398 tokens for 31,699 tokens of material.
 
 ## 0.21.0 - 2026-08-06
 
