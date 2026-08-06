@@ -4,6 +4,11 @@
 
 ### Added
 
+- `ingest_manifest.py` turns a research agent's YAML manifest into bibliography entries.
+  Nothing it adds is marked owned: a manifest entry is something located, not held, which
+  is the whole point of an acquisition list. Near-duplicate detection uses the same key
+  `corpus.py validate` warns on.
+
 - `knowledge.py admission`: a source-level gate. A source counts as admitted only once it
   has produced an anchored card, that card's assumptions and failure modes, a falsifiable
   hypothesis, named observables, a bound method where it claims an implementation, a
