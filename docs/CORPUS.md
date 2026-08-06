@@ -174,8 +174,12 @@ A bucket is `saturated` when two consecutive **expansion** rounds add nothing ne
 ```bash
 python scripts/resolve.py identify --limit 400        # title -> DOI, against Crossref
 python scripts/resolve.py licence  --limit 60         # DOI -> licence, from the landing page
+python scripts/resolve.py arxiv    --delay 5.0        # slow dedicated preprint harvest
+python scripts/resolve.py study --dest corpus/study   # reading copies of freely served full text
 python scripts/resolve.py fetch --dest corpus/sources # only what the manifest already admits
 ```
+
+`arxiv` is a separate pass rather than a step inside `identify` because it used to be a passenger on it, sharing its pace and its circuit breaker. arXiv throttles hard and recovers, so one throttle partway through a run killed the index for every title after it. Preprints are the largest pool of readable full text the corpus has any claim on, which earns them their own pass at their own rate.
 
 Three rules do the work:
 

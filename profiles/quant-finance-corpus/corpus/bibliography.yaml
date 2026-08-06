@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T06:51:12.191921+00:00'
+updated_at: '2026-08-06T08:08:12.806152+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -159,8 +159,8 @@ entries:
   venue: American Journal of Epidemiology 178(9)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/aje/kwt133
+    url: https://doi.org/10.1093/aje/kwt133
   pages: 8
   density: high
   priority: 5
@@ -207,8 +207,8 @@ entries:
   venue: Journal of the American Statistical Association 94(446)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/01621459.1999.10474144
+    url: https://doi.org/10.1080/01621459.1999.10474144
   pages: 14
   density: high
   priority: 5
@@ -245,6 +245,61 @@ entries:
     than one event. `continuation_hazard` currently models the marginal hazard of a single cause, which is the exact
     error this paper exists to correct: the cumulative incidence of one cause is not recoverable from its cause-specific
     hazard alone.
+
+    '
+- id: gama-2014-survey-concept-drift-adaptation
+  title: A Survey on Concept Drift Adaptation
+  authors:
+  - João Gama
+  - Indrė Žliobaitė
+  - Albert Bifet
+  - Mykola Pechenizkiy
+  - Abdelhamid Bouchachia
+  year: 2014
+  bucket: adjacent_disciplines
+  form: survey
+  venue: ACM Computing Surveys 46(4)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 37
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: montgomery-2019-statistical-quality-control
+    relation: cites
+  - target: basseville-1993-detection-abrupt-changes
+    relation: cites
+  - target: meeker-1998-statistical-methods-reliability
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - concept-drift
+  - adaptation
+  - streams
+  - transfer
+  - regime
+  - agentic
+  notes: 'The machine-learning name for a model whose world changed underneath it, with a taxonomy of drift types
+    and the detectors and forgetting schemes that go with each. A trading model decaying toward its cost floor is
+    concept drift, and this field has both the detection machinery and the honest accounting of how often detectors
+    fire on nothing.
 
     '
 - id: gneiting-2007-calibration-and-sharpness
@@ -296,6 +351,184 @@ entries:
     is.
 
     '
+- id: gostic-2020-practical-considerations-rt
+  title: Practical Considerations for Measuring the Effective Reproductive Number, Rt
+  authors:
+  - Katelyn M. Gostic
+  - Lauren McGough
+  - Edward B. Baskerville
+  - Sam Abbott
+  - Keya Joshi
+  - Christine Tedijanto
+  - Rebecca Kahn
+  - Rene Niehus
+  - James A. Hay
+  - Pablo M. De Salazar
+  - Joel Hellewell
+  - Sophie Meakin
+  - James D. Munday
+  - Nikos I. Bosse
+  - Katharine Sherrat
+  - Robin N. Thompson
+  - Laura F. White
+  - Jana S. Huisman
+  - Jérémie Scire
+  - Sebastian Bonhoeffer
+  - Tanja Stadler
+  - Jacco Wallinga
+  - Sebastian Funk
+  - Aaron A. King
+  - Sarah Cobey
+  year: 2020
+  bucket: adjacent_disciplines
+  form: paper
+  venue: PLOS Computational Biology 16(12)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 21
+  density: high
+  priority: 5
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: cori-2013-estimating-time-varying-reproduction-numbers
+    relation: builds_on
+  - target: wallinga-2004-different-epidemic-curves
+    relation: builds_on
+  - target: hardiman-2013-critical-reflexivity
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - reproduction-number
+  - real-time
+  - bias
+  - transfer
+  - hawkes
+  - open-access
+  notes: 'A catalogue of the ways a real-time branching-ratio estimate goes wrong: right-truncation from reporting
+    delay, smoothing that shifts the estimate in time, and the difference between the instantaneous and case reproduction
+    numbers. Every one of those has an exact analogue in estimating reflexivity from a live feed with sequencing
+    gaps, and none of them is discussed in the finance Hawkes literature. PLOS is CC BY, so this one is acquirable.
+
+    '
+- id: hernan-2016-target-trial-emulation
+  title: Using Big Data to Emulate a Target Trial When a Randomized Trial Is Not Available
+  authors:
+  - Miguel A. Hernán
+  - James M. Robins
+  year: 2016
+  bucket: adjacent_disciplines
+  form: paper
+  venue: American Journal of Epidemiology 183(8)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hernan-2020-causal-inference-what-if
+    relation: builds_on
+  - target: gerber-2012-field-experiments
+    relation: cites
+  - target: imbens-2015-causal-inference
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - target-trial
+  - observational
+  - design
+  - transfer
+  - agentic
+  - gate2
+  notes: 'Before analysing observational data, write down the randomized trial you would have run, then say exactly
+    where the data departs from it. It converts vague concerns about confounding into a specific list of discrepancies.
+    That is the discipline our Gate 2 behavioural comparison needs, since it will be run on historical traces rather
+    than on a randomized arm.
+
+    '
+- id: hudgens-2008-causal-inference-interference
+  title: Toward Causal Inference With Interference
+  authors:
+  - Michael G. Hudgens
+  - M. Elizabeth Halloran
+  year: 2008
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Journal of the American Statistical Association 103(482)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 12
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: imbens-2015-causal-inference
+    relation: builds_on
+  - target: cameron-2015-cluster-robust-inference
+    relation: cites
+  - target: cardaliaguet-2018-mean-field-game-trade-crowding
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - interference
+  - spillover
+  - sutva
+  - transfer
+  - agentic
+  notes: 'When one unit''s treatment affects another unit''s outcome, the usual estimands are not even defined and
+    this paper defines the ones that are: direct, indirect, total and overall effects under partial interference.
+    Two paper accounts trading the same book violate no-interference by construction, so a branch-randomized trial
+    is exactly this setting and the naive difference in means is estimating something nobody named.
+
+    '
 - id: jennison-1999-group-sequential-methods
   title: Group Sequential Methods with Applications to Clinical Trials
   authors:
@@ -307,8 +540,8 @@ entries:
   venue: Chapman and Hall/CRC
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1201/9780367805326
+    url: https://doi.org/10.1201/9780367805326
   pages: 390
   density: high
   priority: 5
@@ -359,8 +592,8 @@ entries:
   venue: Seismological Research Letters 77(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1785/gssrl.77.1.3
+    url: https://doi.org/10.1785/gssrl.77.1.3
   pages: 4
   density: high
   priority: 5
@@ -409,8 +642,8 @@ entries:
   venue: Journal of Applied Meteorology 12(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1175/1520-0450(1973)012<0595:anvpot>2.0.co;2
+    url: https://doi.org/10.1175/1520-0450(1973)012<0595:anvpot>2.0.co;2
   pages: 6
   density: high
   priority: 5
@@ -459,8 +692,8 @@ entries:
   venue: Journal of the American Statistical Association 83(401)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/01621459.1988.10478560
+    url: https://doi.org/10.1080/01621459.1988.10478560
   pages: 19
   density: high
   priority: 5
@@ -626,8 +859,8 @@ entries:
   venue: Seismological Research Letters 78(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1785/gssrl.78.1.17
+    url: https://doi.org/10.1785/gssrl.78.1.17
   pages: 13
   density: high
   priority: 5
@@ -679,8 +912,8 @@ entries:
   venue: Journal of the American Statistical Association 113(522)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/01621459.2018.1448823
+    url: https://doi.org/10.1080/01621459.2018.1448823
   pages: 8
   density: high
   priority: 5
@@ -779,8 +1012,8 @@ entries:
   venue: Medical Decision Making 26(6)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1177/0272989x06295361
+    url: https://doi.org/10.1177/0272989x06295361
   pages: 9
   density: high
   priority: 5
@@ -877,8 +1110,8 @@ entries:
   venue: American Journal of Epidemiology 160(6)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/aje/kwh255
+    url: https://doi.org/10.1093/aje/kwh255
   pages: 8
   density: high
   priority: 5
@@ -928,8 +1161,8 @@ entries:
   venue: Journal of the American Statistical Association 97(458)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1198/016214502760046925
+    url: https://doi.org/10.1198/016214502760046925
   pages: 12
   density: high
   priority: 5
@@ -1017,6 +1250,54 @@ entries:
     two.
 
     '
+- id: bifet-2007-adwin-adaptive-windowing
+  title: Learning from Time-Changing Data with Adaptive Windowing
+  authors:
+  - Albert Bifet
+  - Ricard Gavaldà
+  year: 2007
+  bucket: adjacent_disciplines
+  form: proceedings
+  venue: SIAM International Conference on Data Mining 2007
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 6
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gama-2014-survey-concept-drift-adaptation
+    relation: builds_on
+  - target: page-1954-continuous-inspection-schemes
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - adaptive-window
+  - drift-detection
+  - streams
+  - transfer
+  - regime
+  notes: 'Chooses the estimation window from the data instead of fixing it, with a bound on the false-alarm rate.
+    Every estimator we run has a window chosen by hand, and the window is usually the parameter that decides the
+    answer.
+
+    '
 - id: brier-1950-verification-of-forecasts
   title: Verification of Forecasts Expressed in Terms of Probability
   authors:
@@ -1027,8 +1308,8 @@ entries:
   venue: Monthly Weather Review 78(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2
+    url: https://doi.org/10.1175/1520-0493(1950)078<0001:vofeit>2.0.co;2
   pages: 3
   density: high
   priority: 4
@@ -1107,6 +1388,62 @@ entries:
   - actuarial
   - transfer
   notes: null
+- id: funk-2019-assessing-realtime-forecasts
+  title: 'Assessing the Performance of Real-Time Epidemic Forecasts: A Case Study of Ebola in the Western Area Region
+    of Sierra Leone'
+  authors:
+  - Sebastian Funk
+  - Anton Camacho
+  - Adam J. Kucharski
+  - Rachel Lowe
+  - Rosalind M. Eggo
+  - W. John Edmunds
+  year: 2019
+  bucket: adjacent_disciplines
+  form: paper
+  venue: PLOS Computational Biology 15(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 17
+  density: high
+  priority: 4
+  rights:
+    status: cc_by
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gneiting-2007-calibration-and-sharpness
+    relation: builds_on
+  - target: murphy-1973-vector-partition-probability-score
+    relation: cites
+  - target: jordan-2006-earthquake-predictability-brick-by-brick
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - forecast-scoring
+  - real-time
+  - calibration
+  - transfer
+  - gate3
+  - open-access
+  notes: 'Scores forecasts made in real time, before the outcome, using proper scores decomposed into calibration,
+    sharpness and bias. The decomposition is the practical companion to the verification literature and it is applied
+    to forecasts that were actually issued rather than reconstructed afterwards.
+
+    '
 - id: held-2005-multivariate-surveillance-counts
   title: A Statistical Framework for the Analysis of Multivariate Infectious Disease Surveillance Counts
   authors:
@@ -1119,8 +1456,8 @@ entries:
   venue: Statistical Modelling 5(3)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1191/1471082x05st098oa
+    url: https://doi.org/10.1191/1471082x05st098oa
   pages: 21
   density: high
   priority: 4
@@ -1395,8 +1732,8 @@ entries:
   venue: The Economic Journal 114(495)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/j.1468-0297.2004.00207.x
+    url: https://doi.org/10.1111/j.1468-0297.2004.00207.x
   pages: 20
   density: high
   priority: 4
@@ -1463,8 +1800,9 @@ entries:
     relation: cites
   - target: gelman-2013-bayesian-data-analysis
     relation: cites
-  - target: Rasch — Probabilistic Models for Some Intelligence and Attainment Tests
+  - target: rasch-1960-probabilistic-models-attainment-tests
     relation: cites
+    note: null
   discovered:
     round: 0
     method: operator
@@ -1621,6 +1959,58 @@ entries:
     and it is the cross-asset contagion model we keep describing in words.
 
     '
+- id: raftery-2005-bayesian-model-averaging-ensembles
+  title: Using Bayesian Model Averaging to Calibrate Forecast Ensembles
+  authors:
+  - Adrian E. Raftery
+  - Tilmann Gneiting
+  - Fadoua Balabdaoui
+  - Michael Polakowski
+  year: 2005
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Monthly Weather Review 133(5)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 19
+  density: high
+  priority: 4
+  rights:
+    status: government_work
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gneiting-2007-calibration-and-sharpness
+    relation: builds_on
+  - target: satopaa-2014-combining-probability-predictions
+    relation: cites
+  - target: shirani-mehr-2018-bias-variance-election-polls
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - ensemble
+  - model-averaging
+  - calibration
+  - meteorology
+  - transfer
+  notes: 'Ensembles are systematically underdispersed: they disagree less than the world varies, so the spread understates
+    the uncertainty. The correction is a weighted mixture fitted on past performance. A set of correlated prediction
+    markets is an ensemble with the same pathology, and this is the standing fix.
+
+    '
 - id: rasmussen-1997-risk-management-dynamic-society
   title: 'Risk Management in a Dynamic Society: A Modelling Problem'
   authors:
@@ -1681,8 +2071,8 @@ entries:
   venue: Foundations and Trends in Information Retrieval 4(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1561/1500000009
+    url: https://doi.org/10.1561/1500000009
   pages: 129
   density: high
   priority: 4
@@ -1977,8 +2367,8 @@ entries:
   venue: Concurrency and Computation Practice and Experience 22(12)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/cpe.1519
+    url: https://doi.org/10.1002/cpe.1519
   pages: 15
   density: medium
   priority: 4
@@ -2098,8 +2488,8 @@ entries:
   venue: Proceedings of the National Academy of Sciences 96(18)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1073/pnas.96.18.9991
+    url: https://doi.org/10.1073/pnas.96.18.9991
   pages: 4
   density: medium
   priority: 3
@@ -2155,8 +2545,8 @@ entries:
   venue: Industrial and Corporate Change 11(5)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/icc/11.5.895
+    url: https://doi.org/10.1093/icc/11.5.895
   pages: 47
   density: medium
   priority: 3
@@ -2222,8 +2612,8 @@ entries:
   venue: Journal of Geophysical Research 108(B10)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1029/2003jb002485
+    url: https://doi.org/10.1029/2003jb002485
   pages: 18
   density: medium
   priority: 3
@@ -2540,6 +2930,47 @@ entries:
   - transfer
   - polymarket-relevant
   notes: null
+- id: rasch-1960-probabilistic-models-attainment-tests
+  title: Probabilistic Models for Some Intelligence and Attainment Tests
+  authors:
+  - Georg Rasch
+  year: 1960
+  bucket: adjacent_disciplines
+  form: monograph
+  venue: Danmarks Paedagogiske Institut
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 200
+  density: high
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: lord-1980-item-response-theory
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - item-response-theory
+  - ability
+  - separability
+  - transfer
+  notes: The separability of person ability from item difficulty, which is the property that makes the counterparty-skill
+    decomposition identifiable at all.
 - id: stephens-1986-foraging-theory
   title: Foraging Theory
   authors:
@@ -2594,8 +3025,8 @@ entries:
   venue: Journal of Physics of the Earth 43(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.4294/jpe1952.43.1
+    url: https://doi.org/10.4294/jpe1952.43.1
   pages: 33
   density: medium
   priority: 3
@@ -2827,8 +3258,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/2345252
+    url: https://doi.org/10.2307/2345252
   pages: 600
   density: high
   priority: 4
@@ -2986,8 +3417,8 @@ entries:
   venue: Chapman and Hall/CRC
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1201/9781482296426
+    url: https://doi.org/10.1201/9781482296426
   pages: 344
   density: medium
   priority: 3
@@ -3162,8 +3593,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/9781108571401
+    url: https://doi.org/10.1017/9781108571401
   pages: 536
   density: high
   priority: 5
@@ -3205,8 +3636,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9781118548035
+    url: https://doi.org/10.1002/9781118548035
   pages: 480
   density: high
   priority: 5
@@ -3334,8 +3765,8 @@ entries:
   venue: Journal of the Royal Statistical Society Series B 86(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/jrsssb/qkad009
+    url: https://doi.org/10.1093/jrsssb/qkad009
   pages: 30
   density: high
   priority: 5
@@ -3404,8 +3835,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9780511546921
+    url: https://doi.org/10.1017/cbo9780511546921
   pages: 394
   density: high
   priority: 4
@@ -3445,8 +3876,8 @@ entries:
   venue: ACM SIGecom Exchanges 17(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/3331033.3331039
+    url: https://doi.org/10.1145/3331033.3331039
   pages: 10
   density: high
   priority: 4
@@ -3899,8 +4330,8 @@ entries:
   venue: ACM Advances in Financial Technologies
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2139/ssrn.3636514
+    url: https://doi.org/10.2139/ssrn.3636514
   pages: 12
   density: high
   priority: 5
@@ -3997,8 +4428,8 @@ entries:
   venue: ACM Advances in Financial Technologies 2021
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/3479722.3480994
+    url: https://doi.org/10.1145/3479722.3480994
   pages: 15
   density: high
   priority: 5
@@ -4012,7 +4443,23 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: aggregation-and-staleness
+    topic: how a price reaches the chain, and the freshness cost of the defences against manipulation
+    title: null
+    locator: section 4.5
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Time-weighted averaging over several blocks is the standard defence against single-block
+      manipulation, which buys manipulation resistance by giving up freshness. Stale data is treated as the separate
+      failure: it passes selection criteria as valid while degrading the aggregate, and a naive implementation keeps
+      using a feeder''s last submission however old it is. Some aggregators rank feeders on historic timeliness
+      for exactly this reason.
+
+      '
   refs:
   - target: angeris-2020-improved-price-oracles-cfmm
     relation: builds_on
@@ -4063,7 +4510,38 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: no-arbitrage-price
+    topic: the fundamental value of a perpetual and the random-maturity argument behind it
+    title: null
+    locator: abstract and introduction, pp. 1-3
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. A perpetual is not guaranteed to converge to spot, so the usual no-arbitrage price does
+      not apply without extra restrictions; funding does the job that maturity does for a dated contract. The theoretical
+      price is proportional to spot with a constant of proportionality rising in the ratio of the borrowing rate
+      to the funding-rate intensity, so the basis is wider when cash is expensive relative to the funding paid for
+      shorting. The derivation rests on random-maturity arbitrage, where time to convergence is itself random, because
+      the position has to survive margin until it converges. Their own phrasing for the risk is that the arbitrageur
+      must remain liquid longer than the market stays irrational.
+
+      '
+  - unit_id: empirical-deviations
+    topic: how large the deviations are and how they behave
+    title: null
+    locator: empirical section
+    kind: section
+    pages: 12
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read the reported findings. Deviations from the theoretical price are larger in crypto than in traditional
+      currency markets, comove across currencies rather than being instrument-specific, and diminish over time.
+
+      '
   refs:
   - target: hull-2021-options-futures-derivatives
     relation: cites
@@ -4100,8 +4578,8 @@ entries:
   venue: ACM Internet Measurement Conference 2021
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/3487552.3487811
+    url: https://doi.org/10.1145/3487552.3487811
   pages: 15
   density: high
   priority: 5
@@ -4151,8 +4629,8 @@ entries:
   venue: IEEE Symposium on Security and Privacy 2022
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1109/sp46214.2022.9833734
+    url: https://doi.org/10.1109/sp46214.2022.9833734
   pages: 18
   density: high
   priority: 5
@@ -4298,8 +4776,8 @@ entries:
   venue: Crypto Valley Conference on Blockchain Technology 2020
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1109/cvcbt50464.2020.00005
+    url: https://doi.org/10.1109/cvcbt50464.2020.00005
   pages: 15
   density: high
   priority: 4
@@ -4344,8 +4822,8 @@ entries:
   venue: ACM Internet Measurement Conference 2023
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/3618257.3624824
+    url: https://doi.org/10.1145/3618257.3624824
   pages: 15
   density: high
   priority: 4
@@ -4391,8 +4869,8 @@ entries:
   venue: Journal of Finance
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/jofi.13405
+    url: https://doi.org/10.1111/jofi.13405
   pages: 45
   density: high
   priority: 4
@@ -4486,8 +4964,8 @@ entries:
   venue: ACM Advances in Financial Technologies 2022
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/3558535.3559780
+    url: https://doi.org/10.1145/3558535.3559780
   pages: 20
   density: high
   priority: 4
@@ -4761,8 +5239,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/0471221279
+    url: https://doi.org/10.1002/0471221279
   pages: 584
   density: high
   priority: 5
@@ -4976,9 +5454,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Skolnik — Introduction to Radar Systems
+  - target: skolnik-2001-introduction-radar-systems
     relation: cites
     bucket: detection_tracking
+    note: null
   discovered:
     round: 0
     method: seed
@@ -5037,8 +5516,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/0471221082
+    url: https://doi.org/10.1002/0471221082
   pages: 716
   density: high
   priority: 4
@@ -5101,6 +5580,48 @@ entries:
   - phd-filter
   - fusion
   notes: null
+- id: skolnik-2001-introduction-radar-systems
+  title: Introduction to Radar Systems
+  authors:
+  - Merrill I. Skolnik
+  year: 2001
+  bucket: detection_tracking
+  form: textbook
+  venue: McGraw-Hill
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 770
+  density: medium
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: richards-2014-radar-signal-processing
+    relation: cites
+  - target: axelsson-2000-base-rate-fallacy
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - radar
+  - detection
+  - cfar
+  notes: Carries the constant-false-alarm-rate machinery, which is threshold selection against a fluctuating background
+    and is our alarm problem in its original setting.
 - id: kantz-2003-nonlinear-time-series-analysis
   title: Nonlinear Time Series Analysis
   authors:
@@ -5331,8 +5852,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9780511622717
+    url: https://doi.org/10.1017/cbo9780511622717
   pages: 150
   density: high
   priority: 3
@@ -5463,8 +5984,8 @@ entries:
   venue: Reports on Progress in Physics 75(12)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1088/0034-4885/75/12/126001
+    url: https://doi.org/10.1088/0034-4885/75/12/126001
   pages: 60
   density: medium
   priority: 3
@@ -5561,8 +6082,8 @@ entries:
   venue: ACM Transactions on Economics and Computation
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/2465769.2465777
+    url: https://doi.org/10.1145/2465769.2465777
   pages: 35
   density: high
   priority: 5
@@ -5790,8 +6311,8 @@ entries:
   venue: Econometrica
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/1913210
+    url: https://doi.org/10.2307/1913210
   pages: 22
   density: high
   priority: 5
@@ -5929,8 +6450,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/0198296983.001.0001
+    url: https://doi.org/10.1093/0198296983.001.0001
   pages: 264
   density: high
   priority: 4
@@ -6011,8 +6532,8 @@ entries:
   venue: EC 2012
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/2229012.2229047
+    url: https://doi.org/10.1145/2229012.2229047
   pages: 18
   density: high
   priority: 4
@@ -6508,8 +7029,8 @@ entries:
   venue: Princeton University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2139/ssrn.491563
+    url: https://doi.org/10.2139/ssrn.491563
   pages: 246
   density: medium
   priority: 3
@@ -6582,8 +7103,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/ccol052139015x
+    url: https://doi.org/10.1017/ccol052139015x
   pages: 265
   density: high
   priority: 3
@@ -6607,6 +7128,47 @@ entries:
   tags:
   - matching
   - market-design
+  notes: null
+- id: roughgarden-2010-algorithmic-game-theory-approximation
+  title: Algorithmic Game Theory
+  authors:
+  - Tim Roughgarden
+  year: 2010
+  bucket: economics_information
+  form: survey
+  venue: Communications of the ACM 53(7)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 9
+  density: medium
+  priority: 3
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: nisan-2007-algorithmic-game-theory
+    relation: cites
+  - target: roughgarden-2016-twenty-lectures-agt
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - mechanism-design
+  - price-of-anarchy
+  - survey
   notes: null
 - id: satopaa-2014-combining-probability-predictions
   title: Combining Multiple Probability Predictions Using a Simple Logit Model
@@ -6751,8 +7313,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/oso/9780195068856.001.0001
+    url: https://doi.org/10.1093/oso/9780195068856.001.0001
   pages: 430
   density: high
   priority: 3
@@ -7826,8 +8388,8 @@ entries:
   venue: Quantitative Finance
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/14697680701691477
+    url: https://doi.org/10.1080/14697680701691477
   pages: 12
   density: high
   priority: 5
@@ -7917,8 +8479,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/9781108768900
+    url: https://doi.org/10.1017/9781108768900
   pages: 368
   density: high
   priority: 5
@@ -7991,8 +8553,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/9781108231596
+    url: https://doi.org/10.1017/9781108231596
   pages: 296
   density: high
   priority: 5
@@ -8030,8 +8592,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/9781108627771
+    url: https://doi.org/10.1017/9781108627771
   pages: 552
   density: high
   priority: 5
@@ -8073,8 +8635,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/acprof:oso/9780199535255.001.0001
+    url: https://doi.org/10.1093/acprof:oso/9780199535255.001.0001
   pages: 481
   density: high
   priority: 4
@@ -8341,8 +8903,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9780511802256
+    url: https://doi.org/10.1017/cbo9780511802256
   pages: 443
   density: high
   priority: 3
@@ -8630,8 +9192,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9781139025751
+    url: https://doi.org/10.1017/cbo9781139025751
   pages: 625
   density: high
   priority: 5
@@ -8822,6 +9384,50 @@ entries:
   - multiple-testing
   - forecast-comparison
   notes: null
+- id: jiang-2016-doubly-robust-off-policy-rl
+  title: Doubly Robust Off-policy Value Evaluation for Reinforcement Learning
+  authors:
+  - Nan Jiang
+  - Lihong Li
+  year: 2016
+  bucket: inference_causality
+  form: proceedings
+  venue: International Conference on Machine Learning 2016
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 10
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: dudik-2011-doubly-robust-policy-evaluation
+    relation: builds_on
+  - target: precup-2000-eligibility-traces-off-policy
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - off-policy
+  - doubly-robust
+  - evaluation
+  - agentic
+  - open-access
+  notes: null
 - id: pearl-2009-causality
   title: 'Causality: Models, Reasoning, and Inference'
   authors:
@@ -8859,6 +9465,56 @@ entries:
   - dags
   - identification
   notes: null
+- id: precup-2000-eligibility-traces-off-policy
+  title: Eligibility Traces for Off-Policy Policy Evaluation
+  authors:
+  - Doina Precup
+  - Richard S. Sutton
+  - Satinder Singh
+  year: 2000
+  bucket: inference_causality
+  form: proceedings
+  venue: International Conference on Machine Learning 2000
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: thomas-2016-data-efficient-ope
+    relation: cites
+  - target: sutton-2018-reinforcement-learning
+    relation: builds_on
+  - target: levine-2020-offline-rl-tutorial
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - off-policy
+  - importance-sampling
+  - evaluation
+  - agentic
+  notes: 'The origin of importance-sampling estimators for evaluating a policy from data generated by a different
+    one, and of the variance problem that makes them fragile over long horizons. An agent''s trajectory is long,
+    which is exactly where these break.
+
+    '
 - id: romano-2005-stepwise-multiple-testing
   title: Stepwise Multiple Testing as Formalized Data Snooping
   authors:
@@ -8908,8 +9564,8 @@ entries:
   venue: Journal of Machine Learning Research / ICML
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1502.02362
+    url: https://doi.org/10.48550/arXiv.1502.02362
   pages: 30
   density: high
   priority: 4
@@ -8946,8 +9602,8 @@ entries:
   venue: ICML
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1604.00923
+    url: https://doi.org/10.48550/arXiv.1604.00923
   pages: 10
   density: high
   priority: 4
@@ -8986,8 +9642,8 @@ entries:
   venue: NeurIPS 2019
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1904.06019
+    url: https://doi.org/10.48550/arXiv.1904.06019
   pages: 11
   density: high
   priority: 4
@@ -9067,8 +9723,8 @@ entries:
   venue: Journal of the American Statistical Association
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/01621459.2017.1319839
+    url: https://doi.org/10.1080/01621459.2017.1319839
   pages: 15
   density: high
   priority: 4
@@ -9104,8 +9760,8 @@ entries:
   venue: Econometrica
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/1468-0262.00152
+    url: https://doi.org/10.1111/1468-0262.00152
   pages: 30
   density: high
   priority: 4
@@ -9146,8 +9802,8 @@ entries:
   venue: Journal of Economic Perspectives
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1257/jep.31.2.3
+    url: https://doi.org/10.1257/jep.31.2.3
   pages: 32
   density: medium
   priority: 3
@@ -9236,8 +9892,8 @@ entries:
   venue: Annals of Statistics
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1214/20-aos1991
+    url: https://doi.org/10.1214/20-aos1991
   pages: 40
   density: medium
   priority: 3
@@ -9557,9 +10213,10 @@ entries:
   refs:
   - target: li-2008-kolmogorov-complexity
     relation: cites
-  - target: Rissanen — Stochastic Complexity in Statistical Inquiry
+  - target: rissanen-1989-stochastic-complexity
     relation: builds_on
     bucket: information_theory
+    note: null
   discovered:
     round: 0
     method: seed
@@ -9570,6 +10227,48 @@ entries:
   - model-selection
   - compression
   notes: null
+- id: rissanen-1989-stochastic-complexity
+  title: Stochastic Complexity in Statistical Inquiry
+  authors:
+  - Jorma Rissanen
+  year: 1989
+  bucket: information_theory
+  form: monograph
+  venue: World Scientific
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 175
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: grunwald-2007-mdl-principle
+    relation: cites
+  - target: li-2008-kolmogorov-complexity
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - mdl
+  - model-selection
+  - complexity
+  notes: Model selection as code length, which prices complexity in the same units as fit rather than in an arbitrary
+    penalty.
 - id: shannon-1948-mathematical-theory-communication
   title: A Mathematical Theory of Communication
   authors:
@@ -9616,8 +10315,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9780511921889
+    url: https://doi.org/10.1017/cbo9780511921889
   pages: 522
   density: high
   priority: 3
@@ -9813,8 +10512,8 @@ entries:
   venue: arXiv
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.2005.01643
+    url: https://doi.org/10.48550/arXiv.2005.01643
   pages: 43
   density: high
   priority: 5
@@ -9878,8 +10577,8 @@ entries:
   venue: Quantitative Finance
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1803.06917
+    url: https://doi.org/10.48550/arXiv.1803.06917
   pages: 15
   density: high
   priority: 5
@@ -9953,6 +10652,55 @@ entries:
   - factors
   - out-of-sample
   notes: null
+- id: kidger-2019-deep-signature-transforms
+  title: Deep Signature Transforms
+  authors:
+  - Patrick Kidger
+  - Patric Bonnier
+  - Imanol Perez Arribas
+  - Cristopher Salvi
+  - Terry Lyons
+  year: 2019
+  bucket: machine_learning_frontier
+  form: proceedings
+  venue: NeurIPS 2019
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 11
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: chevyrev-2016-signature-method-primer
+    relation: builds_on
+  - target: levin-2013-learning-from-the-past
+    relation: cites
+  - target: kidger-2022-neural-differential-equations
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - signatures
+  - rough-paths
+  - learned-features
+  - open-access
+  notes: The signature as a differentiable layer rather than a fixed feature map, which is the version that scales
+    past level two.
 - id: kidger-2022-neural-differential-equations
   title: On Neural Differential Equations
   authors:
@@ -10006,8 +10754,8 @@ entries:
   venue: NeurIPS
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.2006.04779
+    url: https://doi.org/10.48550/arXiv.2006.04779
   pages: 13
   density: high
   priority: 4
@@ -10045,8 +10793,8 @@ entries:
   venue: null
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1309.0260
+    url: https://doi.org/10.48550/arXiv.1309.0260
   pages: 30
   density: high
   priority: 4
@@ -10173,8 +10921,8 @@ entries:
   venue: ICML
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/1143844.1143929
+    url: https://doi.org/10.1145/1143844.1143929
   pages: 8
   density: high
   priority: 4
@@ -10380,8 +11128,8 @@ entries:
   venue: IEEE Transactions on Signal Processing
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1109/tsp.2019.2907260
+    url: https://doi.org/10.1109/tsp.2019.2907260
   pages: 12
   density: medium
   priority: 3
@@ -10421,8 +11169,8 @@ entries:
   venue: Journal of Risk
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.21314/jor.2001.041
+    url: https://doi.org/10.21314/jor.2001.041
   pages: 39
   density: high
   priority: 5
@@ -10552,8 +11300,8 @@ entries:
   venue: 'Handbook of Financial Markets: Dynamics and Evolution'
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.0809.0822
+    url: https://doi.org/10.48550/arXiv.0809.0822
   pages: 92
   density: high
   priority: 5
@@ -10592,8 +11340,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/9781316659335
+    url: https://doi.org/10.1017/9781316659335
   pages: 464
   density: high
   priority: 5
@@ -10718,6 +11466,56 @@ entries:
   - market-design
   - high-value-target
   notes: null
+- id: budish-2023-quantifying-hft-arms-race
+  title: Quantifying the High-Frequency Trading Arms Race
+  authors:
+  - Matteo Aquilina
+  - Eric Budish
+  - Peter O'Neill
+  year: 2022
+  bucket: market_microstructure
+  form: paper
+  venue: The Quarterly Journal of Economics 137(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 60
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: budish-2015-hft-arms-race
+    relation: builds_on
+  - target: menkveld-2013-hft-new-market-makers
+    relation: cites
+  - target: kelkar-2020-order-fairness-byzantine
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - latency-arbitrage
+  - batch-auction
+  - market-design
+  - hyperliquid-relevant
+  notes: 'Measures the latency-arbitrage tax directly from message-level data, and finds it small per trade and
+    large in aggregate. The empirical case for batching, from the authors of the theoretical one, and the number
+    a batched venue should be compared against.
+
+    '
 - id: cartea-2015-algorithmic-high-frequency-trading
   title: Algorithmic and High-Frequency Trading
   authors:
@@ -11045,8 +11843,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/oso/9780195301649.001.0001
+    url: https://doi.org/10.1093/oso/9780195301649.001.0001
   pages: 208
   density: high
   priority: 5
@@ -11122,8 +11920,8 @@ entries:
   venue: Journal of the American Statistical Association
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/01621459.2014.982278
+    url: https://doi.org/10.1080/01621459.2014.982278
   pages: 20
   density: high
   priority: 5
@@ -11428,8 +12226,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9781316683040
+    url: https://doi.org/10.1017/cbo9781316683040
   pages: 240
   density: high
   priority: 4
@@ -11559,8 +12357,8 @@ entries:
   venue: Journal of Finance 50(5)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/j.1540-6261.1995.tb05192.x
+    url: https://doi.org/10.1111/j.1540-6261.1995.tb05192.x
   pages: 35
   density: high
   priority: 4
@@ -11682,8 +12480,8 @@ entries:
   venue: Quantitative Finance
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1080/14697680903373692
+    url: https://doi.org/10.1080/14697680903373692
   pages: 15
   density: high
   priority: 4
@@ -11719,8 +12517,8 @@ entries:
   venue: Journal of Finance 49(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/j.1540-6261.1994.tb02450.x
+    url: https://doi.org/10.1111/j.1540-6261.1994.tb02450.x
   pages: 35
   density: high
   priority: 4
@@ -11804,8 +12602,8 @@ entries:
   venue: Journal of Finance
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/j.1540-6261.1991.tb03749.x
+    url: https://doi.org/10.1111/j.1540-6261.1991.tb03749.x
   pages: 28
   density: high
   priority: 4
@@ -12286,8 +13084,8 @@ entries:
   venue: Review of Financial Studies 14(3)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/rfs/14.3.705
+    url: https://doi.org/10.1093/rfs/14.3.705
   pages: 30
   density: high
   priority: 3
@@ -12326,8 +13124,8 @@ entries:
   venue: Harper & Row
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/2328222
+    url: https://doi.org/10.2307/2328222
   pages: 600
   density: medium
   priority: 2
@@ -12508,8 +13306,8 @@ entries:
   venue: Market Microstructure and Liquidity
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1142/s2382626615500057
+    url: https://doi.org/10.1142/s2382626615500057
   pages: 46
   density: high
   priority: 5
@@ -12552,9 +13350,10 @@ entries:
     relation: cites
   - target: jaisson-2015-nearly-unstable-hawkes
     relation: cites
-  - target: Bowsher — Modelling security market events in continuous time
+  - target: bowsher-2007-modelling-security-market-events
     relation: cites
     bucket: mathematical_foundations
+    note: null
   discovered:
     round: 0
     method: seed
@@ -12886,6 +13685,49 @@ entries:
   - self-excitation
   - foundational
   notes: null
+- id: bowsher-2007-modelling-security-market-events
+  title: 'Modelling Security Market Events in Continuous Time: Intensity Based, Multivariate Point Process Models'
+  authors:
+  - Clive G. Bowsher
+  year: 2007
+  bucket: mathematical_foundations
+  form: paper
+  venue: Journal of Econometrics 141(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 32
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: daley-2008-point-processes-vol2
+    relation: cites
+  - target: bacry-2015-hawkes-processes-finance
+    relation: cites
+  - target: ogata-1988-statistical-models-earthquake
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - point-process
+  - multivariate
+  - market-events
+  notes: null
 - id: bremaud-1981-point-processes-queues
   title: 'Point Processes and Queues: Martingale Dynamics'
   authors:
@@ -12896,8 +13738,8 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4684-9477-8
+    url: https://doi.org/10.1007/978-1-4684-9477-8
   pages: 354
   density: high
   priority: 4
@@ -13024,8 +13866,8 @@ entries:
   venue: Springer
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1007/978-1-4612-5320-4
+    url: https://doi.org/10.1007/978-1-4612-5320-4
   pages: 400
   density: high
   priority: 4
@@ -13183,6 +14025,48 @@ entries:
   - polymarket-relevant
   notes: Where the Frechet-Hoeffding bounds actually live, with the sharpness statement the trading use depends
     on.
+- id: pardoux-1990-adapted-solution-bsde
+  title: Adapted Solution of a Backward Stochastic Differential Equation
+  authors:
+  - Étienne Pardoux
+  - Shige Peng
+  year: 1990
+  bucket: mathematical_foundations
+  form: paper
+  venue: Systems and Control Letters 14(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 6
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: zhang-2017-bsde
+    relation: cites
+  - target: pham-2009-continuous-time-stochastic-control
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - bsde
+  - stochastic-control
+  - hedging
+  notes: null
 - id: peyre-2019-computational-optimal-transport
   title: Computational Optimal Transport
   authors:
@@ -13194,8 +14078,8 @@ entries:
   venue: Foundations and Trends in Machine Learning
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1561/9781680835519
+    url: https://doi.org/10.1561/9781680835519
   pages: 257
   density: high
   priority: 4
@@ -13338,9 +14222,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Pardoux & Peng — Adapted solution of a backward stochastic differential equation
+  - target: pardoux-1990-adapted-solution-bsde
     relation: builds_on
     bucket: mathematical_foundations
+    note: null
   - target: buehler-2019-deep-hedging
     relation: syllabus_with
   discovered:
@@ -13892,8 +14777,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/oso/9780198805090.001.0001
+    url: https://doi.org/10.1093/oso/9780198805090.001.0001
   pages: 780
   density: high
   priority: 4
@@ -14473,8 +15358,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9781316779309
+    url: https://doi.org/10.1017/cbo9781316779309
   pages: 356
   density: medium
   priority: 3
@@ -14561,8 +15446,8 @@ entries:
   venue: Cambridge University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1017/cbo9780511804441
+    url: https://doi.org/10.1017/cbo9780511804441
   pages: 716
   density: high
   priority: 5
@@ -14605,8 +15490,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9781118029176
+    url: https://doi.org/10.1002/9781118029176
   pages: 656
   density: high
   priority: 5
@@ -14646,8 +15531,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9781119815068
+    url: https://doi.org/10.1002/9781119815068
   pages: 1136
   density: high
   priority: 5
@@ -14683,8 +15568,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/1269932
+    url: https://doi.org/10.2307/1269932
   pages: 684
   density: high
   priority: 5
@@ -14722,8 +15607,8 @@ entries:
   venue: Princeton University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1515/9781400831050
+    url: https://doi.org/10.1515/9781400831050
   pages: 542
   density: high
   priority: 4
@@ -14920,8 +15805,8 @@ entries:
   venue: Prentice Hall
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/2583863
+    url: https://doi.org/10.2307/2583863
   pages: 846
   density: medium
   priority: 3
@@ -15072,8 +15957,8 @@ entries:
   venue: Stanford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1515/9781503619883
+    url: https://doi.org/10.1515/9781503619883
   pages: 320
   density: high
   priority: 3
@@ -15374,6 +16259,50 @@ entries:
   - constraints
   - high-value-target
   notes: null
+- id: goebel-2012-hybrid-dynamical-systems
+  title: 'Hybrid Dynamical Systems: Modeling, Stability, and Robustness'
+  authors:
+  - Rafal Goebel
+  - Ricardo G. Sanfelice
+  - Andrew R. Teel
+  year: 2012
+  bucket: optimal_control
+  form: textbook
+  venue: Princeton University Press
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 230
+  density: high
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: liberzon-2003-switching-systems-control
+    relation: cites
+  - target: rawlings-2017-model-predictive-control
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - hybrid-systems
+  - switching
+  - stability
+  notes: Continuous dynamics punctuated by discrete jumps, which is what a batched venue is and what a switching
+    regime model approximates.
 - id: ioannou-1996-robust-adaptive-control
   title: Robust Adaptive Control
   authors:
@@ -15477,9 +16406,10 @@ entries:
     copy_path: null
   units: []
   refs:
-  - target: Goebel, Sanfelice & Teel — Hybrid Dynamical Systems
+  - target: goebel-2012-hybrid-dynamical-systems
     relation: cites
     bucket: optimal_control
+    note: null
   discovered:
     round: 0
     method: seed
@@ -15844,7 +16774,7 @@ entries:
   - target: karatzas-1998-methods-mathematical-finance
     relation: cites
     note: null
-  - target: Karatzas & Fernholz — Stochastic portfolio theory (Handbook of Numerical Analysis chapter)
+  - target: karatzas-2009-stochastic-portfolio-theory-chapter
     relation: builds_on
     note: null
     bucket: quant_finance_core
@@ -15918,8 +16848,8 @@ entries:
   venue: Econometrica 57(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/1912559
+    url: https://doi.org/10.2307/1912559
   pages: 27
   density: high
   priority: 5
@@ -16060,9 +16990,10 @@ entries:
   refs:
   - target: friz-2020-course-rough-paths
     relation: cites
-  - target: El Euch & Rosenbaum — The characteristic function of rough Heston models
+  - target: eleuch-2018-characteristic-function-rough-heston
     relation: cites
     bucket: quant_finance_core
+    note: null
   discovered:
     round: 0
     method: seed
@@ -16162,8 +17093,8 @@ entries:
   venue: Chapman and Hall/CRC
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1201/9780203485217
+    url: https://doi.org/10.1201/9780203485217
   pages: 552
   density: high
   priority: 4
@@ -16187,6 +17118,48 @@ entries:
   tags:
   - levy-processes
   - jumps
+  notes: null
+- id: eleuch-2018-characteristic-function-rough-heston
+  title: The Characteristic Function of Rough Heston Models
+  authors:
+  - Omar El Euch
+  - Mathieu Rosenbaum
+  year: 2018
+  bucket: quant_finance_core
+  form: paper
+  venue: Mathematical Finance 29(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 29
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: gatheral-2018-volatility-is-rough
+    relation: builds_on
+  - target: bayer-2016-pricing-under-rough-volatility
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - rough-volatility
+  - characteristic-function
+  - options
   notes: null
 - id: gatheral-2006-volatility-surface
   title: 'The Volatility Surface: A Practitioner''s Guide'
@@ -16301,6 +17274,48 @@ entries:
   - derivatives
   - orientation
   notes: null
+- id: karatzas-2009-stochastic-portfolio-theory-chapter
+  title: 'Stochastic Portfolio Theory: An Overview'
+  authors:
+  - Ioannis Karatzas
+  - Robert Fernholz
+  year: 2009
+  bucket: quant_finance_core
+  form: handbook
+  venue: Handbook of Numerical Analysis, Volume 15
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 71
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: fernholz-stochastic-portfolio-theory
+    relation: builds_on
+  - target: cover-1991-universal-portfolios
+    relation: cites
+  discovered:
+    round: 8
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - stochastic-portfolio-theory
+  - relative-arbitrage
+  - diversity
+  notes: null
 - id: lopezdeprado-2018-advances-financial-ml
   title: Advances in Financial Machine Learning
   authors:
@@ -16311,8 +17326,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2139/ssrn.3257415
+    url: https://doi.org/10.2139/ssrn.3257415
   pages: 400
   density: medium
   priority: 4
@@ -16393,8 +17408,8 @@ entries:
   venue: Chapman and Hall/CRC
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1201/9781315144597
+    url: https://doi.org/10.1201/9781315144597
   pages: 1100
   density: high
   priority: 4
@@ -16468,8 +17483,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/acprof:oso/9780199959327.003.0014
+    url: https://doi.org/10.1093/acprof:oso/9780199959327.003.0014
   pages: 717
   density: medium
   priority: 3
@@ -16504,8 +17519,8 @@ entries:
   venue: Chapman and Hall/CRC
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1201/b19649
+    url: https://doi.org/10.1201/b19649
   pages: 520
   density: medium
   priority: 3
@@ -16543,8 +17558,8 @@ entries:
   venue: Oxford University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/oso/9780198851615.001.0001
+    url: https://doi.org/10.1093/oso/9780198851615.001.0001
   pages: 592
   density: medium
   priority: 3
@@ -16729,8 +17744,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9781118673539
+    url: https://doi.org/10.1002/9781118673539
   pages: 864
   density: high
   priority: 3
@@ -17171,8 +18186,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9781118625651
+    url: https://doi.org/10.1002/9781118625651
   pages: 528
   density: medium
   priority: 4
@@ -17488,8 +18503,8 @@ entries:
   venue: Physical Review Letters 88(17)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1103/physrevlett.88.174102
+    url: https://doi.org/10.1103/physrevlett.88.174102
   pages: 4
   density: high
   priority: 5
@@ -17534,8 +18549,8 @@ entries:
   venue: Prentice Hall
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.2307/1269388
+    url: https://doi.org/10.2307/1269388
   pages: 528
   density: high
   priority: 5
@@ -17930,8 +18945,8 @@ entries:
   venue: Wiley-IEEE
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/9780470374122
+    url: https://doi.org/10.1002/9780470374122
   pages: 786
   density: high
   priority: 4
@@ -17967,8 +18982,8 @@ entries:
   venue: Wiley
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1002/0470045345
+    url: https://doi.org/10.1002/0470045345
   pages: 552
   density: high
   priority: 4

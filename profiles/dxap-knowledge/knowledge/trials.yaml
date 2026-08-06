@@ -431,3 +431,40 @@ trials:
       uncertainties: ["whether this detector will work on an instrument with no history"]
       state_notes: ["instrument listed yesterday", "no matured outcomes exist yet"]
       question: "What alarm threshold should I use here?"
+
+  - trial_id: T-PERP-BASIS
+    applicable: true
+    gold_concept_ids: [KC-PERP-BASIS]
+    counterevidence_concept_ids: [KC-COST-FLOOR]
+    note: "A wide basis on a perpetual. The gold card is the one saying the fundamental level is not zero."
+    context:
+      context_id: ctx-perp-basis
+      timestamp: "2026-08-05T08:00:00Z"
+      market_type: perp_dex
+      instrument: "SOL-PERP"
+      decision_type: entry
+      horizon: days
+      observables_available: [mark_price, oracle_price, funding_rate, mid_price_series, position_state, fee_schedule]
+      tools_available: []
+      latency_budget_seconds: 30.0
+      uncertainties: ["the perpetual has traded above spot for a week", "whether that is a mispricing or the normal level"]
+      state_notes: ["flat", "funding has been positive throughout", "borrowing rate elevated"]
+      question: "Is this basis worth trading against spot?"
+
+  - trial_id: T-ORACLE-WEDGE
+    applicable: true
+    gold_concept_ids: [KC-ORACLE-LAG]
+    note: "Fast market, oracle behind the book, sizing an entry into it."
+    context:
+      context_id: ctx-oracle-wedge
+      timestamp: "2026-08-05T17:45:00Z"
+      market_type: perp_dex
+      instrument: "ETH-PERP"
+      decision_type: abstain
+      horizon: minutes
+      observables_available: [oracle_price, mark_price, mid_price_series, funding_rate, l2_book]
+      tools_available: []
+      latency_budget_seconds: 2.0
+      uncertainties: ["the oracle is visibly behind the book", "whether forced flow is about to arrive"]
+      state_notes: ["price moved 3% in four minutes", "open interest elevated"]
+      question: "Should I take this entry now or wait?"

@@ -1250,3 +1250,99 @@ concepts:
     confidence: 0.5
     problem_ids: [PB-COST-DRAG, PB-IMPACT-TIMING]
     tags: [capacity, crowding, market-ecology, transfer, read-directly]
+
+  - concept_id: KC-PERP-BASIS
+    canonical_name: "A perpetual has a fundamental basis, and it is set by rates against funding intensity"
+    plain_description: >
+      A perpetual future is not obliged to converge to spot, so its price is not pinned by
+      maturity. Funding does that job instead, and the level it pins the basis at is not zero:
+      it rises with the cost of borrowing cash and falls with how aggressively funding
+      responds to the gap. A non-zero basis is therefore the normal state, and only the
+      deviation from that level is a signal.
+    mechanism: >
+      Holding spot against a short perpetual costs the cash borrowing rate and earns the
+      funding stream. In equilibrium the perpetual price is proportional to spot, with a
+      constant of proportionality increasing in the ratio of the interest rate to the
+      funding-rate intensity. The argument is not riskless arbitrage: convergence happens at a
+      random time, so the position must survive margin until it arrives. He, Manela, Ross and
+      von Wachter call this random-maturity arbitrage and are explicit that the trade is risky
+      in practice even where it looks riskless in theory.
+    formal_equations: "perpetual price proportional to spot, with the constant rising in (interest rate)/(funding-rate intensity); convergence at a random stopping time rather than a fixed maturity"
+    assumptions:
+      - "The funding mechanism actually responds to the gap it is meant to close, at the intensity assumed."
+      - "The cash borrowing rate applicable to us is known, not proxied by a reference rate."
+      - "The position can be carried until convergence without being liquidated, which is the whole content of the random-maturity caveat."
+    market_types: [perp_dex, clob_crypto]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [mark_price, oracle_price, funding_rate, mid_price_series, position_state]
+    required_data_resolution: "Mark, oracle and funding series at the funding interval or finer, with the borrowing rate that applies to the account."
+    expected_empirical_signature: >
+      A basis that is systematically non-zero and tracks the rate-to-funding-intensity ratio,
+      with deviations from that level that comove across instruments rather than being
+      instrument-specific, and that have narrowed over time as the market matured.
+    alternative_explanations:
+      - "The basis reflects the cost and scarcity of leverage on the venue rather than a rates relationship, which produces a similar level and a different comparative static."
+      - "Deviations comove because a common liquidity factor moves every instrument at once, not because a common mispricing is being corrected."
+    known_failure_modes:
+      - "Treating any non-zero basis as an opportunity. The fundamental level is non-zero, so the tradable quantity is the residual after it, and a strategy that ignores this is short the rates spread without knowing it."
+      - "The convergence time is random, so a position sized as if it were a riskless arbitrage will be liquidated at the worst moment. The authors say so directly."
+      - "Deviations diminishing over time means an estimate fitted on old data overstates what is available now."
+      - "Says nothing about which side the deviation will close from, and a basis can close by spot moving as easily as by the perpetual moving."
+    source_passage_ids:
+      - "he-2022-fundamentals-perpetual-futures#no-arbitrage-price"
+      - "he-2022-fundamentals-perpetual-futures#empirical-deviations"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by its alternative explanations: a leverage-scarcity account produces the same level with different comparative statics, and is the first thing to separate it from."
+    supporting_concept_ids: [KC-XMKT-CONSISTENCY, KC-COST-FLOOR]
+    implementation_status: specified
+    confidence: 0.6
+    problem_ids: [PB-XMARKET, PB-INVENTORY-FUNDING, PB-COST-DRAG]
+    tags: [perpetuals, funding, basis, random-maturity, read-directly]
+    workstream: hyperliquid_l4
+
+  - concept_id: KC-ORACLE-LAG
+    canonical_name: "An oracle buys manipulation resistance with staleness, and both are mechanical"
+    plain_description: >
+      The standard defence against manipulating an on-chain price is to average it over time,
+      which by construction makes the reported price lag the market. On a venue where the
+      oracle drives funding and liquidation, that lag is not a data-quality nuisance: it is a
+      predictable, mechanical wedge between what the market is doing and what the protocol
+      believes, and it moves money.
+    mechanism: >
+      Manipulating a spot price for one block is cheap with borrowed capital, so aggregators
+      average over several blocks, which raises the cost of manipulation in proportion to the
+      window and delays the reported price by the same window. Separately, a feeder that has
+      stopped updating still passes validity checks, so stale data enters the aggregate as
+      though it were fresh unless the aggregator ranks feeders on timeliness. Both effects push
+      the protocol's price behind the market, and both are largest exactly when the market is
+      moving fastest.
+    formal_equations: "reported price = time-weighted average of the underlying over the window; manipulation cost rises with window length while reported price lags by roughly half of it"
+    assumptions:
+      - "The oracle's averaging window and update cadence are known rather than inferred from the output."
+      - "The venue's funding and liquidation logic reads the oracle rather than the venue's own mark."
+      - "A stale feeder is distinguishable from a quiet market, which needs the update timestamp and not just the value."
+    market_types: [perp_dex, amm]
+    relevant_horizons: [seconds, minutes, hours]
+    required_observables: [oracle_price, mark_price, mid_price_series, funding_rate]
+    required_data_resolution: "Oracle and market price series at finer granularity than the oracle's own update interval."
+    expected_empirical_signature: >
+      A lead-lag between market price and oracle price with a sign and magnitude set by the
+      averaging window rather than by information, widening in fast markets, and funding and
+      liquidation events clustering where the wedge is largest rather than where the market
+      price alone would put them.
+    alternative_explanations:
+      - "The wedge is ordinary latency in our own data path rather than in the oracle, which looks identical without synchronized clocks."
+      - "The oracle is tracking a different venue set whose price genuinely differs, so the gap is composition rather than lag."
+    known_failure_modes:
+      - "Averaging window and update cadence are implementation details that change without notice, and a measured lag is only valid for the configuration it was measured under."
+      - "Trading the wedge means betting against the protocol's own price at exactly the moments it is used to liquidate, so the position is short the thing that decides whether it survives."
+      - "Stale and quiet look the same in the value alone; the distinction needs the update timestamp, which not every feed exposes."
+    source_passage_ids:
+      - "eskandari-2021-sok-oracles#aggregation-and-staleness"
+    contradicting_concept_ids: [KC-PRED-LIQUIDITY-MOVE]
+    supporting_concept_ids: [KC-PERP-BASIS, KC-PHANTOM-DEPTH]
+    implementation_status: specified
+    confidence: 0.55
+    problem_ids: [PB-STALE-PROBABILITY, PB-INVENTORY-FUNDING, PB-PHANTOM-LIQUIDITY]
+    tags: [oracle, staleness, twap, liquidation, onchain, read-directly]
+    workstream: hyperliquid_l4

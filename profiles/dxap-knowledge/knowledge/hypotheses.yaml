@@ -382,3 +382,52 @@ hypotheses:
       - "Overlap is uniformly high across events, so there is no variation to test against."
       - "Breach magnitude tracks depth or spread rather than overlap, which makes it a liquidity story and not an aggregation one."
       - "Address churn is fast enough that measured overlap is mostly noise."
+
+  - hypothesis_id: HY-PERP-BASIS-RESIDUAL
+    concept_id: KC-PERP-BASIS
+    market_context: "Hyperliquid perpetuals against spot on the same underlying, across funding intervals."
+    causal_story: >
+      The fundamental basis is set by the borrowing rate against the funding-rate intensity, so
+      the tradable quantity is the residual after that level rather than the raw basis. A
+      strategy trading the raw basis is implicitly short the rates spread.
+    ex_ante_prediction: >
+      Regressing the observed basis on the rate-to-funding-intensity ratio leaves a residual whose
+      mean reversion is at least twice as fast as the raw basis, and the residual predicts the
+      next funding payment's sign better than the raw basis does.
+    null_hypothesis: "The raw basis and the residual after the fundamental level have the same predictive content and the same reversion speed."
+    measurement_operator:
+      description: "Fundamental level from the borrowing rate over the funding-rate intensity; residual = observed basis minus that level; reversion by half-life of an AR(1) fit per instrument."
+      params: {}
+    eligible_universe: "Instruments with a continuously observable spot reference, a published funding rate, and a borrowing rate applicable to the account."
+    decision_timestamp_rule: "Rates and funding as observed at or before the decision; no use of the funding payment being predicted."
+    outcome_horizons: [8h, 1d, 7d]
+    cost_model: "Both legs' taker fees plus funding carried over the holding period, and an explicit charge for the margin the random convergence time requires."
+    invalidation_conditions:
+      - "The residual reverts no faster than the raw basis, meaning the fundamental level adds nothing on this venue."
+      - "Deviations comove so strongly across instruments that the residual is one factor, in which case this is a single bet and not a portfolio of them."
+      - "The margin required to survive the random convergence time makes the strategy unprofitable at any size worth running."
+
+  - hypothesis_id: HY-ORACLE-WEDGE
+    concept_id: KC-ORACLE-LAG
+    market_context: "Hyperliquid perpetuals, minutes around fast market moves."
+    causal_story: >
+      Time-weighted averaging makes the oracle lag the market by roughly half the averaging
+      window. Because funding and liquidation read the oracle, the wedge between market and
+      oracle price predicts when those mechanical flows fire, independently of what the market
+      price alone would imply.
+    ex_ante_prediction: >
+      The market-to-oracle wedge leads liquidation clustering by a lag consistent with the
+      averaging window, and liquidation volume in the top wedge decile is at least three times
+      that in the bottom decile after controlling for realized volatility.
+    null_hypothesis: "Liquidation timing is explained by the market price path alone, with no incremental information in the market-oracle wedge."
+    measurement_operator:
+      description: "Cross-correlation of the market-minus-oracle wedge against liquidation volume, bucketed by trailing realized volatility."
+      params: {}
+    eligible_universe: "Instruments where both oracle and mark are captured without sequence gaps over the window."
+    decision_timestamp_rule: "Wedge measured from prices timestamped before the liquidation being predicted; no use of the liquidation itself."
+    outcome_horizons: [1m, 5m]
+    cost_model: "Taker fee plus expected slippage into the liquidation flow, which is the flow being predicted and therefore moves against a late entry."
+    invalidation_conditions:
+      - "The lead disappears once our own data-path latency is controlled for, meaning the wedge was measurement rather than mechanism."
+      - "The oracle's window changes during the sample, making a single measured lag meaningless."
+      - "Liquidation clustering is fully explained by realized volatility, leaving the wedge with no incremental content."

@@ -470,3 +470,44 @@ decision_relevance:
     minimum_required_confidence: 0.45
     important_side_effects:
       - "Capacity is shared with everyone running the same strategy, so our own returns understate how close the crowd is to the limit."
+
+  - decision_relevance_id: DR-PERP-BASIS-ENTRY
+    concept_id: KC-PERP-BASIS
+    decision_type: entry
+    evidence_that_would_support_action: >
+      The basis residual, after subtracting the level implied by the borrowing rate against
+      funding intensity, is large relative to its own history, and the margin needed to hold the
+      position through a plausible convergence time is available.
+    evidence_that_would_argue_against_action: >
+      The raw basis is wide but the residual is not, meaning the rates relationship explains it;
+      or the residual is wide across every instrument at once, in which case it is one factor bet
+      rather than a diversified set.
+    minimum_required_confidence: 0.55
+    important_side_effects:
+      - "Convergence happens at a random time, so this consumes margin for an unknown period. Sizing it as a riskless arbitrage is how the trade fails."
+
+  - decision_relevance_id: DR-PERP-BASIS-HOLD
+    concept_id: KC-PERP-BASIS
+    decision_type: hold
+    evidence_that_would_support_action: >
+      The residual has not closed but the rates inputs have not moved either, so the reason for
+      the position still holds and the funding carried so far is within what was budgeted.
+    evidence_that_would_argue_against_action: >
+      The borrowing rate or funding intensity has moved enough that the fundamental level itself
+      has shifted, which means the position is now sized against a level that no longer applies.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Holding through adverse funding is the cost this trade is built to earn; distinguishing that from a thesis that has broken needs the level recomputed, not the P&L watched."
+
+  - decision_relevance_id: DR-ORACLE-ABSTAIN
+    concept_id: KC-ORACLE-LAG
+    decision_type: abstain
+    evidence_that_would_support_action: >
+      The market-oracle wedge is wide, which is where mechanical liquidation flow is about to
+      arrive, and the intended entry would be on the side that flow will run over.
+    evidence_that_would_argue_against_action: >
+      The wedge is within its normal range for this volatility level, or our own data path
+      latency has not been ruled out as the source of the apparent gap.
+    minimum_required_confidence: 0.5
+    important_side_effects:
+      - "Abstaining around the wedge means standing aside exactly when volume is highest, which has an opportunity cost that should be recorded rather than assumed to be zero."

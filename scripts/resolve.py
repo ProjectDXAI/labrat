@@ -455,7 +455,7 @@ def cmd_identify(args: argparse.Namespace) -> int:
         preprintable = entry.get("form") in {"paper", "working_paper", "survey", "proceedings", "thesis"}
         if (not best or entry.get("form") == "working_paper") and args.arxiv and preprintable and not arxiv_down:
             try:
-                preprints = arxiv_search(entry.get("title") or "", cache)
+                preprints = arxiv_search(entry.get("title") or "", cache, delay=args.arxiv_delay)
                 arxiv_failures = 0
             except ApiError as error:
                 preprints = []
@@ -864,6 +864,86 @@ def cmd_study(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_arxiv(args: argparse.Namespace) -> int:
+    """A dedicated, slow arXiv harvest.
+
+    arXiv was previously a passenger on `identify`, sharing its pace and its circuit
+    breaker, so a throttle partway through the run killed the index for every title
+    after it. Preprints are the largest pool of readable full text we have any claim
+    on, which makes them worth their own pass at their own rate.
+    """
+    root = Path(args.root)
+    entries = load_entries(root)
+    cache = Cache(root / "corpus" / ".resolve-cache")
+    dest = Path(args.dest)
+    dest.mkdir(parents=True, exist_ok=True)
+
+    preprintable = {"paper", "working_paper", "survey", "proceedings", "thesis"}
+    got, no_match, errors, skipped = [], [], [], 0
+    record: list[dict[str, Any]] = []
+    consecutive = 0
+
+    for entry in entries:
+        if len(got) + len(no_match) >= args.limit:
+            break
+        if entry.get("form") not in preprintable or entry.get("status") == "rejected":
+            continue
+        if (dest / f"{entry['id']}.pdf").exists():
+            skipped += 1
+            continue
+        if consecutive >= args.give_up:
+            errors.append({"id": "-", "error": f"abandoned after {consecutive} consecutive failures; "
+                                               f"{len(entries)} entries were not all searched"})
+            break
+        try:
+            candidates = arxiv_search(entry.get("title") or "", cache, delay=args.delay)
+            consecutive = 0
+        except ApiError as error:
+            consecutive += 1
+            errors.append({"id": entry["id"], "error": str(error)})
+            continue
+
+        best, _, _ = match(entry, candidates)
+        if not best:
+            no_match.append(entry["id"])
+            continue
+
+        arxiv_id = best["raw"].get("arxiv_id")
+        target = dest / f"{entry['id']}.pdf"
+        status, body = http_get(f"https://arxiv.org/pdf/{arxiv_id}", timeout=120, accept="application/pdf")
+        if status != 200 or not body.startswith(b"%PDF"):
+            errors.append({"id": entry["id"], "error": f"pdf http {status}"})
+            time.sleep(args.delay)
+            continue
+        target.write_bytes(body)
+        got.append({"id": entry["id"], "arxiv_id": arxiv_id, "bytes": len(body)})
+        record.append({
+            "id": entry["id"],
+            "identifiers": {"doi": f"10.48550/arXiv.{arxiv_id.split('v')[0]}"},
+            "acquisition": {
+                "state": "owned", "copy_path": str(target),
+                "source_url": f"https://arxiv.org/abs/{arxiv_id}",
+                "obtained_at": str(date.today()),
+                "note": ("Study copy from arXiv. The default arXiv grant licenses arXiv to "
+                         "distribute, not us to redistribute, so the rights tag is unchanged."),
+            },
+        })
+        time.sleep(args.delay)
+
+    if record:
+        out = Path(args.out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(yaml.safe_dump({"round": args.round, "entries": record}, sort_keys=False,
+                                      allow_unicode=True, width=120))
+    print(json.dumps({
+        "downloaded": len(got), "no_match_on_arxiv": len(no_match), "already_held": skipped,
+        "errors": len(errors), "abandoned": consecutive >= args.give_up,
+        "megabytes": round(sum(r["bytes"] for r in got) / 1e6, 1),
+        "dest": str(dest), "findings": args.out if record else None,
+    }, indent=2))
+    return 0
+
+
 def self_test() -> dict[str, Any]:
     checks: list[str] = []
 
@@ -915,6 +995,7 @@ def main(argv: list[str] | None = None) -> int:
     identify.add_argument("--out", default="corpus/resolved.json")
     identify.add_argument("--openalex-fallback", action="store_true", help="Try OpenAlex when nothing else matched (metered API).")
     identify.add_argument("--no-arxiv", dest="arxiv", action="store_false", default=True, help="Skip the arXiv index.")
+    identify.add_argument("--arxiv-delay", type=float, default=2.5, help="Seconds between arXiv queries; it throttles hard.")
     identify.add_argument("--arxiv-give-up", type=int, default=6, help="Consecutive arXiv failures before abandoning that index for the run.")
 
     licence = sub.add_parser("licence", help="Read the licence off the landing page and write verify findings.")
@@ -938,6 +1019,14 @@ def main(argv: list[str] | None = None) -> int:
     study.add_argument("--out", default="corpus/study-findings.yaml")
     study.add_argument("--max-files", type=int, default=60, help="cap per multi-file source")
 
+    ax = sub.add_parser("arxiv", help="Slow dedicated arXiv harvest for preprintable entries with no local copy.")
+    ax.add_argument("--dest", default="corpus/study")
+    ax.add_argument("--limit", type=int, default=400)
+    ax.add_argument("--delay", type=float, default=5.0)
+    ax.add_argument("--give-up", type=int, default=12)
+    ax.add_argument("--round", type=int, default=1)
+    ax.add_argument("--out", default="corpus/arxiv-findings.yaml")
+
     sub.add_parser("self-test", help="Matching and licence-classification checks; no network.")
     args = parser.parse_args(argv)
 
@@ -949,6 +1038,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_fetch(args)
     if args.command == "study":
         return cmd_study(args)
+    if args.command == "arxiv":
+        return cmd_arxiv(args)
 
     result = self_test()
     print(json.dumps(result, indent=2))
