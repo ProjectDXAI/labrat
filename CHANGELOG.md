@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 - 2026-08-05
+
+- Added `knowledge/frontier_bets.yaml` and `labrat knowledge bets`: eleven ranked hypotheses about which advanced-mathematics imports are most likely to pay, each required to carry a sharp prediction, a falsifier, the minimum data and a first computation. Validation refuses a bet that is unfalsifiable, cites a source outside the bibliography, or names an unimplemented computation. Scored by payoff x sqrt(novelty) x testability x maturity - effort.
+- Added four frontier probe methods so the top bets are refutable immediately rather than after a research project: `hawkes_branching_ratio` (endogeneity from count dispersion via the Fano identity), `prediction_market_consistency` (Frechet-Hoeffding, implication and partition bounds across correlated binaries, cost-gated per leg), `path_signature` (level-2 iterated integrals and Levy areas, invariant to time reparametrization), and `time_irreversibility` (ordinal-pattern divergence between a series and its reverse). Each has closed-form self-tests: a recovered branching ratio, an exact Levy area, a reversible triangle wave against an irreversible sawtooth, and a sharp joint bound.
+- Added Fernholz's stochastic portfolio theory to the corpus, decomposed into reading units, closing the last dangling reference from the bets file.
+- Recorded the deliberate non-bets — topological data analysis, quantum portfolio optimization, deterministic chaos prediction, fractal-market narratives, agent-based simulation as evidence — with reasons.
+
 ## 0.5.0 - 2026-08-05
 
 - Corpus sources can now be decomposed into `units` — targeted parts of a source ("the chapter about dealer inventory") with their own page estimate, priority, read status and expected concepts. Reading and compiling happen at unit granularity; `labrat corpus reading` ranks the chapter-level queue and distinguishes units that are located from those still needing to be found, and from sources not yet decomposed at all. 15 high-value sources seeded with 41 units.

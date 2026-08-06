@@ -6217,3 +6217,70 @@ entries:
     relation: syllabus_with
   - target: gatheral-2018-volatility-is-rough
     relation: syllabus_with
+
+- id: fernholz-stochastic-portfolio-theory
+  title: Stochastic Portfolio Theory
+  authors:
+  - E. Robert Fernholz
+  year: 2002
+  bucket: quant_finance_core
+  form: monograph
+  venue: Springer
+  identifiers: {isbn: null, doi: null, url: null}
+  pages: 177
+  density: high
+  priority: 5
+  rights:
+    status: all_rights_reserved
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition: {state: purchasable, copy_path: null}
+  units:
+  - unit_id: excess-growth
+    topic: the excess growth rate and where relative outperformance comes from
+    title: null
+    locator: null
+    kind: chapter
+    pages: 35
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: functionally-generated
+    topic: functionally generated portfolios and the master equation
+    title: null
+    locator: null
+    kind: chapter
+    pages: 40
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: diversity-relative-arbitrage
+    topic: market diversity and conditions for pathwise relative arbitrage
+    title: null
+    locator: null
+    kind: chapter
+    pages: 35
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs:
+  - target: karatzas-1998-methods-mathematical-finance
+    relation: cites
+    note: null
+  - target: Karatzas & Fernholz — Stochastic portfolio theory (Handbook of Numerical Analysis chapter)
+    relation: builds_on
+    note: null
+    bucket: quant_finance_core
+  - target: cover-2006-elements-information-theory
+    relation: syllabus_with
+    note: null
+  discovered: {round: 0, method: seed, source: null}
+  status: candidate
+  tags: [stochastic-portfolio-theory, relative-arbitrage, diversity, pathwise, high-value-target]
+  notes: null

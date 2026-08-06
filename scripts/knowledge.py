@@ -128,6 +128,7 @@ def knowledge_paths(root: Path) -> dict[str, Path]:
         "decisions": root / "decision_relevance.yaml",
         "problems": root / "problems.yaml",
         "trials": root / "trials.yaml",
+        "bets": root / "frontier_bets.yaml",
         "policies": root / "policies.yaml",
         "queues": root / "queues",
         "packets": root / "packets",
@@ -148,6 +149,7 @@ def load_store(paths: dict[str, Path]) -> dict[str, Any]:
         "decisions": load_list(paths["decisions"], "decision_relevance"),
         "problems": load_list(paths["problems"], "problems"),
         "trials": load_list(paths["trials"], "trials"),
+        "bets": load_list(paths["bets"], "bets"),
         "policies": (load_yaml(paths["policies"], {}) or {}).get("policies") or {},
         "utility": load_json(paths["utility"], {}),
     }
@@ -913,6 +915,73 @@ def evaluate_policy(
 
 
 
+
+# --------------------------------------------------------------------------------------
+# Frontier bets: ranking speculative imports before any of them is compiled
+# --------------------------------------------------------------------------------------
+
+BET_REQUIRED = ["bet_id", "title", "domain", "import", "thesis", "sharp_prediction", "falsifier", "problem_ids", "minimum_data"]
+
+
+def score_bet(bet: dict[str, Any]) -> dict[str, Any]:
+    """V = payoff x sqrt(novelty) x testability x maturity - effort, on a 1-5 scale each.
+
+    Novelty is square-rooted on purpose. Being first is worth something, but a novel
+    idea nobody can test is worth less than a known one that can be refuted this week.
+    Maturity multiplies rather than adds: a bet that needs new mathematics before it
+    can be tried is not a bet, it is a research programme.
+    """
+    payoff = float(bet.get("payoff") or 3)
+    novelty = float(bet.get("novelty") or 3)
+    testability = float(bet.get("testability") or 3)
+    maturity = float(bet.get("maturity") or 3)
+    effort = float(bet.get("effort") or 3)
+    raw = payoff * math.sqrt(novelty) * (testability / 5.0) * (maturity / 5.0)
+    return {
+        "score": round(raw - 0.5 * effort, 3),
+        "components": {
+            "payoff": payoff,
+            "novelty": novelty,
+            "testability": testability,
+            "maturity": maturity,
+            "effort": effort,
+            "raw_value": round(raw, 3),
+        },
+    }
+
+
+def validate_bets(store: dict[str, Any], sources: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """A bet must be refutable and grounded, or it is an opinion with a score attached."""
+    rows: list[dict[str, Any]] = []
+    problems = {problem.get("problem_id") for problem in store.get("problems") or []}
+    for bet in store.get("bets") or []:
+        errors: list[str] = []
+        for field in BET_REQUIRED:
+            if bet.get(field) in (None, "", [], {}):
+                errors.append(f"missing required field '{field}'")
+        for problem_id in bet.get("problem_ids") or []:
+            if problems and problem_id not in problems:
+                errors.append(f"unknown problem '{problem_id}'")
+        for source_id in bet.get("sources") or []:
+            if sources and source_id not in sources:
+                errors.append(f"source '{source_id}' is not in the bibliography")
+        method_id = bet.get("first_computation")
+        if method_id and methods_module is not None and method_id not in methods_module.REGISTRY:
+            errors.append(f"first_computation '{method_id}' has no implementation")
+        for field in ("payoff", "novelty", "testability", "maturity", "effort"):
+            value = bet.get(field)
+            if value is not None and not 1 <= float(value) <= 5:
+                errors.append(f"{field} must be between 1 and 5")
+        rows.append({"bet_id": bet.get("bet_id"), "ok": not errors, "errors": errors, "runnable_now": bool(method_id)})
+    return {"ok": all(row["ok"] for row in rows), "bets": rows, "count": len(rows)}
+
+
+def rank_bets(store: dict[str, Any]) -> list[dict[str, Any]]:
+    scored = [{**bet, **score_bet(bet)} for bet in store.get("bets") or []]
+    scored.sort(key=lambda row: (-row["score"], row["bet_id"]))
+    return scored
+
+
 # --------------------------------------------------------------------------------------
 # Robustness: does a policy survive the trial set being wrong about the world?
 # --------------------------------------------------------------------------------------
@@ -1333,6 +1402,8 @@ def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) ->
         ),
         "implementations_available": sorted(methods_module.REGISTRY) if methods_module else [],
         "trials": len(store["trials"]),
+        "frontier_bets": len(store.get("bets") or []),
+        "bets_runnable_now": sum(1 for bet in (store.get("bets") or []) if bet.get("first_computation")),
         "policies": sorted(store["policies"]),
     }
 
@@ -1453,6 +1524,8 @@ def self_test() -> dict[str, Any]:
     assert retrieve(empty, sources, base_context, policy)["abstained"]
     assert retrieve(store, {}, base_context, policy) is not None, "no bibliography should not crash retrieval"
     assert status_payload(empty, {})["servable_rate"] == 0.0
+    assert status_payload(empty, {})["frontier_bets"] == 0, "a store assembled without every key must still report"
+    assert rank_bets({}) == [] and validate_bets({}, {})["ok"], "bets ranking on an empty store"
     checks.append("degenerate input: empty store and missing bibliography degrade quietly")
 
     # Perturbations and integrity accounting.
@@ -1585,6 +1658,32 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_bets(args: argparse.Namespace) -> int:
+    lab_root, paths, corpus_dir = resolve_dirs(args)
+    store = load_store(paths)
+    sources = load_corpus_sources(lab_root, corpus_dir)
+    validation = validate_bets(store, sources)
+    ranked = rank_bets(store)
+
+    if args.json:
+        print(json.dumps({"validation": validation, "ranked": ranked}, indent=2))
+        return 0 if validation["ok"] else 1
+
+    for row in validation["bets"]:
+        for message in row["errors"]:
+            print(f"ERROR  {row['bet_id']}: {message}")
+    print(f"{len(ranked)} bets, {sum(1 for r in validation['bets'] if r['runnable_now'])} with a first computation already implemented\n")
+    for index, bet in enumerate(ranked, 1):
+        runnable = bet.get("first_computation")
+        print(f"{index:>2}. {bet['score']:>5}  {bet['bet_id']:<22} {bet['title']}")
+        print(f"        domain={bet['domain']}  problems={', '.join(bet.get('problem_ids') or [])}")
+        print(f"        run: {runnable or 'no implementation yet'}")
+        if args.verbose:
+            print(f"        prediction: {' '.join(str(bet['sharp_prediction']).split())[:160]}")
+            print(f"        falsifier:  {' '.join(str(bet['falsifier']).split())[:160]}")
+    return 0 if validation["ok"] else 1
+
+
 def cmd_stress(args: argparse.Namespace) -> int:
     lab_root, paths, corpus_dir = resolve_dirs(args)
     store = load_store(paths)
@@ -1667,6 +1766,10 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate_cmd.add_argument("--policy", default=None)
     evaluate_cmd.add_argument("--json", action="store_true")
 
+    bets_cmd = sub.add_parser("bets", help="Rank the frontier research bets and check each one is refutable and grounded.")
+    bets_cmd.add_argument("--verbose", action="store_true")
+    bets_cmd.add_argument("--json", action="store_true")
+
     stress_cmd = sub.add_parser("stress", help="Score policies under perturbation: reworded contexts, missing observables, distractors, duplicates, tool loss.")
     stress_cmd.add_argument("--policy", default=None)
     stress_cmd.add_argument("--json", action="store_true")
@@ -1693,6 +1796,7 @@ def main(argv: list[str] | None = None) -> int:
         "status": cmd_status,
         "retrieve": cmd_retrieve,
         "evaluate": cmd_evaluate,
+        "bets": cmd_bets,
         "stress": cmd_stress,
         "compile-queue": cmd_compile_queue,
         "vocab": cmd_vocab,

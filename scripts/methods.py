@@ -540,6 +540,270 @@ def lmsr_binary(
     }
 
 
+
+# --------------------------------------------------------------------------------------
+# Frontier probes — cheap first computations for the research bets in frontier_bets.yaml
+# --------------------------------------------------------------------------------------
+
+
+@method(
+    name="hawkes_branching_ratio",
+    version="1.0.0",
+    summary="Endogeneity of an event stream: the Hawkes branching ratio recovered from count dispersion.",
+    inputs={
+        "counts": "event counts in consecutive equal-length windows (trades, book updates, liquidations)",
+        "min_windows": "minimum windows required before an estimate is returned (default 20)",
+    },
+    outputs={
+        "branching_ratio": "n in [0,1): the share of events triggered by other events rather than arriving exogenously",
+        "fano_factor": "Var(N)/E[N] over the windows",
+        "criticality": "how close n sits to 1; above ~0.9 the stream is near-critical and cascade-prone",
+        "regime": "exogenous | mixed | endogenous | near_critical | underdispersed",
+    },
+    as_of_contract="Counts must come from windows ending at or before the decision timestamp. The estimator is backward-looking by construction.",
+    failure_modes=[
+        "The Fano identity is asymptotic in window length; short windows bias n downward.",
+        "Underdispersed counts (F < 1) are not a Hawkes process at all — regular or inhibited arrivals return n=0 with a flag rather than a negative number.",
+        "Non-stationarity inside the sample inflates the variance and therefore n. Intraday seasonality must be removed first or the estimate reads 'near-critical' every day at the open.",
+        "Says nothing about direction: a near-critical buy cascade and sell cascade look identical.",
+    ],
+    concepts=["KC-HAWKES-CRITICALITY"],
+)
+def hawkes_branching_ratio(counts: list[float], min_windows: int = 20) -> dict[str, Any]:
+    if len(counts) < min_windows:
+        return {"branching_ratio": None, "refused": f"need at least {min_windows} windows, got {len(counts)}"}
+    mean = _mean([float(c) for c in counts])
+    if mean <= 0:
+        return {"branching_ratio": None, "refused": "no events in the sample"}
+    variance = sum((float(c) - mean) ** 2 for c in counts) / (len(counts) - 1)
+    fano = variance / mean
+    if fano < 1.0:
+        return {
+            "branching_ratio": 0.0,
+            "fano_factor": fano,
+            "criticality": 0.0,
+            "regime": "underdispersed",
+            "note": "counts are more regular than Poisson; a self-exciting model does not describe this stream",
+        }
+    branching = 1.0 - 1.0 / math.sqrt(fano)
+    regime = (
+        "near_critical" if branching >= 0.9
+        else "endogenous" if branching >= 0.6
+        else "mixed" if branching >= 0.3
+        else "exogenous"
+    )
+    return {
+        "branching_ratio": branching,
+        "fano_factor": fano,
+        "criticality": branching,
+        "regime": regime,
+        "windows": len(counts),
+    }
+
+
+@method(
+    name="time_irreversibility",
+    version="1.0.0",
+    summary="Model-free time-asymmetry of a series via ordinal patterns: a screening statistic for exploitable structure.",
+    inputs={
+        "values": "series in time order",
+        "embedding": "ordinal pattern length, 3 or 4 (default 3)",
+    },
+    outputs={
+        "irreversibility": "Jensen-Shannon divergence between forward and time-reversed pattern distributions, in [0, ln 2]",
+        "normalized": "divergence scaled to [0,1] by ln 2",
+        "patterns_seen": "distinct ordinal patterns observed",
+        "verdict": "reversible | weakly_irreversible | irreversible",
+    },
+    as_of_contract="Uses only observations up to the decision timestamp. The reversal is of the observed window, not of anything in the future.",
+    failure_modes=[
+        "Reversibility is necessary, not sufficient, for unexploitability: a reversible series can still be predictable in level.",
+        "Short windows make every series look irreversible; below a few hundred points the statistic is dominated by sampling noise.",
+        "Ordinal patterns discard magnitude, so a series with irreversible amplitudes but symmetric ordering reads as reversible.",
+        "No significance test is attached. Compare against a shuffled control before acting on a number.",
+    ],
+    concepts=["KC-IRREVERSIBILITY"],
+)
+def time_irreversibility(values: list[float], embedding: int = 3) -> dict[str, Any]:
+    if embedding < 2 or embedding > 5:
+        return {"refused": "embedding must be between 2 and 5"}
+    if len(values) < embedding * 20:
+        return {"refused": f"need at least {embedding * 20} points for embedding {embedding}"}
+
+    def pattern_distribution(series: list[float]) -> dict[tuple[int, ...], float]:
+        counts: dict[tuple[int, ...], int] = {}
+        for index in range(len(series) - embedding + 1):
+            window = series[index : index + embedding]
+            order = tuple(sorted(range(embedding), key=lambda i: (window[i], i)))
+            counts[order] = counts.get(order, 0) + 1
+        total = sum(counts.values()) or 1
+        return {key: value / total for key, value in counts.items()}
+
+    forward = pattern_distribution([float(v) for v in values])
+    backward = pattern_distribution([float(v) for v in reversed(values)])
+
+    keys = sorted(set(forward) | set(backward))
+    divergence = 0.0
+    for key in keys:
+        p, q = forward.get(key, 0.0), backward.get(key, 0.0)
+        m = 0.5 * (p + q)
+        if p > 0:
+            divergence += 0.5 * p * math.log(p / m)
+        if q > 0:
+            divergence += 0.5 * q * math.log(q / m)
+
+    normalized = divergence / math.log(2.0)
+    return {
+        "irreversibility": divergence,
+        "normalized": normalized,
+        "patterns_seen": len(keys),
+        "verdict": "irreversible" if normalized > 0.05 else "weakly_irreversible" if normalized > 0.005 else "reversible",
+    }
+
+
+@method(
+    name="path_signature",
+    version="1.0.0",
+    summary="Level-2 path signature of a multivariate path, including Levy areas — path features invariant to time reparametrization.",
+    inputs={
+        "path": "list of points, each a list of d coordinates, in time order",
+        "lead_lag_pair": "optional [i, j] index pair to report the Levy area for explicitly",
+    },
+    outputs={
+        "level1": "total increments per channel",
+        "level2": "d x d matrix of iterated integrals",
+        "levy_areas": "antisymmetric part: signed area enclosed by each coordinate pair",
+        "lead_lag": "Levy area for the requested pair; positive means the first channel leads the second around the loop",
+    },
+    as_of_contract="The path must consist of observations at or before the decision timestamp, in observation order.",
+    failure_modes=[
+        "Invariance to reparametrization is a feature and a trap: signatures cannot see how fast the path was traversed. Add time as an explicit channel when speed matters.",
+        "Level 2 only. Genuinely higher-order interactions need level 3+, which grows as d^k.",
+        "Scale-sensitive: channels must be normalized or the largest-variance channel dominates every area.",
+        "A Levy area near zero means no hysteresis in that window, not that the two channels are unrelated.",
+    ],
+    concepts=["KC-SIGNATURE-PATH"],
+)
+def path_signature(path: list[list[float]], lead_lag_pair: list[int] | None = None) -> dict[str, Any]:
+    if len(path) < 2:
+        return {"refused": "need at least two points"}
+    dimension = len(path[0])
+    if any(len(point) != dimension for point in path):
+        return {"refused": "all points must have the same dimension"}
+
+    level1 = [0.0] * dimension
+    level2 = [[0.0] * dimension for _ in range(dimension)]
+    # Chen's relation over piecewise-linear segments: each segment contributes the
+    # running level-1 signature times its increment, plus its own half-outer-product.
+    for start, end in zip(path, path[1:]):
+        increment = [float(end[k]) - float(start[k]) for k in range(dimension)]
+        for i in range(dimension):
+            for j in range(dimension):
+                level2[i][j] += level1[i] * increment[j] + 0.5 * increment[i] * increment[j]
+        for k in range(dimension):
+            level1[k] += increment[k]
+
+    areas = [[0.5 * (level2[i][j] - level2[j][i]) for j in range(dimension)] for i in range(dimension)]
+    lead_lag = None
+    if lead_lag_pair and len(lead_lag_pair) == 2:
+        i, j = lead_lag_pair
+        if 0 <= i < dimension and 0 <= j < dimension:
+            lead_lag = areas[i][j]
+
+    return {"level1": level1, "level2": level2, "levy_areas": areas, "lead_lag": lead_lag, "dimension": dimension}
+
+
+@method(
+    name="prediction_market_consistency",
+    version="1.0.0",
+    summary="Sharp logical bounds across related binary markets: Frechet-Hoeffding, implication and partition constraints.",
+    inputs={
+        "markets": "mapping of market id to quoted probability",
+        "conjunctions": "list of {a, b, market} where `market` quotes P(a AND b)",
+        "implications": "list of {antecedent, consequent} where the first event implies the second",
+        "partitions": "list of {members: [...], total: 1.0} for mutually exclusive, exhaustive sets",
+        "cost": "round-trip execution cost per leg, in probability units (default 0.02)",
+    },
+    outputs={
+        "violations": "constraints breached, each with the gap and whether it survives cost",
+        "tradable": "violations whose gap exceeds the cost hurdle on every leg involved",
+        "max_gap": "largest gap found",
+    },
+    as_of_contract="All quotes must be synchronized at the decision timestamp. A stale leg manufactures violations that are not executable.",
+    failure_modes=[
+        "Assumes the events are logically related as declared. A resolution-criteria difference is the usual cause of a gap that never closes, and this method cannot see it.",
+        "Frechet bounds are sharp but wide: satisfying them does not imply the joint is correctly priced.",
+        "Uses mid quotes; a violation inside the spread is not executable.",
+        "Silent about capital: holding both legs to resolution has a carry cost this does not model.",
+    ],
+    concepts=["KC-XMKT-CONSISTENCY"],
+)
+def prediction_market_consistency(
+    markets: dict[str, float],
+    conjunctions: list[dict[str, Any]] | None = None,
+    implications: list[dict[str, Any]] | None = None,
+    partitions: list[dict[str, Any]] | None = None,
+    cost: float = 0.02,
+) -> dict[str, Any]:
+    violations: list[dict[str, Any]] = []
+
+    for row in conjunctions or []:
+        a, b, joint_id = row.get("a"), row.get("b"), row.get("market")
+        if a not in markets or b not in markets or joint_id not in markets:
+            continue
+        p, q, joint = markets[a], markets[b], markets[joint_id]
+        lower, upper = max(0.0, p + q - 1.0), min(p, q)
+        if joint < lower - 1e-12:
+            violations.append({"type": "frechet_lower", "markets": [a, b, joint_id], "quoted": joint, "bound": lower, "gap": lower - joint, "legs": 3})
+        elif joint > upper + 1e-12:
+            violations.append({"type": "frechet_upper", "markets": [a, b, joint_id], "quoted": joint, "bound": upper, "gap": joint - upper, "legs": 3})
+
+    for row in implications or []:
+        antecedent, consequent = row.get("antecedent"), row.get("consequent")
+        if antecedent not in markets or consequent not in markets:
+            continue
+        if markets[antecedent] > markets[consequent] + 1e-12:
+            violations.append(
+                {
+                    "type": "implication",
+                    "markets": [antecedent, consequent],
+                    "quoted": markets[antecedent],
+                    "bound": markets[consequent],
+                    "gap": markets[antecedent] - markets[consequent],
+                    "legs": 2,
+                }
+            )
+
+    for row in partitions or []:
+        members = [m for m in (row.get("members") or []) if m in markets]
+        if len(members) < 2:
+            continue
+        total = float(row.get("total", 1.0))
+        observed = sum(markets[m] for m in members)
+        if abs(observed - total) > 1e-12:
+            violations.append(
+                {
+                    "type": "partition",
+                    "markets": members,
+                    "quoted": observed,
+                    "bound": total,
+                    "gap": abs(observed - total),
+                    "legs": len(members),
+                }
+            )
+
+    for row in violations:
+        row["cost_hurdle"] = cost * row["legs"]
+        row["tradable"] = row["gap"] > row["cost_hurdle"]
+
+    return {
+        "violations": violations,
+        "tradable": [row for row in violations if row["tradable"]],
+        "max_gap": max((row["gap"] for row in violations), default=0.0),
+        "checked": len(conjunctions or []) + len(implications or []) + len(partitions or []),
+    }
+
+
 # --------------------------------------------------------------------------------------
 # Self-test
 # --------------------------------------------------------------------------------------
@@ -629,6 +893,71 @@ def self_test() -> dict[str, Any]:
     huge = lmsr_binary(liquidity=1.0, quantity_yes=10000.0, quantity_no=0.0)
     assert abs(huge["price_yes"] - 1.0) < 1e-9 and math.isfinite(huge["cost"]), huge
     checks.append("lmsr_binary: prices sum to one, moving price costs, extreme inventory does not overflow")
+
+    # --- frontier probes -------------------------------------------------------
+    # Fano identity: F -> (1-n)^-2, so a stream built with a known dispersion must
+    # return the branching ratio that produced it.
+    for target in [0.3, 0.6, 0.9]:
+        fano = (1.0 - target) ** -2
+        # counts with mean m and variance m*F, constructed exactly: half at m-d, half at m+d
+        mean_count, count = 100.0, 40
+        delta = math.sqrt(fano * mean_count * (count - 1) / count)
+        counts = [mean_count - delta] * (count // 2) + [mean_count + delta] * (count // 2)
+        estimate = hawkes_branching_ratio(counts)
+        assert abs(estimate["branching_ratio"] - target) < 1e-6, (target, estimate)
+    assert hawkes_branching_ratio([100.0] * 40)["regime"] == "underdispersed"
+    assert hawkes_branching_ratio([1.0] * 5)["refused"]
+    assert hawkes_branching_ratio([50.0 if i % 2 else 150.0 for i in range(40)])["regime"] in {"endogenous", "near_critical"}
+    checks.append("hawkes_branching_ratio: recovers a known branching ratio from count dispersion, flags underdispersion")
+
+    # A symmetric triangle wave is time-reversible; a sawtooth is not.
+    triangle = ([0.0, 1.0, 2.0, 3.0, 2.0, 1.0] * 30)
+    sawtooth = ([0.0, 1.0, 2.0, 3.0] * 45)
+    assert time_irreversibility(triangle)["verdict"] == "reversible", time_irreversibility(triangle)
+    saw = time_irreversibility(sawtooth)
+    assert saw["verdict"] == "irreversible", saw
+    assert saw["normalized"] > time_irreversibility(triangle)["normalized"]
+    assert time_irreversibility([1.0, 2.0])["refused"]
+    checks.append("time_irreversibility: triangle wave reads reversible, sawtooth reads irreversible")
+
+    # Signature: exact Levy area of a closed triangle, and invariance to reparametrization.
+    triangle_path = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 0.0]]
+    signature = path_signature(triangle_path, lead_lag_pair=[0, 1])
+    assert abs(signature["lead_lag"] - 0.5) < 1e-12, signature["lead_lag"]
+    assert all(abs(value) < 1e-12 for value in signature["level1"]), "a closed loop has zero net increment"
+    # Subdividing a segment and repeating a point must not move the signature at all.
+    resampled = [[0.0, 0.0], [0.5, 0.0], [1.0, 0.0], [1.0, 0.5], [1.0, 1.0], [1.0, 1.0], [0.5, 0.5], [0.0, 0.0]]
+    assert abs(path_signature(resampled, lead_lag_pair=[0, 1])["lead_lag"] - 0.5) < 1e-12, "signature must be reparametrization invariant"
+    straight = path_signature([[0.0, 0.0], [1.0, 1.0], [2.0, 2.0]], lead_lag_pair=[0, 1])
+    assert abs(straight["lead_lag"]) < 1e-12, "a straight path encloses no area"
+    assert path_signature([[0.0, 0.0]])["refused"]
+    checks.append("path_signature: exact Levy area, zero for a straight path, invariant under reparametrization")
+
+    # Frechet-Hoeffding and the logical constraints.
+    result = prediction_market_consistency(
+        markets={"a": 0.6, "b": 0.7, "a_and_b": 0.2, "narrow": 0.5, "wide": 0.4, "x": 0.5, "y": 0.4, "z": 0.2},
+        conjunctions=[{"a": "a", "b": "b", "market": "a_and_b"}],
+        implications=[{"antecedent": "narrow", "consequent": "wide"}],
+        partitions=[{"members": ["x", "y", "z"], "total": 1.0}],
+        cost=0.02,
+    )
+    kinds = {row["type"] for row in result["violations"]}
+    assert kinds == {"frechet_lower", "implication", "partition"}, kinds
+    lower = next(row for row in result["violations"] if row["type"] == "frechet_lower")
+    assert abs(lower["gap"] - 0.1) < 1e-9, lower
+    assert lower["tradable"], "a 0.10 gap clears a 0.06 three-leg hurdle"
+    marginal = prediction_market_consistency(
+        markets={"a": 0.6, "b": 0.7, "a_and_b": 0.26},
+        conjunctions=[{"a": "a", "b": "b", "market": "a_and_b"}],
+        cost=0.02,
+    )
+    assert marginal["violations"] and not marginal["tradable"], "a 0.04 gap must not survive the same hurdle"
+    consistent = prediction_market_consistency(
+        markets={"a": 0.6, "b": 0.7, "a_and_b": 0.45},
+        conjunctions=[{"a": "a", "b": "b", "market": "a_and_b"}],
+    )
+    assert not consistent["violations"], consistent
+    checks.append("prediction_market_consistency: Frechet, implication and partition breaches found and cost-gated")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 

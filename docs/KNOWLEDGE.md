@@ -183,6 +183,27 @@ offered -> served -> inspected -> semantically used -> tool-changing
 
 Only the last rung requires matured outcomes, and only a randomized comparison licenses the word "beneficial". A card that is offered a thousand times, opened twice and never changes a decision is not knowledge the agent has — it is context the agent pays for.
 
+## Frontier bets: where an advanced-mathematics import might pay
+
+`knowledge/frontier_bets.yaml` holds ranked *hypotheses about where to look* — mathematical imports that could pay if they transfer. They are not findings and nothing in the file has been tested on our data. Each bet must name the object being imported, the diagnosed problem it attacks, a sharp prediction, a falsifier, the minimum data, and the first computation to run; `knowledge.py bets` refuses a bet that is missing any of them, cites a source not in the bibliography, or names a `first_computation` with no implementation.
+
+```
+V = payoff x sqrt(novelty) x testability x maturity - effort
+```
+
+Novelty is square-rooted deliberately: being first is worth something, but a novel idea nobody can test is worth less than a known one that can be refuted this week. Maturity multiplies rather than adds — a bet that needs new mathematics before it can be tried is a research programme, not a bet.
+
+Four of the eleven ship with their first computation already implemented in `methods.py`, so they can be refuted the day data arrives:
+
+| Bet | Import | First computation |
+|---|---|---|
+| `FB-CRITICALITY` | Hawkes branching ratio as a live fragility state variable | `hawkes_branching_ratio` — recovered from count dispersion via the Fano identity, n = 1 − F^(−1/2) |
+| `FB-JOINT-BOUNDS` | Fréchet–Hoeffding and martingale optimal transport bounds across correlated prediction markets | `prediction_market_consistency` — conjunction, implication and partition breaches, cost-gated per leg |
+| `FB-SIGNATURE` | Path signatures; the Lévy area between price and flow as a clock-free lead-lag measure | `path_signature` — level-2 iterated integrals, invariant to time reparametrization |
+| `FB-IRREVERSIBILITY` | Entropy production and time-reversal asymmetry as a screen for where structure exists | `time_irreversibility` — ordinal-pattern divergence between forward and reversed series |
+
+The file also records what is deliberately *not* a bet — topological data analysis, quantum portfolio optimization, deterministic chaos prediction, fractal-market narratives, agent-based simulation as evidence — with the reason, so the same suggestions do not get relitigated every quarter.
+
 ## Ranking what to compile next
 
 ```bash
@@ -226,6 +247,7 @@ Unlike the corpus lab, this one runs unattended: scoring a policy is a sub-secon
 | `knowledge.py retrieve --context c.json [--policy p] [--markdown]` | Build an evidence packet |
 | `knowledge.py evaluate [--policy p]` | Score policies against the labelled trials |
 | `knowledge.py stress [--policy p]` | Re-score under five perturbations, with integrity violations |
+| `knowledge.py bets [--verbose]` | Rank the frontier research bets; refuse any that is not refutable and grounded |
 | `knowledge.py compile-queue [--limit n]` | Rank what to read and compile next |
 | `knowledge.py vocab` | Card vocabularies and the gate's conditions |
 | `methods.py list / show / run / self-test` | The deterministic method registry |

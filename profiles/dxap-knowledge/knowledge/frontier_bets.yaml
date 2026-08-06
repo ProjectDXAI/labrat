@@ -1,0 +1,401 @@
+# Frontier bets: where an advanced-mathematics import is most likely to pay.
+#
+# These are HYPOTHESES ABOUT WHERE TO LOOK, not findings. Nothing here has been
+# tested on our data. Each bet names the mathematical object being imported, the
+# diagnosed problem it attacks, a sharp prediction, what would kill it, the
+# minimum data required, and the first computation to run — so a bet can be
+# refuted cheaply instead of admired indefinitely.
+#
+# Ranked by `labrat knowledge bets`:
+#
+#   V = payoff x novelty^0.5 x testability x maturity - effort
+#
+# `payoff`      magnitude if the thesis holds (1-5)
+# `novelty`     how underexploited the import is by people trading the same venues (1-5)
+# `testability` can we falsify it with data we plausibly have (1-5)
+# `maturity`    is the mathematics finished, or would we need new theory (1-5)
+# `effort`      engineering and reading cost to a first answer (1-5, subtracted)
+#
+# Novelty enters under a square root deliberately. Being first matters, but a
+# novel idea that cannot be tested is worth less than a known one that can.
+
+bets:
+
+  - bet_id: FB-CRITICALITY
+    title: "Hawkes branching ratio as a live fragility state variable"
+    domain: point_processes
+    import: "The branching ratio n of a self-exciting process: the share of events triggered by other events rather than arriving from outside."
+    thesis: >
+      Order flow is overwhelmingly endogenous — most events are reactions to other events.
+      The branching ratio measures exactly that, is estimable in near real time from count
+      dispersion alone, and n approaching 1 is a critical point: the same shock that is
+      absorbed at n=0.5 cascades at n=0.95. If fragility is measurable before the cascade,
+      abstention and sizing can be conditioned on it rather than on realized volatility,
+      which is a lagging shadow of the same quantity.
+    sharp_prediction: >
+      Liquidation cascades and gap moves are preceded by a rise in the branching ratio of
+      trade or liquidation arrivals, on a horizon longer than the rise in realized
+      volatility. Conditioning position size on n outperforms conditioning on trailing
+      volatility over the same lookback.
+    falsifier: >
+      n has no lead over realized volatility, or its rises are not followed by more cascades
+      than base rate, or intraday seasonality accounts for all of its variation.
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-INVENTORY-FUNDING]
+    minimum_data: "Event timestamps (trades, or better, liquidations) for a few weeks, at one venue."
+    first_computation: hawkes_branching_ratio
+    why_underexploited: >
+      The Hawkes literature in finance is mostly used for simulation and for impact modelling,
+      not as a live regime signal. The count-dispersion estimator is far cheaper than the
+      maximum-likelihood kernel fitting that most papers use, which is what keeps it off desks.
+    unexpected_connection: >
+      Jaisson and Rosenbaum showed that nearly-unstable Hawkes processes converge to rough
+      volatility. The same number therefore links microstructural endogeneity to the roughness
+      of the volatility process — a single state variable spanning two literatures we hold.
+    maturity: 5
+    payoff: 5
+    novelty: 4
+    testability: 5
+    effort: 2
+    sources: [bacry-2015-hawkes-processes-finance, jaisson-2015-nearly-unstable-hawkes, gatheral-2018-volatility-is-rough, hawkes-1971-spectra-self-exciting]
+
+  - bet_id: FB-JOINT-BOUNDS
+    title: "Sharp logical bounds across correlated prediction markets"
+    domain: optimal_transport
+    import: "Frechet-Hoeffding bounds and, at scale, martingale optimal transport: the tightest bounds on a joint distribution consistent with observed marginals."
+    thesis: >
+      A prediction-market venue quotes many binaries over one event tree. Those marginals
+      constrain each other, sharply and model-free. Most cross-market work is pairwise
+      correlation; the transport formulation gives the exact arbitrage-free polytope, so a
+      violation is a theorem being breached rather than a model disagreeing with a price.
+    sharp_prediction: >
+      Logical violations — a conjunction priced below its Frechet lower bound, an implication
+      inverted, a partition not summing to one — occur regularly on thin venues, exceed
+      round-trip cost on a measurable fraction of occasions, and close toward resolution.
+    falsifier: >
+      Violations are rare after synchronizing quotes, or they trace to resolution-criteria
+      differences rather than mispricing, or the cheap leg is never executable at the quote.
+    problem_ids: [PB-XMARKET, PB-STALE-PROBABILITY]
+    minimum_data: "Synchronized quotes across logically related markets on one venue, plus the resolution rules read by a human."
+    first_computation: prediction_market_consistency
+    why_underexploited: >
+      Equities have no analogue: you rarely get dozens of explicit marginals on one event tree.
+      The structure is specific to prediction markets, which are too small to have attracted the
+      people who know this mathematics.
+    unexpected_connection: >
+      The same bounds are the model-free option pricing bounds of martingale optimal transport.
+      A prediction market is a compound option book on an event tree, and the machinery ports
+      directly.
+    maturity: 5
+    payoff: 4
+    novelty: 5
+    testability: 5
+    effort: 2
+    sources: [peyre-2019-computational-optimal-transport, villani-2009-optimal-transport, hanson-2007-logarithmic-market-scoring, wolfers-2004-prediction-markets]
+
+  - bet_id: FB-IRREVERSIBILITY
+    title: "Time-irreversibility as a model-free screen for where structure exists"
+    domain: stochastic_thermodynamics
+    import: "Entropy production and time-reversal asymmetry from nonequilibrium statistical physics; measured here through ordinal-pattern divergence."
+    thesis: >
+      A time-reversible stream carries no directional structure a strategy could exploit from
+      pattern alone. Irreversibility is therefore a necessary condition for a flow-based edge,
+      it is computable without any model, and it costs almost nothing. Used as a screen rather
+      than a signal, it answers a question we currently answer by intuition: which instruments,
+      venues and hours are even worth hunting in.
+    sharp_prediction: >
+      Instrument-venue-hour cells ranked by irreversibility contain the cells where flow-based
+      signals subsequently show out-of-sample edge; reversible cells contain almost none.
+    falsifier: >
+      The ranking has no relationship to realized signal performance, or irreversibility is
+      entirely explained by known deterministic seasonality such as funding settlements.
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-ADVERSE-ENTRY]
+    minimum_data: "Mid-price or signed-flow series per instrument, a few hundred points per cell."
+    first_computation: time_irreversibility
+    why_underexploited: >
+      Econophysics has measured irreversibility in markets as a descriptive fact. Almost nobody
+      uses it as a resource-allocation statistic — as an answer to where to spend research effort
+      rather than as a claim about efficiency.
+    unexpected_connection: >
+      The thermodynamic uncertainty relation bounds the precision of any current by the entropy
+      production sustaining it. If that transfers, it implies a hard ceiling on the Sharpe of any
+      flow-based signal in a given market, computable from the flow alone and without fitting a
+      strategy. That would be a genuinely new kind of statement about a market.
+    maturity: 3
+    payoff: 4
+    novelty: 5
+    testability: 4
+    effort: 2
+    sources: [cover-2006-elements-information-theory, mackay-2003-information-theory-inference, sornette-2003-why-stock-markets-crash]
+
+  - bet_id: FB-SIGNATURE
+    title: "Path signatures for clock-free order-book features, and the Levy area as a lead-lag measure"
+    domain: rough_paths
+    import: "The truncated signature of a path: iterated integrals that characterize the path up to time reparametrization."
+    thesis: >
+      Every order-book feature we build carries a hidden choice of clock — wall time, trade time,
+      volume time. Signatures are invariant to that choice by construction, so they extract what
+      the path did rather than how fast it was sampled. The level-2 antisymmetric part, the Levy
+      area between price and cumulative signed flow, is a direct measure of hysteresis: whether
+      flow led price or price led flow inside the window, in a single number with no lag parameter.
+    sharp_prediction: >
+      Levy area between price and signed flow separates informed from mechanical flow better than
+      contemporaneous order flow imbalance, and its advantage grows in the regimes where sampling
+      is most irregular.
+    falsifier: >
+      Levy area adds nothing over order flow imbalance and volume-clock resampling, or it is so
+      scale-sensitive that normalization choices dominate the signal.
+    problem_ids: [PB-ADVERSE-ENTRY, PB-ABSORPTION, PB-REGIME-BREAK]
+    minimum_data: "Aligned price and signed-volume series at event granularity."
+    first_computation: path_signature
+    why_underexploited: >
+      Signature methods reached finance through deep learning papers that use them as generic
+      features inside a network. The specific properties that matter here — reparametrization
+      invariance and the geometric reading of the Levy area — get lost when the signature is
+      treated as one more embedding.
+    unexpected_connection: >
+      Reparametrization invariance is the same property that makes signatures work for handwriting
+      and speech, where writing speed is nuisance. Sampling irregularity in an order book is the
+      identical nuisance, and the field solved it decades ago for a different reason.
+    maturity: 5
+    payoff: 4
+    novelty: 4
+    testability: 4
+    effort: 3
+    sources: [chevyrev-2016-signature-method-primer, friz-2020-course-rough-paths, lyons-2007-differential-equations-rough-paths, kidger-2022-neural-differential-equations]
+
+  - bet_id: FB-PREDICTIVE-BOTTLENECK
+    title: "Rate-distortion bounds on how much order-book state a world model must keep"
+    domain: information_theory
+    import: "The predictive information bottleneck: the minimum bits of past that must be retained to preserve a given amount of predictive information about the future."
+    thesis: >
+      Compressing L4 state is currently an architecture choice justified after the fact by
+      validation loss. Rate-distortion theory turns it into a measurable frontier: for each
+      compression rate there is a maximum achievable predictive information, and the gap between
+      our encoder and that frontier says whether more capacity would help at all.
+    sharp_prediction: >
+      The predictive-information curve saturates well below full book state, and the saturation
+      point identifies the encoder width beyond which additional capacity buys nothing — a
+      prediction checkable by training encoders on either side of it.
+    falsifier: >
+      Estimated predictive information does not saturate, or the estimator's bias at realistic
+      sample sizes swamps the curve's shape.
+    problem_ids: [PB-REGIME-BREAK, PB-FILL-UNCERTAINTY]
+    minimum_data: "Book snapshots with a forward target, enough history to estimate mutual information at several rates."
+    first_computation: null
+    why_underexploited: >
+      The information bottleneck is well known in deep learning theory and almost never applied
+      to the design decision it most directly answers: how wide the state representation should be.
+    unexpected_connection: >
+      This is the same rate-distortion object as lossy codec design. The codec work already in
+      flight is the same mathematics pointed at a different signal.
+    maturity: 3
+    payoff: 4
+    novelty: 4
+    testability: 3
+    effort: 4
+    sources: [cover-2006-elements-information-theory, berger-1971-rate-distortion-theory, grunwald-2007-mdl-principle, mackay-2003-information-theory-inference]
+
+  - bet_id: FB-NONHERMITIAN
+    title: "Non-Hermitian random matrix theory for lead-lag structure"
+    domain: random_matrix_theory
+    import: "The circular law and its deviations: the spectrum of a large asymmetric random matrix, against which an empirical lead-lag matrix can be tested."
+    thesis: >
+      Covariance cleaning is standard because Marchenko-Pastur gives the null spectrum of a
+      symmetric matrix. The lead-lag matrix is asymmetric and has no such standard treatment in
+      practice, so cross-asset lead-lag is usually read off correlations with no null model at
+      all. Non-Hermitian RMT supplies the null, which converts a pile of suggestive numbers into
+      a test with a rejection region.
+    sharp_prediction: >
+      Most eigenvalues of the empirical lead-lag matrix fall inside the circular law radius and
+      are noise; the few outliers are stable across disjoint periods and identify genuine leaders.
+    falsifier: >
+      No eigenvalues fall outside the bulk, or the outliers are unstable out of sample, meaning
+      the apparent lead-lag structure was estimation noise all along.
+    problem_ids: [PB-XMARKET, PB-ABSORPTION]
+    minimum_data: "Synchronized returns for tens of instruments over months."
+    first_computation: null
+    why_underexploited: >
+      Symmetric RMT is a standard tool on every quant desk. The non-Hermitian case is textbook
+      mathematics that has barely crossed into finance because the natural object — a directed,
+      asymmetric relationship matrix — is less familiar than a covariance.
+    unexpected_connection: >
+      The same spectra describe stability of large ecosystems and neural networks. The question
+      "which few directed links are real amid overwhelming noise" is identical.
+    maturity: 4
+    payoff: 3
+    novelty: 5
+    testability: 4
+    effort: 3
+    sources: [potters-2020-first-course-random-matrix-theory, bai-2010-spectral-analysis-random-matrices, ledoit-2004-well-conditioned-covariance]
+
+  - bet_id: FB-PATHWISE-PORTFOLIO
+    title: "Pathwise relative arbitrage without estimating drift"
+    domain: stochastic_portfolio_theory
+    import: "Functionally generated portfolios: weights derived from a concave function of market weights that outperform the market pathwise, with no drift estimate."
+    thesis: >
+      Everything we do depends on estimating expected returns, which is the hardest quantity in
+      finance to estimate. Stochastic portfolio theory produces relative outperformance conditions
+      that hold pathwise, driven by diversity and volatility rather than by forecasts. Crypto has
+      exceptionally high diversity and turnover in market weights, which is exactly the regime
+      where the excess growth term is large.
+    sharp_prediction: >
+      A diversity-weighted portfolio over a liquid crypto universe outperforms the
+      capitalization-weighted benchmark over multi-month horizons, with the outperformance
+      tracking the realized excess growth rate rather than any return forecast.
+    falsifier: >
+      Rebalancing costs exceed the excess growth term at achievable turnover, or the universe is
+      too concentrated for the diversity term to be meaningful.
+    problem_ids: [PB-COST-DRAG, PB-GIVEBACK]
+    minimum_data: "Market capitalizations and prices for a defined universe, plus a realistic cost model."
+    first_computation: null
+    why_underexploited: >
+      The theory is thirty years old, mathematically demanding, and mostly discussed in equity
+      terms where diversity is stable. Nobody has had a strong reason to port it to a universe
+      whose weights move as violently as crypto.
+    unexpected_connection: >
+      The excess growth rate is a variance-driven quantity, so a portfolio can profit from
+      volatility while holding no options and forecasting nothing.
+    maturity: 4
+    payoff: 4
+    novelty: 5
+    testability: 3
+    effort: 4
+    sources: [fernholz-stochastic-portfolio-theory, cover-2006-elements-information-theory]
+
+  - bet_id: FB-STATE-COLLAPSE
+    title: "Heavy-traffic state-space collapse as a principled book dimensionality reduction"
+    domain: queueing_networks
+    import: "State-space collapse: in heavy traffic, a multidimensional queueing system concentrates on a lower-dimensional manifold, and the theorem names the surviving coordinates."
+    thesis: >
+      We reduce book state with PCA or by choosing levels by hand. Queueing theory says that in the
+      busy regime the state is genuinely lower-dimensional and specifies which linear functionals
+      survive. That is a reduction with a theorem attached rather than a variance heuristic, and it
+      predicts which features remain informative exactly when the book is under stress.
+    sharp_prediction: >
+      Under heavy load, the predictive content of the full depth vector is captured by the
+      theoretically identified functionals, and PCA components that disagree with them add nothing.
+    falsifier: >
+      The collapse coordinates underperform PCA out of sample, or real books never reach the
+      traffic intensity where the theorem bites.
+    problem_ids: [PB-FILL-UNCERTAINTY, PB-ADVERSE-ENTRY]
+    minimum_data: "Depth-of-book snapshots with per-level sizes across a range of activity levels."
+    first_computation: null
+    why_underexploited: >
+      The order-book queueing literature stops at one or two price levels, where collapse is not
+      needed. The heavy-traffic results live in operations research and are written about
+      communication networks and manufacturing.
+    maturity: 4
+    payoff: 3
+    novelty: 4
+    testability: 3
+    effort: 4
+    sources: [whitt-2002-stochastic-process-limits, chen-2001-fundamentals-queueing-networks, cont-2013-price-dynamics-markovian-lob, harrison-1985-brownian-motion-stochastic-flow]
+
+  - bet_id: FB-PROPHET
+    title: "Competitive-ratio exit rules instead of fitted hazards"
+    domain: online_algorithms
+    import: "Prophet inequalities and secretary problems: stopping rules with worst-case guarantees against a prophet who sees the whole sequence."
+    thesis: >
+      Our continuation-value approach needs a conditional distribution estimated from historical
+      episodes, and that estimate is exactly what a regime change invalidates. Prophet inequalities
+      give stopping rules whose guarantee holds without knowing the distribution — a floor under
+      exit quality that survives being wrong about the world.
+    sharp_prediction: >
+      A threshold rule with a competitive guarantee captures a stable fraction of maximum favourable
+      excursion across regimes, with lower variance than the fitted hazard rule, giving up mean
+      capture in calm periods and gaining it in broken ones.
+    falsifier: >
+      The guaranteed rule underperforms the fitted rule in every regime including the disrupted ones,
+      meaning the distributional estimate was never the fragile part.
+    problem_ids: [PB-GIVEBACK, PB-THESIS-DECAY]
+    minimum_data: "Historical position episodes with their full favourable-excursion paths."
+    first_computation: null
+    why_underexploited: >
+      Prophet inequalities live in theoretical computer science and mechanism design. The trading
+      literature on exits is almost entirely distributional.
+    maturity: 4
+    payoff: 3
+    novelty: 4
+    testability: 4
+    effort: 3
+    sources: [peskir-2006-optimal-stopping, lattimore-2020-bandit-algorithms, cesabianchi-2006-prediction-learning-games, nisan-2007-algorithmic-game-theory]
+
+  - bet_id: FB-EVALUE-MONITOR
+    title: "Anytime-valid monitoring of a live edge"
+    domain: sequential_inference
+    import: "E-values and test martingales: evidence that can be monitored continuously and stopped at any time without inflating error."
+    thesis: >
+      Deciding whether a deployed edge has decayed is a peeking problem, and we currently solve it
+      by eyeballing a rolling metric. E-processes make continuous monitoring valid by construction,
+      so retirement becomes a decision with a stated error rate rather than a judgement call.
+    sharp_prediction: >
+      An e-process on realized net edge flags decayed strategies earlier than a fixed-window
+      significance test at the same false-retirement rate.
+    falsifier: >
+      The e-process is so conservative that it never fires before a fixed-window test would, at
+      sample sizes we actually reach.
+    problem_ids: [PB-THESIS-DECAY, PB-COST-DRAG]
+    minimum_data: "Per-trade realized net outcomes for a deployed strategy."
+    first_computation: null
+    why_underexploited: >
+      The methods are recent and are being adopted in A/B testing, not in strategy monitoring, where
+      the peeking problem is at least as severe and the stakes are larger.
+    maturity: 5
+    payoff: 3
+    novelty: 4
+    testability: 5
+    effort: 2
+    sources: [ramdas-2023-game-theoretic-statistics, howard-2021-confidence-sequences, wald-1947-sequential-analysis, tartakovsky-2014-sequential-analysis]
+
+  - bet_id: FB-GRAPHON-CASCADE
+    title: "Graphon and mean-field games for liquidation cascades on a known collateral graph"
+    domain: mean_field_games
+    import: "Graphon games: mean-field limits on heterogeneous network structure, where the interaction is a graph rather than a uniform average."
+    thesis: >
+      On-chain venues expose the collateral and position graph that equity markets hide. Cascade
+      models usually assume anonymous mean-field interaction; with the graph observable, the
+      graphon formulation applies directly and predicts which positions are the load-bearing ones.
+    sharp_prediction: >
+      Cascade severity is predicted better by graph-weighted exposure than by aggregate open
+      interest, and the identified critical positions are disproportionately involved in realized
+      liquidation chains.
+    falsifier: >
+      Graph structure adds nothing over aggregate leverage, or the observable on-chain graph is too
+      incomplete because of cross-venue and off-chain hedging.
+    problem_ids: [PB-XMARKET, PB-INVENTORY-FUNDING, PB-REGIME-BREAK]
+    minimum_data: "On-chain position and collateral snapshots for a perp venue, plus liquidation events."
+    first_computation: null
+    why_underexploited: >
+      Graphon games are very recent mathematics, and the data that makes them applicable — a
+      visible position graph — has only existed for a few years on a handful of venues.
+    maturity: 2
+    payoff: 4
+    novelty: 5
+    testability: 3
+    effort: 5
+    sources: [carmona-2018-mean-field-games-i, cardaliaguet-2013-mean-field-games-notes, acemoglu-2015-systemic-risk-financial-networks, newman-2018-networks]
+
+# Explicitly not bets. Recorded so they are not rediscovered every quarter.
+deprioritized:
+  - name: topological_data_analysis
+    reason: >
+      Persistent homology on price series has produced descriptive crash indicators and little that
+      survives cost. High fashion, low operator density: it rarely ends in a computation with a
+      decision attached.
+  - name: quantum_algorithms_for_portfolio_optimization
+    reason: >
+      No hardware advantage at our problem sizes, and our optimization problems are not the
+      bottleneck. Revisit if a portfolio problem ever becomes the binding constraint, which it is not.
+  - name: deterministic_chaos_prediction
+    reason: >
+      Attractor reconstruction assumes a low-dimensional deterministic system. Markets are
+      high-dimensional and driven by exogenous information; the embedding tools are useful as
+      diagnostics, not as predictors.
+  - name: fractal_market_hypothesis_narratives
+    reason: >
+      Scaling exponents are real and worth measuring, but the narrative layer around them produces
+      no operator, no falsifier and no decision.
+  - name: agent_based_simulation_as_evidence
+    reason: >
+      Useful for intuition and for stress-testing an execution algorithm. Not evidence about this
+      market: the calibration freedom is large enough to produce any conclusion the modeller expects.
