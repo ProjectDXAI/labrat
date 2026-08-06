@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map fetch review
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map fetch label review
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -21,6 +21,7 @@ help:
 	@echo "  make acquire [LAB=dir]        rank what to acquire against what the store cannot support"
 	@echo "  make map [LAB=dir]            write MAP.md and the flat CSVs an agent can browse"
 	@echo "  make fetch [LAB=dir]          download the sources recorded as freely available"
+	@echo "  make label [LAB=dir]          declare reading units on held sources that have none"
 	@echo "  make review [OUT=file]        render the structural findings as one self-contained page"
 
 install:
@@ -248,3 +249,6 @@ review:
 fetch:
 	@$(PYTHON) scripts/fetch_sources.py --lab $(LAB)
 	@$(PYTHON) scripts/passages.py --root $(LAB) index
+
+label:
+	@$(PYTHON) scripts/label_units.py --lab $(LAB)

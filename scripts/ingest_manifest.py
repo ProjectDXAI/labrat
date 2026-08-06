@@ -138,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
     # already catalogued should be enriched rather than added again.
     existing_keys = {corpus_engine.dedupe_key(e): e["id"] for e in data["entries"]}
 
-    added, skipped, bad, near_duplicates = [], [], [], []
+    added, skipped, bad, near_duplicates, enriched = [], [], [], [], []
     for row in rows:
         if not row.get("suggested_id") or not row.get("title"):
             bad.append(row.get("suggested_id") or row.get("title") or "<unnamed>")
@@ -152,12 +152,35 @@ def main(argv: list[str] | None = None) -> int:
         if clash and corpus_engine.compatible_titles(candidate["title"], next(
             (e.get("title", "") for e in data["entries"] if e["id"] == clash), ""
         )):
-            near_duplicates.append(f"{row['suggested_id']} -> already catalogued as {clash}")
+            # Enrich rather than skip. Seventy-four entries were marked freely available
+            # with no URL recorded, so nothing could fetch them; a manifest that found the
+            # URL should fill that in, not be discarded for describing a book we already
+            # knew about. Only empty fields are written, so a curated value always wins.
+            existing_entry = next(e for e in data["entries"] if e["id"] == clash)
+            filled = []
+            ids = existing_entry.setdefault("identifiers", {})
+            for key in ("doi", "isbn", "url"):
+                if not ids.get(key) and candidate["identifiers"].get(key):
+                    ids[key] = candidate["identifiers"][key]
+                    filled.append(key)
+            acq = existing_entry.setdefault("acquisition", {})
+            if not acq.get("source_url") and candidate["acquisition"].get("source_url"):
+                acq["source_url"] = candidate["acquisition"]["source_url"]
+                filled.append("source_url")
+                if acq.get("state") in {None, "not_acquired", "open_url"}:
+                    acq["state"] = candidate["acquisition"]["state"]
+            if not existing_entry.get("pages") and candidate.get("pages"):
+                existing_entry["pages"] = candidate["pages"]
+                filled.append("pages")
+            if filled:
+                enriched.append(f"{clash}: filled {', '.join(filled)}")
+            else:
+                near_duplicates.append(f"{row['suggested_id']} -> already catalogued as {clash}")
             continue
         added.append(candidate)
         existing_keys[key] = candidate["id"]
 
-    if not args.dry_run and added:
+    if not args.dry_run and (added or enriched):
         data["entries"].extend(added)
         path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True, width=100))
 
@@ -167,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
         "purchasable": sum(1 for e in added if e["acquisition"]["state"] == "purchasable"),
         "already_present": skipped,
         "near_duplicates_skipped": near_duplicates,
+        "existing_entries_enriched": enriched,
         "unusable_rows": bad,
     }, indent=2))
     return 0

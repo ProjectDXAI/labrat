@@ -313,7 +313,7 @@ entries:
     isbn: null
     doi: 10.1145/2523813
     url: https://doi.org/10.1145/2523813
-  pages: 37
+  pages: 44
   density: high
   priority: 5
   rights:
@@ -848,8 +848,9 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
+    state: purchasable
     copy_path: null
+    source_url: https://www.tandfonline.com/doi/abs/10.1080/01621459.1988.10478560
   units: []
   refs:
   - target: hawkes-1971-spectra-self-exciting
@@ -1359,7 +1360,7 @@ entries:
   form: textbook
   venue: Springer
   identifiers:
-    isbn: null
+    isbn: '9780387202877'
     doi: 10.1007/978-0-387-68560-1
     url: https://doi.org/10.1007/978-0-387-68560-1
     registry_id: crossref:10.1007/978-0-387-68560-1
@@ -1374,8 +1375,9 @@ entries:
     grant: null
     notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
-    state: not_acquired
+    state: purchasable
     copy_path: null
+    source_url: https://link.springer.com/book/10.1007/978-0-387-68560-1
   units: []
   refs:
   - target: daley-2003-point-processes-vol1
@@ -2840,7 +2842,7 @@ entries:
     isbn: null
     doi: 10.1093/icc/11.5.895
     url: https://doi.org/10.1093/icc/11.5.895
-  pages: 47
+  pages: 66
   density: medium
   priority: 3
   rights:
@@ -2910,7 +2912,7 @@ entries:
     isbn: null
     doi: 10.1029/2003jb002485
     url: https://doi.org/10.1029/2003jb002485
-  pages: 18
+  pages: 35
   density: medium
   priority: 3
   rights:
@@ -3119,7 +3121,7 @@ entries:
     doi: 10.1017/s0266267102001098
     url: https://doi.org/10.1017/s0266267102001098
     registry_id: crossref:10.1017/s0266267102001098
-  pages: 22
+  pages: 23
   density: medium
   priority: 3
   rights:
@@ -3785,7 +3787,17 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Bayesian Workflow in full
+    locator: the whole paper
+    kind: section
+    pages: 77
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: gelman-2013-bayesian-data-analysis
     relation: builds_on
@@ -4508,7 +4520,7 @@ entries:
     isbn: null
     doi: null
     url: null
-  pages: 9
+  pages: 14
   density: medium
   priority: 3
   rights:
@@ -4525,7 +4537,17 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Regret bounds when outcomes arrive long after the actions that caused them.
+    locator: the whole paper
+    kind: section
+    pages: 14
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: lattimore-2020-bandit-algorithms
     relation: builds_on
@@ -4641,7 +4663,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.2003.10001
     url: https://doi.org/10.2139/ssrn.3636514
-  pages: 12
+  pages: 29
   density: high
   priority: 5
   rights:
@@ -4832,7 +4854,7 @@ entries:
     doi: 10.2139/ssrn.4301150
     url: https://doi.org/10.2139/ssrn.4301150
     registry_id: crossref:10.2139/ssrn.4301150
-  pages: 55
+  pages: 64
   density: high
   priority: 5
   rights:
@@ -5057,7 +5079,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Puts a number on what ordering power is worth.
+    locator: the whole paper
+    kind: section
+    pages: 17
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: daian-2020-flash-boys-2
     relation: builds_on
@@ -5187,7 +5219,7 @@ entries:
     doi: 10.48550/arXiv.2112.07386
     url: https://doi.org/10.48550/arXiv.2112.07386
     registry_id: arxiv:2112.07386
-  pages: 50
+  pages: 69
   density: high
   priority: 4
   rights:
@@ -5202,7 +5234,18 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Measures spread, depth and price discovery across venue types with the standard microstructure
+      toolkit, which is the comparison our own data can extend.
+    locator: the whole paper
+    kind: section
+    pages: 69
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: hasbrouck-2007-empirical-market-microstructure
     relation: cites
@@ -5343,7 +5386,18 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Stress-tests a lending protocol to the point of undercollateralization, which is the failure
+      mode a perp venue shares with a lending one.
+    locator: the whole paper
+    kind: section
+    pages: 15
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: qin-2021-empirical-study-defi-liquidations
     relation: cites
@@ -5470,7 +5524,7 @@ entries:
     doi: 10.48550/arXiv.2305.14604
     url: https://doi.org/10.48550/arXiv.2305.14604
     registry_id: arxiv:2305.14604
-  pages: 30
+  pages: 47
   density: high
   priority: 4
   rights:
@@ -5485,7 +5539,18 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The fee-adjusted version of loss-versus-rebalancing, which is the one that decides whether
+      providing liquidity pays at all.
+    locator: the whole paper
+    kind: section
+    pages: 47
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: milionis-2022-loss-versus-rebalancing
     relation: builds_on
@@ -5537,7 +5602,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The map of the primitives and how they compose.
+    locator: the whole paper
+    kind: section
+    pages: 17
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: adams-2021-uniswap-v3-core
     relation: cites
@@ -5617,7 +5692,7 @@ entries:
     doi: 10.1007/978-3-031-07535-3_13
     url: https://doi.org/10.1007/978-3-031-07535-3_13
     registry_id: crossref:10.1007/978-3-031-07535-3_13
-  pages: 30
+  pages: 31
   density: medium
   priority: 3
   rights:
@@ -5634,7 +5709,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Routing across several CFMMs is a convex program.
+    locator: the whole paper
+    kind: section
+    pages: 31
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: angeris-2020-improved-price-oracles-cfmm
     relation: builds_on
@@ -5751,7 +5836,7 @@ entries:
     isbn: null
     doi: null
     url: null
-  pages: 45
+  pages: 63
   density: medium
   priority: 3
   rights:
@@ -5829,7 +5914,7 @@ entries:
     isbn: null
     doi: null
     url: null
-  pages: 40
+  pages: 58
   density: medium
   priority: 3
   rights:
@@ -5846,7 +5931,17 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: What a block producer can and cannot extract, stated as mechanism design.
+    locator: the whole paper
+    kind: section
+    pages: 58
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: nisan-2007-algorithmic-game-theory
     relation: builds_on
@@ -6581,7 +6676,7 @@ entries:
     isbn: null
     doi: null
     url: null
-  pages: 11
+  pages: 14
   density: medium
   priority: 3
   rights:
@@ -6598,7 +6693,18 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The alternative estimator to ordinal patterns, and it connects the statistic to physical entropy
+      production rather than leaving it dimensionless.
+    locator: the whole paper
+    kind: section
+    pages: 14
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: flanagan-2016-irreversibility-financial
     relation: builds_on
@@ -6629,7 +6735,7 @@ entries:
     isbn: null
     doi: 10.1088/0034-4885/75/12/126001
     url: https://doi.org/10.1088/0034-4885/75/12/126001
-  pages: 60
+  pages: 105
   density: medium
   priority: 3
   rights:
@@ -7787,7 +7893,7 @@ entries:
     isbn: null
     doi: null
     url: null
-  pages: 6
+  pages: 11
   density: medium
   priority: 3
   rights:
@@ -7804,7 +7910,18 @@ entries:
     obtained_at: '2026-08-05'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Information spreads by bilateral meeting rather than by announcement, giving an absorption
+      rate with a closed form.
+    locator: the whole paper
+    kind: whole
+    pages: 11
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: grossman-1980-impossibility-efficient-markets
     relation: builds_on
@@ -8959,7 +9076,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The Latest Gossip on BFT Consensus in full
+    locator: the whole paper
+    kind: section
+    pages: 14
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: yin-2019-hotstuff
     relation: cites
@@ -10418,7 +10545,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1511.03722
     url: null
-  pages: 10
+  pages: 14
   density: high
   priority: 4
   rights:
@@ -10435,7 +10562,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Doubly Robust Off-policy Value Evaluation for Reinforcement Learning in full
+    locator: the whole paper
+    kind: section
+    pages: 14
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: dudik-2011-doubly-robust-policy-evaluation
     relation: builds_on
@@ -10608,7 +10745,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Counterfactual Risk Minimization: Learning from Logged Bandit Feedback in full'
+    locator: the whole paper
+    kind: whole
+    pages: 10
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -10633,7 +10780,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1604.00923
     url: https://doi.org/10.48550/arXiv.1604.00923
-  pages: 10
+  pages: 37
   density: high
   priority: 4
   rights:
@@ -10650,7 +10797,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Data-Efficient Off-Policy Policy Evaluation for Reinforcement Learning in full
+    locator: the whole paper
+    kind: section
+    pages: 37
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -10677,7 +10834,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1904.06019
     url: https://doi.org/10.48550/arXiv.1904.06019
-  pages: 11
+  pages: 17
   density: high
   priority: 4
   rights:
@@ -10694,7 +10851,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Conformal Prediction Under Covariate Shift in full
+    locator: the whole paper
+    kind: section
+    pages: 17
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: angelopoulos-2023-conformal-prediction-intro
     relation: builds_on
@@ -10841,7 +11008,7 @@ entries:
     isbn: null
     doi: 10.1257/jep.31.2.3
     url: https://doi.org/10.1257/jep.31.2.3
-  pages: 32
+  pages: 75
   density: medium
   priority: 3
   rights:
@@ -10858,7 +11025,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'The State of Applied Econometrics: Causality and Policy Evaluation in full'
+    locator: the whole paper
+    kind: section
+    pages: 75
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -11088,9 +11265,9 @@ entries:
   form: textbook
   venue: Wiley
   identifiers:
-    isbn: null
-    doi: null
-    url: null
+    isbn: '9780471241959'
+    doi: 10.1002/047174882X
+    url: https://onlinelibrary.wiley.com/doi/book/10.1002/047174882X
   pages: 776
   density: high
   priority: 5
@@ -11104,6 +11281,7 @@ entries:
   acquisition:
     state: purchasable
     copy_path: null
+    source_url: https://onlinelibrary.wiley.com/doi/book/10.1002/047174882X
   units: []
   refs:
   - target: shannon-1948-mathematical-theory-communication
@@ -11131,9 +11309,9 @@ entries:
   form: textbook
   venue: Cambridge University Press
   identifiers:
-    isbn: null
+    isbn: '9780521642989'
     doi: null
-    url: null
+    url: https://www.inference.org.uk/mackay/itila/
   pages: 640
   density: high
   priority: 5
@@ -11146,8 +11324,10 @@ entries:
     notes: Long-standing free-to-view online edition with an explicit statement from the author; read
       it.
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/mackay-2003-information-theory-inference.pdf
+    source_url: https://www.inference.org.uk/itprnn/book.pdf
+    obtained_at: '2026-08-06'
   units: []
   refs: []
   discovered:
@@ -11253,9 +11433,9 @@ entries:
   form: textbook
   venue: MIT Press
   identifiers:
-    isbn: null
+    isbn: '9780262072816'
     doi: null
-    url: null
+    url: https://direct.mit.edu/books/monograph/3813/The-Minimum-Description-Length-Principle
   pages: 703
   density: high
   priority: 4
@@ -11269,6 +11449,7 @@ entries:
   acquisition:
     state: purchasable
     copy_path: null
+    source_url: https://direct.mit.edu/books/monograph/3813/The-Minimum-Description-Length-Principle
   units: []
   refs:
   - target: li-2008-kolmogorov-complexity
@@ -11659,7 +11840,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1803.06917
     url: https://doi.org/10.48550/arXiv.1803.06917
-  pages: 15
+  pages: 20
   density: high
   priority: 5
   rights:
@@ -11676,7 +11857,18 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Universal Features of Price Formation in Financial Markets: Perspectives from Deep Learning
+      in full'
+    locator: the whole paper
+    kind: section
+    pages: 20
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: cont-2014-price-impact-order-book-events
     relation: builds_on
@@ -11752,7 +11944,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1905.08494
     url: null
-  pages: 11
+  pages: 17
   density: high
   priority: 4
   rights:
@@ -11769,7 +11961,18 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The signature as a differentiable layer rather than a fixed feature map, which is the version
+      that scales past level two.
+    locator: the whole paper
+    kind: section
+    pages: 17
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: chevyrev-2016-signature-method-primer
     relation: builds_on
@@ -11844,7 +12047,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.2006.04779
     url: https://doi.org/10.48550/arXiv.2006.04779
-  pages: 13
+  pages: 31
   density: high
   priority: 4
   rights:
@@ -11861,7 +12064,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Conservative Q-Learning for Offline Reinforcement Learning in full
+    locator: the whole paper
+    kind: section
+    pages: 31
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -11887,7 +12100,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1309.0260
     url: https://doi.org/10.48550/arXiv.1309.0260
-  pages: 30
+  pages: 38
   density: high
   priority: 4
   rights:
@@ -11904,7 +12117,18 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from arXiv. The default arXiv grant licenses arXiv to distribute, not us to redistribute,
       so the rights tag is unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Learning from the Past, Predicting the Statistics for the Future, Learning an Evolving System
+      in full
+    locator: the whole paper
+    kind: section
+    pages: 38
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: chevyrev-2016-signature-method-primer
     relation: builds_on
@@ -12114,7 +12338,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Execution when everyone else is executing too, and the equilibrium impact that results.
+    locator: the whole paper
+    kind: section
+    pages: 28
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: carmona-2018-mean-field-games-i
     relation: builds_on
@@ -12244,7 +12478,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'DeepLOB: Deep Convolutional Neural Networks for Limit Order Books in full'
+    locator: the whole paper
+    kind: whole
+    pages: 12
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -12400,7 +12644,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.0809.0822
     url: https://doi.org/10.48550/arXiv.0809.0822
-  pages: 92
+  pages: 111
   density: high
   priority: 5
   rights:
@@ -12915,7 +13159,7 @@ entries:
   title: 'Trading and Exchanges: Market Microstructure for Practitioners'
   authors:
   - Larry Harris
-  year: 2002
+  year: 2003
   bucket: market_microstructure
   form: textbook
   venue: Oxford University Press
@@ -13007,7 +13251,8 @@ entries:
   - orientation
   - institutions
   - order-types
-  notes: Year corrected to 2002 and extent to 656 against the Oxford University Press page.
+  notes: Agents disagreed on year (2002 copyright, 2003 on most records) and extent (643 vs 656); kept
+    the existing year.
 - id: hasbrouck-2007-empirical-market-microstructure
   title: Empirical Market Microstructure
   authors:
@@ -13341,7 +13586,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1105.1694
     url: https://doi.org/10.48550/arXiv.1105.1694
-  pages: 12
+  pages: 16
   density: high
   priority: 5
   rights:
@@ -14125,7 +14370,7 @@ entries:
     doi: 10.1007/s11579-012-0087-0
     url: https://doi.org/10.1007/s11579-012-0087-0
     registry_id: crossref:10.1007/s11579-012-0087-0
-  pages: 31
+  pages: 36
   density: medium
   priority: 3
   rights:
@@ -14142,7 +14387,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Dealing with the Inventory Risk: A Solution to the Market Making Problem in full'
+    locator: the whole paper
+    kind: section
+    pages: 36
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -14269,7 +14524,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Market Making in an Order Book Model and its Impact on the Spread in full
+    locator: the whole paper
+    kind: section
+    pages: 16
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: cont-2010-stochastic-model-order-book
     relation: cites
@@ -14520,7 +14785,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1502.04592
     url: https://doi.org/10.1142/s2382626615500057
-  pages: 46
+  pages: 48
   density: high
   priority: 5
   rights:
@@ -14749,7 +15014,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1603.03788
     url: null
-  pages: 45
+  pages: 61
   density: high
   priority: 5
   rights:
@@ -15424,7 +15689,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.1201.3572
     url: null
-  pages: 8
+  pages: 27
   density: high
   priority: 4
   rights:
@@ -16830,7 +17095,17 @@ entries:
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
     source_url: https://rail.eecs.berkeley.edu/deeprlcourse/
     obtained_at: '2026-08-06'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: UC Berkeley CS285 Deep Reinforcement Learning — lectures and notes in full
+    locator: the whole paper
+    kind: section
+    pages: 65
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: sutton-2018-reinforcement-learning
     relation: syllabus_with
@@ -16873,7 +17148,17 @@ entries:
     source_url: https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/download/
     obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: MIT 15.450 Analytics of Finance in full
+    locator: the whole paper
+    kind: section
+    pages: 42
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -17062,7 +17347,17 @@ entries:
     source_url: https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/download/
     obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: MIT 18.S096 Topics in Mathematics with Applications in Finance in full
+    locator: the whole paper
+    kind: section
+    pages: 47
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -17249,7 +17544,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The lecture videos are freely posted; the book is not.
+    locator: the whole paper
+    kind: whole
+    pages: 10
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: nisan-2007-algorithmic-game-theory
     relation: builds_on
@@ -19310,7 +19615,7 @@ entries:
     isbn: null
     doi: 10.1111/mafi.12173
     url: https://doi.org/10.1111/mafi.12173
-  pages: 29
+  pages: 35
   density: high
   priority: 4
   rights:
@@ -19327,7 +19632,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The Characteristic Function of Rough Heston Models in full
+    locator: the whole paper
+    kind: section
+    pages: 35
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: gatheral-2018-volatility-is-rough
     relation: builds_on
@@ -19720,7 +20035,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Stochastic Volatility Modeling in full
+    locator: the whole paper
+    kind: whole
+    pages: 1
+    priority: 3
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -21155,7 +21480,17 @@ entries:
     obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is
       a reading copy, not a corpus grant.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Adaptive Filters in full
+    locator: the whole paper
+    kind: whole
+    pages: 8
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -21668,7 +22003,17 @@ entries:
     source_url: null
     obtained_at: '2026-08-06'
     note: Local library, text layer present.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Modelling Financial Derivatives with Mathematica in full
+    locator: the whole paper
+    kind: whole
+    pages: 1
+    priority: 2
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -22407,7 +22752,17 @@ entries:
     source_url: null
     obtained_at: '2026-08-06'
     note: Local library, text layer present.
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: An Introduction to Computational Finance Without Agonizing Pain in full
+    locator: the whole paper
+    kind: section
+    pages: 77
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -22937,7 +23292,18 @@ entries:
     source_url: https://www.princeton.edu/~markus/research/papers/liquidity.pdf
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Two-way feedback between funding constraints and market liquidity; margins are destabilising
+      and produce mutually reinforcing liquidity spirals.
+    locator: the whole paper
+    kind: section
+    pages: 38
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -22960,7 +23326,7 @@ entries:
     isbn: null
     doi: 10.1093/rfs/hhr027
     url: https://doi.org/10.1093/rfs/hhr027
-  pages: 43
+  pages: 51
   density: high
   priority: 5
   rights:
@@ -22976,7 +23342,18 @@ entries:
     source_url: https://www.nber.org/system/files/working_papers/w16777/w16777.pdf
     obtained_at: null
     note: 'Manifest uncertain about: free_url.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Under binding margin constraints required returns rise in both beta and margin requirement,
+      producing persistent bases between identical-cashflow securities.
+    locator: the whole paper
+    kind: section
+    pages: 51
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -22999,7 +23376,7 @@ entries:
     isbn: null
     doi: 10.1016/j.jfi.2008.12.002
     url: https://doi.org/10.1016/j.jfi.2008.12.002
-  pages: 20
+  pages: 39
   density: high
   priority: 5
   rights:
@@ -23015,7 +23392,18 @@ entries:
     source_url: https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr328.pdf
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Dealer marked-to-market leverage is strongly procyclical, so balance-sheet adjustment amplifies
+      price moves and drives aggregate liquidity.
+    locator: the whole paper
+    kind: section
+    pages: 39
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23038,7 +23426,7 @@ entries:
     isbn: null
     doi: 10.1111/j.1540-6261.1997.tb03807.x
     url: https://doi.org/10.1111/j.1540-6261.1997.tb03807.x
-  pages: 21
+  pages: 27
   density: high
   priority: 5
   rights:
@@ -23054,7 +23442,18 @@ entries:
     source_url: https://www.nber.org/system/files/working_papers/w5167/w5167.pdf
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: When arbitrage is delegated, capital withdrawals after losses make it least effective exactly
+      when mispricing is largest.
+    locator: the whole paper
+    kind: section
+    pages: 27
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23078,7 +23477,7 @@ entries:
     isbn: null
     doi: 10.1111/j.1468-0262.2005.00639.x
     url: https://doi.org/10.1111/j.1468-0262.2005.00639.x
-  pages: 33
+  pages: 49
   density: high
   priority: 5
   rights:
@@ -23094,7 +23493,18 @@ entries:
     source_url: https://www.nber.org/system/files/working_papers/w10816/w10816.pdf
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Asset prices and dealer spreads in a dynamic search-and-bargaining model; spreads fall with
+      investor search ability and rise with monopolistic marketmaker access.
+    locator: the whole paper
+    kind: section
+    pages: 49
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23134,7 +23544,18 @@ entries:
     source_url: https://www.bis.org/publ/work1087.pdf
     obtained_at: null
     note: 'Manifest uncertain about: year.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Crypto futures and perpetual carry reaches over 40% annualised, driven by retail leverage demand
+      plus constrained arbitrage capital, and is predictable from leverage-demand proxies.
+    locator: the whole paper
+    kind: section
+    pages: 50
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23177,7 +23598,18 @@ entries:
     source_url: https://www.andrew.cmu.edu/user/nicolasc/publications/Soska-WWW21.pdf
     obtained_at: null
     note: 'Manifest uncertain about: free_access.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Uses public BitMEX liquidation events and on-chain forensics to show forced liquidations propagated
+      into dramatic underlying spot price moves.
+    locator: the whole paper
+    kind: whole
+    pages: 12
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23218,7 +23650,18 @@ entries:
     source_url: https://www.repository.cam.ac.uk/bitstreams/d1e66d70-2e65-491f-b6e8-4861e4118822/download
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Shows Cont and de Larrard's conditional price-increase formula is wrong for unbalanced order
+      flow, having imported an erroneous formula, and supplies a corrected closed form.
+    locator: the whole paper
+    kind: whole
+    pages: 7
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23242,7 +23685,7 @@ entries:
     isbn: null
     doi: 10.1080/1350486X.2018.1434009
     url: https://www.tandfonline.com/doi/abs/10.1080/1350486X.2018.1434009
-  pages: 35
+  pages: 41
   density: high
   priority: 5
   rights:
@@ -23258,7 +23701,18 @@ entries:
     source_url: https://ora.ox.ac.uk/objects/uuid:006addde-3a03-4d75-89c1-04b59026e1c0/files/me4008e0ecca779b45d59231ebca3e69c
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Builds a book volume imbalance measure from Nasdaq data, shows it predicts next market order
+      sign and post-trade move, and embeds it in a Markov-modulated jump model.
+    locator: the whole paper
+    kind: section
+    pages: 41
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23281,7 +23735,7 @@ entries:
     isbn: null
     doi: 10.1142/S0219024913500258
     url: https://www.worldscientific.com/doi/10.1142/S0219024913500258
-  pages: 27
+  pages: 43
   density: high
   priority: 5
   rights:
@@ -23297,7 +23751,18 @@ entries:
     source_url: https://arxiv.org/pdf/1010.5136
     obtained_at: null
     note: 'Manifest uncertain about: pages.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The book as a multidimensional Markov chain under Poissonian flow; proves cancellation structure
+      is what makes a stationary distribution exist, and derives Brownian price dynamics at long scales.
+    locator: the whole paper
+    kind: section
+    pages: 43
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23320,7 +23785,7 @@ entries:
     isbn: null
     doi: 10.1137/15M1011469
     url: https://epubs.siam.org/doi/10.1137/15M1011469
-  pages: 18
+  pages: 25
   density: high
   priority: 5
   rights:
@@ -23336,7 +23801,18 @@ entries:
     source_url: https://hal.science/hal-01121711/file/HawkesLOB.pdf
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Replaces Poisson flow with mutually exciting Hawkes processes and proves stationarity of the
+      book and a diffusive scaling limit for the price.
+    locator: the whole paper
+    kind: section
+    pages: 25
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23358,7 +23834,7 @@ entries:
     isbn: null
     doi: 10.1080/14697688.2014.963654
     url: https://www.tandfonline.com/doi/abs/10.1080/14697688.2014.963654
-  pages: 14
+  pages: 26
   density: high
   priority: 5
   rights:
@@ -23374,7 +23850,18 @@ entries:
     source_url: https://arxiv.org/pdf/1311.5661
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Analyses the best-quote queue as an M/M/1-type system; the distribution of limit order sizes,
+      not just their rate, determines average queue length.
+    locator: the whole paper
+    kind: section
+    pages: 26
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23413,7 +23900,18 @@ entries:
     source_url: https://arxiv.org/pdf/1602.03944
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Fits Cox-type multiplicative intensity models to limit, market and cancellation flows, quantifying
+      how queue sizes, imbalance and spread drive each order type's arrival rate.
+    locator: the whole paper
+    kind: section
+    pages: 30
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23451,7 +23949,18 @@ entries:
     source_url: https://arxiv.org/pdf/1502.03871
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Derives the stationary law of volume at the best quote with general order sizes, the distribution
+      needed to reason about queue position and fill probability.
+    locator: the whole paper
+    kind: section
+    pages: 19
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23527,7 +24036,87 @@ entries:
     source_url: https://www.bybit.com/en/help-center/topic-list/trading-products
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: adl
+    title: null
+    topic: 'Bybit Help Center: adl'
+    locator: file:adl.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: docs
+    title: null
+    topic: 'Bybit Help Center: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-calc
+    title: null
+    topic: 'Bybit Help Center: funding calc'
+    locator: file:funding-calc.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-rate
+    title: null
+    topic: 'Bybit Help Center: funding rate'
+    locator: file:funding-rate.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: index-price
+    title: null
+    topic: 'Bybit Help Center: index price'
+    locator: file:index-price.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: insurance-fund
+    title: null
+    topic: 'Bybit Help Center: insurance fund'
+    locator: file:insurance-fund.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: mark-price
+    title: null
+    topic: 'Bybit Help Center: mark price'
+    locator: file:mark-price.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: risk-limit
+    title: null
+    topic: 'Bybit Help Center: risk limit'
+    locator: file:risk-limit.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23565,7 +24154,87 @@ entries:
     source_url: https://www.okx.com/en-us/help/i-perpetual-swaps
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: adl
+    title: null
+    topic: 'OKX Help Center: adl'
+    locator: file:adl.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: docs
+    title: null
+    topic: 'OKX Help Center: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-fee
+    title: null
+    topic: 'OKX Help Center: funding fee'
+    locator: file:funding-fee.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-mechanism
+    title: null
+    topic: 'OKX Help Center: funding mechanism'
+    locator: file:funding-mechanism.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: index-price
+    title: null
+    topic: 'OKX Help Center: index price'
+    locator: file:index-price.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidation
+    title: null
+    topic: 'OKX Help Center: liquidation'
+    locator: file:liquidation.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: margin-tiers
+    title: null
+    topic: 'OKX Help Center: margin tiers'
+    locator: file:margin-tiers.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: mark-price
+    title: null
+    topic: 'OKX Help Center: mark price'
+    locator: file:mark-price.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23604,7 +24273,47 @@ entries:
     source_url: https://support.deribit.com/hc/en-us/categories/25937446683677-Exchange
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: docs
+    title: null
+    topic: 'Deribit Support: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 1
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-specs
+    title: null
+    topic: 'Deribit Support: funding specs'
+    locator: file:funding-specs.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: insurance-fund
+    title: null
+    topic: 'Deribit Support: insurance fund'
+    locator: file:insurance-fund.md
+    kind: section
+    pages: 1
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: linear-perpetual
+    title: null
+    topic: 'Deribit Support: linear perpetual'
+    locator: file:linear-perpetual.md
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23643,7 +24352,67 @@ entries:
     source_url: https://docs.dydx.xyz/concepts/trading/funding
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: docs
+    title: null
+    topic: 'dYdX v4 documentation: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding
+    title: null
+    topic: 'dYdX v4 documentation: funding'
+    locator: file:funding.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: governance
+    title: null
+    topic: 'dYdX v4 documentation: governance'
+    locator: file:governance.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidations
+    title: null
+    topic: 'dYdX v4 documentation: liquidations'
+    locator: file:liquidations.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: margin
+    title: null
+    topic: 'dYdX v4 documentation: margin'
+    locator: file:margin.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: oracle
+    title: null
+    topic: 'dYdX v4 documentation: oracle'
+    locator: file:oracle.md
+    kind: section
+    pages: 1
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23682,7 +24451,57 @@ entries:
     source_url: https://docs.gmx.io/docs/category/trading/
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: docs
+    title: null
+    topic: 'GMX documentation: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 1
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: fees
+    title: null
+    topic: 'GMX documentation: fees'
+    locator: file:fees.md
+    kind: section
+    pages: 9
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidations
+    title: null
+    topic: 'GMX documentation: liquidations'
+    locator: file:liquidations.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: order-types
+    title: null
+    topic: 'GMX documentation: order types'
+    locator: file:order-types.md
+    kind: section
+    pages: 12
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: providing-liquidity
+    title: null
+    topic: 'GMX documentation: providing liquidity'
+    locator: file:providing-liquidity.md
+    kind: section
+    pages: 6
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23722,7 +24541,77 @@ entries:
     source_url: https://docs.velocity.exchange/protocol/trading
     obtained_at: '2026-08-06'
     note: null
-  units: []
+  units:
+  - unit_id: docs
+    title: null
+    topic: 'Velocity Protocol documentation: docs'
+    locator: file:docs.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-rates
+    title: null
+    topic: 'Velocity Protocol documentation: funding rates'
+    locator: file:funding-rates.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: insurance-fund
+    title: null
+    topic: 'Velocity Protocol documentation: insurance fund'
+    locator: file:insurance-fund.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidation-engine
+    title: null
+    topic: 'Velocity Protocol documentation: liquidation engine'
+    locator: file:liquidation-engine.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidations
+    title: null
+    topic: 'Velocity Protocol documentation: liquidations'
+    locator: file:liquidations.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: margin
+    title: null
+    topic: 'Velocity Protocol documentation: margin'
+    locator: file:margin.md
+    kind: section
+    pages: 2
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: oracles
+    title: null
+    topic: 'Velocity Protocol documentation: oracles'
+    locator: file:oracles.md
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -23741,3 +24630,1581 @@ entries:
     Any Drift mechanics recorded before July 2026 describe a venue that no longer operates: the durable-nonce
     mechanism the attackers used is removed, settlement moved from USDC to USDT, and Isolated Markets
     and Amplify were dropped. Verified independently, not taken from the venue''s own pages.'
+- id: akingbade-2026-topological-signatures-of-financial
+  title: Null-Validated Topological Signatures of Financial Market Dynamics
+  authors:
+  - Samuel W. Akingbade
+  year: 2026
+  bucket: adjacent_disciplines
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2602.00383
+  pages: 26
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2602.00383
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/akingbade-2026-topological-signatures-of-financial.pdf
+    source_url: https://arxiv.org/pdf/2602.00383
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Financial markets exhibit temporal organization that is not fully captured by volatility measures
+      or linear correlation structure.
+    locator: the whole paper
+    kind: section
+    pages: 26
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Financial markets exhibit temporal organization that is not fully captured by volatility measures
+    or linear correlation structure. We study a null-validated topological approach for quantifying financial
+    market complexity using Bitcoin daily log returns and the S&P 500 index as e
+- id: stockman-2024-using-simulation-based-inference
+  title: 'SB-ETAS: using simulation based inference for scalable, likelihood-free inference for the ETAS
+    model of earthquake occurrences'
+  authors:
+  - Samuel Stockman
+  - Daniel J. Lawson
+  - Maximilian J. Werner
+  year: 2024
+  bucket: detection_tracking
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2404.16590
+  pages: 28
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2404.16590
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/stockman-2024-using-simulation-based-inference.pdf
+    source_url: https://arxiv.org/pdf/2404.16590
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Performing Bayesian inference for the Epidemic-Type Aftershock Sequence (ETAS) model of earthquakes
+      typically requires MCMC sampling using the likelihood function or estimating the latent branching
+      structure.
+    locator: the whole paper
+    kind: section
+    pages: 28
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Performing Bayesian inference for the Epidemic-Type Aftershock Sequence (ETAS) model of earthquakes
+    typically requires MCMC sampling using the likelihood function or estimating the latent branching
+    structure. These tasks have computational complexity $O(n^2)$ with the number of e
+- id: filimonov-2013-apparent-criticality-and-calibration-issues
+  title: 'Apparent criticality and calibration issues in the Hawkes self-excited point process model:
+    application to high-frequency financial data'
+  authors:
+  - Vladimir Filimonov
+  - Didier Sornette
+  year: 2013
+  bucket: detection_tracking
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1308.6756
+  pages: 40
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1308.6756
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/filimonov-2013-apparent-criticality-and-calibration-issues.pdf
+    source_url: https://arxiv.org/pdf/1308.6756
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: We present a careful analysis of possible issues on the application of the self-excited Hawkes
+      process to high-frequency financial data.
+    locator: the whole paper
+    kind: section
+    pages: 40
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: We present a careful analysis of possible issues on the application of the self-excited Hawkes
+    process to high-frequency financial data. We carefully analyze a set of effects leading to significant
+    biases in the estimation of the "criticality index" n that quantifies the degree o
+- id: jha-2025-a-stochastic-thermodynamics-approach-to
+  title: 'A Stochastic Thermodynamics Approach to Price Impact and Round-Trip Arbitrage: Theory and Empirical
+    Implications'
+  authors:
+  - Amit Kumar Jha
+  year: 2025
+  bucket: dynamical_systems
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2512.03123
+  pages: 17
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2512.03123
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/jha-2025-a-stochastic-thermodynamics-approach-to.pdf
+    source_url: https://arxiv.org/pdf/2512.03123
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: This paper develops a comprehensive theoretical framework that imports concepts from stochastic
+      thermodynamics to model price impact and characterize the feasibility of round-trip arbitrage in
+      financial markets.
+    locator: the whole paper
+    kind: section
+    pages: 17
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: This paper develops a comprehensive theoretical framework that imports concepts from stochastic
+    thermodynamics to model price impact and characterize the feasibility of round-trip arbitrage in financial
+    markets. A trading cycle is treated as a non-equilibrium thermodynamic proces
+- id: bouchaud-1999-apparent-multifractality-in-financial-time
+  title: Apparent multifractality in financial time series
+  authors:
+  - Jean-Philippe Bouchaud
+  - Marc Potters
+  - Martin Meyer
+  year: 1999
+  bucket: dynamical_systems
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/cond-mat/9906347
+  pages: 9
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/cond-mat/9906347
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/bouchaud-1999-apparent-multifractality-in-financial-time.pdf
+    source_url: https://arxiv.org/pdf/cond-mat/9906347
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: We present a exactly soluble model for financial time series that mimics the long range volatility
+      correlations known to be present in financial data.
+    locator: the whole paper
+    kind: whole
+    pages: 9
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: We present a exactly soluble model for financial time series that mimics the long range volatility
+    correlations known to be present in financial data. Although our model is `monofractal' by construction,
+    it shows apparent multiscaling as a result of a slow crossover phenomenon on
+- id: gebele-2026-semantic-and-violations-of
+  title: Semantic Non-Fungibility and Violations of the Law of One Price in Prediction Markets
+  authors:
+  - Jonas Gebele
+  - Florian Matthes
+  year: 2026
+  bucket: economics_information
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2601.01706
+  pages: 39
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2601.01706
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/gebele-2026-semantic-and-violations-of.pdf
+    source_url: https://arxiv.org/pdf/2601.01706
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Prediction markets are designed to aggregate dispersed information about future events, yet
+      today's ecosystem is fragmented across heterogeneous operator-run platforms and blockchain-based
+      protocols that independently list economically iden
+    locator: the whole paper
+    kind: section
+    pages: 39
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Prediction markets are designed to aggregate dispersed information about future events, yet today's
+    ecosystem is fragmented across heterogeneous operator-run platforms and blockchain-based protocols
+    that independently list economically identical events. In the absence of a shared
+- id: dong-2023-on-the-three-demons-in
+  title: 'On the Three Demons in Causality in Finance: Time Resolution, Nonstationarity, and Latent Factors'
+  authors:
+  - Xinshuai Dong
+  - Haoyue Dai
+  - Yewen Fan
+  - Songyao Jin
+  - Sathyamoorthy Rajendran
+  - Kun Zhang
+  year: 2023
+  bucket: inference_causality
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2401.05414
+  pages: 25
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2401.05414
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/dong-2023-on-the-three-demons-in.pdf
+    source_url: https://arxiv.org/pdf/2401.05414
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Financial data is generally time series in essence and thus suffers from three fundamental
+      issues: the mismatch in time resolution, the time-varying property of the distribution - nonstationarity,
+      and causal factors that are important but u'
+    locator: the whole paper
+    kind: section
+    pages: 25
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Financial data is generally time series in essence and thus suffers from three fundamental issues:
+    the mismatch in time resolution, the time-varying property of the distribution - nonstationarity,
+    and causal factors that are important but unknown/unobserved. In this paper, we fol'
+- id: marzen-2014-circumventing-the-curse-of-dimensionality
+  title: 'Circumventing the Curse of Dimensionality in Prediction: Causal Rate-Distortion for Infinite-Order
+    Markov Processes'
+  authors:
+  - Sarah Marzen
+  - James P. Crutchfield
+  year: 2014
+  bucket: information_theory
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1412.2859
+  pages: 25
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1412.2859
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/marzen-2014-circumventing-the-curse-of-dimensionality.pdf
+    source_url: https://arxiv.org/pdf/1412.2859
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Predictive rate-distortion analysis suffers from the curse of dimensionality: clustering arbitrarily
+      long pasts to retain information about arbitrarily long futures requires resources that typically
+      grow exponentially with length.'
+    locator: the whole paper
+    kind: section
+    pages: 25
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Predictive rate-distortion analysis suffers from the curse of dimensionality: clustering arbitrarily
+    long pasts to retain information about arbitrarily long futures requires resources that typically
+    grow exponentially with length. The challenge is compounded for infinite-order Ma'
+- id: kobayashi-2023-the-stock-return-predictions
+  title: The cross-sectional stock return predictions via quantum neural network and tensor network
+  authors:
+  - Nozomu Kobayashi
+  - Yoshiyuki Suimon
+  - Koichi Miyamoto
+  - Kosuke Mitarai
+  year: 2023
+  bucket: machine_learning_frontier
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2304.12501
+  pages: 18
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2304.12501
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kobayashi-2023-the-stock-return-predictions.pdf
+    source_url: https://arxiv.org/pdf/2304.12501
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: In this paper, we investigate the application of quantum and quantum-inspired machine learning
+      algorithms to stock return predictions.
+    locator: the whole paper
+    kind: section
+    pages: 18
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: In this paper, we investigate the application of quantum and quantum-inspired machine learning
+    algorithms to stock return predictions. Specifically, we evaluate the performance of quantum neural
+    network, an algorithm suited for noisy intermediate-scale quantum computers, and tens
+- id: chen-2025-benchmarking-of-quantum-and-classical
+  title: Benchmarking of Quantum and Classical Computing in Large-Scale Dynamic Portfolio Optimization
+    Under Market Frictions
+  authors:
+  - Ying Chen
+  - Thorsten Koch
+  - Hanqiu Peng
+  - Hongrui Zhang
+  year: 2025
+  bucket: machine_learning_frontier
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2502.05226
+  pages: 25
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2502.05226
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/chen-2025-benchmarking-of-quantum-and-classical.pdf
+    source_url: https://arxiv.org/pdf/2502.05226
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Quantum computing is poised to transform the financial industry, yet its advantages over traditional
+      methods have not been evidenced.
+    locator: the whole paper
+    kind: section
+    pages: 25
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Quantum computing is poised to transform the financial industry, yet its advantages over traditional
+    methods have not been evidenced. As this technology rapidly evolves, benchmarking is essential to
+    fairly evaluate and compare different computational strategies. This study presen
+- id: delise-2024-the-negative-drift-of-a
+  title: The Negative Drift of a Limit Order Fill
+  authors:
+  - Timothy DeLise
+  year: 2024
+  bucket: market_microstructure
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2407.16527
+  pages: 28
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2407.16527
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/delise-2024-the-negative-drift-of-a.pdf
+    source_url: https://arxiv.org/pdf/2407.16527
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Market making refers to a form of trading in financial markets characterized by passive orders
+      which add liquidity to limit order books.
+    locator: the whole paper
+    kind: section
+    pages: 28
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Market making refers to a form of trading in financial markets characterized by passive orders
+    which add liquidity to limit order books. Market makers are important for the proper functioning of
+    financial markets worldwide. Given the importance, financial mathematics has endeavor
+- id: kalsi-2019-optimal-execution-with-rough-path
+  title: Optimal execution with rough path signatures
+  authors:
+  - Jasdeep Kalsi
+  - Terry Lyons
+  - Imanol Perez Arribas
+  year: 2019
+  bucket: mathematical_foundations
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1905.00728
+  pages: 33
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1905.00728
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kalsi-2019-optimal-execution-with-rough-path.pdf
+    source_url: https://arxiv.org/pdf/1905.00728
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: We present a method for obtaining approximate solutions to the problem of optimal execution,
+      based on a signature method.
+    locator: the whole paper
+    kind: section
+    pages: 33
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: We present a method for obtaining approximate solutions to the problem of optimal execution,
+    based on a signature method. The framework is general, only requiring that the price process is a
+    geometric rough path and the price impact function is a continuous function of the tradin
+- id: ljung-1999-system-identification
+  title: 'System Identification: Theory for the User'
+  authors:
+  - Lennart Ljung
+  year: 1999
+  bucket: inverse_problems
+  form: textbook
+  venue: Prentice Hall PTR, 2nd edition
+  identifiers:
+    isbn: '9780136566953'
+    doi: null
+    url: https://www.informit.com/store/system-identification-theory-for-the-user-9780136566953
+  pages: 631
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.informit.com/store/system-identification-theory-for-the-user-9780136566953
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.informit.com/store/system-identification-theory-for-the-user-9780136566953
+    obtained_at: null
+    note: 'Manifest uncertain about: pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The standard statistical framework for identifying dynamic models from input-output data: model
+    structures, prediction-error and instrumental-variable methods, convergence and asymptotic variance,
+    experiment design.'
+- id: soderstrom-1989-system-identification
+  title: System Identification
+  authors:
+  - Torsten Söderström
+  - Petre Stoica
+  year: 1989
+  bucket: inverse_problems
+  form: textbook
+  venue: Prentice Hall International
+  identifiers:
+    isbn: '9780131276062'
+    doi: null
+    url: https://user.it.uu.se/~ts/bookinfo.html
+  pages: 612
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://user.it.uu.se/~ts/sysidbook.pdf
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/soderstrom-1989-system-identification.pdf
+    source_url: https://user.it.uu.se/~ts/sysidbook.pdf
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages, isbn.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Rigorous parametric system identification: least-squares and prediction-error estimation, instrumental
+    variables, identifiability, model validation, consistency and asymptotic distribution.'
+- id: kailath-2000-linear-estimation
+  title: Linear Estimation
+  authors:
+  - Thomas Kailath
+  - Ali H. Sayed
+  - Babak Hassibi
+  year: 2000
+  bucket: inverse_problems
+  form: textbook
+  venue: Prentice Hall
+  identifiers:
+    isbn: '9780130224644'
+    doi: null
+    url: https://www.pearson.com/en-us/subject-catalog/p/linear-estimation/P200000003321
+  pages: 880
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.pearson.com/en-us/subject-catalog/p/linear-estimation/P200000003321
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.pearson.com/en-us/subject-catalog/p/linear-estimation/P200000003321
+    obtained_at: null
+    note: 'Manifest uncertain about: url. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Linear least-squares estimation from a unified state-space and innovations viewpoint: Wiener
+    and Kalman filtering, smoothing, array and square-root algorithms, H-infinity estimation.'
+- id: engl-1996-regularization-inverse-problems
+  title: Regularization of Inverse Problems
+  authors:
+  - Heinz Werner Engl
+  - Martin Hanke
+  - Andreas Neubauer
+  year: 1996
+  bucket: inverse_problems
+  form: monograph
+  venue: Kluwer / Springer
+  identifiers:
+    isbn: '9780792341574'
+    doi: null
+    url: https://link.springer.com/book/9780792341574
+  pages: 322
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/book/9780792341574
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/book/9780792341574
+    obtained_at: null
+    note: 'Manifest uncertain about: doi, pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Regularization theory for linear and nonlinear ill-posed operator equations: Tikhonov and iterative
+    regularization, parameter-choice rules, convergence rates under source conditions.'
+- id: brunton-2016-sparse-identification-nonlinear-dynamics
+  title: Discovering governing equations from data by sparse identification of nonlinear dynamical systems
+  authors:
+  - Steven L. Brunton
+  - Joshua L. Proctor
+  - J. Nathan Kutz
+  year: 2016
+  bucket: inverse_problems
+  form: paper
+  venue: PNAS 113(15)
+  identifiers:
+    isbn: null
+    doi: 10.1073/pnas.1517384113
+    url: https://www.pnas.org/doi/10.1073/pnas.1517384113
+  pages: 6
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://www.pnas.org/doi/pdf/10.1073/pnas.1517384113
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    copy_path: null
+    source_url: https://www.pnas.org/doi/pdf/10.1073/pnas.1517384113
+    obtained_at: null
+    note: null
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'SINDy: recovers parsimonious governing differential equations from data by sparse regression
+    over a library of candidate nonlinear basis functions.'
+- id: ayers-1988-iterative-blind-deconvolution
+  title: Iterative blind deconvolution method and its applications
+  authors:
+  - G. R. Ayers
+  - J. Christopher Dainty
+  year: 1988
+  bucket: inverse_problems
+  form: paper
+  venue: Optics Letters 13(7)
+  identifiers:
+    isbn: null
+    doi: 10.1364/OL.13.000547
+    url: https://opg.optica.org/ol/abstract.cfm?uri=ol-13-7-547
+  pages: 3
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://opg.optica.org/ol/abstract.cfm?uri=ol-13-7-547
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://opg.optica.org/ol/abstract.cfm?uri=ol-13-7-547
+    obtained_at: null
+    note: 'Manifest uncertain about: url. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The iterative blind deconvolution algorithm: alternating Fourier-domain constraint projections
+    recover both an unknown signal and an unknown kernel from their convolution alone.'
+- id: darouach-1994-unknown-input-observers
+  title: Full-order observers for linear systems with unknown inputs
+  authors:
+  - Mohamed Darouach
+  - Michel Zasadzinski
+  - Shi Jie Xu
+  year: 1994
+  bucket: inverse_problems
+  form: paper
+  venue: IEEE Trans. Automatic Control 39(3)
+  identifiers:
+    isbn: null
+    doi: 10.1109/9.280770
+    url: https://ieeexplore.ieee.org/document/280770
+  pages: 4
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://ieeexplore.ieee.org/document/280770
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://ieeexplore.ieee.org/document/280770
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Generalized-inverse construction and existence conditions for full-order unknown-input observers
+    estimating the state of a linear system driven by unmeasured disturbances.
+- id: crutchfield-1989-inferring-statistical-complexity
+  title: Inferring Statistical Complexity
+  authors:
+  - James P. Crutchfield
+  - Karl Young
+  year: 1989
+  bucket: information_theory
+  form: paper
+  venue: Physical Review Letters 63(2)
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevLett.63.105
+    url: https://link.aps.org/doi/10.1103/PhysRevLett.63.105
+  pages: 4
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.aps.org/doi/10.1103/PhysRevLett.63.105
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.aps.org/doi/10.1103/PhysRevLett.63.105
+    obtained_at: null
+    note: 'Manifest uncertain about: free_access. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Introduces the epsilon-machine and statistical complexity: a measure of a process''s intrinsic
+    computational structure, distinct from and dual to entropy rate.'
+- id: shalizi-2001-computational-mechanics
+  title: 'Computational Mechanics: Pattern and Prediction, Structure and Simplicity'
+  authors:
+  - Cosma Rohilla Shalizi
+  - James P. Crutchfield
+  year: 2001
+  bucket: information_theory
+  form: paper
+  venue: Journal of Statistical Physics 104(3/4)
+  identifiers:
+    isbn: null
+    doi: 10.1023/A:1010388907793
+    url: https://link.springer.com/article/10.1023/A:1010388907793
+  pages: 63
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/cond-mat/9907176
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/shalizi-2001-computational-mechanics.pdf
+    source_url: https://arxiv.org/pdf/cond-mat/9907176
+    obtained_at: '2026-08-06'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Proves the causal-state epsilon-machine is the unique minimal maximally predictive model of
+      a stochastic process, and compares it to competing representations.
+    locator: the whole paper
+    kind: section
+    pages: 29
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Proves the causal-state epsilon-machine is the unique minimal maximally predictive model of a
+    stochastic process, and compares it to competing representations.
+- id: tishby-1999-information-bottleneck
+  title: The Information Bottleneck Method
+  authors:
+  - Naftali Tishby
+  - Fernando C. Pereira
+  - William Bialek
+  year: 1999
+  bucket: information_theory
+  form: paper
+  venue: 37th Allerton Conference
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/physics/0004057
+  pages: 16
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/physics/0004057
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/tishby-1999-information-bottleneck.pdf
+    source_url: https://arxiv.org/pdf/physics/0004057
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Relevant-information extraction as a rate-distortion problem: a compressed representation
+      of one variable optimised to retain mutual information about a second, with self-consistent iterative
+      equations.'
+    locator: the whole paper
+    kind: section
+    pages: 16
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Relevant-information extraction as a rate-distortion problem: a compressed representation of
+    one variable optimised to retain mutual information about a second, with self-consistent iterative
+    equations.'
+- id: schreiber-2000-measuring-information-transfer
+  title: Measuring Information Transfer
+  authors:
+  - Thomas Schreiber
+  year: 2000
+  bucket: information_theory
+  form: paper
+  venue: Physical Review Letters 85(2)
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevLett.85.461
+    url: https://link.aps.org/doi/10.1103/PhysRevLett.85.461
+  pages: 4
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/nlin/0001042
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/schreiber-2000-measuring-information-transfer.pdf
+    source_url: https://arxiv.org/pdf/nlin/0001042
+    obtained_at: '2026-08-06'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Introduces transfer entropy: a conditional-mutual-information measure separating directed
+      information exchange between series from shared information due to common history or inputs.'
+    locator: the whole paper
+    kind: whole
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Introduces transfer entropy: a conditional-mutual-information measure separating directed information
+    exchange between series from shared information due to common history or inputs.'
+- id: massey-1990-directed-information
+  title: Causality, Feedback and Directed Information
+  authors:
+  - James L. Massey
+  year: 1990
+  bucket: information_theory
+  form: paper
+  venue: ISITA-90
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://www.semanticscholar.org/paper/557668619327081a6b77aa5b181fa84722a875a4
+  pages: 3
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.semanticscholar.org/paper/557668619327081a6b77aa5b181fa84722a875a4
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.semanticscholar.org/paper/557668619327081a6b77aa5b181fa84722a875a4
+    obtained_at: null
+    note: 'Manifest uncertain about: url, doi. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Defines directed information and shows that it, rather than ordinary mutual information, bounds
+    the capacity of channels used with feedback.
+- id: molchan-1991-optimal-prediction-strategies
+  title: Structure of optimal strategies in earthquake prediction
+  authors:
+  - George M. Molchan
+  year: 1991
+  bucket: detection_tracking
+  form: paper
+  venue: Tectonophysics 193(4)
+  identifiers:
+    isbn: null
+    doi: 10.1016/0040-1951(91)90336-Q
+    url: https://doi.org/10.1016/0040-1951(91)90336-Q
+  pages: 10
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://doi.org/10.1016/0040-1951(91)90336-Q
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://doi.org/10.1016/0040-1951(91)90336-Q
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The canonical error-diagram paper: optimal alarm strategies under any convex loss trace the
+    frontier of miss rate against fraction of space-time under alarm, the optimum being a threshold on
+    hazard rate.'
+- id: molchan-2010-space-time-error-diagrams
+  title: 'Space-Time Earthquake Prediction: The Error Diagrams'
+  authors:
+  - George M. Molchan
+  year: 2010
+  bucket: detection_tracking
+  form: paper
+  venue: Pure and Applied Geophysics 167(8-9)
+  identifiers:
+    isbn: null
+    doi: 10.1007/s00024-010-0087-z
+    url: https://link.springer.com/article/10.1007/s00024-010-0087-z
+  pages: 11
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/article/10.1007/s00024-010-0087-z
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/article/10.1007/s00024-010-0087-z
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Generalises the error diagram to space-time alarms and fixes how the alarm-measure axis normalises
+    when alarms occupy regions, which is the version needed to score alarms against a resource budget.
+- id: helmstetter-2003-mainshocks-conditional-foreshocks
+  title: 'Mainshocks are aftershocks of conditional foreshocks: how foreshock statistical properties emerge
+    from aftershock laws'
+  authors:
+  - Agnès Helmstetter
+  - Didier Sornette
+  - Jean-Robert Grasso
+  year: 2003
+  bucket: detection_tracking
+  form: paper
+  venue: JGR Solid Earth 108(B1)
+  identifiers:
+    isbn: null
+    doi: 10.1029/2002JB001991
+    url: https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2002JB001991
+  pages: 36
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/cond-mat/0205499
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/helmstetter-2003-mainshocks-conditional-foreshocks.pdf
+    source_url: https://arxiv.org/pdf/cond-mat/0205499
+    obtained_at: '2026-08-06'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Derives foreshock statistics from ETAS triggering alone, so foreshocks carry prediction gain
+      without requiring any distinct precursory physics.
+    locator: the whole paper
+    kind: section
+    pages: 36
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Derives foreshock statistics from ETAS triggering alone, so foreshocks carry prediction gain
+    without requiring any distinct precursory physics.
+- id: schorlemmer-2018-csep-achievements-priorities
+  title: 'The Collaboratory for the Study of Earthquake Predictability: Achievements and Priorities'
+  authors:
+  - Danijel Schorlemmer
+  - Maximilian J. Werner
+  - Warner Marzocchi
+  - Thomas H. Jordan
+  - Yosihiko Ogata
+  year: 2018
+  bucket: detection_tracking
+  form: survey
+  venue: Seismological Research Letters 89(4)
+  identifiers:
+    isbn: null
+    doi: 10.1785/0220180053
+    url: https://pubs.geoscienceworld.org/ssa/srl/article/89/4/1305/532043/
+  pages: 33
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://research-information.bris.ac.uk/ws/files/156018554/SRL_D_18_00053_R2.pdf
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/schorlemmer-2018-csep-achievements-priorities.pdf
+    source_url: https://research-information.bris.ac.uk/ws/files/156018554/SRL_D_18_00053_R2.pdf
+    obtained_at: '2026-08-06'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'The CSEP prospective forecast-testing framework: consistency and comparative test statistics
+      (N, L, S, M, T) and the experiment-design rules that make forecast evaluation reproducible and blind.'
+    locator: the whole paper
+    kind: section
+    pages: 33
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The CSEP prospective forecast-testing framework: consistency and comparative test statistics
+    (N, L, S, M, T) and the experiment-design rules that make forecast evaluation reproducible and blind.'
+- id: mizrahi-2021-embracing-data-incompleteness
+  title: Embracing Data Incompleteness for Better Earthquake Forecasting
+  authors:
+  - Leila Mizrahi
+  - Shyam Nandan
+  - Stefan Wiemer
+  year: 2021
+  bucket: detection_tracking
+  form: paper
+  venue: JGR Solid Earth 126(12)
+  identifiers:
+    isbn: null
+    doi: 10.1029/2021JB022379
+    url: https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2021JB022379
+  pages: 39
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2105.00888
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/mizrahi-2021-embracing-data-incompleteness.pdf
+    source_url: https://arxiv.org/pdf/2105.00888
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: EM algorithms calibrating ETAS under time-varying completeness magnitude and rate-dependent
+      detection probability, removing the parameter bias caused by short-term aftershock incompleteness.
+    locator: the whole paper
+    kind: section
+    pages: 39
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: EM algorithms calibrating ETAS under time-varying completeness magnitude and rate-dependent detection
+    probability, removing the parameter bias caused by short-term aftershock incompleteness.
+- id: hainzl-2016-rate-dependent-incompleteness
+  title: Rate-Dependent Incompleteness of Earthquake Catalogs
+  authors:
+  - Sebastian Hainzl
+  year: 2016
+  bucket: detection_tracking
+  form: paper
+  venue: Seismological Research Letters 87(2A)
+  identifiers:
+    isbn: null
+    doi: 10.1785/0220150211
+    url: https://pubs.geoscienceworld.org/ssa/srl/article/87/2A/337/315377/
+  pages: 9
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://gfzpublic.gfz.de/pubman/item/item_1541903_6/component/file_1882890/1541903.pdf
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/hainzl-2016-rate-dependent-incompleteness.pdf
+    source_url: https://gfzpublic.gfz.de/pubman/item/item_1541903_6/component/file_1882890/1541903.pdf
+    obtained_at: '2026-08-06'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Detection completeness degrades as a deterministic function of instantaneous seismicity rate,
+      which alone explains the apparent magnitude dependence of the Omori c-value and biases ETAS estimates.
+    locator: the whole paper
+    kind: whole
+    pages: 9
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Detection completeness degrades as a deterministic function of instantaneous seismicity rate,
+    which alone explains the apparent magnitude dependence of the Omori c-value and biases ETAS estimates.
+- id: andersen-1993-counting-processes-models
+  title: Statistical Models Based on Counting Processes
+  authors:
+  - Per Kragh Andersen
+  - Ørnulf Borgan
+  - Richard D. Gill
+  - Niels Keiding
+  year: 1993
+  bucket: survival_reliability
+  form: monograph
+  venue: Springer
+  identifiers:
+    isbn: '9780387945194'
+    doi: 10.1007/978-1-4612-4348-9
+    url: https://link.springer.com/book/10.1007/978-1-4612-4348-9
+  pages: 780
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/book/10.1007/978-1-4612-4348-9
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/book/10.1007/978-1-4612-4348-9
+    obtained_at: null
+    note: 'Manifest uncertain about: pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The definitive martingale and counting-process treatment of event-history data: Nelson-Aalen
+    and Aalen-Johansen estimators, Cox partial likelihood, large-sample theory for multiplicative intensity
+    models.'
+- id: cook-2007-recurrent-events
+  title: The Statistical Analysis of Recurrent Events
+  authors:
+  - Richard J. Cook
+  - Jerald F. Lawless
+  year: 2007
+  bucket: survival_reliability
+  form: monograph
+  venue: Springer
+  identifiers:
+    isbn: '9780387698090'
+    doi: 10.1007/978-0-387-69810-6
+    url: https://link.springer.com/book/10.1007/978-0-387-69810-6
+  pages: 410
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/book/10.1007/978-0-387-69810-6
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/book/10.1007/978-0-387-69810-6
+    obtained_at: null
+    note: 'Manifest uncertain about: pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Recurrent-event data: intensity-based (Andersen-Gill, Markov, semi-Markov) models, mean and
+    rate function models, robust variance estimation, multi-type events with terminal events.'
+- id: fleming-1991-counting-processes-survival
+  title: Counting Processes and Survival Analysis
+  authors:
+  - Thomas R. Fleming
+  - David P. Harrington
+  year: 1991
+  bucket: survival_reliability
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: '9780471522188'
+    doi: 10.1002/9781118150672
+    url: https://onlinelibrary.wiley.com/doi/book/10.1002/9781118150672
+  pages: 430
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://onlinelibrary.wiley.com/doi/book/10.1002/9781118150672
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://onlinelibrary.wiley.com/doi/book/10.1002/9781118150672
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Martingale central limit theory for censored survival data, and from it the G-rho weighted logrank
+    family and the asymptotics of the Cox and Nelson-Aalen estimators.
+- id: putter-2007-competing-risks-multistate
+  title: 'Tutorial in biostatistics: competing risks and multi-state models'
+  authors:
+  - Hein Putter
+  - Marta Fiocco
+  - Ronald B. Geskus
+  year: 2007
+  bucket: survival_reliability
+  form: survey
+  venue: Statistics in Medicine 26(11)
+  identifiers:
+    isbn: null
+    doi: 10.1002/sim.2712
+    url: https://onlinelibrary.wiley.com/doi/10.1002/sim.2712
+  pages: 42
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://onlinelibrary.wiley.com/doi/10.1002/sim.2712
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://onlinelibrary.wiley.com/doi/10.1002/sim.2712
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The standard applied reference for multi-state event-history modelling: transition-specific
+    hazards, Aalen-Johansen transition probabilities, and cause-specific versus subdistribution approaches.'

@@ -4,6 +4,15 @@
 
 ### Added
 
+- `label_units.py` and `make label` declare reading units on held sources that have none.
+  A source under 80 extracted pages becomes one unit, because splitting a paper into
+  sections without having read it invents structure. Venue documentation becomes one unit
+  per fetched page. Books are left alone: a 600-page textbook as one unit is not a reading
+  plan. It also reconciles declared page counts against the extracted PDF, since where the
+  text is held the measured count is the real one.
+- `survival_reliability` and `inverse_problems` buckets, for time-to-event questions the
+  order book asks directly and for separating information flow from mechanical impact.
+
 - `fetch_sources.py` and `make fetch` download the sources whose entries already record a
   legitimate free location, and nothing else: no searching, no alternative links, no second
   try elsewhere. Non-PDF responses are discarded rather than saved, because publishers
@@ -112,6 +121,11 @@
 - The four `ingest_*` classes that clear derivative use now reach the `source` tier.
 
 ### Fixed
+
+- `ingest_manifest.py` now enriches an existing entry on a near-duplicate instead of
+  discarding the row. Seventy-four entries were marked freely available with no URL
+  recorded, so nothing could fetch them, and a manifest that had found the URL was being
+  thrown away for describing a book already catalogued. Only empty fields are written.
 
 - `digest --out` crashed on a key the rights removal deleted. The smoke only ran digest to
   stdout, so that branch went unexercised; it is covered now.
