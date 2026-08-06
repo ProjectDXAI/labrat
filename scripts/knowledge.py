@@ -2207,7 +2207,8 @@ def cmd_digest(args: argparse.Namespace) -> int:
             "digest": str(args.out),
             "tokens_used": result["tokens_used"],
             "by_tier": result["by_tier"],
-            "refused_by_rights": len(result["refused_by_rights"]),
+            "starved": len(result["starved"]),
+            "full_text_served": result["full_text_served"],
         }, indent=2))
         return 0
     print(json.dumps(result, indent=2))

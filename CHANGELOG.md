@@ -4,6 +4,13 @@
 
 ### Added
 
+- `fetch_sources.py` and `make fetch` download the sources whose entries already record a
+  legitimate free location, and nothing else: no searching, no alternative links, no second
+  try elsewhere. Non-PDF responses are discarded rather than saved, because publishers
+  answer bots with HTML interstitials at HTTP 200 and a saved interstitial indexes as a
+  paper. Venue documentation is fetched as HTML and written as markdown, since a docs site
+  is not a paper.
+
 - `ingest_manifest.py` turns a research agent's YAML manifest into bibliography entries.
   Nothing it adds is marked owned: a manifest entry is something located, not held, which
   is the whole point of an acquisition list. Near-duplicate detection uses the same key
@@ -105,6 +112,12 @@
 - The four `ingest_*` classes that clear derivative use now reach the `source` tier.
 
 ### Fixed
+
+- `digest --out` crashed on a key the rights removal deleted. The smoke only ran digest to
+  stdout, so that branch went unexercised; it is covered now.
+- The explorer rendered its header, fetched its data and never hydrated. Binding the dev
+  server to `0.0.0.0` for LAN access makes Next treat every other host as cross-origin and
+  refuse its own dev chunks. `allowedDevOrigins` now names loopback and RFC1918 ranges.
 
 - Courseware is indexed as teaching material only. Problem sets, solution keys and exams
   are dropped from a course folder, which was about a fifth of it by page count and diluted

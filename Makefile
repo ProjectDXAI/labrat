@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map review
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map fetch review
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -20,6 +20,7 @@ help:
 	@echo "  make web                      export, then run the explorer at localhost:3000"
 	@echo "  make acquire [LAB=dir]        rank what to acquire against what the store cannot support"
 	@echo "  make map [LAB=dir]            write MAP.md and the flat CSVs an agent can browse"
+	@echo "  make fetch [LAB=dir]          download the sources recorded as freely available"
 	@echo "  make review [OUT=file]        render the structural findings as one self-contained page"
 
 install:
@@ -78,7 +79,8 @@ smoke-knowledge: clean-smoke-knowledge selftest
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py digest --context .digest-ctx.json --compare --budget 1200 --abstain-threshold 0.01 | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); a=d['arms']; assert a['never']['tokens_used']<a['policy']['tokens_used']<a['always']['tokens_used'], f'the three arms must actually differ: {a}'; assert not a['policy']['over_budget'], a['policy']; assert a['always']['tokens_used']>1200, 'the unbounded arm should blow the budget the policy respects'; assert a['policy']['by_tier']['excerpt']>0, a['policy']; print(f'  digest OK: never={a[\"never\"][\"tokens_used\"]} policy={a[\"policy\"][\"tokens_used\"]} always={a[\"always\"][\"tokens_used\"]} tokens; policy holds the 1200 ceiling the unbounded arm breaks')"
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py digest --context .digest-ctx.json --budget 999999 --abstain-threshold 0.01 | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert not d['full_text_served'], f'no --full was passed and a whole source arrived anyway: {d[\"full_text_served\"]}'; print('  opt-in OK: an ingestable source stays at excerpt until someone asks for it')"
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py digest --context .digest-ctx.json --budget 999999 --abstain-threshold 0.01 --full he-2022-fundamentals-perpetual-futures | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); served=d['full_text_served']; assert served==['he-2022-fundamentals-perpetual-futures'], served; texts=[r['text'] for r in d['passages'] if r['text']]; assert len(texts)==len(set(texts)), 'the same passage was served more than once'; print(f'  full source OK: {d[\"tokens_used\"]:,} tokens, every passage distinct')"
-	@cd $(KNOWLEDGE_LAB) && rm -f .digest-ctx.json && rm -rf corpus/passages
+	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py digest --context .digest-ctx.json --abstain-threshold 0.01 --out .digest-out.json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); assert 'tokens_used' in d and 'by_tier' in d, d; print('  digest --out OK: writes a packet and reports on it')"
+	@cd $(KNOWLEDGE_LAB) && rm -f .digest-ctx.json .digest-out.json && rm -rf corpus/passages
 	@echo ">>> Checking the frontier bets are refutable, grounded and runnable..."
 	@cd $(KNOWLEDGE_LAB) && $(PYTHON) scripts/knowledge.py bets --json | $(PYTHON) -c "import json,sys; d=json.load(sys.stdin); v=d['validation']; assert v['ok'], [r for r in v['bets'] if not r['ok']]; runnable=sum(1 for r in v['bets'] if r['runnable_now']); assert runnable>=4, runnable; top=d['ranked'][0]; assert top['first_computation'], 'the top-ranked bet must be runnable today'; print(f'  bets OK: {v[\"count\"]} refutable bets, {runnable} runnable now, top = {top[\"bet_id\"]} via {top[\"first_computation\"]}')"
 	@echo ">>> Checking proposed extensions are grounded in material actually read..."
@@ -242,3 +244,7 @@ map:
 
 review:
 	@$(PYTHON) scripts/export_review.py --out $(OUT)
+
+fetch:
+	@$(PYTHON) scripts/fetch_sources.py --lab $(LAB)
+	@$(PYTHON) scripts/passages.py --root $(LAB) index

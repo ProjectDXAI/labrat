@@ -12915,7 +12915,7 @@ entries:
   title: 'Trading and Exchanges: Market Microstructure for Practitioners'
   authors:
   - Larry Harris
-  year: 2003
+  year: 2002
   bucket: market_microstructure
   form: textbook
   venue: Oxford University Press
@@ -13007,8 +13007,7 @@ entries:
   - orientation
   - institutions
   - order-types
-  notes: Agents disagreed on year (2002 copyright, 2003 on most records) and extent (643 vs 656); kept
-    the existing year.
+  notes: Year corrected to 2002 and extent to 656 against the Oxford University Press page.
 - id: hasbrouck-2007-empirical-market-microstructure
   title: Empirical Market Microstructure
   authors:
@@ -22933,8 +22932,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/brunnermeier-2009-market-liquidity-funding-liquidity.pdf
     source_url: https://www.princeton.edu/~markus/research/papers/liquidity.pdf
     obtained_at: null
     note: null
@@ -22972,8 +22971,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/garleanu-2011-margin-based-asset-pricing.pdf
     source_url: https://www.nber.org/system/files/working_papers/w16777/w16777.pdf
     obtained_at: null
     note: 'Manifest uncertain about: free_url.'
@@ -23011,8 +23010,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/adrian-2010-liquidity-and-leverage.pdf
     source_url: https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr328.pdf
     obtained_at: null
     note: null
@@ -23050,8 +23049,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/shleifer-1997-limits-of-arbitrage.pdf
     source_url: https://www.nber.org/system/files/working_papers/w5167/w5167.pdf
     obtained_at: null
     note: null
@@ -23090,8 +23089,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/duffie-2005-over-the-counter-markets.pdf
     source_url: https://www.nber.org/system/files/working_papers/w10816/w10816.pdf
     obtained_at: null
     note: null
@@ -23130,8 +23129,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/schmeling-2026-crypto-carry.pdf
     source_url: https://www.bis.org/publ/work1087.pdf
     obtained_at: null
     note: 'Manifest uncertain about: year.'
@@ -23173,8 +23172,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/soska-2021-bitmex-derivatives.pdf
     source_url: https://www.andrew.cmu.edu/user/nicolasc/publications/Soska-WWW21.pdf
     obtained_at: null
     note: 'Manifest uncertain about: free_access.'
@@ -23214,8 +23213,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/zhang-2016-correction-note-price-dynamics.pdf
     source_url: https://www.repository.cam.ac.uk/bitstreams/d1e66d70-2e65-491f-b6e8-4861e4118822/download
     obtained_at: null
     note: null
@@ -23254,8 +23253,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/cartea-2018-enhancing-trading-strategies-order-book-signals.pdf
     source_url: https://ora.ox.ac.uk/objects/uuid:006addde-3a03-4d75-89c1-04b59026e1c0/files/me4008e0ecca779b45d59231ebca3e69c
     obtained_at: null
     note: null
@@ -23293,8 +23292,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/abergel-2013-mathematical-approach-order-book-modeling.pdf
     source_url: https://arxiv.org/pdf/1010.5136
     obtained_at: null
     note: 'Manifest uncertain about: pages.'
@@ -23332,8 +23331,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/abergel-2015-long-time-behavior-hawkes-lob.pdf
     source_url: https://hal.science/hal-01121711/file/HawkesLOB.pdf
     obtained_at: null
     note: null
@@ -23370,8 +23369,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/munitoke-2015-order-book-queueing-system.pdf
     source_url: https://arxiv.org/pdf/1311.5661
     obtained_at: null
     note: null
@@ -23409,8 +23408,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/munitoke-2017-modelling-intensities-order-flows.pdf
     source_url: https://arxiv.org/pdf/1602.03944
     obtained_at: null
     note: null
@@ -23447,8 +23446,8 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/study/munitoke-2017-stationary-distribution-volume-best-quote.pdf
     source_url: https://arxiv.org/pdf/1502.03871
     obtained_at: null
     note: null
@@ -23523,10 +23522,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/bybit-docs-perpetuals-mechanics/docs.md
     source_url: https://www.bybit.com/en/help-center/topic-list/trading-products
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
@@ -23561,10 +23560,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/okx-docs-perpetual-swaps-mechanics/docs.md
     source_url: https://www.okx.com/en-us/help/i-perpetual-swaps
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
@@ -23600,10 +23599,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/deribit-docs-perpetuals-mechanics/docs.md
     source_url: https://support.deribit.com/hc/en-us/categories/25937446683677-Exchange
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
@@ -23639,10 +23638,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/dydx-v4-docs-perpetuals-mechanics/docs.md
     source_url: https://docs.dydx.xyz/concepts/trading/funding
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
@@ -23678,10 +23677,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/gmx-v2-docs-perpetuals-mechanics/docs.md
     source_url: https://docs.gmx.io/docs/category/trading/
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
@@ -23718,10 +23717,10 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
+    state: owned
+    copy_path: corpus/sources/velocity-docs-perpetuals-mechanics/docs.md
     source_url: https://docs.velocity.exchange/protocol/trading
-    obtained_at: null
+    obtained_at: '2026-08-06'
     note: null
   units: []
   refs: []
