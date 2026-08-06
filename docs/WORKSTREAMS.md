@@ -1,6 +1,16 @@
-# DXAP workstreams: state, and where to pick it up
+# Working notes: state, and where to pick it up
 
-Working notes for the corpus and knowledge work as it stands. Written to be picked up on a local machine, so it says what exists, what was actually read, what is ranked, what is blocked, and what to do next.
+**What this corpus is for.** Exploratory understanding of structural mathematics that may or may not touch the trading work — a place to track findings and pathways as they accumulate, and to seed an AI coding agent with creative direction when building. It is not a licensing exercise and not a justification layer for trades.
+
+**Rights are metadata, not a gate.** Recorded so a redistributable build stays possible later; ignored otherwise. Nothing should stop a source being read. The taxonomy records `mode: exploratory` for this reason, and neither reading path consults rights status.
+
+**The primary artifact is `knowledge/structural_findings.yaml`** — patterns that span two or more domains, each with what it buys and an `agent_seed` written for whoever builds in that area next.
+
+```bash
+python scripts/knowledge.py findings --verbose         # the findings, grouped and marked
+python scripts/knowledge.py findings --status tension  # and the one that does not resolve
+python scripts/corpus.py reading --limit 15            # what to open next
+```
 
 Everything below lives in two profiles that stack:
 
@@ -9,79 +19,83 @@ labrat new ~/labs/dxap --profile=quant-finance-corpus --profile=dxap-knowledge
 cd ~/labs/dxap
 python scripts/corpus.py status
 python scripts/knowledge.py status
-python scripts/knowledge.py extensions --verbose
 ```
-
-## The three workstreams
-
-Encoded in `knowledge/problems.yaml` under `workstreams`, because the compile queue seeds a personalized PageRank there and retrieval filters on it. Literature that touches none of them is a distraction, not a neutral addition.
-
-| Workstream | Venue mechanics that matter | Reading priorities |
-|---|---|---|
-| **Polymarket** | CLOB, not a scoring-rule maker. Conditional Token Framework: splitting collateral mints a complete set, merging a complete set returns collateral **atomically**. Negative-risk markets convert one NO into YES across the other outcomes. | economics_information, mathematical_foundations, exchange_documentation |
-| **Hyperliquid L4** | Fully on-chain CLOB with price-time priority, but actions inside a consensus batch are sorted **orders without GTC/IOC → cancels → GTC/IOC orders**, proposer order inside each category, 1–2 batches per block. Margin checked on open *and again for the resting side at each match*. | queueing_networks, market_microstructure, mathematical_foundations |
-| **DXAP agents** | LLM agents with tools, memory and triggers; path-dependent decisions; outcomes mature far slower than the agent acts. | inference_causality, decision_sequential, machine_learning_frontier |
-
-Two of those facts invalidate standard modelling:
-
-- **Batch type-priority is not arrival-time priority.** Every order-book queueing result — birth-death, queue-reactive, heavy traffic — assumes continuous arrival. Cancels being processed *before* aggressive orders in the same batch is a structural maker protection no CEX offers.
-- **Atomic merge removes leg risk.** Cross-market arbitrage literature prices logical inconsistency leg by leg because everywhere it studies, legs can come apart. For constraints the token layer enforces, they cannot. `prediction_market_consistency` 1.1.0 now takes `settlement=atomic` and applies it *only* to partition constraints, since no token operation enforces a conjunction bound.
-
-## What the warehouse actually captures
-
-Read from `ProjectDXAI/hyperliquid-ingest` at commit `eca892b`, migrations `00001` and `00015`. Recorded in `knowledge/problems.yaml` under `observables_available`, including an explicit `not_captured` list — a retrieval filter naming observables we do not have is fiction.
-
-Two properties the published literature has never had:
-
-- **`hl_trades.buyer` and `hl_trades.seller`** — counterparty addresses on every fill. The empirical microstructure literature spends enormous effort *inferring* what this column states outright. It also means trade-classification rules can be validated against ground truth rather than assumed.
-- **`hl_l2_book_levels.order_count`** — order counts per level alongside size. Queueing models of the book are written in aggregate size; a level held by one large order and one held by twenty small orders are the same state to those models and are obviously different systems.
-
-Also captured and unused: `mark_px` and `oracle_px` alongside `mid_px` with `funding` and `open_interest` (so the mechanical trigger of liquidation is observable, not inferred), and Polymarket snapshots keyed to `event_id` / `event_ticker` / `series_id` with `mentioned_symbols` and `tracked_coin` (so the logical constraint set and the cross-venue link are already in the schema).
-
-Not captured: own-order queue rank, individual order lifecycle events, fee schedule.
 
 ## Where the work stands
 
 ```
-267 bibliographic records · 60 reading units · 12 units actually read
-25 concept cards (9 anchored to a read unit, 16 to unread anchors)
-16 method bindings at pinned versions · 17 implemented methods
-11 frontier bets · 18 exploratory extensions (15 with a runnable first computation)
-19 labelled retrieval trials · every diagnosed problem has a servable concept
-manifest: 1 entry eligible at seed (our own repo); a confirmed CC course clears in the smoke round
+465 bibliographic records · 67 decomposed into 118 units · 61 units read
+19 structural findings (17 read, 1 tension, 1 conjecture)
+43 concept cards, all servable (27 anchored to a read unit, 16 to unread anchors)
+22 methods · 11 frontier bets · 18 exploratory extensions
+61 units read but not yet compiled — the current backlog
 ```
 
-`python scripts/knowledge.py status` prints the provenance line. **9 of 25 cards rest on a unit someone opened**, and every card added since the first reading pass is one of them. Seeding from working knowledge is a legitimate way to start; leaving it that way silently is not.
+Reading is the binding constraint, and it always has been. Every finding in the file came from opening something; none came from adding another entry to the bibliography.
 
-The four workstream problems the venue reads opened are now covered: `KC-BATCH-PRIORITY`, `KC-PHANTOM-DEPTH`, `KC-EVENT-TREE-CONSTRAINTS`, `KC-ANYTIME-ATTRIBUTION` and `KC-COUNTERPARTY-INFO`, each with a bound method and a hypothesis carrying a cost model. `make smoke-knowledge` now fails if any problem in the map has no servable concept, so the next gap announces itself.
+## What the reading has produced
+
+The findings file is the output. Some of it bears on the trading work and some of it plainly does not, which is the intended shape. The patterns that keep recurring are recorded at the bottom of that file under `recurring_shapes`; the ones that have shown up more than once so far:
+
+- **One inequality underwriting several apparently separate capabilities** — a maximal inequality behind continuous monitoring, a dissipation identity behind model cost, an uncertainty relation behind precision.
+- **An invariant enforced by the mechanism rather than by the participants** — atomic settlement in the token layer, categorical priority in a consensus batch, and now convex-order barriers implied by two marginals with no model at all.
+- **The same object under two names in two fields with no shared citations** — adverse selection and loss-versus-rebalancing; market-maker subsidy and learner regret; and, joining those, market-maker pricing and natural gradient descent.
+
+Two results worth naming here because they change how anything gets evaluated:
+
+- **Backtest optimism is a closed form.** `R_in² / (1−q) = R_true² = (1−q) R_out²` with `q = N/T`, for a completely general population covariance. The in-sample number understates realized risk by exactly `(1−q)²`, and at `q = 1` in-sample risk is zero while out-of-sample risk diverges. No holdout is needed to correct it — it is arithmetic on two integers any harness already knows.
+- **Quoting is harder than matching.** The LMSR cost function over permutations is `b log perm(B)`, so pricing is #P-hard while matching the same divisible bet language is polynomial. A CLOB can carry combinatorial structure no tractable scoring-rule maker could quote, and the incoherence it permits is what buys the tractability.
+
+The one open tension, `FIND-EXPONENT-TENSION`, is unresolved on purpose: measured Hawkes kernel exponents on equity flow sit near 0.15–0.45, `H ≈ 0.1` implies `α ≈ 0.6`, and the scaling theorem needs `α > 1/2` to give roughness at all. The three cannot all be right about the same object.
+
+## Context: what the trading work actually is
+
+Recorded so a reader knows what the applied side looks like, **not** as a filter on what is worth reading. Plenty of what is in the findings file connects to none of it.
+
+| Workstream | Venue mechanics that matter |
+|---|---|
+| **Polymarket** | CLOB, not a scoring-rule maker. Conditional Token Framework: splitting collateral mints a complete set, merging a complete set returns collateral **atomically**. Negative-risk markets convert one NO into YES across the other outcomes. |
+| **Hyperliquid L4** | Fully on-chain CLOB with price-time priority, but actions inside a consensus batch are sorted **orders without GTC/IOC → cancels → GTC/IOC orders**, proposer order inside each category, 1–2 batches per block. Margin checked on open *and again for the resting side at each match*. |
+| **DXAP agents** | LLM agents with tools, memory and triggers; path-dependent decisions; outcomes mature far slower than the agent acts. |
+
+Two venue facts invalidate standard modelling:
+
+- **Batch type-priority is not arrival-time priority.** Every order-book queueing result — birth-death, queue-reactive, heavy traffic — assumes continuous arrival. Cancels being processed *before* aggressive orders in the same batch is a structural maker protection no CEX offers.
+- **Atomic merge removes leg risk.** Cross-market arbitrage literature prices logical inconsistency leg by leg because everywhere it studies, legs can come apart. For constraints the token layer enforces, they cannot.
+
+## What the warehouse actually captures
+
+Read from `ProjectDXAI/hyperliquid-ingest`, migrations `00001` and `00015`. Recorded in `knowledge/problems.yaml` under `observables_available`, including an explicit `not_captured` list — a retrieval filter naming observables we do not have is fiction.
+
+Two properties the published literature has never had:
+
+- **`hl_trades.buyer` and `hl_trades.seller`** — counterparty addresses on every fill. The empirical microstructure literature spends enormous effort *inferring* what this column states outright.
+- **`hl_l2_book_levels.order_count`** — order counts per level alongside size. Queueing models of the book are written in aggregate size; a level held by one large order and one held by twenty small orders are the same state to those models and are obviously different systems.
+
+Not captured: own-order queue rank, individual order lifecycle events, fee schedule.
 
 ## Ranked next actions
 
-### Runnable today against the warehouse
+### Compile the backlog
 
-1. `EXT-EVENT-TREE-CONSTRAINTS` (8.2) — `event_tree_constraints` derives the partition set from `pm_market_snapshots` grouped by `event_id` and marks which partitions the token layer enforces; feed its `enforced` rows straight into `prediction_market_consistency` with `settlement=atomic`. The two compose without translation and the smoke path checks that they do. What is left is pointing it at a week of real snapshots.
-2. `EXT-CTF-ATOMIC-ARB` (5.8) — the enforced/free split is what `event_tree_constraints` returns. Price each class against its true hurdle and compare against what could actually have been executed.
-3. `EXT-COUNTERPARTY-FLOW` (5.3) — `counterparty_markout` ranks addresses by shrunk mark-out and measures out-of-sample rank persistence. Needs mark-outs computed from `hl_trades` joined to a mid-price series; the statistic itself is done.
-4. `EXT-FANO-EXPONENT` (3.8) — pure theory plus simulation, small enough to finish: derive how the Fano-based `n(w)` grows with aggregation scale under a power-law kernel, invert to read the exponent.
+61 units are read and not yet compiled. That is now the largest gap in the system — material has been opened and the cards do not reflect it. `python scripts/knowledge.py compile-queue` ranks it.
 
-### First computation exists; the data plumbing does not
+### Read next
 
-- `EXT-BATCH-QUEUE` — `batch_priority_fill` takes a batch and returns the execution order, the arrival-time counterfactual and the cancels that escaped an earlier aggressive order. It takes the batch as given, so reconstructing batch boundaries from the feed is the remaining work, and a wrong reconstruction invalidates every number it produces.
-- `EXT-PHANTOM-DEPTH` — `depth_realization` measures the shortfall between displayed and executable depth. It cannot attribute the shortfall to margin rather than to ordinary cancellation; that needs account-level state joined to resting orders.
-- `EXT-AGENT-SHAM-ARM` — `betting_eprocess` is the monitor for the comparison. The sham cards themselves — matched for length, structure and citation density, wrong on market and horizon — still have to be generated. Without that arm, every retrieval benefit measured on agents is confounded with the deliberation effect.
-- `EXT-ORDER-COUNT-QUEUE`, `EXT-LVR-DISCRETE`, `EXT-VENUE-LAG-NULL` — the three proposals still naming no first computation at all.
+`python scripts/corpus.py reading --limit 15` ranks the 57 unopened units and, since the queue no longer surfaces units anyone has already read, its top rows are now real work.
 
-### Corpus hygiene, highest leverage first
+### Runnable today, no new data
 
-```bash
-python scripts/corpus.py rights --verify-queue --limit 20   # 266 sources held, 0 verified
-python scripts/corpus.py reading --limit 15                 # 48 units unread
-python scripts/corpus.py frontier --limit 20                # 47 open targets
-```
+1. `EXT-EVENT-TREE-CONSTRAINTS` — group `pm_market_snapshots` by `event_id`, treat each group as a partition, run `prediction_market_consistency --settlement atomic`.
+2. `EXT-CTF-ATOMIC-ARB` — split constraints into protocol-enforced and free, price each against its true hurdle.
+3. `EXT-COUNTERPARTY-FLOW` — rank addresses by realized mark-out of their aggressive flow, test out-of-sample persistence.
+4. `EXT-FANO-EXPONENT` — theory plus simulation, small enough to finish, and it bears directly on the open tension above.
 
-The binding constraint is no longer coverage. It is that **266 of 267 sources have never had their rights checked**, and **48 of 60 reading units are unopened**. Two `verify` rounds on `open_courseware` and the venue documentation would move the manifest more than another hundred entries.
+### Needs a decision or new plumbing
 
-The single most load-bearing unknown: `hyperliquid-api-docs#market-data-feeds` is marked unread, and whether resting orders carry a persistent publicly visible owner decides how much of the L4 workstream is possible. Open that unit next.
+- `EXT-BATCH-QUEUE` — the queueing model for type-prioritized consensus batches. Highest novelty in the file; needs batch reconstruction from the feed.
+- `EXT-AGENT-SHAM-ARM` — matched-but-irrelevant cards alongside the real retrieval arm. Without it, every retrieval benefit measured on agents is confounded with the deliberation effect.
+- `EXT-PHANTOM-DEPTH` — needs account-level state joined to resting orders.
 
 ## Access gap — what could not be read
 
@@ -91,17 +105,21 @@ Three paths were named that this environment cannot reach, because sessions run 
 - `/Users/punkyrest/Documents/HyperLiquidL4Collection`
 - `/Users/punkyrest/DXT Reports`
 
-`list_repos` shows no GitHub counterpart for any of the three. `ProjectDXAI/hyperliquid-ingest` was attached and read, and it is clearly related to the L4 collection work but is a data-capture service rather than the collection itself.
+`list_repos` shows no GitHub counterpart for any of the three. `ProjectDXAI/hyperliquid-ingest` was attached and read; it is clearly related to the L4 collection work but is a data-capture service rather than the collection itself.
 
 To get them read: push each to GitHub and name it, or paste the material. Until then, anything proposed about the market-making implementation, the L4 collection, or the DXT reports would be invented rather than read — and `knowledge extensions` will refuse to rank it, because the grounding rule requires a unit marked read.
+
+Note also that acquired PDFs live outside git by design, so a fresh container holds none of them. Reading resumes from open sources or from a re-run of the acquisition path.
 
 ## The rules this repo enforces, so they are not accidentally undone
 
 - **SERVABLE gate** — a card needs a mechanism, assumptions, observables, expected signature, failure modes, counterevidence, and resolvable anchors. No contradicting concept and no alternative explanation means it does not serve.
-- **Rights gate** — nothing reaches the manifest without confirmed rights, an evidence URL and a check date. Free to read is not licensed; a purchase is not a clearance. Verbatim quotes are refused from sources whose rights forbid them.
+- **Rights** — recorded as metadata in exploratory mode, not enforced anywhere in the reading path. The manifest machinery still works if a redistributable build is ever wanted.
 - **Version pin** — a method card names its implementation version. A numerical change fails validation until someone re-verifies the card.
 - **Point-in-time** — retrieval refuses sources published after the decision timestamp.
 - **Read-grounding** — an extension must cite a unit whose `read_status` is `read` or `compiled`. This one caught three of my own proposals on first run.
+- **Findings grounding** — a `read` or `tension` finding must name the sources read; a `tension` must state its open question; every finding must span at least two domains.
+- **Reading queue honesty** — a unit anyone has opened leaves the reading queue and is counted as `units_awaiting_compile` instead. Without this the queue ranked already-read units first, because reading raises no score.
 - **Ledger refusal** — no effect estimate on unmatured outcomes or an unfrozen batch.
 
-`make test` runs all three smoke paths plus five engine self-tests, and each of those rules has an assertion behind it.
+`make test` runs the smoke paths plus the engine self-tests, and each of those rules has an assertion behind it.

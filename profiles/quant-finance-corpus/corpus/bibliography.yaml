@@ -21468,3 +21468,110 @@ entries:
       Weighted Majority, with losses set to l_it = (2 eps - q_it)/(eta b). The market maker's b ln(n) worst-case
       subsidy is recovered from the Weighted Majority regret bound ln(n)/eta + eta T. Bounded market-maker loss
       and bounded learner regret are the same bound.
+- id: beiglbock-2016-complete-duality-martingale-transport
+  title: Complete Duality for Martingale Optimal Transport on the Line
+  authors:
+  - Mathias Beiglböck
+  - Marcel Nutz
+  - Nizar Touzi
+  year: 2016
+  bucket: mathematical_foundations
+  form: paper
+  priority: 5
+  status: reviewed
+  pages: 42
+  identifiers:
+    isbn: null
+    doi: 10.1214/16-AOP1131
+    url: https://arxiv.org/abs/1507.00671
+  tags:
+  - optimal-transport
+  - martingale
+  - duality
+  - robust-hedging
+  - convex-order
+  - model-free
+  units:
+  - unit_id: convex-order-and-barriers
+    topic: when a martingale can join two marginals, and where it cannot go
+    title: null
+    locator: sections 1.1-1.2 and the statement of Theorem 3.2, pp. 2-5
+    kind: paper_section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. M(mu,nu) is nonempty iff mu <=_c nu in convex order: a martingale can only disperse.
+      Theorem 3.2 characterizes the polar sets completely — a set is null under EVERY martingale transport iff its
+      trajectories either cross a barrier or are negligible for one marginal. The barriers partition the line into
+      irreducible components that no martingale transport crosses, and they are determined by the two marginals
+      alone.'
+  - unit_id: quasi-sure-closes-the-gap
+    topic: why the pointwise superreplication dual is the wrong dual
+    title: null
+    locator: section 1.2, pp. 4-6
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. The classical dual requires phi(x) + psi(y) + h(x)(y-x) >= f(x,y) POINTWISE. Example 8.1
+      exhibits a duality gap with compactly supported marginals and a bounded lower semicontinuous reward, and Example
+      8.2 shows dual optimizers generically fail to exist off the irreducible case. Requiring the same inequality
+      only M(mu,nu)-quasi-surely — almost surely under every martingale transport at once — gives both no duality
+      gap and dual attainment for arbitrary Borel f >= 0 (Theorem 7.4).
+- id: raskutti-2014-information-geometry-mirror-descent
+  title: The information geometry of mirror descent
+  authors:
+  - Garvesh Raskutti
+  - Sayan Mukherjee
+  year: 2014
+  bucket: machine_learning_frontier
+  form: paper
+  priority: 5
+  status: reviewed
+  pages: 9
+  identifiers:
+    isbn: null
+    doi: 10.1109/TIT.2015.2388583
+    url: https://arxiv.org/abs/1310.7780
+  tags:
+  - mirror-descent
+  - natural-gradient
+  - information-geometry
+  - bregman-divergence
+  - exponential-family
+  - online-learning
+  - convex-duality
+  refs:
+  - target: chen-2008-complexity-combinatorial-market-makers
+    relation: related_to
+  units:
+  - unit_id: mirror-equals-natural-gradient
+    topic: the equivalence of mirror descent and natural gradient descent
+    title: null
+    locator: sections 2.1-2.3 and the proof of Theorem 1, pp. 3-5
+    kind: paper_section
+    pages: 3
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly, including the proof, which is six lines. Mirror descent with Bregman divergence B_G is
+      exactly natural gradient descent on the DUAL Riemannian manifold (Phi, grad^2 H), where H is the convex conjugate
+      of G and the dual coordinate is mu = grad G(theta). Differentiating the mirror step gives g(theta_{t+1}) =
+      g(theta_t) - alpha grad f, and the chain rule turns this into mu_{t+1} = mu_t - alpha [grad^2 H]^{-1} grad_mu
+      f.
+  - unit_id: fisher-efficiency-of-mirror-descent
+    topic: what the equivalence buys statistically and computationally
+    title: null
+    locator: section 3 and 3.1, pp. 5-6
+    kind: paper_section
+    pages: 2
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Because Amari''s theorem makes natural gradient the steepest descent on the manifold,
+      mirror descent inherits it, and for exponential families mirror descent with log-likelihood loss asymptotically
+      attains the Cramer-Rao bound. The direction of transfer also runs the other way: natural gradient is a second-order
+      method requiring the metric tensor, mirror descent is first-order, so the equivalence implements second-order
+      behaviour at first-order cost.'

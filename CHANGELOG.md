@@ -4,6 +4,29 @@
 
 ### Added
 
+- `knowledge/structural_findings.yaml` and `knowledge.py findings`: patterns that recur across two
+  or more unrelated domains, each recording the structure, the correspondence, what it buys, the
+  sources actually read to reach it, and an `agent_seed` written for whoever builds there next.
+  Validation requires two domains, refuses a `read` or `tension` finding that names no source read,
+  and refuses a `tension` that states no open question. 19 findings so far.
+- The reading round behind them. Bun, Bouchaud and Potters give backtest optimism in closed form —
+  `R_in²/(1−q) = R_true² = (1−q) R_out²` for a completely general population covariance — and show
+  the optimally cleaned spectrum is narrower than the *true* one, so recovering the population
+  eigenvalues is provably the wrong objective. Bongiorno and Lamrani show the expected KL divergence
+  of a sample covariance depends on the aspect ratio alone and not at all on what is being
+  estimated, and that the Frobenius error is the leading term of a series that diverges exactly
+  where the tractable loss stays finite and small. Chen, Fortnow, Lambert, Pennock and Wortman show
+  the LMSR cost function over permutations is `b log perm(B)`, so quoting is #P-hard while matching
+  the same divisible bet language is polynomial — and that LMSR prices are Weighted Majority weights
+  with the `b log n` subsidy as the regret bound. Beiglböck, Nutz and Touzi show two marginals in
+  convex order imply barriers no martingale transport crosses, and that the pointwise
+  superreplication dual has a duality gap the quasi-sure formulation closes. Raskutti and Mukherjee
+  show mirror descent is natural gradient descent on the dual manifold, which joins to the LMSR
+  result: market-maker pricing, exponential weights and natural gradient are one algorithm in three
+  coordinate systems, recorded as the file's one `conjecture` because the join is asserted nowhere.
+- Rights are metadata rather than a gate. The corpus taxonomy records `mode: exploratory`, and
+  nothing in the reading or compiling path consults rights status. The manifest machinery is
+  unchanged, so a redistributable build remains possible if it is ever wanted.
 - `knowledge.py digest`: decides how much source text a decision packet actually needs.
   Four tiers per anchor (card, note, excerpt, unit), a rights ceiling no trigger can
   lift, five named escalation triggers logged next to the passage each one paid for, and
@@ -38,6 +61,11 @@
 
 ### Fixed
 
+- `corpus.py reading` skipped `compiled` and `abandoned` units but not `read` ones. Since reading
+  raises no score, every unit anyone had opened sat permanently at the top of "what to read next" —
+  the first twelve rows of the real queue were all already read. Read units now leave the queue, and
+  `status` reports `units_awaiting_compile` so the backlog is visible rather than silent. The
+  self-test plants a read unit that outscores every unread one on every term.
 - Removed the licence gate from both reading paths (`knowledge.py digest` and
   `passages.py brief`) rather than making it configurable. `corpus.py` still records every
   source's terms, which is the thing to consult if any of this is published; reading

@@ -489,6 +489,122 @@ findings:
       bound translates directly into a subsidy bound. Structure any pricing module so its guarantee
       is stated as a regret, since that is the form in which the proofs are available.
 
+  - finding_id: FIND-BARRIERS-FROM-MARGINALS-ALONE
+    title: "Two observed distributions imply hard barriers no consistent model can cross"
+    status: read
+    structure: "The polar sets of the martingale transport polytope, determined entirely by the convex order of its marginals."
+    domains: [mathematical_foundations, economics_information, quant_finance_core]
+    correspondence: >
+      A martingale can join marginals mu and nu if and only if mu <=_c nu in convex order — the
+      distribution may only disperse. Beiglbock, Nutz and Touzi then characterize the polar sets
+      completely: a set of trajectories is null under EVERY martingale transport exactly when it
+      either crosses a barrier or is negligible for one marginal. Those barriers partition the line
+      into irreducible components between which no martingale transport moves any mass, and their
+      locations follow from the two marginals with no model, no dynamics and no parameter.
+    what_it_buys: >
+      Impossibility is usually asserted by a model. Here it is read off two observed distributions.
+      Given a marginal now and a marginal later — an option-implied distribution, a prediction
+      market's outcome distribution today and at resolution, a state distribution before and after
+      an event — the barriers say which joint transitions are excluded under every arbitrage-free
+      model at once. That is a null hypothesis with no free parameters, and it is a strong one:
+      observing a trajectory across a barrier does not disconfirm one model, it disconfirms the
+      martingale property, which usually means the two marginals were not measuring the same thing.
+      The same structure explains why convex order is the right compatibility test between any two
+      snapshots of a fair-game quantity, prices or not.
+    sources_read:
+      - "arXiv 1507.00671 — Beiglbock, Nutz and Touzi, complete duality for martingale optimal transport on the line, sections 1.1-1.2 and Theorem 3.2"
+    agent_seed: >
+      When a system holds two distributions of the same quantity at different times, check convex
+      order between them before anything else, and treat a violation as a data-integrity alarm
+      rather than a trading signal — it usually means the two snapshots are not the same underlying.
+      Then compute the irreducible components and carry them as a partition of the state space that
+      downstream models must respect: a transition matrix, a scenario generator or a simulator that
+      moves mass across a barrier is wrong by construction and can be rejected in a unit test with
+      no reference implementation to compare against. Build this as a validator over distribution
+      pairs, because it is one of the very few checks in this area that needs no model to be right.
+
+  - finding_id: FIND-QUASI-SURE-BEATS-POINTWISE
+    title: "Robustness against every state costs strictly more than robustness against every model"
+    status: read
+    structure: "A duality gap that opens under a pointwise constraint and closes under a quasi-sure one."
+    domains: [mathematical_foundations, decision_sequential, inference_causality]
+    correspondence: >
+      The natural dual to martingale optimal transport asks for a static position plus a dynamic
+      trade dominating the payoff at EVERY point: phi(x) + psi(y) + h(x)(y - x) >= f(x, y)
+      pointwise. Beiglbock, Nutz and Touzi show this formulation both admits a duality gap — with
+      compactly supported marginals and a bounded lower semicontinuous reward — and generically
+      fails to have an optimizer. Requiring the same inequality to hold only quasi-surely, that is
+      almost surely under every martingale transport simultaneously, removes both defects and gives
+      duality for arbitrary non-negative Borel rewards with attainment whenever the value is finite.
+      The gap is precisely the cost of dominating states that no admissible model reaches.
+    what_it_buys: >
+      "Worst case" is not one notion but two, and the difference is not a technicality — it is the
+      gap between a problem with no solution and a problem with an attained one. Guarding against
+      every conceivable state overpays for states the model class already excludes, and the overpay
+      can be unbounded. The disciplined version quantifies over models and takes the union of what
+      they consider possible. That is the correct shape for any robustness requirement stated over
+      a space larger than the reachable one.
+    sources_read:
+      - "arXiv 1507.00671 — Beiglbock, Nutz and Touzi, complete duality for martingale optimal transport on the line, section 1.2"
+    agent_seed: >
+      Whenever code enforces a guarantee over a space — an invariant, a safety bound, a worst-case
+      cost, a fallback that must never be wrong — ask whether it quantifies over states or over
+      models, and prefer models. Implement the check as: enumerate the admissible model class, take
+      the union of their supports, and require the property there rather than everywhere the types
+      allow. Expect the pointwise version to be both more expensive and, in the cases that matter,
+      unsatisfiable. When a robustness constraint turns out to have no feasible solution, this is
+      the first thing to suspect: the constraint is probably being asked to hold somewhere nothing
+      can reach.
+
+    # The two component identities are each stated in a source read here. The
+    # join is not asserted in either, and is why the status is `conjecture`.
+  - finding_id: FIND-PRICING-IS-NATURAL-GRADIENT
+    title: "Market-maker pricing, exponential weights and natural gradient descent are one algorithm in three coordinate systems"
+    status: conjecture
+    structure: "A log-partition function, its convex conjugate, and the dual coordinate map between them."
+    domains: [economics_information, machine_learning_frontier, information_theory, mathematical_foundations]
+    correspondence: >
+      Three statements, two of them read and the third a one-line derivative. First: the LMSR cost
+      function C(q) = b log sum_omega exp(q_omega / b) is the log-partition function G of a
+      categorical exponential family at inverse temperature 1/b, and its instantaneous prices are
+      p_omega = dC/dq_omega, which is exactly the mean-parameter map mu = grad G(theta) — so prices
+      ARE the dual coordinates of the inventory. Second, read from Chen et al.: those same prices
+      are the weights of Weighted Majority, and the market maker's b log(n) subsidy is its regret
+      bound. Third, read from Raskutti and Mukherjee: mirror descent under a Bregman divergence B_G
+      is natural gradient descent on the dual Riemannian manifold (Phi, grad^2 H) with H the convex
+      conjugate of G. Exponential weights is mirror descent with the entropic Bregman divergence.
+      Chaining the three, quoting an LMSR is natural gradient descent on the simplex under the
+      Fisher metric, with the liquidity parameter b as the inverse learning rate.
+    what_it_buys: >
+      Two consequences that do not follow from any one of the three readings. Raskutti and Mukherjee
+      show mirror descent with log-likelihood loss asymptotically attains the Cramer-Rao bound for
+      exponential families; carried across, the market maker's price update is not a plausible
+      heuristic with a regret bound bolted on, it is the asymptotically efficient estimator update
+      written in mean coordinates. And the computational direction reverses usefully: natural
+      gradient is second-order and needs the metric tensor, mirror descent is first-order, so
+      anywhere a system wants natural-gradient behaviour it can have it at first-order cost by
+      writing the update as a cost-function market instead.
+    open_question: >
+      Whether Fisher efficiency survives the adversarial setting the market actually faces. The
+      efficiency result is asymptotic and assumes data from the family; the regret bound assumes an
+      adversary and no distributional assumption at all. They are proved under incompatible
+      premises about the same update, and which one describes a real venue with informed traders is
+      not something either source addresses.
+    sources_read:
+      - "arXiv 1310.7780 — Raskutti and Mukherjee, the information geometry of mirror descent, sections 2.1-3.1"
+      - "arXiv 0802.1362 — Chen, Fortnow, Lambert, Pennock and Wortman, complexity of combinatorial market makers, section 6"
+    agent_seed: >
+      Treat "maintain a distribution that updates against evidence" as one component with three
+      interfaces, not three components. Write the log-partition function once; derive the prices,
+      the weights and the natural-gradient step from it rather than implementing each. The practical
+      payoff is that tuning arguments become shared — the liquidity parameter, the learning rate and
+      the metric are one number — and so do the guarantees: a regret bound obtained in the learning
+      reading is a subsidy bound in the market reading and a convergence rate in the optimization
+      reading. When building anything that must be both calibrated and adversarially robust, start
+      from the exponential-family form and check which of the two guarantees the deployment actually
+      needs, because the efficiency result and the regret result rest on premises that contradict
+      each other.
+
 # Patterns worth watching for, recorded so they are noticed when they recur.
 recurring_shapes:
   - shape: "A nuisance parameter turns out to select the model class"
@@ -500,7 +616,7 @@ recurring_shapes:
     why_it_matters: "The failure is not loss of power, it is a confident wrong answer that moves in a plausible direction."
 
   - shape: "The same object under two names in two fields with no shared citations"
-    instances: [FIND-ADVERSE-SELECTION-RENAMED, FIND-SUBSIDY-IS-REGRET]
+    instances: [FIND-ADVERSE-SELECTION-RENAMED, FIND-SUBSIDY-IS-REGRET, FIND-PRICING-IS-NATURAL-GRADIENT]
     why_it_matters: "Each side has results the other lacks, and the translation is usually short once the correspondence is seen."
 
   - shape: "Tractability bought by giving up a guarantee, with the gap being where the opportunity lives"
@@ -508,7 +624,7 @@ recurring_shapes:
     why_it_matters: "The missing guarantee names the anomaly precisely, so the mechanism tells you what to look for before any data does."
 
   - shape: "An invariant enforced by the mechanism rather than by the participants"
-    instances: [FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE, FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE]
+    instances: [FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE, FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE, FIND-BARRIERS-FROM-MARGINALS-ALONE]
     why_it_matters: "Enforced invariants bound where anything interesting can happen, and they are enumerable from the mechanism in advance."
 
   - shape: "A penalty fixed by the geometry of the estimation rather than by its content"
@@ -522,6 +638,10 @@ recurring_shapes:
   - shape: "The tractable objective agrees with the real one only in the easy regime"
     instances: [FIND-CONVENIENT-LOSS-HIDES-THE-DIVERGENCE]
     why_it_matters: "The disagreement is absent from the tests that would catch it, and the surviving number reads as a pass."
+
+  - shape: "Quantifying over states where quantifying over models was meant"
+    instances: [FIND-QUASI-SURE-BEATS-POINTWISE]
+    why_it_matters: "The stronger-looking requirement is not conservative, it is a different and often infeasible problem."
 
   - shape: "A quantity that is empirically orthogonal to volatility"
     instances: [FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY]
