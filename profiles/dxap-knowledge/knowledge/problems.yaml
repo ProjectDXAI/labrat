@@ -7,6 +7,79 @@
 #
 # `buckets` and `tags` connect a problem to the corpus bibliography.
 
+# The three concrete workstreams this knowledge base serves. Literature that does
+# not touch one of these is not neutral, it is a distraction — the verticals below
+# exist to keep the corpus pointed at them.
+workstreams:
+  polymarket:
+    name: "Prediction markets on Polymarket"
+    venue_mechanics: >
+      Central limit order book, not a scoring-rule maker, so LMSR-based reasoning does not price
+      the cost of moving the market. Positions are Gnosis Conditional Token Framework ERC-1155
+      outcome tokens: splitting collateral mints a complete set, and merging a complete set returns
+      collateral atomically. Negative-risk markets add a conversion that exchanges one NO token for
+      YES tokens in the event's other outcomes.
+    why_it_shapes_the_corpus: >
+      The atomic split and merge mean logical arbitrage across related markets does not carry the
+      leg risk that the cross-market literature assumes. The combinatorial structure is explicit in
+      the token layer rather than inferred, which makes transport-style joint bounds executable
+      rather than merely descriptive.
+    reading_priorities: [economics_information, mathematical_foundations, exchange_documentation]
+
+  hyperliquid_l4:
+    name: "L4 limit order book research on Hyperliquid"
+    venue_mechanics: >
+      Fully on-chain central limit order book with price-time priority, but actions are sorted
+      within each consensus batch by a deterministic hierarchy — orders without GTC or IOC first,
+      then cancels, then orders carrying GTC or IOC — with proposer order breaking ties inside each
+      category, and usually one or two batches per block. Margin is checked when an order opens and
+      again for the resting side at each match.
+    why_it_shapes_the_corpus: >
+      Almost every order-book model in the literature assumes continuous time and true arrival-time
+      priority. This venue is a discrete batch with a type-based priority hierarchy, so the standard
+      queueing results describe a different system than the one we trade. L4 visibility also makes
+      queue position an observable rather than an estimate, which turns several modelling
+      assumptions into testable claims.
+    reading_priorities: [queueing_networks, market_microstructure, mathematical_foundations, exchange_documentation]
+
+  dxap_agents:
+    name: "LLM-based agentic asset managers on Hyperliquid"
+    venue_mechanics: >
+      Agents make sequential decisions with tool access, memory and triggers, against the same
+      venue. Their decisions are path dependent, and their outcomes mature slowly relative to the
+      rate at which they act.
+    why_it_shapes_the_corpus: >
+      This is what the retrieval layer serves and what the attribution ledger measures. It makes
+      causal inference, off-policy evaluation and anytime-valid monitoring first-order rather than
+      methodological garnish, because the alternative is trusting an agent's own account of why it
+      acted.
+    reading_priorities: [inference_causality, decision_sequential, machine_learning_frontier]
+
+# Observables the warehouse actually carries, read from the ingest schema at
+# migrations/00001 and 00015. A concept card requiring anything not on this list is
+# untestable for us today, however good the mechanism is.
+observables_available:
+  hyperliquid:
+    - l2_book            # px, sz AND order_count per level
+    - l1_book            # bbo with bid_count and ask_count
+    - trade_prints       # side, px, sz, tid
+    - counterparty_ids   # buyer and seller addresses on every fill — rare, and unused so far
+    - mid_price_series
+    - mark_price
+    - oracle_price       # drives funding and liquidation on this venue
+    - funding_rate
+    - open_interest
+    - sequence_metadata  # connection_id and sequence, for gap detection
+  polymarket:
+    - market_probability
+    - event_tree         # event_id, event_ticker, series_id, series_ticker
+    - cross_asset_link   # mentioned_symbols and tracked_coin, linking to traded instruments
+    - liquidity_and_volume
+  not_captured:
+    - queue_position     # order count per level is available; own-order queue rank is not
+    - order_lifecycle    # individual order add/cancel events are not in this pipeline
+    - fee_schedule       # not a captured column; must be supplied by the caller
+
 verticals:
   execution_cost:
     name: "Execution, adverse selection and fee drag"
@@ -125,3 +198,40 @@ problems:
     weight: 0.8
     buckets: [market_microstructure, operations_research, defi_mechanics]
     tags: [inventory, funding, market-making]
+
+  # Workstream-specific problems, added once the venue mechanics were read directly.
+  - problem_id: PB-BATCH-PRIORITY
+    vertical: execution_cost
+    workstream: hyperliquid_l4
+    statement: "Order placement assumes arrival-time priority, but the venue sorts actions within a consensus batch by order type before proposer order."
+    observed_signature: "Passive placements that model queue position by arrival time mispredict fills; cancels and post-only placements interact in ways a continuous-time model does not represent."
+    weight: 1.0
+    buckets: [queueing_networks, market_microstructure, exchange_documentation, mathematical_foundations]
+    tags: [queueing, batch-auction, priority, fill-probability, onchain]
+
+  - problem_id: PB-PHANTOM-LIQUIDITY
+    vertical: execution_cost
+    workstream: hyperliquid_l4
+    statement: "Resting liquidity may fail its margin check at match time, so displayed depth overstates executable depth by an unknown amount."
+    observed_signature: "Aggressive orders that consume less than the displayed depth; slippage worse than the book predicted."
+    weight: 0.9
+    buckets: [market_microstructure, exchange_documentation, queueing_networks]
+    tags: [phantom-liquidity, margin, depth, onchain]
+
+  - problem_id: PB-LOGICAL-ARB
+    vertical: probability_formation
+    workstream: polymarket
+    statement: "Logically related markets are priced inconsistently, and the token layer offers an atomic settlement path that the pricing does not reflect."
+    observed_signature: "Complete sets trading away from par; partitions not summing to one; implications inverted across related questions."
+    weight: 1.0
+    buckets: [economics_information, mathematical_foundations, exchange_documentation]
+    tags: [prediction-market, arbitrage, conditional-tokens, polymarket-relevant]
+
+  - problem_id: PB-AGENT-ATTRIBUTION
+    vertical: stopping
+    workstream: dxap_agents
+    statement: "An agent's stated reason for a decision is not evidence that the reason caused the decision, and outcomes mature far more slowly than the agent acts."
+    observed_signature: "Self-reported use of a concept with no corresponding change in tool calls or actions; performance claims made before outcomes matured."
+    weight: 1.0
+    buckets: [inference_causality, decision_sequential, machine_learning_frontier]
+    tags: [attribution, off-policy-evaluation, anytime-valid, agentic]

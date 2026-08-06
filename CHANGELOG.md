@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.0 - 2026-08-06
+
+- Encoded the three live workstreams — Polymarket prediction markets, Hyperliquid L4 order-book research, and LLM-based agentic asset managers — into the problem map with their venue mechanics, so the compile queue and retrieval rank by proximity to work that is actually happening. Added four workstream-specific problems.
+- Read venue documentation directly. HyperCore sorts actions within a consensus batch by a type hierarchy — orders without GTC/IOC, then cancels, then GTC/IOC orders — before proposer order, which is not the continuous arrival-time priority every order-book model assumes. Polymarket's conditional-token layer merges a complete set for collateral atomically, which invalidates the leg-by-leg cost model used for logical arbitrage.
+- `prediction_market_consistency` 1.1.0 adds `settlement=atomic`, applying the single-transaction hurdle only to partition constraints the token layer actually enforces, and leaving conjunction and implication breaches on the leg-by-leg model.
+- Read our own ingest repository and recorded what the warehouse actually captures. The observables vocabulary now matches the schema, including two properties the literature has never had: counterparty addresses on every fill, and order counts per book level. Recorded what is *not* captured, so untestable concepts are visible as such.
+- Added nine extensions grounded in venue and schema reads, covering batched queueing with type priority, phantom depth from margin checks at match time, atomic-settlement arbitrage, protocol-enforced constraint boundaries, counterparty informativeness, event-tree constraint derivation, order-count queue composition, oracle-basis cascade decomposition, and a sham-retrieval arm for agentic traces.
+- The internal ingest repository is the first `owned_by_us` source in the corpus, so the build manifest is non-empty for the first time.
+
 ## 0.7.0 - 2026-08-05
 
 - Added `knowledge/exploratory_extensions.yaml` and `labrat knowledge extensions`: nine proposals for new work extending read literature into our domain, each naming what the source leaves open in its own terms, our specific advantage over the original authors, the novel claim and the experiment that would kill it. The validator refuses any extension not grounded in a corpus unit whose `read_status` is `read` or `compiled`.

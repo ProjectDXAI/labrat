@@ -363,6 +363,382 @@ extensions:
     maturity: 4
     effort: 3
 
+  # ----------------------------------------------------------------------------
+  # Grounded in venue documentation read directly. These are the extensions that
+  # only exist because of which venues we actually trade.
+  # ----------------------------------------------------------------------------
+
+  - extension_id: EXT-BATCH-QUEUE
+    title: "Queueing theory for a consensus batch with type-based priority"
+    domain: queueing_networks
+    workstream: hyperliquid_l4
+    grounded_in:
+      - "hyperliquid-api-docs#hypercore-order-book"
+    what_the_source_leaves_open: >
+      The venue documents price-time priority, and then documents that actions inside a consensus
+      batch are sorted by a type hierarchy first — orders without GTC or IOC, then cancels, then
+      orders carrying GTC or IOC — with proposer order breaking ties, at one or two batches per
+      block. No model in the order-book literature describes that system. Cont's birth-death books,
+      the queue-reactive model and every heavy-traffic result assume continuous time and genuine
+      arrival-time priority.
+    our_advantage: >
+      We trade the venue and can observe the batch structure directly, and the ordering rule is
+      documented rather than inferred, so the model has a specification rather than a guess at one.
+    proposed_work: >
+      Write the queueing model for a discrete batch with a deterministic type hierarchy: derive fill
+      probability and expected adverse selection for a resting order as a function of its category,
+      its position within the category, and the batch composition. Compare against the continuous
+      price-time results the literature would predict.
+    novel_claim: >
+      Fill probability on this venue is not a function of queue position in the continuous sense.
+      Because cancels are processed before aggressive orders within the same batch, a maker has a
+      structural protection that a continuous-time venue cannot offer, and the standard adverse
+      selection calculation overstates the cost of resting here.
+    first_experiment: >
+      Reconstruct batches from the feed, classify each action by category, and measure realized fill
+      and mark-out conditional on category and intra-batch rank against the continuous-time
+      prediction from queue position alone.
+    first_computation: null
+    would_be_novel_because: >
+      The batched-matching literature argues about whether exchanges should batch. Nobody has written
+      the queueing model for a venue that already does, with a published type hierarchy rather than
+      a uniform auction.
+    already_done_risk: 2
+    kill_condition: >
+      Fill and mark-out are explained by continuous-time queue position alone, meaning the batch
+      structure is too fine relative to the trading horizon to matter.
+    payoff: 5
+    novelty: 5
+    testability: 4
+    maturity: 3
+    effort: 4
+
+  - extension_id: EXT-PHANTOM-DEPTH
+    title: "Displayed depth that fails its margin check at match time"
+    domain: market_microstructure
+    workstream: hyperliquid_l4
+    grounded_in:
+      - "hyperliquid-api-docs#hypercore-order-book"
+    what_the_source_leaves_open: >
+      Margin is checked when an order opens and again for the resting side at the matching of each
+      order. The consequence is stated nowhere: resting liquidity can be displayed and then fail at
+      the moment it would execute, so displayed depth is an upper bound on executable depth by an
+      amount nobody has measured.
+    our_advantage: >
+      On-chain state makes both sides observable — the resting order and the account backing it —
+      which no centralized venue exposes.
+    proposed_work: >
+      Measure the rate and the size distribution of resting liquidity that fails at match, condition
+      it on account leverage and on volatility, and build the correction from displayed to executable
+      depth.
+    novel_claim: >
+      Phantom depth is a distinct adverse-selection channel from queue position and from spoofing,
+      it concentrates exactly when volatility rises and margin binds, and it means slippage models
+      built on displayed depth are biased in the state where the estimate matters most.
+    first_experiment: >
+      Compare intended against realized consumption for aggressive orders that walk the book, and
+      test whether the shortfall rises with the leverage of the accounts resting at those levels.
+    first_computation: null
+    would_be_novel_because: >
+      The microstructure literature treats displayed depth as executable, or discounts it for hidden
+      liquidity and spoofing. A margin-driven failure channel is specific to a venue where positions
+      and orders share a collateral account, and it has no analogue in the equity literature.
+    already_done_risk: 2
+    kill_condition: >
+      The failure rate is negligible, or it is indistinguishable from ordinary cancellation.
+    payoff: 4
+    novelty: 5
+    testability: 3
+    maturity: 4
+    effort: 4
+
+  - extension_id: EXT-CTF-ATOMIC-ARB
+    title: "Logical arbitrage priced against atomic settlement rather than leg risk"
+    domain: optimal_transport
+    workstream: polymarket
+    grounded_in:
+      - "polymarket-clob-docs#conditional-token-framework"
+    what_the_source_leaves_open: >
+      Splitting collateral mints a complete set of outcome tokens and merging a complete set returns
+      collateral atomically. The cross-market arbitrage literature prices logical inconsistencies
+      leg by leg, because in every market it studies the legs can come apart. Here, for the
+      constraints the token layer enforces, they cannot.
+    our_advantage: >
+      We trade the venue where the settlement primitive exists, and the constraint set is explicit
+      in the token structure rather than assumed.
+    proposed_work: >
+      Separate the logical constraints into those the token layer settles atomically and those that
+      still require crossing each leg, price each class against its true hurdle, and measure how
+      often each class is breached beyond that hurdle.
+    novel_claim: >
+      The tradability of a logical inconsistency on this venue is determined by whether the token
+      layer enforces the constraint, not by the size of the inconsistency. A partition breach is a
+      single transaction against collateral; a conjunction breach is a multi-leg execution with all
+      the usual risk. Treating them with one cost model, as the literature does, systematically
+      misranks the opportunities.
+    first_experiment: >
+      Run the consistency check across related markets under both cost models and compare the sets
+      of violations each declares tradable against what could actually have been executed.
+    first_computation: prediction_market_consistency
+    would_be_novel_because: >
+      Prediction-market arbitrage work predates the conditional-token settlement primitive and
+      therefore has no reason to distinguish the two classes.
+    already_done_risk: 3
+    kill_condition: >
+      Split and merge fees, or gas, exceed the gaps that appear in practice, collapsing the
+      distinction between the two cost models.
+    payoff: 4
+    novelty: 4
+    testability: 5
+    maturity: 5
+    effort: 2
+
+  - extension_id: EXT-NEGRISK-BOUNDARY
+    title: "Mapping which logical constraints the protocol enforces and which it leaves free"
+    domain: economics_information
+    workstream: polymarket
+    grounded_in:
+      - "polymarket-clob-docs#conditional-token-framework"
+    what_the_source_leaves_open: >
+      Negative-risk markets provide a conversion exchanging one NO token for YES tokens in the
+      event's other outcomes, which mechanically enforces a partition relation. The documentation
+      does not say which relations across the full market set are enforced this way and which are
+      merely conventional.
+    our_advantage: >
+      The full market set and the token structure are both public, so the enforced constraint set can
+      be enumerated rather than guessed.
+    proposed_work: >
+      Enumerate the logical relations implied by the market set, mark which are protocol-enforced,
+      and test whether persistent mispricing lives exclusively in the unenforced complement.
+    novel_claim: >
+      Mispricing cannot persist where the protocol enforces the constraint, so the tradable surface
+      is precisely the unenforced complement — and that complement is enumerable in advance rather
+      than discovered by scanning prices.
+    first_experiment: >
+      Build the constraint graph for one large event tree, classify each edge as enforced or free,
+      and compare the frequency and persistence of violations across the two classes.
+    first_computation: prediction_market_consistency
+    would_be_novel_because: >
+      It inverts the usual scanning approach. Instead of searching prices for anomalies, it derives
+      from the protocol where anomalies are even possible.
+    already_done_risk: 3
+    kill_condition: >
+      Violations appear at similar rates on enforced and unenforced relations, which would mean the
+      enforcement mechanism is not used in practice.
+    payoff: 4
+    novelty: 5
+    testability: 4
+    maturity: 4
+    effort: 3
+
+  - extension_id: EXT-AGENT-SHAM-ARM
+    title: "A sham-retrieval arm for agentic decision traces"
+    domain: inference_causality
+    workstream: dxap_agents
+    grounded_in:
+      - "ramdas-2023-game-theoretic-statistics#open-problems"
+    what_the_source_leaves_open: >
+      The anytime-valid literature gives us monitoring that survives continuous peeking, and lists
+      composite nulls and filtration choice as unresolved. It says nothing about the specific
+      confound in an agentic system: that giving a model any additional context makes it deliberate
+      longer, which changes behaviour independently of the content.
+    our_advantage: >
+      We control the retrieval layer and can serve matched-but-irrelevant cards, so the confound can
+      be measured rather than argued about, and the ledger already records the offered-to-behaviour
+      ladder needed to detect it.
+    proposed_work: >
+      Run a sham arm — cards matched for length, structure and citation density but irrelevant to the
+      decision — alongside the real retrieval arm, and estimate how much of the behavioural change is
+      attributable to content rather than to deliberation.
+    novel_claim: >
+      A meaningful fraction of measured behaviour change from retrieval in agentic systems is the
+      deliberation effect rather than the knowledge, and without a sham arm every reported retrieval
+      benefit in this setting is confounded.
+    first_experiment: >
+      Generate sham cards from real ones by substituting a different market type and horizon, run
+      both arms over identical historical contexts, and compare tool-call rates and action changes.
+    first_computation: null
+    would_be_novel_because: >
+      Retrieval evaluations for LLM agents report accuracy against labels. The placebo control is
+      standard in clinical work and essentially absent here.
+    already_done_risk: 2
+    kill_condition: >
+      The sham arm produces no behavioural change, meaning the deliberation confound is negligible
+      and the simpler design was adequate.
+    payoff: 5
+    novelty: 4
+    testability: 4
+    maturity: 4
+    effort: 3
+
+  # ----------------------------------------------------------------------------
+  # Grounded in our own data infrastructure, read at the schema level. These are
+  # the extensions that exist because of what we actually capture.
+  # ----------------------------------------------------------------------------
+
+  - extension_id: EXT-COUNTERPARTY-FLOW
+    title: "Per-counterparty informativeness, using the trade attribution the venue publishes"
+    domain: market_microstructure
+    workstream: hyperliquid_l4
+    grounded_in:
+      - "dxai-hyperliquid-ingest#clickhouse-schema"
+    what_the_source_leaves_open: >
+      Our trades table carries buyer and seller addresses on every fill. The entire empirical
+      microstructure literature is built on anonymous data and spends enormous effort inferring
+      what this column states outright — trade signing, participant classification, informed-trader
+      identification. None of those inference methods are necessary here, and none of the results
+      that depend on them have been checked against ground truth.
+    our_advantage: >
+      Counterparty identity on every fill, which no centralized venue exposes and which the
+      published literature has never had. The inference methods it developed can be validated
+      rather than merely used.
+    proposed_work: >
+      Build per-address flow profiles, measure the mark-out of each address's flow, and test whether
+      adverse selection concentrates in a small set of counterparties. Separately, use the ground
+      truth to measure the error rate of the standard trade-classification rules the literature
+      relies on.
+    novel_claim: >
+      Adverse selection is not a property of the market state but of who is on the other side, and
+      it is predictable from counterparty history. A second claim follows for free: the accuracy of
+      classification-based microstructure results can be quantified rather than assumed.
+    first_experiment: >
+      Rank addresses by realized mark-out of their aggressive flow over a training period, then test
+      whether the ranking predicts mark-out out of sample on the fills we take against them.
+    first_computation: order_flow_imbalance
+    would_be_novel_because: >
+      Counterparty-attributed studies exist for a handful of regulator-access equity datasets and
+      have never been run on a continuously trading crypto venue with public attribution.
+    already_done_risk: 3
+    kill_condition: >
+      Address-level mark-out has no out-of-sample persistence, meaning counterparty identity carries
+      no information beyond the market state already observed.
+    payoff: 5
+    novelty: 4
+    testability: 5
+    maturity: 4
+    effort: 3
+
+  - extension_id: EXT-EVENT-TREE-CONSTRAINTS
+    title: "Deriving the logical constraint set from the captured event tree"
+    domain: optimal_transport
+    workstream: polymarket
+    grounded_in:
+      - "dxai-hyperliquid-ingest#polymarket-snapshots"
+      - "polymarket-clob-docs#conditional-token-framework"
+    what_the_source_leaves_open: >
+      Our Polymarket snapshots already key every market to an event id, an event ticker, a series id
+      and a series ticker, and carry mentioned symbols and a tracked coin. That is the logical
+      grouping the joint-bounds work needs, and the link from a prediction market to a traded crypto
+      instrument, both sitting unused in the schema.
+    our_advantage: >
+      The constraint set does not have to be reconstructed by parsing question text; it is already a
+      key in the warehouse, alongside Hyperliquid data in the same database.
+    proposed_work: >
+      Generate partition and implication constraints automatically from the event and series
+      grouping, run the consistency check continuously, and use the tracked-coin link to extend the
+      same check across venues to the perpetual instrument.
+    novel_claim: >
+      A complete, continuously updated map of logical consistency across a prediction-market venue
+      is derivable from metadata already captured, without any natural-language reasoning about what
+      the questions mean — and the same key set extends the check to a second venue.
+    first_experiment: >
+      Group one week of snapshots by event id, treat each group as a partition, run the consistency
+      check with atomic settlement, and measure how often the partition fails to sum to one beyond
+      the cost hurdle.
+    first_computation: prediction_market_consistency
+    would_be_novel_because: >
+      Published prediction-market arbitrage studies hand-select related markets. Deriving the
+      relation set from the venue's own event structure makes the scan exhaustive rather than
+      anecdotal.
+    already_done_risk: 2
+    kill_condition: >
+      Event grouping does not correspond to a genuine partition often enough to be useful, because
+      events contain markets that are neither exclusive nor exhaustive.
+    payoff: 5
+    novelty: 4
+    testability: 5
+    maturity: 5
+    effort: 2
+
+  - extension_id: EXT-ORDER-COUNT-QUEUE
+    title: "Order count per level, not just size, as the queue state variable"
+    domain: queueing_networks
+    workstream: hyperliquid_l4
+    grounded_in:
+      - "dxai-hyperliquid-ingest#clickhouse-schema"
+    what_the_source_leaves_open: >
+      Our book table carries an order count alongside size at every level, and the best-bid-offer
+      table carries counts on both sides. The queueing models of the order book — birth-death,
+      queue-reactive, heavy-traffic — are written in terms of aggregate size at a level. A level
+      holding one large order and a level holding twenty small ones are the same state to those
+      models and are obviously different systems.
+    our_advantage: >
+      Order counts are captured already, at no additional cost, and were not available to the
+      studies that built the models.
+    proposed_work: >
+      Add mean order size at each level as a state variable, and test whether cancellation intensity,
+      fill probability and mark-out depend on it after conditioning on total size.
+    novel_claim: >
+      Level composition predicts level behaviour beyond level size: a level held by few large orders
+      is more fragile than an equally deep level held by many small ones, because its survival
+      depends on fewer independent decisions.
+    first_experiment: >
+      Regress level depletion time on total size and on order count separately, and test whether
+      count carries incremental explanatory power.
+    first_computation: null
+    would_be_novel_because: >
+      The models are size-based because most historical data was size-only. The refinement is
+      obvious once the count exists, and the count usually does not.
+    already_done_risk: 3
+    kill_condition: >
+      Order count adds nothing after conditioning on size, meaning composition does not matter.
+    payoff: 3
+    novelty: 4
+    testability: 5
+    maturity: 4
+    effort: 2
+
+  - extension_id: EXT-ORACLE-BASIS-CASCADE
+    title: "The mechanical trigger of liquidation, observed directly"
+    domain: defi_mechanics
+    workstream: hyperliquid_l4
+    grounded_in:
+      - "dxai-hyperliquid-ingest#clickhouse-schema"
+      - "hardiman-2013-critical-reflexivity#empirical-criticality"
+    what_the_source_leaves_open: >
+      Our market context table carries mid, mark and oracle prices together with funding and open
+      interest. On this venue the oracle price drives liquidation, so the mechanical trigger of a
+      cascade is directly observable rather than inferred. The cascade literature works with price
+      and volume alone because that is all equity data provides.
+    our_advantage: >
+      The three prices, the funding rate and open interest arrive on the same event stream, so the
+      state that determines whether a cascade can start is measurable before it does.
+    proposed_work: >
+      Build a fragility state from the mark-to-oracle basis, open interest and funding, and test it
+      against the endogeneity measure as a competing and possibly complementary predictor of
+      liquidation clusters.
+    novel_claim: >
+      Cascade risk on a perpetual venue decomposes into a mechanical component that is directly
+      observable from the oracle basis and open interest, and a behavioural component that the
+      endogeneity measure captures. Separating them should beat either alone, and nobody can attempt
+      the decomposition on a venue that hides the trigger.
+    first_experiment: >
+      Regress liquidation clustering on basis and open-interest terms, then add the scale-resolved
+      endogeneity measure and test for incremental explanatory power.
+    first_computation: hawkes_branching_ratio
+    would_be_novel_because: >
+      Equity cascade studies must infer the constraint that forces selling. Here the constraint is
+      published as a price feed.
+    already_done_risk: 2
+    kill_condition: >
+      The mechanical state fully explains cascade clustering, leaving no room for the behavioural
+      component — which would be a clean and useful negative result.
+    payoff: 4
+    novelty: 4
+    testability: 4
+    maturity: 4
+    effort: 3
+
 # Extensions we considered and are not proposing, with the reason. Kept so the same
 # ideas do not resurface as if they were new.
 declined:

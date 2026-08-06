@@ -17,7 +17,7 @@
 #
 # `refs` entries without an id are frontier targets: works the mapped literature
 # points at that we have not catalogued yet.
-# Page counts are estimates.updated_at: seed
+# Page counts are estimates.updated_at: null
 entries:
 - id: harris-2003-trading-exchanges
   title: 'Trading and Exchanges: Market Microstructure for Practitioners'
@@ -3797,6 +3797,34 @@ entries:
   - target: dYdX v4 protocol documentation
     relation: syllabus_with
     bucket: exchange_documentation
+  units:
+  - unit_id: hypercore-order-book
+    topic: matching, intra-batch action ordering and margin checks on the on-chain book
+    title: null
+    locator: hypercore/order-book
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-BATCH-PRIORITY
+    notes: 'Read directly. Price-time priority, but actions are sorted within each consensus batch: orders
+      without GTC/IOC first, then cancels, then orders carrying GTC/IOC, with proposer order inside each
+      category and usually one or two batches per block. Margin is checked on order open and again for
+      the resting side at each match.'
+  - unit_id: market-data-feeds
+    topic: what order-level data the websocket and API expose, and whether orders are attributable
+    title: null
+    locator: null
+    kind: section
+    pages: 6
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: Not yet read. The L4 attribution question — whether resting orders carry a persistent, publicly
+      visible owner — is the single most load-bearing unknown for the L4 workstream and should be the
+      next unit opened.
+  status: reviewed
 - id: polymarket-clob-docs
   title: Polymarket CLOB API and market resolution documentation
   authors:
@@ -3821,6 +3849,33 @@ entries:
   refs:
   - target: hanson-2007-logarithmic-market-scoring
     relation: syllabus_with
+  units:
+  - unit_id: conditional-token-framework
+    topic: how outcome tokens are minted, split and merged, and what the negative-risk conversion does
+    title: null
+    locator: developers/CTF/overview
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: read
+    concepts_expected:
+    - KC-CTF-ATOMIC
+    notes: Read directly. Binary markets mint ERC-1155 YES and NO tokens fully collateralized at one dollar
+      per pair; splitting collateral mints a complete set and merging a complete set returns collateral
+      atomically. Negative-risk markets add a conversion exchanging one NO token for YES tokens in the
+      event's other outcomes. Position ids derive from condition id then collection id.
+  - unit_id: fees-and-execution
+    topic: fee schedule for trading versus split and merge, and order book execution mechanics
+    title: null
+    locator: null
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: Not yet read. The overview did not state fees for split and merge versus trading, and that
+      number decides whether logical arbitrage is executable. Next unit to open for the Polymarket workstream.
+  status: reviewed
 - id: binance-futures-api-docs
   title: Binance derivatives API documentation
   authors:
@@ -6643,3 +6698,366 @@ entries:
   - prior-art
   notes: 'Prior art for the lead-lag RMT bet: time-lagged correlation matrices already treated as asymmetric
     random matrices with a circular-symmetric spectrum.'
+- id: gnosis-conditional-tokens-spec
+  title: Gnosis Conditional Tokens Framework specification
+  authors:
+  - Gnosis
+  year: 2019
+  bucket: exchange_documentation
+  form: standard
+  venue: Gnosis
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 40
+  density: high
+  priority: 5
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: Open-source protocol documentation; check the repository licence, which may make this genuinely
+      ingestable.
+  acquisition:
+    state: open_url
+    copy_path: null
+  units:
+  - unit_id: combinatorial-positions
+    topic: deep positions, collection ids and how nested conditions compose
+    title: null
+    locator: null
+    kind: section
+    pages: 12
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: The combinatorial layer beneath Polymarket. Determines which logical relations are protocol-enforced
+      and which are merely conventional.
+  refs:
+  - target: polymarket-clob-docs
+    relation: cites
+    note: null
+  - target: hanson-2007-logarithmic-market-scoring
+    relation: syllabus_with
+    note: null
+  - target: Combinatorial prediction market design and computational tractability
+    relation: cites
+    bucket: economics_information
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: polymarket CTF overview
+  status: candidate
+  tags:
+  - conditional-tokens
+  - combinatorial
+  - polymarket-relevant
+  - rights-upside
+  notes: null
+- id: budish-cramton-shim-batch-auction-design
+  title: Will the market fix the market? A theory of stock exchange competition and innovation
+  authors:
+  - Eric Budish
+  - Robin S. Lee
+  - John J. Shim
+  year: 2024
+  bucket: market_microstructure
+  form: paper
+  venue: Journal of Political Economy
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 60
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: library
+    copy_path: null
+  refs:
+  - target: budish-2015-hft-arms-race
+    relation: builds_on
+    note: null
+  discovered:
+    round: 0
+    method: context
+    source: batched matching relevance to HyperCore
+  status: candidate
+  tags:
+  - batch-auction
+  - market-design
+  - venue-competition
+  notes: Batched matching is the venue's actual mechanism; the design literature on batching is therefore
+    directly rather than theoretically relevant.
+- id: kyle-lee-continuous-scaled-limit-orders
+  title: Toward a fully continuous exchange
+  authors:
+  - Albert S. Kyle
+  - Jeongmin Lee
+  year: 2017
+  bucket: market_microstructure
+  form: paper
+  venue: Oxford Review of Economic Policy
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 25
+  density: high
+  priority: 3
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: library
+    copy_path: null
+  refs:
+  - target: budish-2015-hft-arms-race
+    relation: responds_to
+    note: null
+  discovered:
+    round: 0
+    method: context
+    source: the counterargument to batching
+  status: candidate
+  tags:
+  - batch-auction
+  - contradiction-queue
+  - market-design
+  notes: The case against discrete batching, kept so the batch-priority work has a live opposing account.
+- id: abernethy-2013-combinatorial-market-makers
+  title: Efficient market making via convex optimization, and a connection to online learning
+  authors:
+  - Jacob Abernethy
+  - Yiling Chen
+  - Jennifer Wortman Vaughan
+  year: 2013
+  bucket: economics_information
+  form: paper
+  venue: ACM Transactions on Economics and Computation
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 35
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: open_url
+    copy_path: null
+  refs:
+  - target: hanson-2007-logarithmic-market-scoring
+    relation: builds_on
+    note: null
+  - target: boyd-2004-convex-optimization
+    relation: builds_on
+    note: null
+  - target: cesabianchi-2006-prediction-learning-games
+    relation: cites
+    note: null
+  discovered:
+    round: 0
+    method: context
+    source: combinatorial structure of the CTF
+  status: candidate
+  tags:
+  - combinatorial-markets
+  - convex-duality
+  - online-learning
+  - polymarket-relevant
+  - high-value-target
+  notes: Connects scoring-rule market making to convex duality and online learning; the natural formalism
+    for pricing a combinatorial outcome space.
+- id: vaughan-2019-ml-prediction-markets-survey
+  title: 'Interactive machine learning and prediction markets: elicitation and aggregation'
+  authors:
+  - Jennifer Wortman Vaughan
+  year: 2019
+  bucket: economics_information
+  form: survey
+  venue: survey chapter
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 30
+  density: medium
+  priority: 3
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: Title and venue need verifying before citing externally; located by topic, not read.
+  acquisition:
+    state: open_url
+    copy_path: null
+  refs:
+  - target: abernethy-2013-combinatorial-market-makers
+    relation: cites
+    note: null
+  discovered:
+    round: 0
+    method: context
+    source: elicitation literature for prediction markets
+  status: candidate
+  tags:
+  - elicitation
+  - aggregation
+  - prediction-market
+  - verify-metadata
+  notes: null
+- id: llm-agent-trading-evidence-review
+  title: 'Closed-loop LLM trading agents: an evidence review'
+  authors: []
+  year: 2026
+  bucket: machine_learning_frontier
+  form: survey
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 40
+  density: medium
+  priority: 4
+  rights:
+    status: unknown
+    confidence: unknown
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: 'Placeholder for the review the operator referenced: 19 primary closed-loop studies, 2 with
+      extractable time-consistent splits, 1 with an explicit transaction-cost model, none at the top reproducibility
+      tier. Metadata must be supplied by the operator before this is cited.'
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  refs:
+  - target: harvey-2016-cross-section-expected-returns
+    relation: syllabus_with
+    note: null
+  - target: levine-2020-offline-rl-tutorial
+    relation: cites
+    note: null
+  discovered:
+    round: 0
+    method: operator
+    source: cited in the DXAP architecture brief
+  status: candidate
+  tags:
+  - llm-agents
+  - reproducibility
+  - evidence-review
+  - verify-metadata
+  - agentic
+  notes: Recorded because its headline numbers are load-bearing for how sceptically the agentic workstream
+    should read its own results. Cannot be cited until identified.
+- id: dxai-hyperliquid-ingest
+  title: 'hyperliquid-ingest: Hyperliquid and Polymarket market data capture into ClickHouse'
+  authors:
+  - ProjectDXAI
+  year: 2026
+  bucket: exchange_documentation
+  form: software_docs
+  venue: ProjectDXAI internal
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://github.com/projectdxai/hyperliquid-ingest
+  pages: 40
+  density: high
+  priority: 5
+  rights:
+    status: owned_by_us
+    confidence: confirmed
+    evidence: https://github.com/projectdxai/hyperliquid-ingest
+    checked_at: '2026-08-06'
+    grant: null
+    notes: Internal repository read directly at commit eca892b. We hold the copyright.
+  acquisition:
+    state: owned
+    copy_path: /workspace/hyperliquid-ingest
+  units:
+  - unit_id: clickhouse-schema
+    topic: what market data is actually captured and at what granularity
+    title: null
+    locator: migrations/00001_create_clickhouse_base_tables.sql
+    kind: section
+    pages: 10
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. hl_l2_book_levels carries px, sz AND order_count per level; hl_bbo carries bid_count
+      and ask_count; hl_market_ctx carries mid, mark and oracle prices plus funding and open interest;
+      hl_trades carries side, px, sz, tid and — unusually — buyer and seller addresses. Every table carries
+      connection_id and sequence for gap detection.
+  - unit_id: polymarket-snapshots
+    topic: the Polymarket snapshot schema and the event tree it preserves
+    title: null
+    locator: migrations/00015_create_polymarket_snapshots.sql
+    kind: section
+    pages: 6
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: Read directly. pm_market_snapshots keys markets to event_id, event_ticker, series_id and series_ticker,
+      and carries mentioned_symbols and tracked_coin. The logical grouping needed for partition and implication
+      constraints is already in the schema, and so is the link from a prediction market to a traded crypto
+      symbol.
+  - unit_id: ingest-service
+    topic: the Go ingest service, sharding, writer leases and sequencing guarantees
+    title: null
+    locator: services/ingest
+    kind: section
+    pages: 20
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: Not yet read. Sequencing and gap semantics decide whether the as-of contract on every method
+      is actually honoured.
+  refs:
+  - target: hyperliquid-api-docs
+    relation: builds_on
+    note: null
+  - target: polymarket-clob-docs
+    relation: builds_on
+    note: null
+  discovered:
+    round: 0
+    method: direct_read
+    source: operator pointed at the workstream repositories
+  status: reviewed
+  tags:
+  - internal
+  - data-infrastructure
+  - clickhouse
+  - read-directly
+  - owned
+  - hyperliquid
+  - polymarket-relevant
+  notes: The ground truth on what is measurable. Any concept card requiring an observable this schema
+    does not carry is untestable for us today.

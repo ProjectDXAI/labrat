@@ -781,7 +781,7 @@ def path_signature(path: list[list[float]], lead_lag_pair: list[int] | None = No
 
 @method(
     name="prediction_market_consistency",
-    version="1.0.0",
+    version="1.1.0",
     summary="Sharp logical bounds across related binary markets: Frechet-Hoeffding, implication and partition constraints.",
     inputs={
         "markets": "mapping of market id to quoted probability",
@@ -789,6 +789,8 @@ def path_signature(path: list[list[float]], lead_lag_pair: list[int] | None = No
         "implications": "list of {antecedent, consequent} where the first event implies the second",
         "partitions": "list of {members: [...], total: 1.0} for mutually exclusive, exhaustive sets",
         "cost": "round-trip execution cost per leg, in probability units (default 0.02)",
+        "settlement": "legwise (default) or atomic; atomic applies where a complete set can be split or merged for collateral in one transaction, so the legs cannot come apart",
+        "settlement_cost": "flat cost of an atomic split or merge, in probability units (default 0.005)",
     },
     outputs={
         "violations": "constraints breached, each with the gap and whether it survives cost",
@@ -800,7 +802,8 @@ def path_signature(path: list[list[float]], lead_lag_pair: list[int] | None = No
         "Assumes the events are logically related as declared. A resolution-criteria difference is the usual cause of a gap that never closes, and this method cannot see it.",
         "Frechet bounds are sharp but wide: satisfying them does not imply the joint is correctly priced.",
         "Uses mid quotes; a violation inside the spread is not executable.",
-        "Silent about capital: holding both legs to resolution has a carry cost this does not model.",
+        "The legwise cost model assumes each leg is a separate execution that can fail independently. On a venue where a complete set can be split or merged for collateral in a single transaction, that model overstates the hurdle badly — pass settlement=atomic there, and note that only constraints the token layer actually enforces are settled atomically.",
+        "Silent about capital: holding a position to resolution has a carry cost this does not model.",
     ],
     concepts=["KC-XMKT-CONSISTENCY"],
 )
@@ -810,7 +813,11 @@ def prediction_market_consistency(
     implications: list[dict[str, Any]] | None = None,
     partitions: list[dict[str, Any]] | None = None,
     cost: float = 0.02,
+    settlement: str = "legwise",
+    settlement_cost: float = 0.005,
 ) -> dict[str, Any]:
+    if settlement not in {"legwise", "atomic"}:
+        return {"refused": "settlement must be legwise or atomic"}
     violations: list[dict[str, Any]] = []
 
     for row in conjunctions or []:
@@ -859,7 +866,13 @@ def prediction_market_consistency(
             )
 
     for row in violations:
-        row["cost_hurdle"] = cost * row["legs"]
+        # A partition breach on a venue with atomic split and merge is a single
+        # transaction against collateral, not N independent executions that can
+        # come apart. Conjunction and implication breaches still require crossing
+        # each leg, because no token operation enforces them.
+        atomic_eligible = settlement == "atomic" and row["type"] == "partition"
+        row["settlement"] = "atomic" if atomic_eligible else "legwise"
+        row["cost_hurdle"] = (cost + settlement_cost) if atomic_eligible else cost * row["legs"]
         row["tradable"] = row["gap"] > row["cost_hurdle"]
 
     return {
@@ -867,6 +880,7 @@ def prediction_market_consistency(
         "tradable": [row for row in violations if row["tradable"]],
         "max_gap": max((row["gap"] for row in violations), default=0.0),
         "checked": len(conjunctions or []) + len(implications or []) + len(partitions or []),
+        "settlement": settlement,
     }
 
 
@@ -1036,7 +1050,27 @@ def self_test() -> dict[str, Any]:
         conjunctions=[{"a": "a", "b": "b", "market": "a_and_b"}],
     )
     assert not consistent["violations"], consistent
-    checks.append("prediction_market_consistency: Frechet, implication and partition breaches found and cost-gated")
+    # Atomic settlement changes which breaches are worth taking: a partition breach
+    # that eight separate legs could never clear becomes a single transaction.
+    wide_partition = {f"o{i}": 0.14 for i in range(8)}
+    legwise = prediction_market_consistency(
+        markets=wide_partition, partitions=[{"members": list(wide_partition), "total": 1.0}], cost=0.02
+    )
+    atomic = prediction_market_consistency(
+        markets=wide_partition, partitions=[{"members": list(wide_partition), "total": 1.0}],
+        cost=0.02, settlement="atomic", settlement_cost=0.005,
+    )
+    assert abs(legwise["violations"][0]["gap"] - 0.12) < 1e-9, legwise["violations"][0]
+    assert not legwise["tradable"], "eight legs at 0.02 each cannot clear a 0.12 gap"
+    assert atomic["tradable"], "the same gap clears once the complete set settles atomically"
+    assert atomic["violations"][0]["settlement"] == "atomic", atomic["violations"][0]
+    conj_atomic = prediction_market_consistency(
+        markets={"a": 0.6, "b": 0.7, "a_and_b": 0.2},
+        conjunctions=[{"a": "a", "b": "b", "market": "a_and_b"}],
+        settlement="atomic",
+    )
+    assert conj_atomic["violations"][0]["settlement"] == "legwise", "no token operation enforces a conjunction bound"
+    checks.append("prediction_market_consistency: breaches cost-gated, and atomic settlement applied only where the token layer enforces the constraint")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 
