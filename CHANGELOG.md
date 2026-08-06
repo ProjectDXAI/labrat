@@ -27,12 +27,12 @@
 
 ### Fixed
 
-- The digest no longer applies redistribution licences to local reading. `corpus.py`'s
-  rights model exists for corpus construction, where CC BY-NC and subscription terms
-  genuinely bite; it was being used to gate how much of a paper you already hold could be
-  shown to you on your own machine. `rights_mode` now defaults to `personal` and
-  `--rights-mode redistribution` restores the strict ceilings for a packet that will be
-  published. Confidential material is refused in both.
+- Removed the licence gate from both reading paths (`knowledge.py digest` and
+  `passages.py brief`) rather than making it configurable. `corpus.py` still records every
+  source's terms, which is the thing to consult if any of this is published; reading
+  material you already hold is not redistribution and is no longer gated on it.
+- The explorer and its dev server bind to `127.0.0.1`, the generated bundle stays
+  gitignored, and `web/DO-NOT-DEPLOY.md` records why.
 - A unit whose locator names no pages no longer serves the whole entry as its `unit`
   tier. Ninety-four of this corpus's hundred-and-five units are in that state, so a card
   anchored to "the empirical section" was arriving with all 54 pages of the paper.

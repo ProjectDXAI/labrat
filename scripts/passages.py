@@ -232,34 +232,35 @@ def score_passages(query: str, rows: list[dict[str, Any]], index: dict[str, Any]
     return [(position, score, hits[position]) for position, score in ranked]
 
 
-def emit_passage(row: dict[str, Any], terms: dict[str, int], allow_quote: bool) -> dict[str, Any]:
-    """Rights gate on output. The locator is always emitted; the text is not."""
-    quotable = row["use_class"] in QUOTABLE
-    out = {
+def emit_passage(row: dict[str, Any], terms: dict[str, int], allow_quote: bool = True) -> dict[str, Any]:
+    """One matched passage, with its text and where to go and check it.
+
+    There is no licence gate here. A licence restricting redistribution does not restrict
+    reading text you already hold, and this brief is assembled and read on the machine
+    that holds the file. `corpus.py rights` still records every source's terms; that is
+    the thing to consult if any of this is ever published.
+
+    The locator is not optional. A passage you cannot go and verify against the page is
+    not evidence, whatever it says.
+    """
+    matched = sorted(terms, key=lambda term: -terms[term])[:8]
+    snippet = row["text"][:SNIPPET_CHARS]
+    return {
         "passage_id": row["passage_id"],
         "entry_id": row["entry_id"],
         "locator": f"{row['file']} p.{row['page']}",
         "use_class": row["use_class"],
-        "matched_terms": sorted(terms, key=lambda t: -terms[t])[:8],
-        "quotable": quotable,
+        "matched_terms": matched,
+        "snippet": snippet + ("\u2026" if len(row["text"]) > SNIPPET_CHARS else ""),
+        "read_it_at": f"{row['file']} p.{row['page']}",
+        "why_it_matched": (
+            f"{sum(terms.values())} occurrences of {', '.join(matched[:5])} on this page"
+        ),
     }
-    if quotable or allow_quote:
-        snippet = row["text"][:SNIPPET_CHARS]
-        out["snippet"] = snippet + ("…" if len(row["text"]) > SNIPPET_CHARS else "")
-        out["quote_basis"] = "licence permits it" if quotable else "local reading override"
-    else:
-        # Not a snippet: our own account of why it matched, which is a derived fact
-        # about the document rather than a copy of it.
-        out["why_it_matched"] = (
-            f"{sum(terms.values())} occurrences of "
-            f"{', '.join(sorted(terms, key=lambda t: -terms[t])[:5])} on this page"
-        )
-        out["read_it_at"] = out["locator"]
-    return out
 
 
 def analysis_brief(root: Path, question: str, passage_limit: int = 8, concept_limit: int = 5,
-                   allow_quote: bool = False) -> dict[str, Any]:
+                   allow_quote: bool = True) -> dict[str, Any]:
     """Everything the corpus has to say about a question, in the order it should be read."""
     knowledge_dir = root / "knowledge"
     store = knowledge_engine.load_store(knowledge_engine.knowledge_paths(knowledge_dir))
@@ -389,7 +390,7 @@ def analysis_brief(root: Path, question: str, passage_limit: int = 8, concept_li
     }
 
 
-def render_brief(brief: dict[str, Any], allow_quote: bool = False) -> str:
+def render_brief(brief: dict[str, Any], allow_quote: bool = True) -> str:
     lines = [f"# {brief['question']}", ""]
     coverage = brief["coverage"]
     lines.append(
@@ -511,16 +512,17 @@ def self_test() -> dict[str, Any]:
     assert narrow and narrow[0][0] == 2, narrow
     checks.append("score_passages: corpus-wide vocabulary is floored out, a rare term still ranks")
 
-    open_hit = emit_passage(rows[0], {"queue": 6}, allow_quote=False)
-    closed_hit = emit_passage(rows[1], {"queue": 6}, allow_quote=False)
-    assert open_hit.get("snippet") and open_hit["quotable"], open_hit
-    assert not closed_hit.get("snippet"), "reference-only text must not be emitted"
-    assert closed_hit["why_it_matched"] and closed_hit["read_it_at"], closed_hit
+    # Both emit text: this is a local reading tool and the licence question belongs to
+    # publishing, not to assembling a brief on the machine that already holds the file.
+    # The locator has to survive either way, because a passage you cannot go and check is
+    # not evidence.
+    open_hit = emit_passage(rows[0], {"queue": 6})
+    closed_hit = emit_passage(rows[1], {"queue": 6})
+    for hit in (open_hit, closed_hit):
+        assert hit.get("snippet"), hit
+        assert hit["why_it_matched"] and hit["read_it_at"], hit
     assert closed_hit["locator"] == "g.pdf p.2"
-    override = emit_passage(rows[1], {"queue": 6}, allow_quote=True)
-    assert override.get("snippet") and override["quote_basis"] == "local reading override", override
-    assert not override["quotable"], "the override emits the text; it does not change the licence"
-    checks.append("emit_passage: locator always, text only where the licence permits or the local override is set")
+    checks.append("emit_passage: text and locator emitted for anything held")
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)

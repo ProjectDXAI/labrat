@@ -448,30 +448,14 @@ fix is to write page numbers into the locator.
 | `unit` | every page the unit names, only when the locator resolves | 1–90k tokens |
 | `source` | every page of the entry | 100–200k tokens |
 
-Three things decide which one an anchor gets.
+Two things decide which one an anchor gets.
 
-**Rights cap it, and only when you are publishing.** Two different questions get called
-"rights". `corpus.py` answers the redistribution question: may this text go into a
-corpus, a manifest, a published artifact, a model someone deploys. CC BY-NC and
-"subscription required" bite hard there. The digest answers a different one: how much of
-a source you already hold should go in front of a model, locally, to help you read it. A
-licence restricting redistribution does not restrict reading, so the default
-`rights_mode: personal` does not cap on it.
-
-`--rights-mode redistribution` restores the corpus ceilings for a packet that is going
-somewhere published. Every served passage carries its rights class in both modes, so the
-constraint is recorded and can be re-applied later. One thing is refused in both:
-`excluded` is `proprietary_confidential` — leaked or NDA-bound material the corpus engine
-says we should not hold at all, which was never a redistribution objection.
-
-Under `redistribution`, the four `ingest_*` classes that clear derivative use reach
-`source`. `ingest_check_terms` does not, because its whole meaning is that the terms were
-never read. A `reference_only` source can be cited and paraphrased from our own
-notes; its text does not enter the packet. The ceiling is taken from the stricter of the
-bibliography's derived rights and the class stamped on each extracted page, because when
-those two disagree it usually means one has not been re-checked. No trigger lifts a
-ceiling, and a use class this module has never been taught falls to `card` — the
-self-test fails if the corpus vocabulary grows a class with no ceiling.
+**There is no licence gate.** `corpus.py` records the terms for every source, and that
+record is worth keeping — it is a fact about the source and the thing to consult if any
+of this is ever published. Redistribution is not what the digest does. It assembles text
+you already hold into a prompt on your own machine, and a licence restricting
+redistribution does not restrict reading. Gating that produced a tool refusing to show
+you a paper on your own disk.
 
 **Triggers raise it.** Escalation is never a vibe. Each trigger names a condition the
 card text demonstrably cannot settle, and every one that fires is written into the digest
@@ -523,13 +507,11 @@ complete:
   digest_full_text: true
 ```
 
-The licence still outranks the request. Asking for a `reference_only` source in full
-returns its note and a line in `refused_by_rights`.
+Asking for a source the lab does not hold returns a line in `starved`, which is the
+fetch list.
 
-**What is actually reachable.** Of the 2.2M tokens extracted from this corpus, about
-800k across 8 entries sit under `ingest_noncommercial` or `ingest_attribution` and can be
-served whole. The other 1.4M across 56 entries is `reference_only` or `needs_review` and
-stops at the note, whatever any flag says.
+**What is actually reachable.** All 2.2M tokens extracted from this corpus, across 64
+entries. The limit is what has been extracted, not what may be used.
 
 ### Two things the digest reports that are not tier choices
 
