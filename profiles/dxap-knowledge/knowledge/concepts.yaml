@@ -1565,3 +1565,138 @@ concepts:
     problem_ids: [PB-AGENT-ATTRIBUTION]
     tags: [off-policy, doubly-robust, propensity, agentic, read-directly]
     workstream: dxap_agents
+
+  - concept_id: KC-COINTEGRATION
+    canonical_name: "Two prices can each wander without bound and still be tied together"
+    plain_description: >
+      A relationship between two prices can hold in levels even when neither price is
+      stationary. If it does, the gap between them mean reverts and the speed at which it
+      closes is estimable. If it does not, a strategy trading the gap is trading a difference
+      of two random walks, which has no reversion to earn.
+    mechanism: >
+      Two integrated series are cointegrated when some linear combination of them is
+      stationary. Engle and Granger's representation theorem says such a pair admits an
+      error-correction form: the change in each series loads on the previous period's deviation
+      from the long-run relation. The loading is the reversion speed, and its sign is the
+      testable content — negative means the gap pulls itself closed.
+    formal_equations: "y_t = a + b x_t + u_t with u_t stationary; error correction: dy_t = alpha u_{t-1} + ... with alpha < 0; half-life = ln(0.5)/ln(1 + rho)"
+    assumptions:
+      - "Both series are integrated of the same order, which has to be established rather than assumed."
+      - "The hedge ratio is estimated on a period disjoint from the one it is traded on."
+      - "The relationship is structural rather than an artifact of both series trending over the sample."
+    market_types: [clob_crypto, perp_dex, prediction_market, clob_futures]
+    relevant_horizons: [hours, days, weeks]
+    required_observables: [mid_price_series, mark_price]
+    required_data_resolution: "Two aligned level series, long enough that the reversion speed is estimable rather than fitted to noise."
+    expected_empirical_signature: >
+      A residual whose lagged level predicts its own change with a negative coefficient, a
+      half-life short relative to the intended holding period, and a hedge ratio stable across
+      sub-periods rather than drifting.
+    alternative_explanations:
+      - "Both series trend over the sample, which produces an apparently stationary residual that has no reversion outside it. This is the standard spurious-regression trap and it is why the test exists at all."
+      - "The pair is tied by a common exogenous driver rather than by any tradable mechanism, so the relationship holds and closing the gap is not profitable."
+    known_failure_modes:
+      - "The residual is estimated, so its Dickey-Fuller statistic does not have the standard distribution and the ordinary critical values over-reject. The Engle-Granger tabulation is required and our implementation reports the statistic against a conventional threshold rather than a p-value."
+      - "Regressing y on x and x on y give different hedge ratios in finite samples, and the test can accept one direction and reject the other."
+      - "Two legs only. Three or more need Johansen, where the number of independent relationships is itself the estimate rather than an assumption, and assuming one relationship among many is how a portfolio of pairs becomes a single hidden bet."
+      - "A half-life assumes AR(1) reversion. A residual reverting on two timescales gets one number describing neither."
+    source_passage_ids:
+      - "engle-1987-cointegration-error-correction#representation-theorem"
+      - "johansen-1991-cointegration-vectors#rank-test"
+    contradicting_concept_ids: []
+    alternative_note: "Held to account by the spurious-regression alternative, which is the standard way this analysis fails and is the first thing the test is for."
+    supporting_concept_ids: [KC-XMKT-CONSISTENCY, KC-PERP-BASIS]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-XMARKET, PB-STALE-PROBABILITY]
+    tags: [cointegration, error-correction, relative-value, mathematical]
+
+  - concept_id: KC-VOLATILITY-CASCADE
+    canonical_name: "Volatility looks long-memoried because several horizons act at once"
+    plain_description: >
+      Realized volatility is strongly persistent, and the persistence looks like long memory.
+      A model with three ordinary horizons — roughly a day, a week and a month — reproduces it
+      without any long-memory machinery, which makes it the benchmark any volatility forecast
+      has to beat before its complexity is worth anything.
+    mechanism: >
+      Participants act on different horizons and each generates volatility at its own scale.
+      Aggregating a short-horizon component into a longer one produces an autocorrelation
+      decay that mimics long memory over the range anyone measures. Corsi's cascade
+      regresses next-period variance on the daily, weekly and monthly averages of past
+      realized variance, and three coefficients absorb what fractional integration was invented
+      to describe.
+    formal_equations: "RV_{t+1} = c + b_d RV_t + b_w mean(RV_{t-4..t}) + b_m mean(RV_{t-21..t}); persistence = b_d + b_w + b_m"
+    assumptions:
+      - "Realized variance is computed from a consistent sampling scheme across the whole series."
+      - "The three horizons carry independent variation; at a fixed point they are collinear and nothing is identified."
+      - "The measurement error in realized variance is small relative to its variation, which fails as sampling gets very fine."
+    market_types: [clob_equities, clob_futures, clob_crypto, perp_dex]
+    relevant_horizons: [days, weeks]
+    required_observables: [mid_price_series]
+    required_data_resolution: "Intraday returns fine enough to build a realized variance per period, and at least a few months of periods."
+    expected_empirical_signature: >
+      Daily, weekly and monthly loadings all positive with the daily term largest, persistence
+      below but near one, and an out-of-sample fit that a fractionally integrated model does
+      not materially improve on.
+    alternative_explanations:
+      - "The persistence is genuine long memory and the cascade is an approximation that happens to fit over the measured range, which is observationally very hard to separate."
+      - "Apparent persistence is a sequence of regime shifts rather than a stationary memory, which produces the same autocorrelation and a completely different forecast."
+    known_failure_modes:
+      - "This is a benchmark, not a result. A volatility forecast that does not beat it has not earned its complexity, and reporting a sophisticated model without this control is the standard omission."
+      - "Fitted in variance rather than log variance, a level regression is dominated by the largest few observations, because realized variance is strongly right skewed."
+      - "Persistence at or above one means the fitted process does not mean revert, which usually signals a break rather than a forecast."
+      - "Sampling too finely makes microstructure noise dominate the variance estimate, which is the two-timescales problem and it bites before the model does."
+    source_passage_ids:
+      - "corsi-2009-har-realized-volatility#cascade-specification"
+      - "andersen-2003-modeling-forecasting-realized-volatility#realized-measure"
+    contradicting_concept_ids: [KC-REFLEXIVITY-DRIFT]
+    supporting_concept_ids: [KC-HAWKES-CRITICALITY]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG]
+    tags: [realized-volatility, har, long-memory, benchmark, mathematical]
+
+  - concept_id: KC-ROBUST-ESTIMATION
+    canonical_name: "An estimator's breakdown point is how much of the sample can be arbitrary"
+    plain_description: >
+      On heavy-tailed data a single observation can move a mean arbitrarily far. How far one
+      observation can move an estimate, and what fraction of the sample can be arbitrary before
+      the estimate is meaningless, are both computable properties of the estimator rather than
+      matters of judgment.
+    mechanism: >
+      The influence function is the derivative of the estimate with respect to contamination at
+      a point: for the mean it is unbounded, which is why the mean has breakdown point zero. An
+      M-estimator caps the influence of any single observation by downweighting residuals beyond
+      a tuning constant, giving a bounded influence function and a breakdown point of one half.
+      Scale is estimated by median absolute deviation, which is itself bounded, so the two
+      together do not inherit the fragility they are meant to remove.
+    formal_equations: "minimise sum rho((x_i - mu)/s); Huber rho quadratic within k and linear beyond; breakdown point 0.5; MAD scale = 1.4826 x median|x - median(x)|"
+    assumptions:
+      - "Fewer than half the observations are contaminated; beyond that no equivariant estimator can recover the rest."
+      - "The uncontaminated part is approximately symmetric, or the estimate targets neither the mean nor the median of the true law."
+      - "The tuning constant is chosen and reported rather than tuned until the answer looks right."
+    market_types: [any]
+    relevant_horizons: [minutes, hours, days]
+    required_observables: [mid_price_series, trade_prints]
+    required_data_resolution: "Any sample where the tail matters, which on this data is all of them."
+    expected_empirical_signature: >
+      The mean and the M-estimate diverging on real order-flow samples, with the gap growing in
+      the periods of interest rather than in the quiet ones, and a downweighted share that rises
+      exactly when the market moves.
+    alternative_explanations:
+      - "The extreme observations are the signal rather than contamination, in which case downweighting them discards the information and a robust estimate is precisely the wrong summary."
+    known_failure_modes:
+      - "Robust to outliers is not robust to skew. On a genuinely asymmetric law the M-estimate has no clean interpretation, and financial returns are asymmetric."
+      - "The alternative explanation above is the real hazard here: in a market the tail often IS the event. Downweighting is a modelling decision about what counts as the process, not a cleaning step, and the downweighted share should be read as information rather than removed noise."
+      - "Breakdown is a worst-case guarantee. At 40% contamination the estimate is bounded and can still be badly wrong."
+      - "A degenerate scale, which happens when over half the sample is identical, makes the whole construction undefined rather than merely imprecise."
+    source_passage_ids:
+      - "huber-2009-robust-statistics#influence-and-breakdown"
+      - "maronna-2006-robust-statistics-theory-methods#m-estimators"
+    contradicting_concept_ids: []
+    alternative_note: "Its own alternative explanation is the standing objection: on market data the outliers are frequently the event, so this card argues for measuring influence rather than for always downweighting."
+    supporting_concept_ids: [KC-IMPACT-CONFLATION]
+    implementation_status: implemented
+    confidence: 0.7
+    problem_ids: [PB-REGIME-BREAK, PB-COST-DRAG, PB-ADVERSE-ENTRY]
+    tags: [robust, breakdown-point, influence-function, heavy-tails, mathematical]

@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T09:26:30.986328+00:00'
+updated_at: '2026-08-06T09:47:00.978905+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -6691,6 +6691,54 @@ entries:
   - high-value-target
   notes: Connects scoring-rule market making to convex duality and online learning; the natural formalism for pricing
     a combinatorial outcome space.
+- id: aumann-1976-agreeing-to-disagree
+  title: Agreeing to Disagree
+  authors:
+  - Robert J. Aumann
+  year: 1976
+  bucket: economics_information
+  form: paper
+  venue: The Annals of Statistics 4(6)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 3
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: milgrom-1982-no-trade-theorem
+    relation: cites
+  - target: grossman-1980-impossibility-efficient-markets
+    relation: cites
+  - target: list-2002-aggregating-sets-of-judgments
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - common-knowledge
+  - posteriors
+  - mathematical
+  - polymarket-relevant
+  notes: 'Three pages proving that two people with a common prior cannot have common knowledge of differing posteriors.
+    Every trade rests on a disagreement, so this result and its descendants are where the reason for that disagreement
+    has to come from.
+
+    '
 - id: back-1992-insider-trading-continuous-time
   title: Insider Trading in Continuous Time
   authors:
@@ -6910,6 +6958,57 @@ entries:
   - lambda
   - price-impact
   notes: null
+- id: milgrom-1982-no-trade-theorem
+  title: Information, Trade and Common Knowledge
+  authors:
+  - Paul Milgrom
+  - Nancy Stokey
+  year: 1982
+  bucket: economics_information
+  form: paper
+  venue: Journal of Economic Theory 26(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 12
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: aumann-1976-agreeing-to-disagree
+    relation: builds_on
+  - target: glosten-1985-bid-ask
+    relation: cites
+  - target: kyle-1985-continuous-auctions
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - no-trade
+  - common-knowledge
+  - speculation
+  - mathematical
+  - polymarket-relevant
+  notes: 'With a common prior and common knowledge of rationality, purely speculative trade cannot occur: if you
+    want to trade with me, that is itself information. Volume therefore requires something outside the model — heterogeneous
+    priors, liquidity needs, or noise — and which one is assumed decides what any flow-informativeness measure is
+    measuring.
+
+    '
 - id: milgrom-2004-putting-auction-theory-to-work
   title: Putting Auction Theory to Work
   authors:
@@ -9200,7 +9299,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: influence-and-breakdown
+    topic: the influence function, the breakdown point, and Huber's M-estimator
+    title: null
+    locator: chapters 1-4
+    kind: chapter
+    pages: 70
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: maronna-2006-robust-statistics-theory-methods
     relation: cites
@@ -9483,7 +9592,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: m-estimators
+    topic: M-estimators of location and scale, and their efficiency-resistance trade-off
+    title: null
+    locator: chapters 2-3
+    kind: chapter
+    pages: 60
+    priority: 4
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: huber-2009-robust-statistics
     relation: builds_on
@@ -14372,6 +14491,55 @@ entries:
     is the machinery the joint-bounds bet names, stated properly rather than as the two-market Frechet special case.
 
     '
+- id: blackwell-1956-approachability
+  title: An Analog of the Minimax Theorem for Vector Payoffs
+  authors:
+  - David Blackwell
+  year: 1956
+  bucket: mathematical_foundations
+  form: paper
+  venue: Pacific Journal of Mathematics 6(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: cesabianchi-2006-prediction-learning-games
+    relation: cites
+  - target: foster-1998-asymptotic-calibration
+    relation: cites
+  - target: shafer-2019-game-theoretic-foundations
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - approachability
+  - minimax
+  - regret
+  - calibration
+  - mathematical
+  notes: 'Approachability generalises the minimax theorem to vector payoffs and is the result the whole no-regret
+    and calibration literature is built on. Eight pages, and the geometry of the separating hyperplane is the mechanism
+    behind every online-learning guarantee the corpus already carries.
+
+    '
 - id: borkar-2008-stochastic-approximation
   title: 'Stochastic Approximation: A Dynamical Systems Viewpoint'
   authors:
@@ -14519,6 +14687,105 @@ entries:
   - foundations
   - order-flow-relevant
   notes: null
+- id: foster-1998-asymptotic-calibration
+  title: Asymptotic Calibration
+  authors:
+  - Dean P. Foster
+  - Rakesh V. Vohra
+  year: 1998
+  bucket: mathematical_foundations
+  form: paper
+  venue: Biometrika 85(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 12
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: blackwell-1956-approachability
+    relation: builds_on
+  - target: gneiting-2007-calibration-and-sharpness
+    relation: cites
+  - target: gneiting-2007-proper-scoring-rules
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - calibration
+  - no-regret
+  - forecasting
+  - mathematical
+  - polymarket-relevant
+  notes: 'A forecaster can be asymptotically calibrated against an arbitrary, even adversarial, sequence with no
+    model of it at all. That is a striking result and it bounds what calibration alone can be evidence of: it is
+    achievable without knowing anything, so a calibrated forecast is not thereby an informed one.
+
+    '
+- id: freedman-1975-tail-probabilities-martingales
+  title: On Tail Probabilities for Martingales
+  authors:
+  - David A. Freedman
+  year: 1975
+  bucket: mathematical_foundations
+  form: paper
+  venue: The Annals of Probability 3(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 19
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: howard-2021-confidence-sequences
+    relation: cites
+  - target: boucheron-2013-concentration-inequalities
+    relation: cites
+  - target: ramdas-2023-game-theoretic-statistics
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - martingale
+  - concentration
+  - bernstein
+  - anytime-valid
+  - mathematical
+  notes: 'The Bernstein inequality for martingales, with the bound in terms of the predictable quadratic variation
+    rather than the sample size. That is what makes it usable at a stopping time, and it is the workhorse under
+    the time-uniform bounds our anytime-valid machinery relies on.
+
+    '
 - id: hardiman-2013-critical-reflexivity
   title: 'Critical reflexivity in financial markets: a Hawkes process analysis'
   authors:
@@ -14639,6 +14906,97 @@ entries:
   - self-excitation
   - foundational
   notes: null
+- id: robbins-1951-stochastic-approximation
+  title: A Stochastic Approximation Method
+  authors:
+  - Herbert Robbins
+  - Sutton Monro
+  year: 1951
+  bucket: mathematical_foundations
+  form: paper
+  venue: The Annals of Mathematical Statistics 22(3)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 9
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: kushner-2003-stochastic-approximation
+    relation: cites
+  - target: borkar-2008-stochastic-approximation
+    relation: cites
+  - target: bifet-2007-adwin-adaptive-windowing
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - stochastic-approximation
+  - step-size
+  - convergence
+  - mathematical
+  notes: 'Finding a root of a function observable only with noise, and the step-size conditions — divergent sum,
+    convergent sum of squares — that every online estimator we run either satisfies or quietly violates.
+
+    '
+- id: billingsley-1999-convergence-probability-measures
+  title: Convergence of Probability Measures
+  authors:
+  - Patrick Billingsley
+  year: 1999
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 290
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: whitt-2002-stochastic-process-limits
+    relation: cites
+  - target: jacod-2003-limit-theorems-stochastic-processes
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - weak-convergence
+  - tightness
+  - functional-limits
+  - mathematical
+  notes: Tightness and weak convergence in function space, which is what every heavy-traffic and diffusion-limit
+    argument in the queueing material silently assumes.
 - id: bowsher-2007-modelling-security-market-events
   title: 'Modelling Security Market Events in Continuous Time: Intensity Based, Multivariate Point Process Models'
   authors:
@@ -14852,6 +15210,49 @@ entries:
   - structural-import
   notes: The rate-function machinery for events that are rare and consequential, which concentration inequalities
     bound but do not describe.
+- id: doob-1953-stochastic-processes
+  title: Stochastic Processes
+  authors:
+  - Joseph L. Doob
+  year: 1953
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 650
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: revuz-1999-continuous-martingales
+    relation: cites
+  - target: freedman-1975-tail-probabilities-martingales
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - martingale
+  - optional-stopping
+  - foundations
+  - mathematical
+  notes: Where the martingale convergence and optional stopping theorems come from, which is what licenses looking
+    at a process at a time chosen by looking at it.
 - id: filimonov-2012-quantifying-reflexivity
   title: 'Quantifying reflexivity in financial markets: toward a prediction of flash crashes'
   authors:
@@ -14915,6 +15316,55 @@ entries:
   - contradiction-queue
   notes: The exponential-kernel, 30-minute-window estimate of rising reflexivity that Hardiman et al argue is an
     artifact. Kept as the contradicting source.
+- id: kesten-1973-random-difference-equations
+  title: Random Difference Equations and Renewal Theory for Products of Random Matrices
+  authors:
+  - Harry Kesten
+  year: 1973
+  bucket: mathematical_foundations
+  form: paper
+  venue: Acta Mathematica 131
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 78
+  density: high
+  priority: 4
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: embrechts-1997-modelling-extremal-events
+    relation: cites
+  - target: resnick-2007-heavy-tail-phenomena
+    relation: cites
+  - target: sornette-2003-why-stock-markets-crash
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - heavy-tails
+  - power-law
+  - multiplicative
+  - mathematical
+  notes: 'A multiplicative recursion with random coefficients has a power-law stationary tail, with the exponent
+    determined by the coefficient distribution. It is the cleanest mechanism by which heavy tails arise from ordinary
+    dynamics rather than from extreme inputs, and it says the exponent is a property of the process rather than
+    of the shocks.
+
+    '
 - id: meyn-2009-markov-chains-stochastic-stability
   title: Markov Chains and Stochastic Stability
   authors:
@@ -15125,6 +15575,54 @@ entries:
   - stochastic-integration
   - jumps
   notes: null
+- id: rockafellar-1970-convex-analysis
+  title: Convex Analysis
+  authors:
+  - R. Tyrrell Rockafellar
+  year: 1970
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Princeton University Press
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 470
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: boyd-2004-convex-optimization
+    relation: cites
+  - target: abernethy-2013-combinatorial-market-makers
+    relation: cites
+  - target: gneiting-2007-proper-scoring-rules
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - convexity
+  - duality
+  - subgradient
+  - mathematical
+  notes: 'Conjugate duality, which is the same object appearing as the scoring-rule/convex-function correspondence,
+    as the transport dual, and as the market-maker cost function. Three parts of this corpus are the same theorem
+    wearing different clothes.
+
+    '
 - id: zhang-2005-tale-of-two-time-scales
   title: 'A Tale of Two Time Scales: Determining Integrated Volatility with Noisy High-Frequency Data'
   authors:
@@ -15575,6 +16073,48 @@ entries:
     event tree.
 
     '
+- id: sato-1999-levy-processes
+  title: Lévy Processes and Infinitely Divisible Distributions
+  authors:
+  - Ken-iti Sato
+  year: 1999
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Cambridge University Press
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 490
+  density: high
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: cont-2003-financial-modelling-jump-processes
+    relation: cites
+  - target: protter-2005-stochastic-integration
+    relation: cites
+  discovered:
+    round: 18
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - levy
+  - jumps
+  - infinite-divisibility
+  - mathematical
+  notes: null
 - id: villani-2009-optimal-transport
   title: 'Optimal Transport: Old and New'
   authors:
@@ -17716,7 +18256,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: realized-measure
+    topic: realized volatility as a consistent estimator of quadratic variation, and its sampling trade-off
+    title: null
+    locator: sections 2-3
+    kind: section
+    pages: 14
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: aitsahalia-2014-high-frequency-econometrics
     relation: cites
@@ -17763,7 +18313,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: cascade-specification
+    topic: the three-horizon cascade and why it mimics long memory
+    title: null
+    locator: sections 2-3
+    kind: section
+    pages: 9
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: andersen-2003-modeling-forecasting-realized-volatility
     relation: builds_on
@@ -17810,7 +18370,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: representation-theorem
+    topic: the Granger representation theorem and the error-correction form it forces
+    title: null
+    locator: sections 2-3
+    kind: section
+    pages: 10
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: hamilton-1994-time-series-analysis
     relation: cites
@@ -18064,7 +18634,17 @@ entries:
   acquisition:
     state: not_acquired
     copy_path: null
-  units: []
+  units:
+  - unit_id: rank-test
+    topic: the trace and maximum-eigenvalue tests for the number of cointegrating vectors
+    title: null
+    locator: sections 2-4
+    kind: section
+    pages: 12
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs:
   - target: engle-1987-cointegration-error-correction
     relation: builds_on

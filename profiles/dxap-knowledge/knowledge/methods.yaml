@@ -246,3 +246,62 @@ methods:
       Pair with `hawkes_branching_ratio` and read its `scale_profile` first. The multiplier is
       1/(1-n), so an error in n near criticality is amplified without limit, and the source's
       own finding is that the naive forecast's relative evolution is often good enough.
+
+  # Estimators for mathematics the corpus carried but never made executable.
+  - method_id: doubly_robust_value
+    implementation_version: "1.0.0"
+    concept_ids: [KC-DOUBLY-ROBUST]
+    default_params: {clip: 0.01}
+    data_requirements: [decision_log, matured_outcomes]
+    status: implemented
+    synthetic_tests:
+      - "Under correct propensities both importance sampling and DR return the true value exactly."
+      - "A perfect reward model makes the direct method exact and leaves DR exact."
+      - "A reward model biased by a constant 10 leaves DR exactly unbiased while the direct method carries the whole 10."
+    notes: >
+      Read `effective_sample_size` and `max_weight_share` before the point estimate. Doubly
+      robust is not doubly safe: if both models are bad it inherits both problems and says
+      nothing about which case you are in.
+
+  - method_id: har_realized_volatility
+    implementation_version: "1.0.0"
+    concept_ids: [KC-VOLATILITY-CASCADE]
+    default_params: {weekly: 5, monthly: 22, horizon: 1}
+    data_requirements: [mid_price_series]
+    status: implemented
+    synthetic_tests:
+      - "The daily loading dominates on a signal with genuine one-lag dependence."
+      - "A constant series is refused as collinear rather than fitted."
+      - "Horizon ordering is validated; weekly longer than monthly is refused."
+    notes: >
+      This is the control, not the model. Any volatility forecast that does not beat it has not
+      earned its complexity, and it is cheap enough that omitting it is a choice.
+
+  - method_id: engle_granger_cointegration
+    implementation_version: "1.0.0"
+    concept_ids: [KC-COINTEGRATION]
+    default_params: {lags: 1}
+    data_requirements: [mid_price_series, mark_price]
+    status: implemented
+    synthetic_tests:
+      - "Hedge ratio recovered exactly on a noiseless proportional pair."
+      - "A planted bounded spread over a random walk reads cointegrated with a negative error-correction coefficient."
+      - "Two independent random walks read not cointegrated, with residual variance an order of magnitude larger."
+    notes: >
+      The reported t-statistic does not have a standard distribution, because the residual is
+      itself estimated. It is compared against the conventional Engle-Granger threshold and must
+      not be read as an ADF or normal t.
+
+  - method_id: robust_location_scale
+    implementation_version: "1.0.0"
+    concept_ids: [KC-ROBUST-ESTIMATION]
+    default_params: {tuning: 1.345, iterations: 50}
+    data_requirements: [mid_price_series, trade_prints]
+    status: implemented
+    synthetic_tests:
+      - "Exact on symmetric data, where mean, median and M-estimate coincide."
+      - "One arbitrary observation moves the mean by three orders of magnitude and leaves the M-estimate within one unit."
+      - "A degenerate median absolute deviation is refused rather than divided by."
+    notes: >
+      Report `downweighted_share` with the estimate. A high share means the model and the data
+      disagree about what the process is, which is information rather than noise to be removed.

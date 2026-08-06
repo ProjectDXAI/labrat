@@ -1520,6 +1520,338 @@ def cascade_forecast(
 
 
 # --------------------------------------------------------------------------------------
+# Estimators for the mathematics the corpus carries but never made executable
+# --------------------------------------------------------------------------------------
+
+
+def _solve(matrix: list[list[float]], rhs: list[float]) -> list[float] | None:
+    """Gaussian elimination with partial pivoting. Returns None on a singular system."""
+    n = len(matrix)
+    augmented = [row[:] + [rhs[i]] for i, row in enumerate(matrix)]
+    for column in range(n):
+        pivot = max(range(column, n), key=lambda r: abs(augmented[r][column]))
+        if abs(augmented[pivot][column]) < 1e-12:
+            return None
+        augmented[column], augmented[pivot] = augmented[pivot], augmented[column]
+        for row in range(column + 1, n):
+            factor = augmented[row][column] / augmented[column][column]
+            for k in range(column, n + 1):
+                augmented[row][k] -= factor * augmented[column][k]
+    solution = [0.0] * n
+    for row in range(n - 1, -1, -1):
+        total = augmented[row][n] - sum(augmented[row][k] * solution[k] for k in range(row + 1, n))
+        solution[row] = total / augmented[row][row]
+    return solution
+
+
+def _ols(design: list[list[float]], target: list[float]) -> dict[str, Any] | None:
+    """Least squares by normal equations. Small p, so conditioning is not the binding issue."""
+    n, p = len(design), len(design[0])
+    if n <= p:
+        return None
+    gram = [[sum(design[i][a] * design[i][b] for i in range(n)) for b in range(p)] for a in range(p)]
+    moment = [sum(design[i][a] * target[i] for i in range(n)) for a in range(p)]
+    beta = _solve(gram, moment)
+    if beta is None:
+        return None
+    fitted = [sum(beta[a] * design[i][a] for a in range(p)) for i in range(n)]
+    residual = [target[i] - fitted[i] for i in range(n)]
+    mean_target = _mean(target)
+    ss_total = sum((y - mean_target) ** 2 for y in target)
+    ss_residual = sum(r * r for r in residual)
+    return {
+        "coefficients": beta,
+        "residuals": residual,
+        "r_squared": (1.0 - ss_residual / ss_total) if ss_total > 0 else None,
+        "sigma2": ss_residual / (n - p),
+        "n": n,
+    }
+
+
+@method(
+    name="doubly_robust_value",
+    version="1.0.0",
+    summary="Off-policy value of a target policy from logged decisions, unbiased if either the reward model or the propensities are right.",
+    inputs={
+        "logged": "rows of {context_id, action, reward, propensity, reward_hat: {action: value}}",
+        "target_policy": "mapping of context_id to the action the target policy would take",
+        "clip": "minimum propensity, to bound the importance weight (default 0.01)",
+    },
+    outputs={
+        "doubly_robust": "the DR value estimate",
+        "direct_method": "the reward-model-only estimate, for comparison",
+        "importance_sampling": "the propensity-only estimate, for comparison",
+        "effective_sample_size": "Kish ESS of the importance weights; low means the estimate rests on few rows",
+        "max_weight_share": "share of the total weight carried by the single largest weight",
+    },
+    as_of_contract="Every logged row must predate the evaluation, and the propensity must be the one in force when the action was taken, not one fitted afterwards on the same data.",
+    failure_modes=[
+        "DOUBLY ROBUST IS NOT DOUBLY SAFE. It is accurate when EITHER the reward model or the propensity model is good. If both are bad it inherits both problems, and nothing in the output tells you which case you are in.",
+        "It needs propensities. A decision trace that records what was done but not how likely it was to be done cannot use this, and propensity has to be designed into the logging before the trace exists — it cannot be recovered afterwards.",
+        "Clipping bounds the variance and reintroduces bias. The clip level is a choice and must be reported with the estimate; `max_weight_share` says whether it mattered.",
+        "Any action the target policy takes that the logging policy never took has no support, and no reweighting reaches it. Coverage is a precondition, not a diagnostic.",
+        "Variance grows with the horizon. This is a single-step contextual estimator; a long agent trajectory needs the sequential version and degrades badly regardless.",
+    ],
+    concepts=["KC-DOUBLY-ROBUST"],
+)
+def doubly_robust_value(
+    logged: list[dict[str, Any]],
+    target_policy: dict[str, Any],
+    clip: float = 0.01,
+) -> dict[str, Any]:
+    if not logged:
+        return {"refused": "no logged rows"}
+    n = len(logged)
+    dr_terms, dm_terms, ips_terms, weights = [], [], [], []
+    for row in logged:
+        context = str(row.get("context_id"))
+        if context not in target_policy:
+            continue
+        chosen = target_policy[context]
+        model = row.get("reward_hat") or {}
+        baseline = float(model.get(chosen, model.get(str(chosen), 0.0)))
+        observed_hat = float(model.get(row["action"], model.get(str(row["action"]), 0.0)))
+        propensity = max(float(row.get("propensity", 1.0)), clip)
+        matched = 1.0 if row["action"] == chosen else 0.0
+        weight = matched / propensity
+        dr_terms.append(baseline + weight * (float(row["reward"]) - observed_hat))
+        dm_terms.append(baseline)
+        ips_terms.append(weight * float(row["reward"]))
+        weights.append(weight)
+    if not dr_terms:
+        return {"refused": "no logged row shares a context with the target policy"}
+
+    total_weight = sum(weights)
+    sum_squares = sum(w * w for w in weights)
+    ess = (total_weight ** 2 / sum_squares) if sum_squares > 0 else 0.0
+    return {
+        "doubly_robust": _mean(dr_terms),
+        "direct_method": _mean(dm_terms),
+        "importance_sampling": _mean(ips_terms),
+        "effective_sample_size": ess,
+        "rows_used": len(dr_terms),
+        "max_weight_share": (max(weights) / total_weight) if total_weight > 0 else None,
+        "clip": clip,
+    }
+
+
+@method(
+    name="har_realized_volatility",
+    version="1.0.0",
+    summary="Corsi's heterogeneous autoregressive model: daily, weekly and monthly realized variance predicting the next period.",
+    inputs={
+        "realized_variance": "realized variance per period, in time order",
+        "weekly": "periods in the weekly aggregate (default 5)",
+        "monthly": "periods in the monthly aggregate (default 22)",
+        "horizon": "periods ahead to predict (default 1)",
+    },
+    outputs={
+        "coefficients": "intercept, daily, weekly and monthly loadings",
+        "r_squared": "in-sample fit",
+        "next_forecast": "the forecast from the most recent observation",
+        "persistence": "the sum of the three loadings; at or above one the process is non-stationary",
+    },
+    as_of_contract="Each row's regressors are aggregates ending at or before the period being predicted from. The forecast uses only the last observed window.",
+    failure_modes=[
+        "This is the benchmark, not a model to beat itself with. It is cheap enough that any volatility forecast which does not beat it has not earned its complexity, and reporting a fancy model without this control is the standard omission.",
+        "Fitted in variance, not in log variance. Realized variance is strongly right skewed, so a level fit is dominated by the largest few observations; the log specification is the usual remedy and is not what this computes.",
+        "Persistence at or above one means the fitted process does not mean revert, which is common in sample and is a sign of a break rather than a forecast.",
+        "In-sample R-squared on an autoregressive fit is optimistic by construction and says nothing about out-of-sample skill.",
+        "Realized variance must come from a consistent sampling scheme. Mixing sampling frequencies across the series changes what is being modelled halfway through.",
+    ],
+    concepts=["KC-VOLATILITY-CASCADE"],
+)
+def har_realized_volatility(
+    realized_variance: list[float],
+    weekly: int = 5,
+    monthly: int = 22,
+    horizon: int = 1,
+) -> dict[str, Any]:
+    series = [float(v) for v in realized_variance]
+    if monthly < weekly or weekly < 1:
+        return {"refused": "need monthly >= weekly >= 1"}
+    if len(series) < monthly + horizon + 5:
+        return {"refused": f"need at least {monthly + horizon + 5} observations"}
+
+    design, target = [], []
+    for t in range(monthly - 1, len(series) - horizon):
+        daily_term = series[t]
+        weekly_term = _mean(series[t - weekly + 1: t + 1])
+        monthly_term = _mean(series[t - monthly + 1: t + 1])
+        design.append([1.0, daily_term, weekly_term, monthly_term])
+        target.append(series[t + horizon])
+
+    fit = _ols(design, target)
+    if fit is None:
+        return {"refused": "regressors are collinear; the three aggregates carry no independent variation"}
+    intercept, beta_d, beta_w, beta_m = fit["coefficients"]
+    last = len(series) - 1
+    forecast = (intercept
+                + beta_d * series[last]
+                + beta_w * _mean(series[last - weekly + 1: last + 1])
+                + beta_m * _mean(series[last - monthly + 1: last + 1]))
+    return {
+        "coefficients": {"intercept": intercept, "daily": beta_d, "weekly": beta_w, "monthly": beta_m},
+        "r_squared": fit["r_squared"],
+        "next_forecast": forecast,
+        "persistence": beta_d + beta_w + beta_m,
+        "n": fit["n"],
+    }
+
+
+@method(
+    name="engle_granger_cointegration",
+    version="1.0.0",
+    summary="Two-step cointegration test: regress the levels, then check whether the residual mean reverts, and report the error-correction speed.",
+    inputs={
+        "y": "first series, in levels",
+        "x": "second series, in levels, same length",
+        "lags": "augmentation lags in the residual regression (default 1)",
+    },
+    outputs={
+        "hedge_ratio": "the cointegrating coefficient from the levels regression",
+        "residual_half_life": "periods for the residual to close half its gap; None if it does not revert",
+        "adf_t": "t-statistic on the residual's own lagged level; more negative is stronger evidence",
+        "error_correction": "speed at which a gap in the residual feeds back into the next change in y",
+        "verdict": "cointegrated | not_cointegrated | degenerate",
+    },
+    as_of_contract="Both series must be observed to the same timestamps and end at or before the decision. The hedge ratio must be estimated on a period disjoint from the one it is traded on.",
+    failure_modes=[
+        "THE REPORTED t-STATISTIC DOES NOT HAVE A STANDARD DISTRIBUTION. Because the residual is itself estimated, the Dickey-Fuller critical values do not apply and the Engle-Granger tabulation is required. This returns the statistic and a comparison against a conventional threshold; treating it as a normal or a standard ADF t is the classic error and it over-rejects.",
+        "Order matters. Regressing y on x and x on y give different hedge ratios in finite samples, and the test can accept one way and reject the other.",
+        "Two series can look cointegrated over any window if both trend. A relationship that only holds in sample is exactly what this will report.",
+        "Handles one pair. Three or more legs need Johansen, where the number of independent relationships is itself the estimate rather than an assumption.",
+        "The half-life assumes the residual is AR(1). A residual reverting on two timescales gets one number that describes neither.",
+    ],
+    concepts=["KC-COINTEGRATION"],
+)
+def engle_granger_cointegration(y: list[float], x: list[float], lags: int = 1) -> dict[str, Any]:
+    n = min(len(y), len(x))
+    if n < 20:
+        return {"refused": "need at least 20 observations"}
+    y, x = [float(v) for v in y[:n]], [float(v) for v in x[:n]]
+
+    levels = _ols([[1.0, xi] for xi in x], y)
+    if levels is None:
+        return {"refused": "levels regression is singular"}
+    intercept, hedge = levels["coefficients"]
+    residual = levels["residuals"]
+
+    # Augmented Dickey-Fuller on the residual: d_res_t = rho * res_{t-1} + sum(gamma_i d_res_{t-i})
+    diffs = [residual[i] - residual[i - 1] for i in range(1, n)]
+    rows, targets = [], []
+    for t in range(lags, len(diffs)):
+        row = [residual[t]]  # residual[t] is res_{t-1} relative to diffs[t]
+        row.extend(diffs[t - i - 1] for i in range(lags))
+        rows.append(row)
+        targets.append(diffs[t])
+    adf = _ols(rows, targets) if rows else None
+    if adf is None:
+        return {"refused": "residual regression is singular", "hedge_ratio": hedge}
+    rho = adf["coefficients"][0]
+
+    denominator = sum(r[0] ** 2 for r in rows) - (sum(r[0] for r in rows) ** 2) / len(rows)
+    standard_error = math.sqrt(adf["sigma2"] / denominator) if denominator > 1e-12 else None
+    adf_t = (rho / standard_error) if standard_error else None
+    half_life = (math.log(0.5) / math.log(1 + rho)) if -2 < rho < 0 else None
+
+    # Error correction: how last period's gap feeds into this period's change in y.
+    ec_rows = [[1.0, residual[t - 1], x[t] - x[t - 1]] for t in range(1, n)]
+    ec_fit = _ols(ec_rows, [y[t] - y[t - 1] for t in range(1, n)])
+    error_correction = ec_fit["coefficients"][1] if ec_fit else None
+
+    # -3.34 is the conventional 5% Engle-Granger critical value for one regressor with a
+    # constant. It is a threshold, not a p-value, and the failure modes say why.
+    verdict = "degenerate" if adf_t is None else ("cointegrated" if adf_t < -3.34 else "not_cointegrated")
+    return {
+        "hedge_ratio": hedge,
+        "intercept": intercept,
+        "residual_half_life": half_life,
+        "adf_t": adf_t,
+        "adf_rho": rho,
+        "error_correction": error_correction,
+        "residual_variance": _mean([r * r for r in residual]),
+        "verdict": verdict,
+        "critical_value_used": -3.34,
+        "n": n,
+    }
+
+
+@method(
+    name="robust_location_scale",
+    version="1.0.0",
+    summary="Huber M-estimate of location with a median-absolute-deviation scale: an estimate that a few extreme observations cannot drag.",
+    inputs={
+        "values": "observations",
+        "tuning": "Huber tuning constant in scale units (default 1.345, which is 95% efficient at the Gaussian)",
+        "iterations": "reweighting iterations (default 50)",
+    },
+    outputs={
+        "huber_location": "the M-estimate",
+        "median": "for comparison; breakdown point 0.5 and lower efficiency",
+        "mean": "for comparison; breakdown point 0",
+        "mad_scale": "median absolute deviation, scaled to be consistent at the Gaussian",
+        "downweighted_share": "share of observations the estimator pulled in",
+    },
+    as_of_contract="All observations must be available at the decision time; this is a summary of a sample, not a filter over time.",
+    failure_modes=[
+        "The breakdown point is 0.5, so the estimator survives up to half the sample being arbitrary — and no further. If more than half the observations are contaminated, no equivariant estimator can recover the rest, and this one will confidently report the contamination.",
+        "Robust to outliers is not robust to skew. On a genuinely asymmetric distribution the M-estimate targets neither the mean nor the median of the true law, and the number has no clean interpretation.",
+        "A zero MAD, which happens when over half the sample is identical, makes the scale degenerate. Reported explicitly rather than divided by.",
+        "Downweighting an observation is a modelling decision, not a cleaning step. `downweighted_share` is reported because a high share means the model and the data disagree, and that is information rather than noise to be removed.",
+        "The tuning constant trades efficiency at the Gaussian against resistance. 1.345 is the conventional choice and is not optimal for any particular contaminated law.",
+    ],
+    concepts=["KC-ROBUST-ESTIMATION"],
+)
+def robust_location_scale(values: list[float], tuning: float = 1.345, iterations: int = 50) -> dict[str, Any]:
+    sample = sorted(float(v) for v in values)
+    n = len(sample)
+    if n < 3:
+        return {"refused": "need at least 3 observations"}
+
+    def median_of(data: list[float]) -> float:
+        ordered = sorted(data)
+        mid = len(ordered) // 2
+        return ordered[mid] if len(ordered) % 2 else 0.5 * (ordered[mid - 1] + ordered[mid])
+
+    centre = median_of(sample)
+    absolute_deviation = median_of([abs(v - centre) for v in sample])
+    scale = 1.4826 * absolute_deviation  # consistent with the standard deviation at the Gaussian
+    if scale <= 0:
+        return {
+            "refused": "median absolute deviation is zero; over half the sample is identical and the scale is degenerate",
+            "median": centre, "mean": _mean(sample), "mad_scale": 0.0,
+        }
+
+    estimate, downweighted = centre, 0
+    for _ in range(iterations):
+        weights, downweighted = [], 0
+        for value in sample:
+            standardized = (value - estimate) / scale
+            if abs(standardized) <= tuning:
+                weights.append(1.0)
+            else:
+                weights.append(tuning / abs(standardized))
+                downweighted += 1
+        total = sum(weights)
+        updated = sum(w * v for w, v in zip(weights, sample)) / total
+        if abs(updated - estimate) < 1e-12:
+            estimate = updated
+            break
+        estimate = updated
+
+    return {
+        "huber_location": estimate,
+        "median": centre,
+        "mean": _mean(sample),
+        "mad_scale": scale,
+        "downweighted_share": downweighted / n,
+        "breakdown_point": 0.5,
+        "n": n,
+    }
+
+
+# --------------------------------------------------------------------------------------
 # Self-test
 # --------------------------------------------------------------------------------------
 
@@ -1870,6 +2202,115 @@ def self_test() -> dict[str, Any]:
     assert cascade_forecast([100.0], branching_ratio=1.0)["refused"]
     assert cascade_forecast([], branching_ratio=0.5)["refused"]
     checks.append("cascade_forecast: 1/(1-n) recovered exactly, amplification doubles at n=0.5, near-critical warned, supercritical refused")
+
+    # ---- Doubly robust: the defining property, demonstrated exactly ---------------------
+    # Two contexts, two actions, reward r(x, a) = x + a, logging propensity exactly 0.5 and
+    # a perfectly balanced sample, target policy always action 1. True value = mean(1, 2) = 1.5.
+    balanced = []
+    for context in (0, 1):
+        for action in (0, 1):
+            for _ in range(2):
+                balanced.append({"context_id": str(context), "action": action,
+                                 "reward": float(context + action), "propensity": 0.5})
+    target = {"0": 1, "1": 1}
+    truth = {str(c): {a: float(c + a) for a in (0, 1)} for c in (0, 1)}
+
+    no_model = doubly_robust_value([{**row, "reward_hat": {0: 0.0, 1: 0.0}} for row in balanced], target)
+    assert abs(no_model["importance_sampling"] - 1.5) < 1e-12, no_model
+    assert abs(no_model["doubly_robust"] - 1.5) < 1e-12, no_model
+    perfect_model = doubly_robust_value([{**row, "reward_hat": truth[row["context_id"]]} for row in balanced], target)
+    assert abs(perfect_model["direct_method"] - 1.5) < 1e-12, perfect_model
+    assert abs(perfect_model["doubly_robust"] - 1.5) < 1e-12, perfect_model
+    # A reward model biased by a constant 10, with correct propensities. The direct method
+    # inherits the whole bias; DR removes it exactly, because the reweighted residual is
+    # -10 on half the rows at weight 2. This is the double-robustness property itself.
+    biased = doubly_robust_value(
+        [{**row, "reward_hat": {a: truth[row["context_id"]][a] + 10.0 for a in (0, 1)}} for row in balanced], target)
+    assert abs(biased["direct_method"] - 11.5) < 1e-12, biased["direct_method"]
+    assert abs(biased["doubly_robust"] - 1.5) < 1e-12, biased["doubly_robust"]
+    assert abs(biased["effective_sample_size"] - 4.0) < 1e-12, biased["effective_sample_size"]
+    assert doubly_robust_value([], target)["refused"]
+    assert doubly_robust_value(balanced, {"9": 1})["refused"]
+    checks.append("doubly_robust_value: IPS and DR both exact under correct propensities, and a reward model biased by 10 leaves DR exactly unbiased while the direct method carries the whole 10")
+
+    # ---- Least squares: exact recovery of a planted linear model -----------------------
+    # The numerical core of both regressions below, so it is tested on its own where an
+    # exact answer exists. A self-generated HAR series cannot serve this purpose: any
+    # stable linear recursion converges to a fixed point, at which the daily, weekly and
+    # monthly aggregates become collinear and the coefficients stop being identified.
+    planted = [0.7, -1.3, 2.5, 0.4]
+    design = [[1.0, math.sin(i / 5.0), math.cos(i / 3.0), (i % 7) / 7.0] for i in range(60)]
+    targets = [sum(planted[k] * row[k] for k in range(4)) for row in design]
+    recovered = _ols(design, targets)
+    assert recovered is not None
+    assert all(abs(recovered["coefficients"][k] - planted[k]) < 1e-9 for k in range(4)), recovered["coefficients"]
+    assert recovered["r_squared"] > 1 - 1e-12, recovered["r_squared"]
+    assert _ols([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]], [1.0, 2.0, 3.0]) is None, "a collinear design must be refused"
+    checks.append("_ols: planted four-parameter model recovered to 1e-9, collinear design refused rather than solved")
+
+    # ---- HAR: structure, not planted coefficients ---------------------------------------
+    # A signal with genuine one-lag dependence on top of multi-frequency structure, so the
+    # three aggregates stay distinguishable and the daily term should dominate.
+    rv = [2.0 + math.sin(i / 4.0) + 0.6 * math.cos(i / 11.0) + 0.3 * math.sin(i / 29.0) for i in range(400)]
+    har = har_realized_volatility(rv)
+    coefficients = har["coefficients"]
+    assert har["r_squared"] > 0.9, har["r_squared"]
+    assert coefficients["daily"] > coefficients["weekly"], coefficients
+    assert coefficients["daily"] > coefficients["monthly"], coefficients
+    assert math.isfinite(har["next_forecast"]) and math.isfinite(har["persistence"]), har
+    flat = har_realized_volatility([3.0] * 400)
+    assert flat.get("refused"), "a constant series carries no independent variation across the three horizons"
+    assert har_realized_volatility([1.0] * 10)["refused"]
+    assert har_realized_volatility([1.0] * 400, weekly=30, monthly=5)["refused"]
+    checks.append("har_realized_volatility: daily loading dominates on a one-lag-dependent signal, constant series refused as collinear, ordering of horizons validated")
+
+    # ---- Cointegration: a planted relationship against two independent walks ------------
+    # Deterministic pseudo-random walks, so the test is reproducible without a seeded RNG.
+    walk_a, walk_b, value_a, value_b = [], [], 0.0, 0.0
+    s1, s2 = 12345, 67890
+    for step in range(300):
+        s1 = (1103515245 * s1 + 12345) % (2 ** 31)
+        s2 = (1103515245 * s2 + 12345) % (2 ** 31)
+        value_a += (s1 % 1000) / 1000.0 - 0.5
+        value_b += (s2 % 1000) / 1000.0 - 0.5
+        walk_a.append(value_a)
+        walk_b.append(value_b)
+    # y is exactly twice x plus a bounded oscillation: cointegrated by construction.
+    spread = [0.4 * math.sin(i / 3.0) for i in range(300)]
+    tied = [2.0 * walk_a[i] + spread[i] for i in range(300)]
+
+    linked = engle_granger_cointegration(tied, walk_a)
+    assert abs(linked["hedge_ratio"] - 2.0) < 0.02, linked["hedge_ratio"]
+    assert linked["adf_t"] is not None and linked["adf_t"] < -3.34, linked["adf_t"]
+    assert linked["verdict"] == "cointegrated", linked
+    assert linked["error_correction"] is not None and linked["error_correction"] < 0, linked["error_correction"]
+    independent = engle_granger_cointegration(walk_b, walk_a)
+    assert independent["verdict"] == "not_cointegrated", independent
+    assert independent["residual_variance"] > linked["residual_variance"] * 10, \
+        (independent["residual_variance"], linked["residual_variance"])
+    exact = engle_granger_cointegration([3.0 * v for v in walk_a], walk_a)
+    assert abs(exact["hedge_ratio"] - 3.0) < 1e-9, exact["hedge_ratio"]
+    assert engle_granger_cointegration([1.0, 2.0], [1.0, 2.0])["refused"]
+    checks.append("engle_granger_cointegration: hedge ratio exact on a noiseless pair, planted spread reads cointegrated with negative error correction, two independent walks do not")
+
+    # ---- Robust location: breakdown demonstrated -----------------------------------------
+    clean = [float(v) for v in range(1, 12)]  # symmetric about 6
+    clean_fit = robust_location_scale(clean)
+    assert abs(clean_fit["median"] - 6.0) < 1e-12 and abs(clean_fit["mean"] - 6.0) < 1e-12
+    assert abs(clean_fit["huber_location"] - 6.0) < 1e-9, clean_fit["huber_location"]
+    # One arbitrary observation moves the mean by 90 and leaves the M-estimate alone.
+    contaminated = [0.0] * 10 + [1000.0]
+    dirty = robust_location_scale(contaminated)
+    assert abs(dirty["mean"] - 1000.0 / 11) < 1e-9, dirty["mean"]
+    assert dirty.get("refused"), "ten identical values give a zero MAD, which must be refused rather than divided by"
+    spread_out = [float(v) for v in range(1, 11)] + [10000.0]
+    resistant = robust_location_scale(spread_out)
+    assert resistant["mean"] > 900, resistant["mean"]
+    assert abs(resistant["median"] - 6.0) < 1e-12, resistant["median"]
+    assert abs(resistant["huber_location"] - 6.0) < 1.0, resistant["huber_location"]
+    assert resistant["downweighted_share"] > 0, resistant
+    assert robust_location_scale([1.0, 2.0])["refused"]
+    checks.append("robust_location_scale: exact on symmetric data, one arbitrary point moves the mean by three orders of magnitude and not the M-estimate, degenerate scale refused")
 
     return {"ok": True, "methods": len(REGISTRY), "checks": checks}
 

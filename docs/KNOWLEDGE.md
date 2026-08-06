@@ -58,7 +58,18 @@ What makes the concept testable here: market context, causal story, ex-ante pred
 
 A binding from a concept to a versioned, tested implementation in `methods.py`. The version is pinned: if the implementation changes version, validation fails until someone re-verifies the card. A silent numerical change under a stable card is how a knowledge base quietly becomes wrong.
 
-Shipped implementations, each with a closed-form self-test: `order_flow_imbalance`, `kyle_lambda`, `avellaneda_stoikov_quotes`, `almgren_chriss_schedule`, `kalman_local_level`, `cusum_changepoint`, `continuation_hazard`, `lmsr_binary`, the four frontier probes below, and the five workstream methods below that. Every one declares its as-of contract — what it is allowed to see relative to the decision timestamp — and its known numerical failure modes.
+Twenty-three implementations, each with a closed-form self-test. Every one declares its as-of contract — what it is allowed to see relative to the decision timestamp — and its known numerical failure modes.
+
+The self-tests are closed-form on purpose: a test that checks a number against a previously recorded number only detects change, while a test that checks it against a derivation detects error. Some of them are the mathematics itself:
+
+- `doubly_robust_value` — a reward model biased by a constant 10 leaves the estimate **exactly** unbiased while the direct method carries the whole 10. That is the double-robustness property, not an approximation of it.
+- `betting_eprocess` — mean capital over every equiprobable null path is exactly 1, at every sequence length. That is Ville's inequality's premise, checked directly rather than assumed.
+- `cascade_forecast` — the total-descendants factor 1/(1−n) recovered exactly, amplification exactly 2 at n = 0.5.
+- `path_signature` — the exact Lévy area of the unit triangle, unchanged under reparametrization.
+- `molchan_error_diagram` — a constant score scores loss exactly 1.0, the no-skill line.
+- `_ols` — a planted four-parameter model recovered to 1e-9, and a collinear design refused rather than solved.
+
+Where an exact test is not available the check says what it does verify instead. `har_realized_volatility` cannot recover planted coefficients from a self-generated series, because any stable linear recursion converges to a fixed point at which the daily, weekly and monthly aggregates become collinear and the coefficients stop being identified. So the exactness is tested on `_ols` and the HAR check verifies structure: the daily loading dominates, a constant series is refused, horizon ordering is validated.
 
 ### Decision-relevance card
 
