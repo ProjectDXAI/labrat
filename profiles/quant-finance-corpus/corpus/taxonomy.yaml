@@ -2,9 +2,14 @@ defaults:
   saturation_dry_rounds: 2
   round_limit: 25
   page_counts: Seed page counts are estimates. Verification rounds replace them.
-  rights_policy: 'Nothing enters the build manifest without rights.confidence == confirmed, an evidence URL, and
-    a check date. Everything else is study-only: read it, learn from it, write our own explanations. Free to read
-    is not free to redistribute.
+  mode: exploratory
+  rights_policy: 'EXPLORATORY MODE. This corpus exists for internal understanding, for tracking findings
+    and pathways, and for seeding an AI coding agent. Rights are recorded as metadata and are NOT a gate
+    on reading, compiling or proposing — nothing here should stop a source being read.
+
+    The manifest machinery is unchanged and still requires rights.confidence == confirmed with an evidence
+    URL and a check date, so a redistributable build stays possible if it is ever wanted. Until then treat
+    manifest output and the verification queue as informational.
 
     '
 buckets:

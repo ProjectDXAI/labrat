@@ -132,6 +132,7 @@ def knowledge_paths(root: Path) -> dict[str, Path]:
         "trials": root / "trials.yaml",
         "bets": root / "frontier_bets.yaml",
         "extensions": root / "exploratory_extensions.yaml",
+        "findings": root / "structural_findings.yaml",
         "policies": root / "policies.yaml",
         "queues": root / "queues",
         "packets": root / "packets",
@@ -154,6 +155,7 @@ def load_store(paths: dict[str, Path]) -> dict[str, Any]:
         "trials": load_list(paths["trials"], "trials"),
         "bets": load_list(paths["bets"], "bets"),
         "extensions": load_list(paths["extensions"], "extensions"),
+        "findings": load_list(paths["findings"], "findings"),
         "policies": (load_yaml(paths["policies"], {}) or {}).get("policies") or {},
         "utility": load_json(paths["utility"], {}),
     }
@@ -1072,6 +1074,56 @@ def rank_extensions(store: dict[str, Any]) -> list[dict[str, Any]]:
     return scored
 
 
+FINDING_STATUS = ["read", "tension", "conjecture"]
+FINDING_REQUIRED = ["finding_id", "title", "status", "structure", "domains", "correspondence", "what_it_buys", "agent_seed"]
+
+
+def validate_findings(store: dict[str, Any]) -> dict[str, Any]:
+    """Findings are notes, not claims, so the bar is different from a bet or an extension.
+
+    The only things enforced: a finding says what structure it is about, spans at
+    least two domains (a pattern inside one field is just that field's content),
+    declares whether it came from reading or from conjecture, and carries a seed
+    written for whoever builds in the area next. A `read` finding must name what
+    was read; a `tension` must state the open question it opens.
+    """
+    rows: list[dict[str, Any]] = []
+    for finding in store.get("findings") or []:
+        errors: list[str] = []
+        for field in FINDING_REQUIRED:
+            if finding.get(field) in (None, "", [], {}):
+                errors.append(f"missing required field '{field}'")
+        if finding.get("status") not in FINDING_STATUS:
+            errors.append(f"status must be one of {', '.join(FINDING_STATUS)}")
+        if len(finding.get("domains") or []) < 2:
+            errors.append("a structural finding must span at least two domains")
+        if finding.get("status") in {"read", "tension"} and not finding.get("sources_read"):
+            errors.append(f"status '{finding.get('status')}' must name what was read")
+        if finding.get("status") == "tension" and not finding.get("open_question"):
+            errors.append("a tension must state the open question it opens")
+        rows.append({"finding_id": finding.get("finding_id"), "ok": not errors, "errors": errors})
+    return {"ok": all(row["ok"] for row in rows), "findings": rows, "count": len(rows)}
+
+
+def findings_index(store: dict[str, Any]) -> dict[str, Any]:
+    """Group findings by domain and by status, so the shape of the corpus is visible."""
+    by_domain: dict[str, list[str]] = {}
+    by_status: dict[str, int] = {}
+    for finding in store.get("findings") or []:
+        by_status[finding.get("status")] = by_status.get(finding.get("status"), 0) + 1
+        for domain in finding.get("domains") or []:
+            by_domain.setdefault(domain, []).append(finding["finding_id"])
+    # A domain that appears in several findings is a hub: the place the corpus keeps
+    # arriving at from different directions, which is usually where to read next.
+    hubs = sorted(by_domain.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    return {
+        "by_status": by_status,
+        "by_domain": {domain: ids for domain, ids in hubs},
+        "hubs": [domain for domain, ids in hubs if len(ids) >= 3],
+        "shapes": (load_yaml(knowledge_paths(Path(".")).get("findings"), {}) or {}).get("recurring_shapes") or [],
+    }
+
+
 # --------------------------------------------------------------------------------------
 # Robustness: does a policy survive the trial set being wrong about the world?
 # --------------------------------------------------------------------------------------
@@ -1708,6 +1760,7 @@ def status_payload(store: dict[str, Any], sources: dict[str, dict[str, Any]]) ->
         "trials": len(store["trials"]),
         "frontier_bets": len(store.get("bets") or []),
         "exploratory_extensions": len(store.get("extensions") or []),
+        "structural_findings": len(store.get("findings") or []),
         "cards_anchored_to_read_units": _cards_on_read_units(store, sources)["grounded"],
         "cards_anchored_only_to_unread": _cards_on_read_units(store, sources)["ungrounded"],
         "bets_runnable_now": sum(1 for bet in (store.get("bets") or []) if bet.get("first_computation")),
@@ -1981,7 +2034,7 @@ def cmd_status(args: argparse.Namespace) -> int:
         f"  provenance: {grounded}/{payload['counts']['concepts']} cards anchored to a source unit someone has opened; "
         f"{len(payload['cards_anchored_only_to_unread'])} rest on unread anchors"
     )
-    print(f"  bets={payload['frontier_bets']} extensions={payload['exploratory_extensions']}")
+    print(f"  bets={payload['frontier_bets']} extensions={payload['exploratory_extensions']} findings={payload['structural_findings']}")
     return 0
 
 
@@ -2122,6 +2175,56 @@ def cmd_bets(args: argparse.Namespace) -> int:
     return 0 if validation["ok"] else 1
 
 
+def cmd_findings(args: argparse.Namespace) -> int:
+    _, paths, _ = resolve_dirs(args)
+    store = load_store(paths)
+    validation = validate_findings(store)
+    raw = load_yaml(paths["findings"], {}) or {}
+    shapes = raw.get("recurring_shapes") or []
+
+    if args.json:
+        print(json.dumps({"validation": validation, "findings": store.get("findings") or [], "recurring_shapes": shapes}, indent=2))
+        return 0 if validation["ok"] else 1
+
+    for row in validation["findings"]:
+        for message in row["errors"]:
+            print(f"ERROR  {row['finding_id']}: {message}")
+
+    by_status: dict[str, int] = {}
+    by_domain: dict[str, list[str]] = {}
+    for finding in store.get("findings") or []:
+        by_status[finding["status"]] = by_status.get(finding["status"], 0) + 1
+        for domain in finding.get("domains") or []:
+            by_domain.setdefault(domain, []).append(finding["finding_id"])
+
+    print(f"{validation['count']} structural findings: " + ", ".join(f"{k}={v}" for k, v in sorted(by_status.items())))
+    print()
+    for finding in store.get("findings") or []:
+        if args.status and finding["status"] != args.status:
+            continue
+        if args.domain and args.domain not in (finding.get("domains") or []):
+            continue
+        marker = {"read": " ", "tension": "!", "conjecture": "?"}.get(finding["status"], " ")
+        print(f"{marker} {finding['finding_id']:<38} {finding['title']}")
+        print(f"    spans: {', '.join(finding.get('domains') or [])}")
+        if args.verbose:
+            print(f"    buys:  {' '.join(str(finding['what_it_buys']).split())[:200]}")
+            if finding.get("open_question"):
+                print(f"    open:  {' '.join(str(finding['open_question']).split())[:200]}")
+            print(f"    seed:  {' '.join(str(finding['agent_seed']).split())[:200]}")
+        print()
+
+    hubs = [d for d, ids in sorted(by_domain.items(), key=lambda kv: -len(kv[1])) if len(ids) >= 3]
+    if hubs:
+        print("domains the corpus keeps arriving at from different directions: " + ", ".join(hubs))
+    if shapes and not args.status and not args.domain:
+        print()
+        print("recurring shapes:")
+        for shape in shapes:
+            print(f"  - {shape['shape']}  ({len(shape.get('instances') or [])} instances)")
+    return 0 if validation["ok"] else 1
+
+
 def cmd_extensions(args: argparse.Namespace) -> int:
     lab_root, paths, corpus_dir = resolve_dirs(args)
     store = load_store(paths)
@@ -2258,6 +2361,12 @@ def build_parser() -> argparse.ArgumentParser:
     bets_cmd.add_argument("--verbose", action="store_true")
     bets_cmd.add_argument("--json", action="store_true")
 
+    findings_cmd = sub.add_parser("findings", help="Structural patterns found while reading: what spans two or more domains, and the seed for building in that area.")
+    findings_cmd.add_argument("--status", choices=["read", "tension", "conjecture"], default=None)
+    findings_cmd.add_argument("--domain", default=None)
+    findings_cmd.add_argument("--verbose", action="store_true")
+    findings_cmd.add_argument("--json", action="store_true")
+
     extensions_cmd = sub.add_parser("extensions", help="Rank proposed new work; refuse anything not grounded in a source unit that has been read.")
     extensions_cmd.add_argument("--verbose", action="store_true")
     extensions_cmd.add_argument("--json", action="store_true")
@@ -2292,6 +2401,7 @@ def main(argv: list[str] | None = None) -> int:
         "evaluate": cmd_evaluate,
         "bets": cmd_bets,
         "extensions": cmd_extensions,
+        "findings": cmd_findings,
         "stress": cmd_stress,
         "compile-queue": cmd_compile_queue,
         "vocab": cmd_vocab,

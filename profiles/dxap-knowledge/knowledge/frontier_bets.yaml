@@ -51,16 +51,20 @@ bets:
       not as a live regime signal. The count-dispersion estimator is far cheaper than the
       maximum-likelihood kernel fitting that most papers use, which is what keeps it off desks.
     unexpected_connection: >
-      Jaisson and Rosenbaum showed that nearly-unstable Hawkes processes converge to rough
-      volatility. The same number therefore links microstructural endogeneity to the roughness
-      of the volatility process — a single state variable spanning two literatures we hold.
+      CORRECTED after reading both papers. Nearly unstable Hawkes with a light-tailed kernel converges
+      to integrated CIR and a Heston price model — not to rough volatility. Roughness requires HEAVY
+      tails: kernel decay x^-(1+alpha) with alpha in (1/2,1), giving Hurst H = alpha - 1/2. So the
+      quantity linking microstructure to macroscopic volatility is not the branching ratio at all, it
+      is the kernel tail exponent, and that exponent selects the model class rather than tuning it.
+      Recorded as FIND-EXPONENT-SELECTS-MODEL, with the quantitative tension against measured kernel
+      exponents as FIND-EXPONENT-TENSION.
     maturity: 5
     payoff: 5
     novelty: 4
     testability: 5
     effort: 2
     read_status_note: "Primary sources read 2026-08. The bet survived; its prediction did not, and was rewritten."
-    sources: [hardiman-2013-critical-reflexivity, filimonov-2012-quantifying-reflexivity, bacry-2015-hawkes-processes-finance, jaisson-2015-nearly-unstable-hawkes, gatheral-2018-volatility-is-rough, hawkes-1971-spectra-self-exciting]
+    sources: [hardiman-2013-critical-reflexivity, filimonov-2012-quantifying-reflexivity, bacry-2015-hawkes-processes-finance, jaisson-2015-nearly-unstable-hawkes, jaisson-2015-rough-heavy-tailed-hawkes, gatheral-2018-volatility-is-rough, hawkes-1971-spectra-self-exciting]
 
   - bet_id: FB-JOINT-BOUNDS
     title: "Sharp logical bounds across correlated prediction markets"

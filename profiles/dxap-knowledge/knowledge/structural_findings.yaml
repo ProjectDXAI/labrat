@@ -1,0 +1,344 @@
+# Structural findings: patterns in the mathematics, tracked as they are read.
+#
+# This file is the point of the corpus. Not "what may we license" and not "which
+# trade does this justify" — what STRUCTURE keeps showing up, where the same
+# object appears under two names in two fields, and where two literatures make
+# quantitative claims that must be consistent and might not be.
+#
+# A finding may or may not touch the trading work. That is fine and expected;
+# recording the pattern is the deliverable. Each entry carries an `agent_seed`:
+# a paragraph written to be handed to a coding agent as creative direction when
+# building in this area.
+#
+# `status` is the only quality gate that matters here:
+#   read        — taken from primary material opened in this repository
+#   tension     — two read sources make claims that may not be mutually consistent
+#   conjecture  — a pattern proposed from what was read, not itself asserted anywhere
+
+findings:
+
+  - finding_id: FIND-EXPONENT-SELECTS-MODEL
+    title: "One microstructural exponent selects the entire macroscopic volatility model class"
+    status: read
+    structure: "Scaling limits of nearly unstable Hawkes processes, indexed by the kernel's tail exponent."
+    domains: [point_processes, quant_finance_core, dynamical_systems]
+    correspondence: >
+      Take a self-exciting process whose kernel L1 norm approaches one. If the kernel is light
+      tailed, the rescaled limit is an integrated Cox-Ingersoll-Ross process and the price model
+      converges to Heston. If instead the kernel has power-law tails of the form x^-(1+alpha) with
+      alpha in (1/2, 1), the limit is an integrated FRACTIONAL CIR process with Hurst parameter
+      H = alpha - 1/2. The same construction, differing only in the tail of the excitation kernel,
+      lands in two different model classes.
+    what_it_buys: >
+      The kernel tail exponent is not a nuisance parameter to be integrated out. It is the model
+      selector. Every argument about whether volatility is rough is, under this construction, an
+      argument about the tail of the order-flow excitation kernel — a microstructural quantity
+      measurable from event timestamps alone, with no options data and no volatility proxy.
+    sources_read:
+      - "arXiv 1504.03100 — Jaisson and Rosenbaum, rough fractional diffusions as scaling limits of nearly unstable heavy tailed Hawkes processes"
+      - "arXiv 1310.2033 — Jaisson and Rosenbaum, limit theorems for nearly unstable Hawkes processes"
+    agent_seed: >
+      When building anything that estimates volatility dynamics from high-frequency data, treat the
+      excitation kernel tail as the primary parameter and the volatility model as derived. Estimate
+      alpha first; let it choose between a Heston-class and a rough-class model rather than
+      selecting the model by fit. Build the estimator so alpha is reported with its uncertainty, and
+      so the implied H = alpha - 1/2 is carried alongside any volatility surface the system produces.
+      Structure the code so the two model classes are two instantiations of one interface selected
+      by a measured number, not two competing codepaths chosen by a flag.
+
+  - finding_id: FIND-EXPONENT-TENSION
+    title: "The measured kernel exponent and the measured volatility roughness do not obviously agree"
+    status: tension
+    structure: "A consistency condition, H = alpha - 1/2, between two independently measured quantities."
+    domains: [point_processes, quant_finance_core]
+    correspondence: >
+      The scaling limit requires alpha in (1/2, 1) to produce roughness, and gives H = alpha - 1/2.
+      Rough volatility work reports H near 0.1, which implies alpha near 0.6. Hardiman, Bercot and
+      Bouchaud, fitting a power-law Hawkes kernel to E-mini mid-price changes, report decay
+      exponents near -1.15 below about a thousand seconds and near -1.45 above it — that is, alpha
+      near 0.15 and 0.45 in the same parameterization. Both sit below the 1/2 threshold at which the
+      roughness regime begins.
+    what_it_buys: >
+      Either the empirical kernel is not in the regime the theorem requires, or the two-regime kernel
+      means no single alpha applies, or one of the two measurements does not mean what the other
+      assumes. All three possibilities are interesting, and the question appears not to have been
+      asked because the two numbers live in different papers using different data and different
+      estimators. It is directly checkable: measure both on one instrument over one period.
+    sources_read:
+      - "arXiv 1504.03100 — the H = alpha - 1/2 relation and the (1/2, 1) condition"
+      - "arXiv 1302.1405 — measured kernel exponents of -1.15 and -1.45 across two regimes"
+    open_question: >
+      Does the consistency relation hold on any real instrument when both sides are estimated from
+      the same data? If it fails, which side fails?
+    agent_seed: >
+      Build the cross-check as a first-class diagnostic rather than a study: a routine that takes one
+      instrument and one period, estimates the Hawkes kernel exponent from event timestamps and the
+      Hurst parameter from realized volatility, and reports both alongside the residual of
+      H = alpha - 1/2. Treat a large residual as a signal that the model family is wrong for that
+      instrument, not as an error to be tuned away. This is the shape of diagnostic worth having
+      everywhere: two independent estimates of quantities a theorem says must be related, with the
+      violation surfaced rather than reconciled.
+
+  - finding_id: FIND-DISSIPATION-IS-NONPREDICTIVE-MEMORY
+    title: "Memory that does not predict is exactly dissipated work"
+    status: read
+    structure: "An identity between thermodynamic dissipation and an information difference."
+    domains: [information_theory, stochastic_thermodynamics, machine_learning_frontier]
+    correspondence: >
+      For a system whose state s_t responds to a driving signal x_t, define instantaneous memory as
+      I_mem = I[s_t ; x_t] and instantaneous predictive power as I_pred = I[s_t ; x_{t+1}]. The
+      central result is beta <W_diss> = I_mem - I_pred. The work irretrievably lost is precisely the
+      information the system holds about the present that tells it nothing about the future. The
+      authors' conclusion: any system that keeps memory of its environment and operates at maximal
+      energetic efficiency has to be predictive.
+    what_it_buys: >
+      A state-compression objective that is not a heuristic. For any learned representation of market
+      state, the quantity to minimize is retained-but-nonpredictive information, and it is measurable
+      in the same units as the information retained. It also reframes model complexity: excess
+      capacity is not merely wasteful in the statistical sense, it is the exact analogue of a
+      thermodynamic inefficiency, with an equality rather than an inequality behind the analogy.
+    sources_read:
+      - "arXiv 1203.3271 — Still, Sivak, Bell and Crooks, thermodynamics of prediction"
+    agent_seed: >
+      When building a world model or any compressed market-state representation, instrument
+      I[state ; present] and I[state ; future] separately rather than tracking a single loss. Report
+      their difference as the primary diagnostic — it is the system's "useless nostalgia" and it has
+      a physical interpretation. Design the encoder API so both quantities are estimable at any
+      layer, and treat a growing gap during training as the signal to stop adding capacity. This is a
+      better stopping rule than validation loss because it says WHY the extra capacity is not paying.
+
+  - finding_id: FIND-PRECISION-COSTS-DISSIPATION
+    title: "The precision of any current is bounded by what is dissipated to sustain it"
+    status: read
+    structure: "The thermodynamic uncertainty relation: a variance-versus-cost inequality for steady-state currents."
+    domains: [stochastic_thermodynamics, information_theory, market_microstructure]
+    correspondence: >
+      For a nonequilibrium steady state, achieving relative uncertainty epsilon in any output current
+      requires a cost of at least 2 k_B T / epsilon^2, independent of how long the output takes to
+      generate. Precision is not free and its price scales as the inverse square of the tolerance.
+    what_it_buys: >
+      Paired with the previous finding, it gives two bounds on any predictive machine from the same
+      physics: one on what retaining information costs, one on what precision costs. If an analogue
+      of the relation holds for order flow — where the measurable dissipation is the time-asymmetry
+      of the flow — it would bound the achievable precision of any flow-based signal using only the
+      flow, with no strategy fitted. That would be an unusual kind of statement about a market:
+      a ceiling derived rather than discovered.
+    sources_read:
+      - "arXiv 1502.05944 — Barato and Seifert, thermodynamic uncertainty relation"
+      - "arXiv 1601.01980 — Flanagan and Lacasa, irreversibility of financial time series"
+    open_question: >
+      What is the correct market analogue of entropy production, and does any inequality of this shape
+      survive the translation? The honest answer today is that nobody has tried.
+    agent_seed: >
+      Treat this as a research scaffold rather than a formula to apply. Build the measurement side
+      first: an irreversibility estimator over flow series with a surrogate null, reported per
+      instrument and period. Then, separately, measure the realized precision of flow-based signals in
+      the same cells. The interesting artifact is the scatter plot of the two, and whether an envelope
+      appears. Do not implement a bound you have not established; implement the two measurements whose
+      relationship would reveal one.
+
+  - finding_id: FIND-CRITICAL-SYSTEMS-LOOK-SUBCRITICAL
+    title: "A critical system observed through a short window reports as sub-critical, and as trending"
+    status: read
+    structure: "Estimator bias from a mismatch between kernel support and observation window."
+    domains: [point_processes, high_dim_statistics, signal_processing]
+    correspondence: >
+      Fitting an exponential kernel over thirty-minute windows to data generated by a critical
+      power-law kernel returns a branching ratio well below one — and, when the high-frequency cutoff
+      of the true kernel shrinks over the years, returns a spuriously RISING branching ratio. The
+      published claim that market reflexivity has been increasing reproduces exactly on synthetic
+      data generated at constant criticality.
+    what_it_buys: >
+      A general warning with a specific shape: when a process has mass at long lags and the estimator
+      has a short window, the estimator does not merely lose power, it manufactures a trend out of a
+      change in some other parameter. The defence is to report the estimate as a function of
+      observation scale and to treat a scale-dependent answer as evidence about the kernel rather
+      than as a number.
+    sources_read:
+      - "arXiv 1302.1405 — Hardiman, Bercot and Bouchaud, critical reflexivity"
+    agent_seed: >
+      Any estimator built over windows should return a scale profile, not a scalar. Make the signature
+      estimate(series, scales) -> profile, and let the caller collapse it only if the profile is flat.
+      Build the synthetic check into the test suite: generate data at a KNOWN constant parameter with a
+      long-memory kernel, run the estimator across scales and across a shrinking cutoff, and assert that
+      the reported trend is zero. That test would have caught a published result.
+
+  - finding_id: FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE
+    title: "Where a protocol enforces an invariant, mispricing cannot live; the tradable surface is the complement"
+    status: read
+    structure: "Constraint enforcement at the settlement layer versus at the pricing layer."
+    domains: [economics_information, defi_mechanics, optimal_transport]
+    correspondence: >
+      In a conditional-token market, splitting collateral mints a complete set of outcome tokens and
+      merging a complete set returns collateral atomically, and negative-risk markets add a conversion
+      exchanging one NO token for YES tokens across the other outcomes. Those operations mechanically
+      enforce particular logical relations. Other relations — a conjunction priced against its
+      Frechet-Hoeffding bounds, for instance — have no corresponding token operation and are enforced
+      only by whoever chooses to trade them.
+    what_it_buys: >
+      The set of relations a system enforces structurally can be enumerated from its mechanism, and
+      persistent inconsistency can only exist in the complement. This inverts the usual approach of
+      scanning prices for anomalies: derive first where an anomaly is even possible, then look only
+      there. It generalizes well beyond prediction markets — any system with atomic invariants has
+      this decomposition.
+    sources_read:
+      - "Polymarket conditional token framework overview, read directly"
+      - "arXiv 2208.06046 — Milionis, Moallemi, Roughgarden and Zhang, loss-versus-rebalancing"
+    agent_seed: >
+      When modelling any venue, write down its enforced invariants as code before writing any pricing
+      logic — a function that takes the venue state and returns the constraints that CANNOT be
+      violated. Then let the search for opportunities run only over the unconstrained directions.
+      Structurally this is the same discipline as writing type invariants before business logic: it
+      makes an entire class of impossible states unrepresentable rather than checked for.
+
+  - finding_id: FIND-ADVERSE-SELECTION-RENAMED
+    title: "Loss-versus-rebalancing is adverse selection, re-derived by a field that did not know the name"
+    status: read
+    structure: "The same economic object appearing under different names in disconnected literatures."
+    domains: [defi_mechanics, market_microstructure, economics_information]
+    correspondence: >
+      A liquidity provider's loss relative to a rebalancing strategy is (sigma^2 P^2 / 2) times the
+      marginal liquidity of the pool, and provider profit decomposes as rebalancing profits minus that
+      loss plus fees. The mechanism the authors describe is a stale quote being picked off when the
+      reference price moves — which is the sniping problem of the high-frequency literature and the
+      adverse selection of Glosten and Milgrom, expressed through a curve instead of a queue.
+    what_it_buys: >
+      Two literatures with no shared citations describing one object. Every result about adverse
+      selection in a limit order book has a candidate analogue in automated market making, and the
+      translation dictionary is short: marginal liquidity plays the role of displayed depth, the
+      arbitrageur plays the informed trader, and the fee plays the spread. The translation runs both
+      ways, and the AMM side has closed forms the order-book side lacks.
+    sources_read:
+      - "arXiv 2208.06046 — loss-versus-rebalancing, read directly"
+      - "Glosten and Milgrom, held in the corpus"
+    agent_seed: >
+      Build a shared abstraction for adverse selection that both venue types instantiate: something
+      that takes a liquidity supply schedule and a reference price process and returns expected loss to
+      informed flow. The AMM case has a closed form and the order-book case does not, which makes the
+      AMM the natural test harness for the shared code. Resist writing two separate modules named for
+      their venues; the mathematics is one module with two parameterizations.
+
+  - finding_id: FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY
+    title: "Time-asymmetry is a genuinely independent axis from volatility"
+    status: read
+    structure: "An empirical near-independence between two summary statistics of a series."
+    domains: [stochastic_thermodynamics, dynamical_systems, high_dim_statistics]
+    correspondence: >
+      Across thirty-five equities over fourteen years, every series is irreversible to some degree, the
+      degree varies substantially across names and fluctuates over time, and the measured irreversibility
+      is essentially uncorrelated with volatility — a reported r-squared of about 0.06.
+    what_it_buys: >
+      An axis that is not a repackaging of volatility. Most market state variables are volatility in
+      disguise, which is why so many of them stop working together. A statistic that is empirically
+      orthogonal to it is worth having even before anyone shows what it predicts — and its predictive
+      value is stated by the authors as an open question rather than a result.
+    sources_read:
+      - "arXiv 1601.01980 — Flanagan and Lacasa"
+      - "arXiv 1809.04377 — Martinez, Herrera-Diestra and Chavez, ordinal-pattern method with surrogates"
+    agent_seed: >
+      Whenever adding a state variable to any system, test it for orthogonality against volatility
+      before testing it for predictive power, and record the correlation permanently next to the
+      variable. Build the state-variable registry so each entry carries its correlation with the
+      existing set; reject additions that are linear combinations of what is already there. Most
+      feature bloat is rediscovering volatility.
+
+  - finding_id: FIND-REPARAMETRIZATION-DISSOLVES-THE-CLOCK
+    title: "Path signatures make the choice of clock a non-question"
+    status: read
+    structure: "Invariance of iterated integrals under reparametrization of the path."
+    domains: [rough_paths, signal_processing, market_microstructure]
+    correspondence: >
+      The signature of a path is unchanged by any reparametrization of time. Two samplings of the same
+      underlying path — wall clock, trade clock, volume clock — have identical signatures. The
+      antisymmetric part of the second level is the signed area enclosed by a pair of coordinates,
+      which measures hysteresis between them with no lag parameter anywhere in it.
+    what_it_buys: >
+      The clock debate consumes real effort in market feature engineering and the invariance simply
+      removes it. The cost is exactly as sharp: signatures cannot see speed, so anything genuinely
+      about urgency must add time as an explicit channel. Both the benefit and the cost are theorems
+      rather than empirical claims.
+    sources_read:
+      - "arXiv 1603.03788 — Chevyrev and Kormilitzin, primer on the signature method"
+    agent_seed: >
+      Implement signature features early in any path-based pipeline, and use the invariance as a TEST:
+      compute the signature under two different samplings of the same window and assert equality. That
+      assertion catches resampling bugs, alignment bugs and look-ahead leaks in one line, whatever the
+      features are eventually used for. Add time as an explicit channel only where urgency is part of
+      the question, and make that an explicit, documented choice at the call site.
+
+  - finding_id: FIND-MAXIMAL-INEQUALITY-UNDERWRITES-PEEKING
+    title: "One maximal inequality is what makes continuous monitoring safe"
+    status: read
+    structure: "Ville's inequality for nonnegative supermartingales, and its inversion into confidence sequences."
+    domains: [inference_causality, decision_sequential, information_theory]
+    correspondence: >
+      If M is a test martingale under the null, then P(sup_t M_t >= alpha) <= 1/alpha. Every guarantee
+      of anytime-valid inference descends from that single bound: stopping when the wealth process
+      first exceeds 1/alpha controls type I error at alpha regardless of the stopping rule, and
+      inverting a family of such martingales over a parameter yields a confidence sequence valid at all
+      stopping times simultaneously.
+    what_it_buys: >
+      Peeking becomes safe by construction rather than by correction. The same maximal-inequality
+      machinery is what underlies optimal stopping bounds, so sequential testing and optimal exit are
+      not merely analogous — they run on the same inequality. A system that monitors a strategy and a
+      system that decides when to close a position can share their core.
+    sources_read:
+      - "arXiv 2210.01948 — Ramdas, Grunwald, Vovk and Shafer, game-theoretic statistics"
+    agent_seed: >
+      Build monitoring as a wealth process rather than as a rolling statistic with a threshold. The
+      interface is: start at one, multiply by a likelihood-ratio-like factor per observation, alarm when
+      it crosses 1/alpha. That single abstraction serves strategy decay detection, A/B evaluation and
+      anomaly monitoring, and it is correct under arbitrary stopping — which rolling z-scores are not.
+      Where a composite null with a nuisance parameter is needed, note that the authors list this as an
+      area where the theory is incomplete, so treat any construction there as a research artifact.
+
+  - finding_id: FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE
+    title: "Discrete batching with categorical priority is not the queueing system the literature models"
+    status: read
+    structure: "Priority determined by action type before arrival order, inside a discrete batch."
+    domains: [queueing_networks, market_microstructure, defi_mechanics]
+    correspondence: >
+      On an on-chain matching engine, actions within a consensus batch are sorted by category — orders
+      not carrying GTC or IOC, then cancels, then orders carrying them — with proposer order breaking
+      ties inside each category, at one or two batches per block. Continuous-time order-book models,
+      from birth-death queues to heavy-traffic limits, assume genuine arrival-time priority.
+    what_it_buys: >
+      A concrete instance of a general pattern: when a mechanism batches and then orders by type, the
+      resulting system is a different queueing class, and results imported from the continuous case can
+      be wrong in direction rather than merely in magnitude. Here, cancels being processed before
+      aggressive orders means a resting order has a protection that continuous-time adverse-selection
+      calculations do not price.
+    sources_read:
+      - "Hyperliquid HyperCore order book documentation, read directly"
+    agent_seed: >
+      Before importing any queueing result, write down the venue's actual ordering rule as an explicit
+      comparator function. If that comparator is not "by arrival time", the standard results do not
+      apply and the code should say so at the point of use. Build the simulator around the real
+      comparator; it costs almost nothing and it makes the difference between the modelled and the
+      actual system visible in tests rather than in production.
+
+# Patterns worth watching for, recorded so they are noticed when they recur.
+recurring_shapes:
+  - shape: "A nuisance parameter turns out to select the model class"
+    instances: [FIND-EXPONENT-SELECTS-MODEL]
+    why_it_matters: "Estimation effort should go to the parameter that decides the family, not to the parameters inside a family chosen by habit."
+
+  - shape: "An estimator whose window is shorter than the process memory manufactures a trend"
+    instances: [FIND-CRITICAL-SYSTEMS-LOOK-SUBCRITICAL]
+    why_it_matters: "The failure is not loss of power, it is a confident wrong answer that moves in a plausible direction."
+
+  - shape: "The same object under two names in two fields with no shared citations"
+    instances: [FIND-ADVERSE-SELECTION-RENAMED]
+    why_it_matters: "Each side has results the other lacks, and the translation is usually short once the correspondence is seen."
+
+  - shape: "An invariant enforced by the mechanism rather than by the participants"
+    instances: [FIND-ENFORCED-INVARIANTS-BOUND-ARBITRAGE, FIND-CATEGORICAL-PRIORITY-IS-A-DIFFERENT-QUEUE]
+    why_it_matters: "Enforced invariants bound where anything interesting can happen, and they are enumerable from the mechanism in advance."
+
+  - shape: "A quantity that is empirically orthogonal to volatility"
+    instances: [FIND-IRREVERSIBILITY-ORTHOGONAL-TO-VOLATILITY]
+    why_it_matters: "Most proposed state variables are volatility wearing a hat; the rare orthogonal one is worth keeping even before it predicts anything."
+
+  - shape: "One inequality underwriting several apparently separate capabilities"
+    instances: [FIND-MAXIMAL-INEQUALITY-UNDERWRITES-PEEKING, FIND-DISSIPATION-IS-NONPREDICTIVE-MEMORY, FIND-PRECISION-COSTS-DISSIPATION]
+    why_it_matters: "Shared foundations mean shared code and shared failure modes; finding them collapses apparent complexity."
