@@ -530,7 +530,7 @@ decision_relevance:
     concept_id: KC-OFFLINE-SHIFT
     decision_type: abstain
     evidence_that_would_support_action: >
-      The question is what the agent would have done under a treatment it was never run with, the
+      The question is what the agent would have done under a treatment it has not been run with, the
       only evidence is logged traces, and the evaluated policy departs enough from the logging one
       that most of its states are outside the logged distribution.
     evidence_that_would_argue_against_action: >

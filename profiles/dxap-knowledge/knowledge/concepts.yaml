@@ -1479,3 +1479,89 @@ concepts:
     problem_ids: [PB-AGENT-ATTRIBUTION]
     tags: [off-policy, distribution-shift, evaluation, agentic, read-directly]
     workstream: dxap_agents
+
+  - concept_id: KC-REAL-DRIFT
+    canonical_name: "The relationship can change while the inputs look identical"
+    plain_description: >
+      A model decays when the conditional distribution of the outcome given the inputs changes.
+      That can happen with the input distribution completely unchanged, which means monitoring
+      the inputs for a shift will not detect it. A detector watching price or flow features alone
+      is watching the distribution that need not move.
+    mechanism: >
+      Real concept drift is a change in P(outcome | features). Virtual drift is a change in
+      P(features) with the conditional intact. Only the first invalidates the model, and only the
+      second is visible without outcomes. Since outcomes mature slowly and features arrive
+      continuously, the cheap monitor watches the wrong thing and the informative monitor is the
+      one that has to wait.
+    formal_equations: "real drift: P_t(y|x) != P_{t+1}(y|x); virtual drift: P_t(x) != P_{t+1}(x) with P(y|x) unchanged"
+    assumptions:
+      - "Outcomes eventually arrive and can be paired with the features that preceded them."
+      - "The feature set is stable enough that the conditional is comparable across periods."
+      - "The maturation lag is short relative to the drift being detected, or detection is structurally late."
+    market_types: [any]
+    relevant_horizons: [days, weeks]
+    required_observables: [mid_price_series, matured_outcomes, decision_log]
+    required_data_resolution: "Paired feature and matured-outcome records across a period long enough to compare conditionals."
+    expected_empirical_signature: >
+      Model performance degrading while every input-distribution monitor stays quiet, and a
+      conditional fitted on a recent window differing materially from one fitted on an earlier
+      window at the same input values.
+    alternative_explanations:
+      - "Performance fell because the feature distribution moved into a region the model was always bad at, which is virtual drift and needs a different remedy."
+      - "Nothing drifted and the model was overfitted, so its apparent decay is the training-period advantage disappearing."
+    known_failure_modes:
+      - "Detecting real drift requires matured outcomes, so detection is structurally later than the drift. A monitor that fires fast is almost certainly watching the inputs."
+      - "The literature reinvented these strategies independently under different names across fields, so a search on any one vocabulary finds a fraction of what exists — the source says so directly."
+      - "Held-out evaluation does not exist when the world changes underneath, which is why adaptive methods are scored prequentially: predict, observe, update, score as you go."
+    source_passage_ids:
+      - "gama-2014-survey-concept-drift-adaptation#real-vs-virtual-drift"
+      - "gama-2014-survey-concept-drift-adaptation#adaptation-and-evaluation"
+    contradicting_concept_ids: [KC-EARLY-WARNING-FRAGILITY]
+    supporting_concept_ids: [KC-DETECT-CUSUM, KC-ANYTIME-ATTRIBUTION, KC-ALARM-LOSS]
+    implementation_status: specified
+    confidence: 0.65
+    problem_ids: [PB-THESIS-DECAY, PB-REGIME-BREAK, PB-AGENT-ATTRIBUTION]
+    tags: [concept-drift, conditional-shift, prequential, transfer, read-directly]
+
+  - concept_id: KC-DOUBLY-ROBUST
+    canonical_name: "Two ways of estimating a counterfactual fail differently, and one estimator survives either"
+    plain_description: >
+      Estimating what a new policy would have earned from logged data can be done by modelling
+      rewards or by reweighting on how likely the logged policy was to take each action. The first
+      is biased, the second is high variance. The doubly robust combination is accurate when
+      either one is good, and neither has to be right.
+    mechanism: >
+      A reward model extrapolates into actions the logging policy rarely took, so its error is
+      systematic. Inverse-propensity reweighting is unbiased but divides by small probabilities,
+      so its variance explodes exactly where coverage is thin. The doubly robust estimator uses
+      the reward model as a baseline and reweights only its residual, so a good reward model
+      shrinks the variance term and a good propensity model removes the bias term. Getting one
+      right is enough.
+    formal_equations: "V_DR = mean over logged data of [ rhat(x, pi(x)) + (1{a = pi(x)}/phat(a|x)) (r - rhat(x, a)) ]; consistent if either rhat or phat is consistent"
+    assumptions:
+      - "The propensity of each logged action is known or estimable, which a decision trace usually does not record."
+      - "Every action the evaluated policy would take had some chance of being taken by the logging policy, or no reweighting can reach it."
+      - "The context recorded is the context the logging policy actually conditioned on."
+    market_types: [any]
+    relevant_horizons: [days, weeks]
+    required_observables: [decision_log, matured_outcomes]
+    required_data_resolution: "Logged context, action, outcome, and ideally the action probability under the logging policy."
+    expected_empirical_signature: >
+      The doubly robust estimate sitting between the reward-model and reweighted estimates, with
+      variance closer to the former and bias closer to the latter, and its advantage growing where
+      coverage is thin.
+    alternative_explanations:
+      - "The three estimators agree, which means coverage is good and the whole apparatus was unnecessary here."
+    known_failure_modes:
+      - "It needs propensities. An agent trace that records what was done and not how likely it was to be done cannot use this, and recording propensity has to be designed in before the trace is generated rather than recovered after."
+      - "Doubly robust is not doubly safe: if both models are bad it inherits both problems, and nothing in the output says which case you are in."
+      - "Variance still grows with the horizon, so a long agent trajectory remains the hard case regardless of the estimator."
+    source_passage_ids:
+      - "dudik-2011-doubly-robust-policy-evaluation#bias-variance-tradeoff"
+    contradicting_concept_ids: [KC-OFFLINE-SHIFT]
+    supporting_concept_ids: [KC-ANYTIME-ATTRIBUTION]
+    implementation_status: specified
+    confidence: 0.65
+    problem_ids: [PB-AGENT-ATTRIBUTION]
+    tags: [off-policy, doubly-robust, propensity, agentic, read-directly]
+    workstream: dxap_agents

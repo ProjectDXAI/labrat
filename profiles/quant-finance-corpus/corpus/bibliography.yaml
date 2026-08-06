@@ -1,4 +1,4 @@
-updated_at: '2026-08-06T08:27:40.506899+00:00'
+updated_at: '2026-08-06T09:26:30.986328+00:00'
 entries:
 - id: axelsson-2000-base-rate-fallacy
   title: The Base-Rate Fallacy and the Difficulty of Intrusion Detection
@@ -196,6 +196,56 @@ entries:
     of this machinery. Likely CC BY — worth a verify round, and probably downloadable.
 
     '
+- id: fellegi-1969-theory-for-record-linkage
+  title: A Theory for Record Linkage
+  authors:
+  - Ivan P. Fellegi
+  - Alan B. Sunter
+  year: 1969
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Journal of the American Statistical Association 64(328)
+  identifiers:
+    isbn: null
+    doi: 10.1080/01621459.1969.10501049
+    url: https://doi.org/10.1080/01621459.1969.10501049
+  pages: 28
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: lord-1980-item-response-theory
+    relation: cites
+  - target: christen-2012-data-matching
+    relation: cites
+  - target: kay-1998-detection-theory
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - record-linkage
+  - entity-resolution
+  - transfer
+  - counterparty
+  notes: 'The decision-theoretic framework for deciding whether two records are the same entity, with explicit error
+    rates for the two ways of being wrong and a region where the honest answer is to refuse. Our counterparty work
+    assumes one address is one participant; this is the theory for when that assumption can be replaced by an estimate
+    with a stated error rate.
+
+    '
 - id: fine-1999-subdistribution-competing-risk
   title: A Proportional Hazards Model for the Subdistribution of a Competing Risk
   authors:
@@ -261,8 +311,8 @@ entries:
   venue: ACM Computing Surveys 46(4)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1145/2523813
+    url: https://doi.org/10.1145/2523813
   pages: 37
   density: high
   priority: 5
@@ -274,9 +324,43 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
-  units: []
+    state: open_url
+    source_url: http://eprints.bournemouth.ac.uk/22491/1/ACM%20computing%20surveys.pdf
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
+  units:
+  - unit_id: real-vs-virtual-drift
+    topic: the distinction between a changed conditional and a changed input distribution
+    title: null
+    locator: section 1, pp. 1-2
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Real concept drift is a change in the conditional distribution of the target given the
+      inputs, and it can happen while the input distribution stays exactly the same. That separation is the operative
+      one: monitoring the inputs for change will not see it, and every drift detector we run on price or flow features
+      alone is watching the distribution that need not move. They also note the terminology is not settled and the
+      same strategies have been reinvented under different names in different fields.
+
+      '
+  - unit_id: adaptation-and-evaluation
+    topic: adaptation strategies and how adaptive algorithms are evaluated at all
+    title: null
+    locator: survey sections on adaptation and evaluation methodology
+    kind: section
+    pages: 14
+    priority: 4
+    read_status: read
+    concepts_expected: []
+    notes: 'Read the survey structure and its evaluation discussion. The hard part is that a held-out test set does
+      not exist when the world changes underneath the model, so evaluation is prequential: predict, then observe,
+      then update, scoring as you go. That is the same shape as the anytime-valid monitoring the corpus already
+      carries, arrived at from a different direction.
+
+      '
   refs:
   - target: montgomery-2019-statistical-quality-control
     relation: cites
@@ -437,8 +521,8 @@ entries:
   venue: American Journal of Epidemiology 183(8)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1093/aje/kwv254
+    url: https://doi.org/10.1093/aje/kwv254
   pages: 8
   density: high
   priority: 5
@@ -489,8 +573,8 @@ entries:
   venue: Journal of the American Statistical Association 103(482)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1198/016214508000000292
+    url: https://doi.org/10.1198/016214508000000292
   pages: 12
   density: high
   priority: 5
@@ -630,6 +714,61 @@ entries:
   notes: 'The argument for building shared prospective testing infrastructure rather than arguing about retrospective
     claims, and the founding case for CSEP. Four pages, and it is the closest thing anyone has written to a constitution
     for PB-AGENT-ATTRIBUTION.
+
+    '
+- id: meiklejohn-2013-fistful-of-bitcoins
+  title: 'A Fistful of Bitcoins: Characterizing Payments Among Men with No Names'
+  authors:
+  - Sarah Meiklejohn
+  - Marjori Pomarole
+  - Grant Jordan
+  - Kirill Levchenko
+  - Damon McCoy
+  - Geoffrey M. Voelker
+  - Stefan Savage
+  year: 2013
+  bucket: adjacent_disciplines
+  form: proceedings
+  venue: ACM Internet Measurement Conference 2013
+  identifiers:
+    isbn: null
+    doi: 10.1145/2504730.2504747
+    url: https://doi.org/10.1145/2504730.2504747
+  pages: 14
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: fellegi-1969-theory-for-record-linkage
+    relation: cites
+  - target: androulaki-2013-evaluating-user-privacy-bitcoin
+    relation: cites
+  - target: dxai-hyperliquid-ingest
+    relation: builds_on
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - address-clustering
+  - deanonymization
+  - onchain
+  - transfer
+  - counterparty
+  notes: 'The clustering heuristics that turn addresses into participants, and their failure modes. This is the
+    applied half of the entity-resolution import and it is the specific method our counterparty ranking needs before
+    its results mean anything about people rather than keys.
 
     '
 - id: murphy-1973-vector-partition-probability-score
@@ -1250,6 +1389,50 @@ entries:
     two.
 
     '
+- id: androulaki-2013-evaluating-user-privacy-bitcoin
+  title: Evaluating User Privacy in Bitcoin
+  authors:
+  - Elli Androulaki
+  - Ghassan O. Karame
+  - Marc Roeschlin
+  - Tobias Scherer
+  - Srdjan Capkun
+  year: 2013
+  bucket: adjacent_disciplines
+  form: proceedings
+  venue: Financial Cryptography and Data Security 2013
+  identifiers:
+    isbn: null
+    doi: 10.1007/978-3-642-39884-1_4
+    url: https://doi.org/10.1007/978-3-642-39884-1_4
+  pages: 16
+  density: high
+  priority: 4
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: meiklejohn-2013-fistful-of-bitcoins
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - address-clustering
+  - privacy
+  - onchain
+  - transfer
+  notes: null
 - id: bifet-2007-adwin-adaptive-windowing
   title: Learning from Time-Changing Data with Adaptive Windowing
   authors:
@@ -1261,8 +1444,8 @@ entries:
   venue: SIAM International Conference on Data Mining 2007
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1137/1.9781611972771.42
+    url: https://doi.org/10.1137/1.9781611972771.42
   pages: 6
   density: high
   priority: 4
@@ -1388,6 +1571,95 @@ entries:
   - actuarial
   - transfer
   notes: null
+- id: christen-2012-data-matching
+  title: 'Data Matching: Concepts and Techniques for Record Linkage, Entity Resolution, and Duplicate Detection'
+  authors:
+  - Peter Christen
+  year: 2012
+  bucket: adjacent_disciplines
+  form: textbook
+  venue: Springer
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 270
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: fellegi-1969-theory-for-record-linkage
+    relation: builds_on
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - entity-resolution
+  - blocking
+  - evaluation
+  - transfer
+  - counterparty
+  notes: 'Includes the evaluation problem, which is the hard part: measuring linkage quality without ground truth
+    on who is who.'
+- id: dean-2013-tail-at-scale
+  title: The Tail at Scale
+  authors:
+  - Jeffrey Dean
+  - Luiz André Barroso
+  year: 2013
+  bucket: adjacent_disciplines
+  form: paper
+  venue: Communications of the ACM 56(2)
+  identifiers:
+    isbn: null
+    doi: 10.1145/2408776.2408794
+    url: https://doi.org/10.1145/2408776.2408794
+  pages: 7
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: kleinrock-1975-queueing-systems-vol1
+    relation: cites
+  - target: harrison-1985-brownian-motion-stochastic-flow
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - tail-latency
+  - variability
+  - transfer
+  - agentic
+  notes: 'In a system of many components the tail dominates: if a request touches a hundred services, the 99th percentile
+    of each becomes the median of the whole. An agent turn that fans out to several tools has the same arithmetic,
+    and a latency budget expressed as a mean is measuring the wrong thing.
+
+    '
 - id: funk-2019-assessing-realtime-forecasts
   title: 'Assessing the Performance of Real-Time Epidemic Forecasts: A Case Study of Ebola in the Western Area Region
     of Sierra Leone'
@@ -2435,7 +2707,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0041010&type=printable
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -2503,7 +2775,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/adap-org/9912001
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -2559,9 +2831,9 @@ entries:
     notes: null
   acquisition:
     state: open_url
-    source_url: https://arxiv.org/pdf/adap-org/9812005
-    obtained_at: '2026-08-05'
-    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+    source_url: https://academic.oup.com/icc/article-pdf/11/5/895/2326660/1100895.pdf
+    obtained_at: '2026-08-06'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
   - unit_id: capacity-and-diversity
@@ -2627,7 +2899,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/cond-mat/0208597
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -2722,7 +2994,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://www.annalsofgeophysics.eu/index.php/annals/article/download/5350/5371
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -2831,7 +3103,7 @@ entries:
   acquisition:
     state: open_url
     source_url: http://eprints.lse.ac.uk/704/1/List_Econ%26Phil_18%281%29.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -3040,7 +3312,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://www.jstage.jst.go.jp/article/jpe1952/43/1/43_1_1/_pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -4444,8 +4716,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/2106.00667
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units:
   - unit_id: aggregation-and-staleness
     topic: how a price reaches the chain, and the freshness cost of the defences against manipulation
@@ -4565,6 +4840,55 @@ entries:
   - defi
   notes: 'The pricing theory of a contract with no expiry, where the funding rate does the work maturity does elsewhere.
     Every position we hold on Hyperliquid is one of these and the corpus had no account of what determines its basis.
+
+    '
+- id: makarov-2020-trading-arbitrage-cryptocurrency-markets
+  title: Trading and Arbitrage in Cryptocurrency Markets
+  authors:
+  - Igor Makarov
+  - Antoinette Schoar
+  year: 2020
+  bucket: defi_mechanics
+  form: paper
+  venue: Journal of Financial Economics 135(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 27
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: barbon-2021-quality-of-cryptocurrency-markets
+    relation: cites
+  - target: engle-1987-cointegration-error-correction
+    relation: cites
+  - target: he-2022-fundamentals-perpetual-futures
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - cross-exchange
+  - arbitrage
+  - segmentation
+  - cross-market
+  notes: 'Large and persistent price differences across exchanges and across countries, with the size of the gap
+    explained by capital controls and transfer frictions rather than by inattention. The empirical baseline any
+    cross-venue consistency claim we make has to beat.
 
     '
 - id: qin-2021-empirical-study-defi-liquidations
@@ -4693,6 +5017,49 @@ entries:
     hierarchy is protecting a maker from, and the lower bound on what a proposer is being paid to reorder.
 
     '
+- id: aave-protocol-docs
+  title: Aave Protocol Documentation
+  authors:
+  - Aave
+  year: 2026
+  bucket: defi_mechanics
+  form: api_doc
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 150
+  density: medium
+  priority: 4
+  rights:
+    status: public_but_restricted
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: qin-2021-empirical-study-defi-liquidations
+    relation: builds_on
+  - target: compound-protocol-docs
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - lending
+  - liquidation
+  - parameters
+  - defi
+  notes: 'The live parameter set behind the fixed-spread liquidation design: close factor, bonus, and how governance
+    changes them.'
 - id: aoyagi-2021-coexisting-exchange-platforms
   title: 'Coexisting Exchange Platforms: Limit Order Books and Automated Market Makers'
   authors:
@@ -4788,6 +5155,96 @@ entries:
   - defi
   notes: Measures spread, depth and price discovery across venue types with the standard microstructure toolkit,
     which is the comparison our own data can extend.
+- id: chainlink-docs
+  title: Chainlink Price Feeds Documentation
+  authors:
+  - Chainlink Labs
+  year: 2026
+  bucket: defi_mechanics
+  form: api_doc
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 100
+  density: medium
+  priority: 4
+  rights:
+    status: public_but_restricted
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: eskandari-2021-sok-oracles
+    relation: builds_on
+  - target: angeris-2020-improved-price-oracles-cfmm
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - oracle
+  - aggregation
+  - heartbeat
+  - deviation-threshold
+  - defi
+  notes: 'Publishes the heartbeat and deviation threshold per feed, which is exactly the configuration KC-ORACLE-LAG
+    says a measured lag is only valid under. Without it the lag is unattributable.
+
+    '
+- id: cong-2019-blockchain-disruption-smart-contracts
+  title: Blockchain Disruption and Smart Contracts
+  authors:
+  - Lin William Cong
+  - Zhiguo He
+  year: 2019
+  bucket: defi_mechanics
+  form: paper
+  venue: The Review of Financial Studies 32(5)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 44
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: werner-2022-sok-decentralized-finance
+    relation: cites
+  - target: laffont-2002-theory-of-incentives
+    relation: builds_on
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - smart-contracts
+  - information
+  - consensus
+  - defi
+  notes: 'The trade-off a public ledger creates: contractibility improves and so does the ability to collude on
+    what everyone can see.'
 - id: gudgeon-2020-decentralized-financial-crisis
   title: The Decentralized Financial Crisis
   authors:
@@ -4815,8 +5272,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/2002.08099
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: qin-2021-empirical-study-defi-liquidations
@@ -5003,8 +5463,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://dl.acm.org/doi/pdf/10.1145/3558535.3559780
+    obtained_at: '2026-08-06'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: adams-2021-uniswap-v3-core
@@ -5098,7 +5561,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/2107.12484
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -5122,6 +5585,87 @@ entries:
     per leg.
 
     '
+- id: compound-protocol-docs
+  title: Compound Protocol Documentation
+  authors:
+  - Compound Labs
+  year: 2026
+  bucket: defi_mechanics
+  form: api_doc
+  venue: null
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 120
+  density: medium
+  priority: 3
+  rights:
+    status: public_but_restricted
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: qin-2021-empirical-study-defi-liquidations
+    relation: builds_on
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - lending
+  - liquidation
+  - interest-rate-model
+  - defi
+  notes: null
+- id: harvey-2021-defi-future-of-finance
+  title: DeFi and the Future of Finance
+  authors:
+  - Campbell R. Harvey
+  - Ashwin Ramachandran
+  - Joey Santoro
+  year: 2021
+  bucket: defi_mechanics
+  form: monograph
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: 10.2139/ssrn.3711777
+    url: https://doi.org/10.2139/ssrn.3711777
+  pages: 200
+  density: medium
+  priority: 3
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: werner-2022-sok-decentralized-finance
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - defi
+  - overview
+  - primitives
+  notes: null
 - id: milionis-2022-loss-versus-rebalancing
   title: Automated Market Making and Loss-Versus-Rebalancing
   authors:
@@ -6025,7 +6569,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://iopscience.iop.org/article/10.1088/0034-4885/75/12/126001/pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -6714,6 +7258,99 @@ entries:
   - auctions
   - revenue-equivalence
   notes: null
+- id: loughran-2011-when-is-a-liability-not-a-liability
+  title: When Is a Liability Not a Liability? Textual Analysis, Dictionaries, and 10-Ks
+  authors:
+  - Tim Loughran
+  - Bill McDonald
+  year: 2011
+  bucket: economics_information
+  form: paper
+  venue: The Journal of Finance 66(1)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 31
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: tetlock-2007-giving-content-investor-sentiment
+    relation: builds_on
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - text
+  - dictionaries
+  - domain-adaptation
+  notes: 'A general-purpose sentiment dictionary misclassifies a large share of finance words, so a text signal
+    built on one is measuring something other than what it claims. The direct warning for any language model reading
+    market text without a domain check.
+
+    '
+- id: mailath-2006-repeated-games-reputations
+  title: 'Repeated Games and Reputations: Long-Run Relationships'
+  authors:
+  - George J. Mailath
+  - Larry Samuelson
+  year: 2006
+  bucket: economics_information
+  form: textbook
+  venue: Oxford University Press
+  identifiers:
+    isbn: null
+    doi: 10.1093/acprof:oso/9780195300796.001.0001
+    url: https://doi.org/10.1093/acprof:oso/9780195300796.001.0001
+  pages: 630
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: fudenberg-1991-game-theory
+    relation: builds_on
+  - target: laffont-2002-theory-of-incentives
+    relation: cites
+  - target: farmer-2002-market-force-ecology-evolution
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - repeated-games
+  - reputation
+  - equilibrium
+  - counterparty
+  notes: 'Behaviour that is irrational once is rational when the same counterparties meet repeatedly, and reputation
+    is the mechanism. Our counterparty ranking assumes participants keep behaving as they did; this is the theory
+    of when that holds and when acting on the ranking destroys it.
+
+    '
 - id: manski-2006-interpreting-prediction-markets
   title: Interpreting the Predictions of Prediction Markets
   authors:
@@ -6879,6 +7516,49 @@ entries:
   - game-theory
   - high-value-target
   notes: null
+- id: tetlock-2007-giving-content-investor-sentiment
+  title: 'Giving Content to Investor Sentiment: The Role of Media in the Stock Market'
+  authors:
+  - Paul C. Tetlock
+  year: 2007
+  bucket: economics_information
+  form: paper
+  venue: The Journal of Finance 62(3)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 30
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: loughran-2011-when-is-a-liability-not-a-liability
+    relation: cites
+  - target: brunnermeier-2001-asset-pricing-asymmetric-information
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - text
+  - sentiment
+  - media
+  - absorption
+  notes: The reference result that media content predicts returns and reverses, which is the absorption question
+    with a text source rather than a price one.
 - id: wolfers-2004-prediction-markets
   title: Prediction Markets
   authors:
@@ -8494,6 +9174,55 @@ entries:
   - tails
   - liquidation-relevant
   notes: null
+- id: huber-2009-robust-statistics
+  title: Robust Statistics
+  authors:
+  - Peter J. Huber
+  - Elvezio M. Ronchetti
+  year: 2009
+  bucket: high_dim_statistics
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: 10.1002/9780470434697
+    url: https://doi.org/10.1002/9780470434697
+  pages: 350
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: maronna-2006-robust-statistics-theory-methods
+    relation: cites
+  - target: embrechts-1997-modelling-extremal-events
+    relation: cites
+  - target: vandervaart-1998-asymptotic-statistics
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - robust
+  - breakdown-point
+  - influence-function
+  - heavy-tails
+  notes: 'The influence function says how much one observation can move an estimate, and the breakdown point says
+    what fraction of contamination it survives. Both are the right diagnostics for estimators run on heavy-tailed
+    order-flow data, and neither appears anywhere in this corpus.
+
+    '
 - id: potters-2020-first-course-random-matrix-theory
   title: A First Course in Random Matrix Theory for Physicists, Engineers and Data Scientists
   authors:
@@ -8726,6 +9455,50 @@ entries:
   - statistical-learning
   - orientation
   - high-value-target
+  notes: null
+- id: maronna-2006-robust-statistics-theory-methods
+  title: 'Robust Statistics: Theory and Methods'
+  authors:
+  - Ricardo A. Maronna
+  - R. Douglas Martin
+  - Victor J. Yohai
+  year: 2006
+  bucket: high_dim_statistics
+  form: textbook
+  venue: Wiley
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 400
+  density: high
+  priority: 4
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: huber-2009-robust-statistics
+    relation: builds_on
+  - target: ledoit-2004-well-conditioned-covariance
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - robust
+  - m-estimators
+  - regression
+  - heavy-tails
   notes: null
 - id: bai-2010-spectral-analysis-random-matrices
   title: Spectral Analysis of Large Dimensional Random Matrices
@@ -9076,7 +9849,23 @@ entries:
   acquisition:
     state: open_url
     copy_path: null
-  units: []
+  units:
+  - unit_id: bias-variance-tradeoff
+    topic: why reward models and propensity models each fail, and what doubly robust buys
+    title: null
+    locator: abstract and section 1
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: read
+    concepts_expected: []
+    notes: 'Read directly. Evaluating a new policy on logged contexts, actions and rewards fails two ways: a model
+      of rewards carries large bias, a model of the past policy carries large variance. The doubly robust estimator
+      is accurate when EITHER model is good, and neither has to be consistent. That is the practical answer to the
+      coverage problem, and it makes explicit what an offline estimate needs that a trace usually lacks: the propensity
+      of each action under the policy that logged it.
+
+      '
   refs:
   - target: swaminathan-2015-counterfactual-risk-minimization
     relation: cites
@@ -9855,7 +10644,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://www.aeaweb.org/articles/pdf/doi/10.1257/jep.31.2.3
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -9945,7 +10734,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://projecteuclid.org/journals/annals-of-statistics/volume-49/issue-2/Time-uniform-nonparametric-nonasymptotic-confidence-sequences/10.1214/20-AOS1991.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units:
@@ -10552,7 +11341,7 @@ entries:
     isbn: null
     doi: 10.48550/arXiv.2005.01643
     url: https://doi.org/10.48550/arXiv.2005.01643
-  pages: 43
+  pages: 90
   density: high
   priority: 5
   rights:
@@ -11082,7 +11871,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/1610.09904
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -11211,7 +12000,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/1808.03668
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -12285,8 +13074,8 @@ entries:
   venue: Physical Review X 1(2)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.48550/arXiv.1105.1694
+    url: https://doi.org/10.48550/arXiv.1105.1694
   pages: 12
   density: high
   priority: 5
@@ -12298,8 +13087,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/1105.1694
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units:
   - unit_id: latent-book-argument
     topic: the V-shaped latent order book and why it forces square-root impact
@@ -13078,7 +13870,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://arxiv.org/pdf/1105.3115
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -13202,8 +13994,11 @@ entries:
     grant: null
     notes: Publisher landing page read in full; it states no open licence. Readable and citable, not ingestable.
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://arxiv.org/pdf/1003.3796
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: cont-2010-stochastic-model-order-book
@@ -14215,8 +15010,8 @@ entries:
   venue: Systems and Control Letters 14(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1016/0167-6911(90)90082-6
+    url: https://doi.org/10.1016/0167-6911(90)90082-6
   pages: 6
   density: high
   priority: 4
@@ -14565,7 +15360,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://projecteuclid.org/journals/annals-of-applied-probability/volume-25/issue-2/Limit-theorems-for-nearly-unstable-Hawkes-processes/10.1214/14-AAP1005.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -15301,7 +16096,7 @@ entries:
     download_index: https://rail.eecs.berkeley.edu/deeprlcourse/
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
     source_url: https://rail.eecs.berkeley.edu/deeprlcourse/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
   units: []
   refs:
   - target: sutton-2018-reinforcement-learning
@@ -15342,7 +16137,7 @@ entries:
     state: open_url
     download_index: https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/download/
     source_url: https://ocw.mit.edu/courses/15-450-analytics-of-finance-fall-2010/download/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
@@ -15384,7 +16179,7 @@ entries:
     state: open_url
     download_index: https://ocw.mit.edu/courses/18-657-mathematics-of-machine-learning-fall-2015/download/
     source_url: https://ocw.mit.edu/courses/18-657-mathematics-of-machine-learning-fall-2015/download/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs:
@@ -15429,7 +16224,7 @@ entries:
     state: open_url
     download_index: https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/download/
     source_url: https://ocw.mit.edu/courses/18-s096-topics-in-mathematics-with-applications-in-finance-fall-2013/download/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
@@ -15469,7 +16264,7 @@ entries:
     state: open_url
     download_index: https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/download/
     source_url: https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/download/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs:
@@ -15513,7 +16308,7 @@ entries:
     state: open_url
     download_index: https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/download/
     source_url: https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/download/
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
   units: []
   refs: []
@@ -15552,7 +16347,7 @@ entries:
   acquisition:
     state: open_url
     source_url: https://www.cambridge.org/core/services/aop-cambridge-core/content/view/2A0AA623C1D1A7A3CDADA75CC376644D/9781316779309c1_p1-10_CBO.pdf/introduction_and_examples.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -15599,7 +16394,7 @@ entries:
     download_index: https://web.stanford.edu/class/ee364a/lectures.html
     note: Study copies of the notes the course serves publicly. Rights tag unchanged.
     source_url: https://web.stanford.edu/class/ee364a/lectures.html
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
   units: []
   refs:
   - target: boyd-2004-convex-optimization
@@ -15999,7 +16794,7 @@ entries:
   acquisition:
     state: open_url
     source_url: http://www.gbv.de/dms/hbz/toc/ht004490488.PDF
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -16450,8 +17245,8 @@ entries:
   venue: Princeton University Press
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.23943/princeton/9780691153896.001.0001
+    url: https://doi.org/10.23943/princeton/9780691153896.001.0001
   pages: 230
   density: high
   priority: 3
@@ -16893,6 +17688,151 @@ entries:
   - excluded
   - policy-example
   notes: null
+- id: andersen-2003-modeling-forecasting-realized-volatility
+  title: Modeling and Forecasting Realized Volatility
+  authors:
+  - Torben G. Andersen
+  - Tim Bollerslev
+  - Francis X. Diebold
+  - Paul Labys
+  year: 2003
+  bucket: quant_finance_core
+  form: paper
+  venue: Econometrica 71(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 47
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: aitsahalia-2014-high-frequency-econometrics
+    relation: cites
+  - target: zhang-2005-tale-of-two-time-scales
+    relation: cites
+  - target: barndorffnielsen-2002-econometric-analysis-realized-volatility
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - realized-volatility
+  - high-frequency
+  - forecasting
+  notes: 'Volatility measured from high-frequency returns rather than inferred from a model, which turns a latent
+    state into an observable. Every volatility input our cards ask for is one of these and the corpus never said
+    which estimator or at what sampling frequency.
+
+    '
+- id: corsi-2009-har-realized-volatility
+  title: A Simple Approximate Long-Memory Model of Realized Volatility
+  authors:
+  - Fulvio Corsi
+  year: 2009
+  bucket: quant_finance_core
+  form: paper
+  venue: Journal of Financial Econometrics 7(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 23
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: andersen-2003-modeling-forecasting-realized-volatility
+    relation: builds_on
+  - target: gatheral-2018-volatility-is-rough
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - har
+  - realized-volatility
+  - long-memory
+  - forecasting
+  notes: 'Three regressors at daily, weekly and monthly horizons reproduce the long memory of volatility without
+    a long-memory model. It is the benchmark any volatility forecast has to beat, and it is cheap enough that there
+    is no excuse for not running it as the control.
+
+    '
+- id: engle-1987-cointegration-error-correction
+  title: 'Co-integration and Error Correction: Representation, Estimation, and Testing'
+  authors:
+  - Robert F. Engle
+  - C. W. J. Granger
+  year: 1987
+  bucket: quant_finance_core
+  form: paper
+  venue: Econometrica 55(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 26
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: hamilton-1994-time-series-analysis
+    relation: cites
+  - target: johansen-1991-cointegration-vectors
+    relation: cites
+  - target: tsay-2010-analysis-financial-time-series
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - cointegration
+  - error-correction
+  - relative-value
+  - cross-market
+  notes: 'Two series can each wander without bound and still be tied together, and the error-correction representation
+    says how the gap feeds back into both. That is the formal content of every cross-venue relative-value claim
+    we make, and the corpus had none of it.
+
+    '
 - id: fernholz-stochastic-portfolio-theory
   title: Stochastic Portfolio Theory
   authors:
@@ -17099,6 +18039,51 @@ entries:
   - state-space
   - regime-switching
   notes: null
+- id: johansen-1991-cointegration-vectors
+  title: Estimation and Hypothesis Testing of Cointegration Vectors in Gaussian Vector Autoregressive Models
+  authors:
+  - Søren Johansen
+  year: 1991
+  bucket: quant_finance_core
+  form: paper
+  venue: Econometrica 59(6)
+  identifiers:
+    isbn: null
+    doi: 10.2307/2938278
+    url: https://doi.org/10.2307/2938278
+  pages: 30
+  density: high
+  priority: 5
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: engle-1987-cointegration-error-correction
+    relation: builds_on
+  - target: hamilton-1994-time-series-analysis
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - cointegration
+  - rank-test
+  - multivariate
+  - cross-market
+  notes: 'The multivariate version, which matters because an event tree or a venue set has more than two legs and
+    the number of independent relationships is itself the thing to estimate.
+
+    '
 - id: shreve-2004-stochastic-calculus-finance-ii
   title: 'Stochastic Calculus for Finance II: Continuous-Time Models'
   authors:
@@ -17137,6 +18122,48 @@ entries:
   - stochastic-calculus
   - martingales
   - foundations
+  notes: null
+- id: barndorffnielsen-2002-econometric-analysis-realized-volatility
+  title: Econometric Analysis of Realized Volatility and its Use in Estimating Stochastic Volatility Models
+  authors:
+  - Ole E. Barndorff-Nielsen
+  - Neil Shephard
+  year: 2002
+  bucket: quant_finance_core
+  form: paper
+  venue: Journal of the Royal Statistical Society Series B 64(2)
+  identifiers:
+    isbn: null
+    doi: null
+    url: null
+  pages: 28
+  density: high
+  priority: 4
+  rights:
+    status: subscription_required
+    confidence: inferred
+    evidence: null
+    checked_at: null
+    grant: null
+    notes: null
+  acquisition:
+    state: not_acquired
+    copy_path: null
+  units: []
+  refs:
+  - target: jacod-2003-limit-theorems-stochastic-processes
+    relation: builds_on
+  - target: andersen-2003-modeling-forecasting-realized-volatility
+    relation: cites
+  discovered:
+    round: 15
+    method: seed
+    source: null
+  status: candidate
+  tags:
+  - realized-volatility
+  - quadratic-variation
+  - inference
   notes: null
 - id: bayer-2016-pricing-under-rough-volatility
   title: Pricing Under Rough Volatility
@@ -17309,8 +18336,8 @@ entries:
   venue: Mathematical Finance 29(1)
   identifiers:
     isbn: null
-    doi: null
-    url: null
+    doi: 10.1111/mafi.12173
+    url: https://doi.org/10.1111/mafi.12173
   pages: 29
   density: high
   priority: 4
@@ -17322,8 +18349,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
-    copy_path: null
+    state: open_url
+    source_url: https://onlinelibrary.wiley.com/doi/pdfdirect/10.1111/mafi.12173
+    obtained_at: '2026-08-06'
+    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs:
   - target: gatheral-2018-volatility-is-rough
@@ -17713,7 +18743,7 @@ entries:
   acquisition:
     state: open_url
     source_url: http://www.gbv.de/dms/bowker/toc/9781482244069.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -17752,7 +18782,7 @@ entries:
   acquisition:
     state: open_url
     source_url: http://digitale-objekte.hbz-nrw.de/storage2/2020/03/03/file_8/8833083.pdf
-    obtained_at: '2026-08-05'
+    obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is a reading
       copy, not a corpus grant.
   units: []
@@ -19140,8 +20170,11 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: purchasable
-    copy_path: null
+    state: open_url
+    source_url: https://infoscience.epfl.ch/bitstreams/948773f6-0b87-468c-9f48-24becb2035bc/download
+    obtained_at: '2026-08-06'
+    note: Study copy from the repository copy the publisher serves free. Rights tag unchanged; this is a reading
+      copy, not a corpus grant.
   units: []
   refs: []
   discovered:
