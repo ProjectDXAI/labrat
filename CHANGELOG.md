@@ -72,6 +72,17 @@
   documentation site can be a first-class source instead of something printed to PDF.
 - `make web` / `make web-data` and the corpus explorer under `web/`, documented in
   `docs/EXPLORER.md`.
+- `scripts/export_review.py` and `make review`: renders `structural_findings.yaml` as one
+  self-contained HTML page — filterable by status, domain and text, with the recurring shapes as
+  their own section. No build step and no network, so it can be opened from disk or published. The
+  YAML stays the source of truth.
+- `docs/WANTED.md`: a scouting brief for a human with access this environment does not have. Names
+  the three unreachable local paths and the single documentation question that blocks the most work
+  (whether resting Hyperliquid orders carry a persistent public owner), the hunting patterns worth
+  grabbing on sight, and six ranked bets on where unexpected value is — the strongest being that
+  epidemiology has already named and corrected the R_0 estimation bias that
+  `FIND-CRITICAL-SYSTEMS-LOOK-SUBCRITICAL` records as a finance result, which if true may dissolve
+  the corpus's one open tension.
 
 ### Changed
 

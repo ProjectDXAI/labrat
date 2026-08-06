@@ -1,4 +1,4 @@
-.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map
+.PHONY: install install-nlp-sentiment smoke smoke-transformer smoke-corpus smoke-knowledge clean-smoke clean-smoke-corpus clean-smoke-knowledge test help web web-data acquire map review
 
 PYTHON ?= python
 PROFILE ?= transformer-arch
@@ -20,6 +20,7 @@ help:
 	@echo "  make web                      export, then run the explorer at localhost:3000"
 	@echo "  make acquire [LAB=dir]        rank what to acquire against what the store cannot support"
 	@echo "  make map [LAB=dir]            write MAP.md and the flat CSVs an agent can browse"
+	@echo "  make review [OUT=file]        render the structural findings as one self-contained page"
 
 install:
 	@$(PYTHON) -m pip install -e .
@@ -220,6 +221,7 @@ smoke: clean-smoke
 	@echo "    (lab left at $(SMOKE_LAB)/ for inspection; run 'make clean-smoke' to remove)"
 
 LAB ?= corpus-lab
+OUT ?= review.html
 
 web-data:
 	@test -f $(LAB)/corpus/bibliography.yaml || (echo "ERROR: no corpus at $(LAB). Scaffold one: python scripts/new_lab.py $(LAB) --profile=quant-finance-corpus --profile=dxap-knowledge" && exit 1)
@@ -235,3 +237,6 @@ acquire:
 
 map:
 	@$(PYTHON) scripts/atlas.py --lab $(LAB) --out $(LAB)/map
+
+review:
+	@$(PYTHON) scripts/export_review.py --out $(OUT)
