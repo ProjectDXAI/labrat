@@ -4,6 +4,12 @@
 
 ### Added
 
+- `fetch_rendered.py` and `make render` fetch documentation that only exists after
+  JavaScript runs, via headless Chromium. Binance's futures FAQ returns zero characters to
+  a scripted GET and about 23,000 through a browser. Scope is public documentation only:
+  publishers answering 403 are refusing scripted access to copyrighted material, and that
+  refusal is respected rather than routed around.
+
 - `status.py` prints one screen of where the corpus stands, ordered by what is actionable
   rather than by what is large: blocked chains first, then compilation, then grounding,
   then the backlog. It separates "free with a URL" from "believed free with no URL

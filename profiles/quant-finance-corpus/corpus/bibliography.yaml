@@ -24033,7 +24033,67 @@ entries:
     source_url: https://www.binance.com/en/futures/trading-rules/perpetual
     obtained_at: null
     note: null
-  units: []
+  units:
+  - unit_id: auto-deleveraging
+    title: null
+    topic: 'Binance Futures documentation: auto deleveraging'
+    locator: file:auto-deleveraging.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: funding-rates
+    title: null
+    topic: 'Binance Futures documentation: funding rates'
+    locator: file:funding-rates.md
+    kind: section
+    pages: 7
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: insurance-fund
+    title: null
+    topic: 'Binance Futures documentation: insurance fund'
+    locator: file:insurance-fund.md
+    kind: section
+    pages: 4
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: leverage-and-margin
+    title: null
+    topic: 'Binance Futures documentation: leverage and margin'
+    locator: file:leverage-and-margin.md
+    kind: section
+    pages: 3
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: liquidation-protocols
+    title: null
+    topic: 'Binance Futures documentation: liquidation protocols'
+    locator: file:liquidation-protocols.md
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  - unit_id: mark-price
+    title: null
+    topic: 'Binance Futures documentation: mark price'
+    locator: file:mark-price.md
+    kind: section
+    pages: 5
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0

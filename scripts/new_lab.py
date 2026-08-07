@@ -129,6 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         "promote_units.py",
         "ingest_manifest.py",
         "fetch_sources.py",
+        "fetch_rendered.py",
         "label_units.py",
         "status.py",
         "add_library.py",
