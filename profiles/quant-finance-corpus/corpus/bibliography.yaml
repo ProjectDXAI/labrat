@@ -24767,16 +24767,35 @@ entries:
   units:
   - unit_id: whole-paper
     title: null
-    topic: We present a careful analysis of possible issues on the application of the self-excited Hawkes
-      process to high-frequency financial data.
+    topic: what biases the Hawkes branching ratio, and why a value near one is not evidence of criticality
     locator: the whole paper
     kind: section
     pages: 40
     priority: 5
-    read_status: unread
+    read_status: read
     concepts_expected: []
-    notes: null
-  refs: []
+    notes: 'Read directly, and it refutes the anchor this corpus was using. The paper is a systematic
+      audit of what biases the Hawkes branching ratio n, and the headline demonstration is that the estimator
+      returns criticality on data that has none. Independent Poisson processes, one per trading day, with
+      intensity taken from real E-mini data: true n is zero by construction, and Hawkes calibration reports
+      n-hat hovering around 1 across almost the whole 1998-2012 window. Dropping the low-activity rollover
+      days leaves it above 0.8, and close to 1 after 2007. Worse, residual analysis does not reject the
+      null: the standard goodness-of-fit test cannot tell a regime-switching Poisson process from a Hawkes
+      process at criticality. So a good-looking fit is not evidence. Nor is it kernel-specific -- any
+      kernel, including a short-memory exponential, picks up the bias under non-stationarity. Three more
+      biases, each large enough to matter alone. Outliers: with a power-law kernel and true n = 0.7, one
+      percent of inter-quote duration outliers pushes n-hat to about 0.98, and at a heavier outlier scale
+      0.17 percent is enough to reach or exceed criticality. Kernel misspecification: fitting a short-memory
+      kernel to long-memory data gives n-hat minus n above 0.2 for any n above 0.3. And the likelihood
+      surface has several minima along flat valleys: on the same E-mini series the global minimum gives
+      n-hat = 0.075 and a badly-started local minimum gives n-hat = 1.105. Same data, same model, and
+      the conclusion flips from almost no endogeneity to supercritical on the optimiser''s starting point.
+      The authors name Hardiman, Bercot and Bouchaud (2013) as the claim that cannot be supported, which
+      is precisely the source KC-HAWKES-CRITICALITY rests on. A branching ratio near one is now evidence
+      of nothing until outliers, intraday seasonality, overnight gaps, timestamp packetisation, kernel
+      form and optimiser start have all been ruled out.'
+  refs:
+  - hardiman-2013-critical-reflexivity:refutes
   discovered:
     round: 0
     method: acquisition_manifest
@@ -24871,15 +24890,26 @@ entries:
   units:
   - unit_id: whole-paper
     title: null
-    topic: We present a exactly soluble model for financial time series that mimics the long range volatility
-      correlations known to be present in financial data.
+    topic: a monofractal process that produces apparent multiscaling over realistic finite ranges
     locator: the whole paper
     kind: whole
     pages: 9
     priority: 5
-    read_status: unread
+    read_status: read
     concepts_expected: []
-    notes: null
+    notes: 'Read directly. Short and it does one thing: builds an exactly soluble model that is monofractal
+      by construction, with the long-range volatility correlations real markets show, and demonstrates
+      that it nevertheless produces apparent multiscaling. The mechanism is a slow crossover on finite
+      time scales, giving a systematic negative correction to the scaling exponent that can be fitted
+      over many decades with an effective exponent obeying m_q proportional to N to the zeta-tilde-q,
+      with zeta-tilde-q not equal to q times zeta. So a measured multifractal spectrum is not evidence
+      of a multiplicative cascade. The authors'' own conclusion is that it may be hard to distinguish
+      apparent from true multifractal behaviour in financial data at all, and that crossover effects should
+      be checked before any asymptotic claim. The transferable rule is narrow and firm: any scaling exponent
+      estimated on a market series has to be tested against a long-memory monofractal null before it can
+      be read as structure. This is the same failure shape as the Hawkes branching ratio, where a regime-switching
+      Poisson null reproduces apparent criticality. In both cases the statistic is real, the estimator
+      is fine, and the null model was never run.'
   refs: []
   discovered:
     round: 0
@@ -25189,15 +25219,29 @@ entries:
   units:
   - unit_id: whole-paper
     title: null
-    topic: Market making refers to a form of trading in financial markets characterized by passive orders
-      which add liquidity to limit order books.
+    topic: 'why a passive fill is not free: fills coincide with the adverse move, at about half a tick'
     locator: the whole paper
     kind: section
     pages: 28
     priority: 5
-    read_status: unread
+    read_status: read
     concepts_expected: []
-    notes: null
+    notes: 'Read directly. The claim is that a passive fill is not the free execution that market making
+      models assume, because fills are caused by and coincide with the adverse move. The theoretical part
+      is a discrete three-state model (up, flat, down by one tick) in which the drift conditional on a
+      fill is proved always negative. The empirical part is 10-Year US Treasury futures, TY, with a naive
+      passive strategy. The number is the point. Mean drift over the 100 events following a fill is about
+      -0.0065, against a tick size of 1/64 = 0.015625, so half a tick is 0.0078125. The adverse drift
+      a passive fill suffers is therefore very close to the half-tick slippage a market order pays to
+      cross. The control sample shows almost no directional drift, and the sign always opposes the order
+      direction. About a third of orders never filled at all. So the standard reasoning that a limit order
+      avoids the crossing cost is wrong in a way that matters for the cost floor: passive execution does
+      not remove the half-tick, it converts it into adverse selection of roughly equal size, and adds
+      fill uncertainty on top. A cost model that books passive fills at mid is overstating edge by about
+      half a tick per round trip. Scope: one instrument, one naive strategy, and a model whose price moves
+      are exactly one tick. Whether the near-equality of adverse drift and half-spread holds anywhere
+      else is untested here, and the equality is what makes the result interesting, so it is the thing
+      to check before relying on it.'
   refs: []
   discovered:
     round: 0
