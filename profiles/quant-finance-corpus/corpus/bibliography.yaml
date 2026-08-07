@@ -15600,7 +15600,7 @@ entries:
   form: textbook
   venue: Springer
   identifiers:
-    isbn: null
+    isbn: '9783642033100'
     doi: 10.1007/978-1-4612-5320-4
     url: https://doi.org/10.1007/978-1-4612-5320-4
   pages: 400
@@ -15614,8 +15614,9 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: not_acquired
+    state: purchasable
     copy_path: null
+    source_url: https://link.springer.com/book/10.1007/978-3-642-03311-7
   units: []
   refs:
   - target: boucheron-2013-concentration-inequalities
@@ -20079,13 +20080,12 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/bjork-2019-arbitrage-theory.pdf
     source_url: http://digitale-objekte.hbz-nrw.de/storage2/2020/03/03/file_8/8833083.pdf
     obtained_at: '2026-08-06'
-    note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
-      a reading copy, not a corpus grant. Symlinked into a local library folder this process can no longer
-      read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21753,12 +21753,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/wilmott-2006-paul-wilmott-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21796,12 +21796,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/fabozzi-2004-mathematics-financial-modeling.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21837,12 +21837,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/blyth-2014-introduction-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21878,12 +21878,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/brandimarte-2006-numerical-methods-finance-economics.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21922,12 +21922,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/kabanov-2006-stochastic-calculus-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -21963,12 +21963,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/lyuu-2002-financial-engineering-computation.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22005,12 +22005,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/shaw-1998-modelling-financial-derivatives-mathematica.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units:
   - unit_id: whole-paper
     title: null
@@ -22056,12 +22056,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/seydel-2012-computational-finance-numerical-methods.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22100,12 +22100,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/hardle-2002-applied-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22142,12 +22142,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/fries-2007-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22184,12 +22184,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/elliott-2005-mathematics-financial-markets.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22229,12 +22229,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/rachev-2008-bayesian-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22272,12 +22272,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/capinski-2011-mathematics-for-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22314,12 +22314,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/vanderhoek-2006-binomial-models-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22358,12 +22358,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/cherubini-2004-copula-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22400,12 +22400,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/bartholomewbiggs-2008-nonlinear-optimization-financial.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22442,12 +22442,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/javaheri-2005-inside-volatility-arbitrage.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22484,12 +22484,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/mcnelis-2005-neural-networks-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22524,12 +22524,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/anon-financial-mathematics-lecture-notes.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22565,12 +22565,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/chen-2008-financial-econometrics-derivatives-pricing.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22607,12 +22607,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/tsang-2003-optimal-control-models-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22648,12 +22648,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/voit-2005-quantitative-finance-for-physicists.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22690,12 +22690,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/harrison-2011-mathematical-economics-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22731,12 +22731,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/kolokoltsov-basics-financial-mathematics.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22772,12 +22772,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/forsyth-2008-computational-finance-without-agonizing-pain.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units:
   - unit_id: whole-paper
     title: null
@@ -22824,12 +22824,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/neftci-2000-financial-derivatives-solution-manual.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present. Symlinked into a local library folder this process can no
-      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22866,13 +22866,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/musiela-2005-martingale-methods-financial-modelling.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22910,13 +22909,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/karatzas-1998-methods-mathematical-finance-copy.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22954,13 +22952,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/baxter-1996-financial-calculus.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -22997,13 +22994,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/jackel-2002-monte-carlo-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -23040,13 +23036,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/chan-2009-quantitative-trading.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -23084,13 +23079,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/neftci-2000-mathematics-financial-derivatives.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -23129,13 +23123,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/wilmott-1995-mathematics-financial-derivatives.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -23172,13 +23165,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: unavailable
+    state: owned
     copy_path: corpus/study/ross-2011-introduction-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
-      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
-      corpus/study/ to restore it.
+    note: Copied into the corpus rather than symlinked, so it no longer depends on a folder outside the
+      lab.
   units: []
   refs: []
   discovered:
@@ -25519,7 +25511,7 @@ entries:
     isbn: null
     doi: 10.1073/pnas.1517384113
     url: https://www.pnas.org/doi/10.1073/pnas.1517384113
-  pages: 6
+  pages: 26
   density: high
   priority: 5
   rights:
@@ -25530,12 +25522,23 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: open_url
-    copy_path: null
-    source_url: https://www.pnas.org/doi/pdf/10.1073/pnas.1517384113
-    obtained_at: null
-    note: null
-  units: []
+    state: owned
+    copy_path: corpus/study/brunton-2016-sparse-identification-nonlinear-dynamics.pdf
+    source_url: https://arxiv.org/pdf/1509.03580
+    obtained_at: '2026-08-07'
+    note: Publisher copy returns 403 to scripted fetch; the arXiv version is the reachable one.
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'SINDy: recovers parsimonious governing differential equations from data by sparse regression
+      over a library of candidate nonlinear basis functions.'
+    locator: the whole paper
+    kind: section
+    pages: 26
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -26309,7 +26312,7 @@ entries:
     isbn: null
     doi: null
     url: https://arxiv.org/abs/2305.08459
-  pages: null
+  pages: 27
   density: high
   priority: 5
   rights:
@@ -26325,7 +26328,19 @@ entries:
     source_url: https://arxiv.org/pdf/2305.08459
     obtained_at: '2026-08-06'
     note: 'Manifest uncertain about: pages.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Dynamical mean-field theory is a powerful physics tool used to analyze the typical behavior
+      of neural networks, where neurons can be recurrently connected, or multiple layers of neurons can
+      be stacked.
+    locator: the whole paper
+    kind: section
+    pages: 27
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -26349,7 +26364,7 @@ entries:
     isbn: null
     doi: null
     url: https://arxiv.org/abs/2607.26036
-  pages: null
+  pages: 22
   density: high
   priority: 5
   rights:
@@ -26365,7 +26380,17 @@ entries:
     source_url: https://arxiv.org/pdf/2607.26036
     obtained_at: '2026-08-06'
     note: 'Manifest uncertain about: pages.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Earthquake triggering is conventionally characterised by a scalar ETAS branching ratio.
+    locator: the whole paper
+    kind: section
+    pages: 22
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -26389,7 +26414,7 @@ entries:
     isbn: null
     doi: null
     url: https://arxiv.org/abs/2307.09077
-  pages: null
+  pages: 42
   density: high
   priority: 5
   rights:
@@ -26405,7 +26430,17 @@ entries:
     source_url: https://arxiv.org/pdf/2307.09077
     obtained_at: '2026-08-06'
     note: 'Manifest uncertain about: pages.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: A point process for event arrivals in high frequency trading is presented.
+    locator: the whole paper
+    kind: section
+    pages: 42
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -26428,7 +26463,7 @@ entries:
     isbn: null
     doi: null
     url: https://arxiv.org/abs/1108.2431
-  pages: null
+  pages: 30
   density: high
   priority: 5
   rights:
@@ -26444,7 +26479,18 @@ entries:
     source_url: https://arxiv.org/pdf/1108.2431
     obtained_at: '2026-08-06'
     note: 'Manifest uncertain about: pages.'
-  units: []
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: In this paper, we prove a process-level, also known as level-3 large deviation principle for
+      a very general class of simple point processes, i.e.
+    locator: the whole paper
+    kind: section
+    pages: 30
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
   refs: []
   discovered:
     round: 0
@@ -26455,3 +26501,837 @@ entries:
   notes: In this paper, we prove a process-level, also known as level-3 large deviation principle for
     a very general class of simple point processes, i.e. nonlinear Hawkes process, with a rate function
     given by the process-level entropy, which has an explicit formula.
+- id: jovanovic-2015-hawkes-cumulants
+  title: Cumulants of Hawkes point processes
+  authors:
+  - Stojan Jovanović
+  - John Hertz
+  - Stefan Rotter
+  year: 2015
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review E 91, 042802
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevE.91.042802
+    url: https://journals.aps.org/pre/abstract/10.1103/PhysRevE.91.042802
+  pages: 11
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1409.5353
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/jovanovic-2015-hawkes-cumulants.pdf
+    source_url: https://arxiv.org/pdf/1409.5353
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Closed-form cumulant densities of arbitrary order for multivariate linear Hawkes processes,
+      by enumerating Poisson-cluster family trees.
+    locator: the whole paper
+    kind: whole
+    pages: 11
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Closed-form cumulant densities of arbitrary order for multivariate linear Hawkes processes, by
+    enumerating Poisson-cluster family trees. The diagrammatic layer any field-theoretic treatment builds
+    on.
+- id: kanazawa-2020-field-master-equation-hawkes
+  title: Field master equation theory of the self-excited Hawkes process
+  authors:
+  - Kiyoshi Kanazawa
+  - Didier Sornette
+  year: 2020
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review Research 2, 033442
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevResearch.2.033442
+    url: https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.2.033442
+  pages: 39
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.2.033442
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kanazawa-2020-field-master-equation-hawkes.pdf
+    source_url: https://arxiv.org/pdf/2001.01197
+    obtained_at: '2026-08-07'
+    note: Publisher copy returns 403 to scripted fetch; the arXiv version is the reachable one.
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Embeds the non-Markovian Hawkes intensity with arbitrary memory kernel into an infinite-dimensional
+      Markovian field, giving a master equation for the intensity probability density functional.
+    locator: the whole paper
+    kind: section
+    pages: 39
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Embeds the non-Markovian Hawkes intensity with arbitrary memory kernel into an infinite-dimensional
+    Markovian field, giving a master equation for the intensity probability density functional.
+- id: kanazawa-2020-nonuniversal-power-law-hawkes
+  title: 'Non-universal power law distribution of intensities of the self-excited Hawkes process: a field-theoretical
+    approach'
+  authors:
+  - Kiyoshi Kanazawa
+  - Didier Sornette
+  year: 2020
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review Letters 125, 138301
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevLett.125.138301
+    url: https://link.aps.org/doi/10.1103/PhysRevLett.125.138301
+  pages: 6
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2001.01195
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kanazawa-2020-nonuniversal-power-law-hawkes.pdf
+    source_url: https://arxiv.org/pdf/2001.01195
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The intensity PDF of the critical self-excited Hawkes process is a power law whose exponent
+      is non-universal, depending on background rate, kernel timescale and branching ratio.
+    locator: the whole paper
+    kind: whole
+    pages: 6
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The intensity PDF of the critical self-excited Hawkes process is a power law whose exponent is
+    non-universal, depending on background rate, kernel timescale and branching ratio.
+- id: kanazawa-2021-ubiquitous-power-law-nonlinear-hawkes
+  title: Ubiquitous power law scaling in nonlinear self-excited Hawkes processes
+  authors:
+  - Kiyoshi Kanazawa
+  - Didier Sornette
+  year: 2021
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review Letters 127, 188301
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevLett.127.188301
+    url: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.127.188301
+  pages: 24
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2102.00242
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kanazawa-2021-ubiquitous-power-law-nonlinear-hawkes.pdf
+    source_url: https://arxiv.org/pdf/2102.00242
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Nonlinear Hawkes processes with fast-accelerating intensity and two-sided marks of negative
+      mean generically produce power-law intensity distributions, including Zipf scaling.
+    locator: the whole paper
+    kind: section
+    pages: 24
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Nonlinear Hawkes processes with fast-accelerating intensity and two-sided marks of negative mean
+    generically produce power-law intensity distributions, including Zipf scaling.
+- id: kanazawa-2023-nonlinear-hawkes-steady-state-classification
+  title: 'Asymptotic solutions to nonlinear Hawkes processes: a systematic classification of the steady-state
+    solutions'
+  authors:
+  - Kiyoshi Kanazawa
+  - Didier Sornette
+  year: 2023
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review Research 5, 013067
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevResearch.5.013067
+    url: https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.5.013067
+  pages: 63
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.5.013067
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/kanazawa-2023-nonlinear-hawkes-steady-state-classification.pdf
+    source_url: https://arxiv.org/pdf/2110.01523
+    obtained_at: '2026-08-07'
+    note: Publisher copy returns 403 to scripted fetch; the arXiv version is the reachable one.
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Solves nonlinear Hawkes processes asymptotically via the field master equation and classifies
+      their steady-state intensity distributions, giving the tail exponent analytically.
+    locator: the whole paper
+    kind: section
+    pages: 63
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Solves nonlinear Hawkes processes asymptotically via the field master equation and classifies
+    their steady-state intensity distributions, giving the tail exponent analytically.
+- id: bacry-2016-hawkes-first-second-order-statistics
+  title: First- and Second-Order Statistics Characterization of Hawkes Processes and Non-Parametric Estimation
+  authors:
+  - Emmanuel Bacry
+  - Jean-François Muzy
+  year: 2016
+  bucket: mathematical_foundations
+  form: paper
+  venue: IEEE Trans. Information Theory 62(4)
+  identifiers:
+    isbn: null
+    doi: 10.1109/TIT.2016.2533397
+    url: https://doi.org/10.1109/TIT.2016.2533397
+  pages: 25
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1401.0903
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/bacry-2016-hawkes-first-second-order-statistics.pdf
+    source_url: https://arxiv.org/pdf/1401.0903
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: The jump correlation matrix of a multivariate Hawkes process satisfies a Wiener-Hopf system
+      with a unique causal solution, giving a non-parametric kernel estimator by numerical inversion.
+    locator: the whole paper
+    kind: section
+    pages: 25
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The jump correlation matrix of a multivariate Hawkes process satisfies a Wiener-Hopf system with
+    a unique causal solution, giving a non-parametric kernel estimator by numerical inversion. Note the
+    arXiv preprint carries an earlier, different title.
+- id: bacry-2012-nonparametric-kernel-estimation-hawkes
+  title: 'Non-parametric kernel estimation for symmetric Hawkes processes: application to high frequency
+    financial data'
+  authors:
+  - Emmanuel Bacry
+  - Khalil Dayri
+  - Jean-François Muzy
+  year: 2012
+  bucket: mathematical_foundations
+  form: paper
+  venue: European Physical Journal B 85, 157
+  identifiers:
+    isbn: null
+    doi: 10.1140/epjb/e2012-21005-8
+    url: https://link.springer.com/article/10.1140/epjb/e2012-21005-8
+  pages: 13
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1112.1838
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/bacry-2012-nonparametric-kernel-estimation-hawkes.pdf
+    source_url: https://arxiv.org/pdf/1112.1838
+    obtained_at: '2026-08-07'
+    note: 'Manifest uncertain about: doi.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Minimal-phase spectral-factorisation kernel estimation on futures data recovers slowly decaying
+      power-law Hawkes kernels, evidence of long-memory self-excitation in microstructure.
+    locator: the whole paper
+    kind: section
+    pages: 13
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Minimal-phase spectral-factorisation kernel estimation on futures data recovers slowly decaying
+    power-law Hawkes kernels, evidence of long-memory self-excitation in microstructure.
+- id: smith-2003-continuous-double-auction
+  title: Statistical theory of the continuous double auction
+  authors:
+  - Eric Smith
+  - J. Doyne Farmer
+  - László Gillemot
+  - Supriya Krishnamurthy
+  year: 2003
+  bucket: market_microstructure
+  form: paper
+  venue: Quantitative Finance 3(6)
+  identifiers:
+    isbn: null
+    doi: 10.1088/1469-7688/3/6/307
+    url: https://doi.org/10.1088/1469-7688/3/6/307
+  pages: 36
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/cond-mat/0210475
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/smith-2003-continuous-double-auction.pdf
+    source_url: https://arxiv.org/pdf/cond-mat/0210475
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: A zero-intelligence model of the continuous double auction, with scaling laws for spread, depth,
+      volatility and impact derived by dimensional analysis and mean-field theory.
+    locator: the whole paper
+    kind: section
+    pages: 36
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: A zero-intelligence model of the continuous double auction, with scaling laws for spread, depth,
+    volatility and impact derived by dimensional analysis and mean-field theory.
+- id: blanc-2017-quadratic-hawkes-financial-prices
+  title: Quadratic Hawkes processes for financial prices
+  authors:
+  - Pierre Blanc
+  - Jonathan Donier
+  - Jean-Philippe Bouchaud
+  year: 2017
+  bucket: market_microstructure
+  form: paper
+  venue: Quantitative Finance 17(2)
+  identifiers:
+    isbn: null
+    doi: 10.1080/14697688.2016.1193215
+    url: https://doi.org/10.1080/14697688.2016.1193215
+  pages: 24
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1509.07710
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/blanc-2017-quadratic-hawkes-financial-prices.pdf
+    source_url: https://arxiv.org/pdf/1509.07710
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Hawkes price models with feedback quadratic in past returns, producing time-reversal asymmetry
+      and fat-tailed volatility, with the quadratic kernel fitted non-parametrically on NYSE data.
+    locator: the whole paper
+    kind: section
+    pages: 24
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Hawkes price models with feedback quadratic in past returns, producing time-reversal asymmetry
+    and fat-tailed volatility, with the quadratic kernel fitted non-parametrically on NYSE data.
+- id: donier-2015-minimal-nonlinear-market-impact
+  title: A fully consistent, minimal model for non-linear market impact
+  authors:
+  - Jonathan Donier
+  - Julius Bonart
+  - Iacopo Mastromatteo
+  - Jean-Philippe Bouchaud
+  year: 2015
+  bucket: market_microstructure
+  form: paper
+  venue: Quantitative Finance 15(7)
+  identifiers:
+    isbn: null
+    doi: 10.1080/14697688.2015.1040056
+    url: https://doi.org/10.1080/14697688.2015.1040056
+  pages: 20
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1412.0141
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/donier-2015-minimal-nonlinear-market-impact.pdf
+    source_url: https://arxiv.org/pdf/1412.0141
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: A reaction-diffusion latent order book model reproducing the square-root impact law, generalising
+      propagator models, and provably free of price manipulation.
+    locator: the whole paper
+    kind: section
+    pages: 20
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: A reaction-diffusion latent order book model reproducing the square-root impact law, generalising
+    propagator models, and provably free of price manipulation.
+- id: bouchaud-2004-fluctuations-response-propagator
+  title: 'Fluctuations and response in financial markets: the subtle nature of random price changes'
+  authors:
+  - Jean-Philippe Bouchaud
+  - Yuval Gefen
+  - Marc Potters
+  - Matthieu Wyart
+  year: 2004
+  bucket: market_microstructure
+  form: paper
+  venue: Quantitative Finance 4(2)
+  identifiers:
+    isbn: null
+    doi: 10.1088/1469-7688/4/2/007
+    url: https://doi.org/10.1088/1469-7688/4/2/007
+  pages: 30
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/cond-mat/0307332
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/bouchaud-2004-fluctuations-response-propagator.pdf
+    source_url: https://arxiv.org/pdf/cond-mat/0307332
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'The propagator model: price is the sum of decaying impacts of all past trades, and the market
+      sits where long-range-correlated order flow and mean-reverting liquidity cancel to give diffusive
+      prices.'
+    locator: the whole paper
+    kind: section
+    pages: 30
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The propagator model: price is the sum of decaying impacts of all past trades, and the market
+    sits where long-range-correlated order flow and mean-reverting liquidity cancel to give diffusive
+    prices.'
+- id: e-2010-transition-path-theory-rare-events
+  title: Transition-Path Theory and Path-Finding Algorithms for the Study of Rare Events
+  authors:
+  - Weinan E
+  - Eric Vanden-Eijnden
+  year: 2010
+  bucket: mathematical_foundations
+  form: survey
+  venue: Annual Review of Physical Chemistry 61
+  identifiers:
+    isbn: null
+    doi: 10.1146/annurev.physchem.040808.090412
+    url: https://www.annualreviews.org/content/journals/10.1146/annurev.physchem.040808.090412
+  pages: 30
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.annualreviews.org/content/journals/10.1146/annurev.physchem.040808.090412
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.annualreviews.org/content/journals/10.1146/annurev.physchem.040808.090412
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Transition path theory: rare transitions characterised through the committor function and the
+    reactive probability current, with the string and path-finding algorithms built on it.'
+- id: chetrite-2015-conditioned-markov-processes
+  title: Nonequilibrium Markov Processes Conditioned on Large Deviations
+  authors:
+  - Raphaël Chetrite
+  - Hugo Touchette
+  year: 2015
+  bucket: mathematical_foundations
+  form: paper
+  venue: Annales Henri Poincaré 16(9)
+  identifiers:
+    isbn: null
+    doi: 10.1007/s00023-014-0375-8
+    url: https://link.springer.com/article/10.1007/s00023-014-0375-8
+  pages: 46
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1405.5157
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/chetrite-2015-conditioned-markov-processes.pdf
+    source_url: https://arxiv.org/pdf/1405.5157
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: A Markov process conditioned on a large-deviation event is asymptotically equivalent to a driven
+      process given by a generalised Doob h-transform, linking conditioning to exponential tilting.
+    locator: the whole paper
+    kind: section
+    pages: 46
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: A Markov process conditioned on a large-deviation event is asymptotically equivalent to a driven
+    process given by a generalised Doob h-transform, linking conditioning to exponential tilting.
+- id: touchette-2009-large-deviation-approach
+  title: The large deviation approach to statistical mechanics
+  authors:
+  - Hugo Touchette
+  year: 2009
+  bucket: mathematical_foundations
+  form: survey
+  venue: Physics Reports 478(1-3)
+  identifiers:
+    isbn: null
+    doi: 10.1016/j.physrep.2009.05.002
+    url: https://doi.org/10.1016/j.physrep.2009.05.002
+  pages: 95
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/0804.0327
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/touchette-2009-large-deviation-approach.pdf
+    source_url: https://arxiv.org/pdf/0804.0327
+    obtained_at: '2026-08-07'
+    note: null
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Recasts equilibrium and nonequilibrium statistical mechanics in large deviation language: rate
+    functions, Gärtner-Ellis, Varadhan''s lemma, Legendre duality.'
+- id: freidlin-2012-random-perturbations-dynamical-systems
+  title: Random Perturbations of Dynamical Systems
+  authors:
+  - Mark I. Freidlin
+  - Alexander D. Wentzell
+  year: 2012
+  bucket: mathematical_foundations
+  form: monograph
+  venue: Springer, 3rd edition
+  identifiers:
+    isbn: '9783642258466'
+    doi: 10.1007/978-3-642-25847-3
+    url: https://link.springer.com/book/10.1007/978-3-642-25847-3
+  pages: null
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/book/10.1007/978-3-642-25847-3
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/book/10.1007/978-3-642-25847-3
+    obtained_at: null
+    note: 'Manifest uncertain about: pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The action-functional theory of small random perturbations of dynamical systems: exit times,
+    quasipotentials, metastable transition asymptotics.'
+- id: karim-2025-compound-hawkes-rare-event-simulation
+  title: 'Compound multivariate Hawkes processes: large deviations and rare event simulation'
+  authors:
+  - Raviar S. Karim
+  - Roger J. A. Laeven
+  - Michel R. H. Mandjes
+  year: 2025
+  bucket: mathematical_foundations
+  form: paper
+  venue: Bernoulli 31
+  identifiers:
+    isbn: null
+    doi: 10.3150/24-BEJ1840
+    url: https://doi.org/10.3150/24-BEJ1840
+  pages: 38
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2211.16848
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/karim-2025-compound-hawkes-rare-event-simulation.pdf
+    source_url: https://arxiv.org/pdf/2211.16848
+    obtained_at: '2026-08-07'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: A large deviations principle for multivariate compound Hawkes processes with random marks,
+      plus an exponentially tilted importance sampling estimator that is asymptotically efficient.
+    locator: the whole paper
+    kind: section
+    pages: 38
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: A large deviations principle for multivariate compound Hawkes processes with random marks, plus
+    an exponentially tilted importance sampling estimator that is asymptotically efficient.
+- id: cerou-2019-adaptive-multilevel-splitting
+  title: 'Adaptive multilevel splitting: historical perspective and recent results'
+  authors:
+  - Frédéric Cérou
+  - Arnaud Guyader
+  - Mathias Rousset
+  year: 2019
+  bucket: mathematical_foundations
+  form: survey
+  venue: Chaos 29(4)
+  identifiers:
+    isbn: null
+    doi: 10.1063/1.5082247
+    url: https://pubs.aip.org/aip/cha/article/29/4/043108/1027309
+  pages: 32
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://inria.hal.science/hal-01936611v2/document
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/cerou-2019-adaptive-multilevel-splitting.pdf
+    source_url: https://inria.hal.science/hal-01936611v2/document
+    obtained_at: '2026-08-07'
+    note: 'Manifest uncertain about: pages.'
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Importance splitting and adaptive multilevel splitting for rare-event estimation, with unbiasedness,
+      a CLT, and how the importance function controls asymptotic variance.
+    locator: the whole paper
+    kind: section
+    pages: 32
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Importance splitting and adaptive multilevel splitting for rare-event estimation, with unbiasedness,
+    a CLT, and how the importance function controls asymptotic variance.

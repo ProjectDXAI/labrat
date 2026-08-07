@@ -4,6 +4,11 @@
 
 ### Added
 
+- `status.py` prints one screen of where the corpus stands, ordered by what is actionable
+  rather than by what is large: blocked chains first, then compilation, then grounding,
+  then the backlog. It separates "free with a URL" from "believed free with no URL
+  recorded", because counting them together overstated what `make fetch` can do by seventy.
+
 - `label_units.py` and `make label` declare reading units on held sources that have none.
   A source under 80 extracted pages becomes one unit, because splitting a paper into
   sections without having read it invents structure. Venue documentation becomes one unit
