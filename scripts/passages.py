@@ -171,7 +171,28 @@ def source_files(root: Path, entry_id: str, study_dir: Path, sources_dir: Path) 
     return list(unique.values())
 
 
-def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False) -> dict[str, Any]:
+def previous_coverage(root: Path) -> dict[str, int]:
+    """Entry -> passage count from the index already on disk, for the regression guard."""
+    path = passage_paths(root)["passages"]
+    if not path.exists():
+        return {}
+    counts: dict[str, int] = {}
+    with path.open() as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entry_id = json.loads(line).get("entry_id")
+            except json.JSONDecodeError:
+                continue
+            if entry_id:
+                counts[entry_id] = counts.get(entry_id, 0) + 1
+    return counts
+
+
+def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False,
+                allow_shrink: bool = False) -> dict[str, Any]:
     if not have_extractor():
         raise SystemExit(
             "ERROR: pdftotext not found. Install poppler (brew install poppler) — "
@@ -182,6 +203,7 @@ def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False) -
         corpus_engine.corpus_paths(root / "corpus"))}
     paths = passage_paths(root)
     paths["dir"].mkdir(parents=True, exist_ok=True)
+    before = previous_coverage(root)
 
     rows: list[dict[str, Any]] = []
     covered, skipped_excluded, no_text = [], [], []
@@ -212,6 +234,25 @@ def build_index(root: Path, study: Path, sources: Path, rebuild: bool = False) -
             covered.append(entry_id)
         else:
             no_text.append(entry_id)
+    # A permission change, a moved library or an unmounted volume can make a source
+    # unreadable without anything in this repo changing. Overwriting a good index with the
+    # degraded one then destroys extracted text that took hours to produce, silently.
+    # macOS revoked this process's access to ~/Downloads once and 10,000 passages went with
+    # it. Refuse rather than shrink.
+    lost = sorted(
+        entry_id for entry_id, count in before.items()
+        if count > 0 and sum(1 for r in rows if r["entry_id"] == entry_id) == 0
+    )
+    if lost and not allow_shrink:
+        raise SystemExit(
+            f"ERROR: {len(lost)} entries had extracted text and now have none, so this index "
+            f"would lose it. The existing store is untouched.\n"
+            f"  First few: {', '.join(lost[:5])}\n"
+            f"  Usual cause is a source that became unreadable rather than a change here: a "
+            f"revoked folder permission, a moved library, an unmounted volume.\n"
+            f"  Re-run with --allow-shrink once you have checked that losing them is intended."
+        )
+
 
     with paths["passages"].open("w") as handle:
         for row in rows:
@@ -620,6 +661,35 @@ def self_test() -> dict[str, Any]:
         assert len(standalone) == 1, standalone
     checks.append("source_files: course exercises dropped, a standalone solution manual kept")
 
+    # An index that silently shrinks destroys extracted text when a source becomes
+    # unreadable for reasons outside this repo. This happened: macOS revoked access to a
+    # symlinked library and one re-index dropped 10,000 passages.
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "corpus").mkdir()
+        (root / "corpus" / "bibliography.yaml").write_text(
+            "entries:\n- id: doc-a\n  title: A\n  bucket: x\n  form: paper\n"
+            "  rights: {status: cc0, confidence: confirmed}\n  units: []\n")
+        study = root / "corpus" / "study"
+        (study / "doc-a").mkdir(parents=True)
+        (study / "doc-a" / "page.md").write_text("alpha beta gamma delta " * 200)
+        first = build_index(root, study, root / "corpus" / "sources")
+        assert first["passages"] >= 1, first
+        (study / "doc-a" / "page.md").unlink()
+        try:
+            build_index(root, study, root / "corpus" / "sources")
+            raise AssertionError("a shrinking index must be refused, not written")
+        except SystemExit:
+            pass
+        kept = sum(1 for _ in (root / "corpus" / "passages" / "passages.jsonl").open())
+        assert kept == first["passages"], (kept, first["passages"])
+        forced = build_index(root, study, root / "corpus" / "sources", allow_shrink=True)
+        assert forced["passages"] == 0, forced
+    checks.append(
+        "build_index: refuses to overwrite the store when a source that had text now has "
+        "none, leaves the existing store intact, and shrinks only under --allow-shrink"
+    )
+
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "corpus").mkdir(parents=True)
@@ -654,6 +724,8 @@ def main(argv: list[str] | None = None) -> int:
     index_cmd = sub.add_parser("index", help="Extract and index the text of every source we hold.")
     index_cmd.add_argument("--study", default="corpus/study")
     index_cmd.add_argument("--sources", default="corpus/sources")
+    index_cmd.add_argument("--allow-shrink", action="store_true",
+                           help="permit an index that drops entries which previously had text")
 
     search_cmd = sub.add_parser("search", help="Rank passages against a query.")
     search_cmd.add_argument("--query", required=True)
@@ -675,7 +747,8 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root)
 
     if args.command == "index":
-        print(json.dumps(build_index(root, root / args.study, root / args.sources), indent=2))
+        print(json.dumps(build_index(root, root / args.study, root / args.sources,
+                                     allow_shrink=args.allow_shrink), indent=2))
         return 0
 
     if args.command == "search":

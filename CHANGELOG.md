@@ -125,6 +125,12 @@
 
 ### Fixed
 
+- `passages.py index` refused nothing when a source became unreadable, so one re-index
+  replaced 16,268 passages with 6,243 and destroyed the extracted text silently. It now
+  refuses to write an index that drops entries which previously had text, leaves the
+  existing store intact, and shrinks only under `--allow-shrink`. The CLI never passed the
+  flag through, which is the path that caused the loss, so that is wired and self-tested.
+
 - The branching-ratio estimator returned 0.569 with regime "mixed" on a regime-switching
   Poisson stream with zero self-excitation by construction, which is the failure Filimonov
   and Sornette demonstrate for the MLE version. The null now runs inside the method.

@@ -20079,12 +20079,13 @@ entries:
     grant: null
     notes: null
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/bjork-2019-arbitrage-theory.pdf
     source_url: http://digitale-objekte.hbz-nrw.de/storage2/2020/03/03/file_8/8833083.pdf
     obtained_at: '2026-08-06'
     note: Study copy from the publisher copy the publisher serves free. Rights tag unchanged; this is
-      a reading copy, not a corpus grant.
+      a reading copy, not a corpus grant. Symlinked into a local library folder this process can no longer
+      read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21752,11 +21753,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/wilmott-2006-paul-wilmott-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21794,11 +21796,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/fabozzi-2004-mathematics-financial-modeling.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21834,11 +21837,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/blyth-2014-introduction-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21874,11 +21878,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/brandimarte-2006-numerical-methods-finance-economics.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21917,11 +21922,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/kabanov-2006-stochastic-calculus-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21957,11 +21963,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/lyuu-2002-financial-engineering-computation.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -21998,11 +22005,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/shaw-1998-modelling-financial-derivatives-mathematica.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units:
   - unit_id: whole-paper
     title: null
@@ -22048,11 +22056,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/seydel-2012-computational-finance-numerical-methods.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22091,11 +22100,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/hardle-2002-applied-quantitative-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22132,11 +22142,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/fries-2007-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22173,11 +22184,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/elliott-2005-mathematics-financial-markets.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22217,11 +22229,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/rachev-2008-bayesian-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22259,11 +22272,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/capinski-2011-mathematics-for-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22300,11 +22314,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/vanderhoek-2006-binomial-models-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22343,11 +22358,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/cherubini-2004-copula-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22384,11 +22400,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/bartholomewbiggs-2008-nonlinear-optimization-financial.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22425,11 +22442,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/javaheri-2005-inside-volatility-arbitrage.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22466,11 +22484,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/mcnelis-2005-neural-networks-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22505,11 +22524,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/anon-financial-mathematics-lecture-notes.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22545,11 +22565,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/chen-2008-financial-econometrics-derivatives-pricing.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22586,11 +22607,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/tsang-2003-optimal-control-models-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22626,11 +22648,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/voit-2005-quantitative-finance-for-physicists.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22667,11 +22690,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/harrison-2011-mathematical-economics-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22707,11 +22731,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/kolokoltsov-basics-financial-mathematics.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22747,11 +22772,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/forsyth-2008-computational-finance-without-agonizing-pain.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units:
   - unit_id: whole-paper
     title: null
@@ -22798,11 +22824,12 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/neftci-2000-financial-derivatives-solution-manual.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, text layer present.
+    note: Local library, text layer present. Symlinked into a local library folder this process can no
+      longer read (macOS revoked access to ~/Downloads). Copy the file into corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22839,11 +22866,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/musiela-2005-martingale-methods-financial-modelling.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22881,11 +22910,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/karatzas-1998-methods-mathematical-finance-copy.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22923,11 +22954,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/baxter-1996-financial-calculus.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -22964,11 +22997,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/jackel-2002-monte-carlo-methods-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -23005,11 +23040,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/chan-2009-quantitative-trading.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -23047,11 +23084,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/neftci-2000-mathematics-financial-derivatives.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -23090,11 +23129,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/wilmott-1995-mathematics-financial-derivatives.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -23131,11 +23172,13 @@ entries:
     notes: Owned copy, read locally. Redistribution is a separate question and this is not a grant for
       it.
   acquisition:
-    state: owned
+    state: unavailable
     copy_path: corpus/study/ross-2011-introduction-mathematical-finance.pdf
     source_url: null
     obtained_at: '2026-08-06'
-    note: Local library, no text layer; needs OCR before it is readable.
+    note: Local library, no text layer; needs OCR before it is readable. Symlinked into a local library
+      folder this process can no longer read (macOS revoked access to ~/Downloads). Copy the file into
+      corpus/study/ to restore it.
   units: []
   refs: []
   discovered:
@@ -26252,3 +26295,163 @@ entries:
   tags: []
   notes: 'The standard applied reference for multi-state event-history modelling: transition-specific
     hazards, Aalen-Johansen transition probabilities, and cause-specific versus subdistribution approaches.'
+- id: zou-2023-introduction-to-dynamical-theory
+  title: Introduction to dynamical mean-field theory of randomly connected neural networks with bidirectionally
+    correlated couplings
+  authors:
+  - Wenxuan Zou
+  - Haiping Huang
+  year: 2023
+  bucket: adjacent_disciplines
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2305.08459
+  pages: null
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2305.08459
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/zou-2023-introduction-to-dynamical-theory.pdf
+    source_url: https://arxiv.org/pdf/2305.08459
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Dynamical mean-field theory is a powerful physics tool used to analyze the typical behavior of
+    neural networks, where neurons can be recurrently connected, or multiple layers of neurons can be
+    stacked. However, it is not easy for beginners to access the essence of this tool and the underlying
+    physic
+- id: sornette-2026-amplification-in-multitype
+  title: Non-normal amplification in multitype Hawkes-ETAS models of earthquake triggering
+  authors:
+  - Didier Sornette
+  year: 2026
+  bucket: detection_tracking
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2607.26036
+  pages: null
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2607.26036
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/sornette-2026-amplification-in-multitype.pdf
+    source_url: https://arxiv.org/pdf/2607.26036
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Earthquake triggering is conventionally characterised by a scalar ETAS branching ratio. We develop
+    a three-type Hawkes-ETAS model that resolves strike-slip, normal, and reverse/thrust earthquakes through
+    a directed branching matrix $N$. While the spectral radius $ρ(N)<1$ controls asymptotic stabilit
+- id: mucciante-2023-estimation-of-an-order-book
+  title: Estimation of an Order Book Dependent Hawkes Process for Large Datasets
+  authors:
+  - Luca Mucciante
+  - Alessio Sancetta
+  year: 2023
+  bucket: market_microstructure
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/2307.09077
+  pages: null
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/2307.09077
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/mucciante-2023-estimation-of-an-order-book.pdf
+    source_url: https://arxiv.org/pdf/2307.09077
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: A point process for event arrivals in high frequency trading is presented. The intensity is the
+    product of a Hawkes process and high dimensional functions of covariates derived from the order book.
+    Conditions for stationarity of the process are stated. An algorithm is presented to estimate the model
+- id: zhu-2011-large-deviations-for-nonlinear
+  title: Process-Level Large Deviations for Nonlinear Hawkes Point Processes
+  authors:
+  - Lingjiong Zhu
+  year: 2011
+  bucket: mathematical_foundations
+  form: paper
+  venue: arXiv preprint
+  identifiers:
+    isbn: null
+    doi: null
+    url: https://arxiv.org/abs/1108.2431
+  pages: null
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1108.2431
+    checked_at: '2026-08-06'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/zhu-2011-large-deviations-for-nonlinear.pdf
+    source_url: https://arxiv.org/pdf/1108.2431
+    obtained_at: '2026-08-06'
+    note: 'Manifest uncertain about: pages.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: In this paper, we prove a process-level, also known as level-3 large deviation principle for
+    a very general class of simple point processes, i.e. nonlinear Hawkes process, with a rate function
+    given by the process-level entropy, which has an explicit formula.
