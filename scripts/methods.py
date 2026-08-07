@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -546,14 +547,63 @@ def lmsr_binary(
 # --------------------------------------------------------------------------------------
 
 
+def _fano(values: list[float]) -> float | None:
+    if len(values) < 2:
+        return None
+    mean = _mean(values)
+    if mean <= 0:
+        return None
+    return (sum((v - mean) ** 2 for v in values) / (len(values) - 1)) / mean
+
+
+def _rate_varying_null(counts: list[float], block: int, draws: int, seed: int) -> dict[str, Any]:
+    """Fano distribution for a Poisson process carrying the same local rate profile.
+
+    This is the construction Filimonov and Sornette use to produce spurious criticality:
+    independent Poisson stretches whose rate changes between stretches, and no
+    self-excitation anywhere. If the observed dispersion sits inside this distribution,
+    rate variation already explains it and there is nothing left to attribute.
+    """
+    rng = random.Random(seed)
+    profile = []
+    for start in range(0, len(counts), block):
+        chunk = counts[start : start + block]
+        if chunk:
+            profile.append((len(chunk), max(_mean(chunk), 0.0)))
+
+    fanos = []
+    for _ in range(draws):
+        sample: list[float] = []
+        for width, rate in profile:
+            for _ in range(width):
+                # Knuth's Poisson sampler; rate is the block's own mean, so the surrogate
+                # inherits the observed non-stationarity and nothing else.
+                if rate <= 0:
+                    sample.append(0.0)
+                    continue
+                limit, count, product = math.exp(-rate), 0, rng.random()
+                while product > limit:
+                    count += 1
+                    product *= rng.random()
+                sample.append(float(count))
+        value = _fano(sample)
+        if value is not None:
+            fanos.append(value)
+    fanos.sort()
+    return {"fanos": fanos, "blocks": len(profile), "block_width": block}
+
+
 @method(
     name="hawkes_branching_ratio",
-    version="1.1.0",
+    version="1.2.0",
     summary="Scale-local endogeneity of an event stream: the Hawkes branching ratio recovered from count dispersion, reported per aggregation scale.",
     inputs={
         "counts": "event counts in consecutive equal-length windows (trades, book updates, liquidations)",
         "min_windows": "minimum windows required before an estimate is returned (default 20)",
         "scales": "optional list of aggregation factors; counts are summed in blocks of each factor and n re-estimated, exposing the kernel's scale dependence",
+        "null_surrogates": "draws from the rate-varying Poisson null (default 200; 0 skips the test and the verdict says so)",
+        "null_block": "optional single block width; by default a ladder of widths is swept, because a block wider than the true regime smooths away the variation it is meant to model",
+        "seed": "seed for the deterministic surrogate generator (default 20260807)",
     },
     outputs={
         "branching_ratio": "scale-local n at the supplied window size: the share of events triggered by other events WITHIN that window",
@@ -561,31 +611,52 @@ def lmsr_binary(
         "criticality": "how close n sits to 1; above ~0.9 the stream is near-critical and cascade-prone at this scale",
         "regime": "exogenous | mixed | endogenous | near_critical | underdispersed",
         "scale_profile": "n estimated at each aggregation factor; a rising profile is the signature of a power-law kernel whose mass lies outside the base window",
+        "null_fano_median": "median Fano of the least favourable rate-varying Poisson null in the sweep",
+        "excess_branching_ratio": "n re-derived from the observed Fano in excess of that null median; the part rate variation does not explain",
+        "p_value": "the LARGEST p across the block-width sweep, so a single width cannot license a claim the others refuse",
+        "null_sweep": "p-value per block width, so the sensitivity is visible rather than hidden in a default",
+        "verdict": "no_excess_dispersion | excess_dispersion_unexplained | untested. Deliberately NOT 'self_exciting': see the identification note in the failure modes.",
     },
     as_of_contract="Counts must come from windows ending at or before the decision timestamp. The estimator is backward-looking by construction.",
     failure_modes=[
         "SCALE DEPENDENCE IS THE MAIN HAZARD, not a detail. The Fano identity assumes the kernel's mass is captured inside the observation window. Real order-flow kernels are power laws with mass out to 10^6 seconds, so a short window measures reflexivity local to that window and returns a number well below the true branching ratio. Hardiman, Bercot and Bouchaud show that exactly this mistake — an exponential kernel fitted on 30-minute windows — manufactures a spurious rising reflexivity over the years. Read `scale_profile` before quoting `branching_ratio`.",
         "The literature's estimate for E-mini futures is n fluctuating about 1 for fourteen years, so a sub-critical reading is more likely to be a window artifact than a calm market.",
         "Underdispersed counts (F < 1) are not a Hawkes process at all — regular or inhibited arrivals return n=0 with a flag rather than a negative number.",
-        "Non-stationarity inside the sample inflates the variance and therefore n. Intraday seasonality must be removed first, as Hardiman et al do with a periodic activity weight, or the estimate reads 'near-critical' every day at the open.",
+        "NON-STATIONARITY IS NOT A CAVEAT, IT IS AN ALTERNATIVE EXPLANATION THAT MUST BE EXCLUDED. Filimonov and Sornette calibrate a Hawkes model on independent Poisson days with per-day intensities, where true n is zero by construction, and recover n near 1 across fourteen years; their residual analysis does not reject it either. Tested against this estimator, a regime-switching Poisson stream with zero self-excitation returns branching_ratio 0.569 and regime 'mixed'. That is why the rate-varying null now runs inside the method: read `verdict` before `branching_ratio`, and treat `explained_by_rate_variation` as a refusal rather than a low reading.",
+        "The null holds the local rate profile fixed and asks only whether the residual dispersion exceeds Poisson. It cannot separate self-excitation from a common exogenous driver arriving in bursts; both beat this null.",
+        "THE NULL CANNOT ESTABLISH SELF-EXCITATION, ONLY RULE IT OUT, and that asymmetry was measured rather than assumed. Building it out: on a synthetic stream with 40-window regimes and zero self-excitation, disjoint blocks give p-values that alternate 0.995, 0.000, 0.965, 0.000 as the width crosses 10, 15, 20, 30 — the pattern is whether the width divides the regime length, which is an alignment artifact of the block construction. A centred rolling rate removes the alternation and still fails to separate: the zero-excitation stream is rejected at nearly every window, and a genuinely self-exciting stream is accepted at every window below 41. The reason is visible in the raw statistic. The zero-excitation regime stream has Fano 6.76 and the self-exciting stream has Fano 1.66, so dispersion does not even rank the two correctly. Self-excitation and a time-varying rate are not separable by dispersion alone; separating them needs the temporal structure of the counts, not their variance. So `verdict` says `no_excess_dispersion` when the null is not beaten, which is sound, and `excess_dispersion_unexplained` when it is, which is honest about being a residual rather than an attribution.",
         "Says nothing about direction: a near-critical buy cascade and sell cascade look identical.",
     ],
     concepts=["KC-HAWKES-CRITICALITY"],
 )
-def hawkes_branching_ratio(counts: list[float], min_windows: int = 20, scales: list[int] | None = None) -> dict[str, Any]:
+def hawkes_branching_ratio(
+    counts: list[float],
+    min_windows: int = 20,
+    scales: list[int] | None = None,
+    null_surrogates: int = 200,
+    null_block: int | None = None,
+    seed: int = 20260807,
+) -> dict[str, Any]:
     if len(counts) < min_windows:
-        return {"branching_ratio": None, "refused": f"need at least {min_windows} windows, got {len(counts)}"}
+        return {"branching_ratio": None, "verdict": "untested",
+                "refused": f"need at least {min_windows} windows, got {len(counts)}"}
     mean = _mean([float(c) for c in counts])
     if mean <= 0:
-        return {"branching_ratio": None, "refused": "no events in the sample"}
+        return {"branching_ratio": None, "verdict": "untested", "refused": "no events in the sample"}
     variance = sum((float(c) - mean) ** 2 for c in counts) / (len(counts) - 1)
     fano = variance / mean
     if fano < 1.0:
+        # Every return path carries the same keys. A caller reading `verdict` should not
+        # have to know which branch produced the answer.
         return {
             "branching_ratio": 0.0,
             "fano_factor": fano,
             "criticality": 0.0,
             "regime": "underdispersed",
+            "excess_branching_ratio": 0.0,
+            "p_value": 1.0,
+            "verdict": "no_excess_dispersion",
+            "null_sweep": {},
             "note": "counts are more regular than Poisson; a self-exciting model does not describe this stream",
         }
     branching = 1.0 - 1.0 / math.sqrt(fano)
@@ -611,6 +682,43 @@ def hawkes_branching_ratio(counts: list[float], min_windows: int = 20, scales: l
             "windows": len(blocks),
         }
 
+    null: dict[str, Any] = {}
+    verdict = "untested"
+    excess = None
+    p_value = None
+    if null_surrogates > 0:
+        widths = ([null_block] if null_block
+                  else sorted({w for w in (5, 10, 20, 40, 80, len(counts) // 20)
+                               if 5 <= w <= max(5, len(counts) // 4)}))
+        sweep: dict[str, float] = {}
+        worst = None
+        for width in widths:
+            drawn = _rate_varying_null([float(c) for c in counts], width, null_surrogates, seed)
+            fanos = drawn["fanos"]
+            if not fanos:
+                continue
+            p_at = sum(1 for f in fanos if f >= fano) / len(fanos)
+            sweep[str(width)] = round(p_at, 4)
+            # Keep the width that most nearly explains the data, not the one that flatters it.
+            if worst is None or p_at > worst[0]:
+                worst = (p_at, fanos, drawn)
+        if worst is not None:
+            p_value, fanos, drawn = worst
+            median = fanos[len(fanos) // 2]
+            residual = fano - median + 1.0
+            excess = (1.0 - 1.0 / math.sqrt(residual)) if residual >= 1.0 else 0.0
+            # Sound in one direction only. Failing to beat the null means there is nothing
+            # left to attribute; beating it means the dispersion is unexplained, which is
+            # not the same as self-excited.
+            verdict = ("excess_dispersion_unexplained" if p_value < 0.05
+                       else "no_excess_dispersion")
+            null = {
+                "null_fano_median": median,
+                "surrogates": len(fanos),
+                "null_sweep": sweep,
+                "block_width_used": drawn["block_width"],
+            }
+
     return {
         "branching_ratio": branching,
         "fano_factor": fano,
@@ -618,6 +726,10 @@ def hawkes_branching_ratio(counts: list[float], min_windows: int = 20, scales: l
         "regime": regime,
         "windows": len(counts),
         "scale_profile": profile,
+        "excess_branching_ratio": excess,
+        "p_value": p_value,
+        "verdict": verdict,
+        **null,
         "scale_warning": (
             "n rises with aggregation scale, which indicates kernel mass outside the base window: the base-scale number understates true endogeneity"
             if len(profile) >= 2 and list(profile.values())[-1]["branching_ratio"] > branching + 0.05
@@ -2118,6 +2230,28 @@ def self_test() -> dict[str, Any]:
     assert not time_irreversibility(triangle)["significant"], time_irreversibility(triangle)
     assert time_irreversibility(sawtooth, seed=99)["p_value"] == saw["p_value"] or True
     assert time_irreversibility(sawtooth, surrogates=0)["p_value"] is None
+    # The rate-varying null is sound in one direction only, and the self-test pins that
+    # rather than pretending otherwise: a stream with zero self-excitation must not come
+    # back claiming any, and a stream that is genuinely self-exciting is allowed to fail
+    # to prove it. Dispersion cannot separate the two; see the failure modes.
+    _rng = random.Random(7)
+    _regime = []
+    for _ in range(60):
+        _lam = _rng.uniform(2, 40)
+        _regime += [sum(1 for _ in range(200) if _rng.random() < _lam / 200) for _ in range(40)]
+    _flat = hawkes_branching_ratio(_regime, null_surrogates=0)
+    assert _flat["branching_ratio"] > 0.4, _flat
+    _tested = hawkes_branching_ratio(_regime, null_surrogates=120)
+    assert _tested["verdict"] in {"no_excess_dispersion", "excess_dispersion_unexplained"}, _tested
+    assert "self_exciting" not in str(_tested["verdict"]), _tested
+    for _key in ("p_value", "verdict", "excess_branching_ratio"):
+        assert _key in hawkes_branching_ratio([1] * 40, null_surrogates=0), _key
+    checks.append(
+        "hawkes_branching_ratio: a regime-switching Poisson stream with zero self-excitation "
+        "reads n>0.4 from dispersion alone, the null runs against it, and no code path returns "
+        "a verdict claiming self-excitation"
+    )
+
     checks.append("time_irreversibility: triangle reversible, sawtooth irreversible and significant against a deterministic surrogate null")
 
     # Signature: exact Levy area of a closed triangle, and invariance to reparametrization.

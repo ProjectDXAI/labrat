@@ -116,11 +116,18 @@
 
 ### Changed
 
+- `hawkes_branching_ratio` 1.1.0 to 1.2.0: runs a rate-varying Poisson null and reports a
+  verdict. The verdict is deliberately not "self exciting" — see below.
+
 - Digest defaults raised for long-context use: budget 6k -> 60k tokens, excerpt cap
   1,400 -> 20,000 characters. The old excerpt was under a third of one extracted page.
 - The four `ingest_*` classes that clear derivative use now reach the `source` tier.
 
 ### Fixed
+
+- The branching-ratio estimator returned 0.569 with regime "mixed" on a regime-switching
+  Poisson stream with zero self-excitation by construction, which is the failure Filimonov
+  and Sornette demonstrate for the MLE version. The null now runs inside the method.
 
 - The admission gate reported one problem six times. Five of its seven checks read fields
   on a concept card, so a source with no card failed all six at once; those are

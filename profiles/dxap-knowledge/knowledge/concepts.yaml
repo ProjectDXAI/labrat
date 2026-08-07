@@ -962,11 +962,9 @@ concepts:
   required_observables:
   - trade_prints
   required_data_resolution: Event timestamps at sub-second precision, aggregated into count windows.
-  expected_empirical_signature: 'Counts far more dispersed than Poisson, with dispersion that keeps growing
-    as windows are aggregated — the signature of a power-law kernel with mass at long lags. Reported kernel
-    exponents are near -1.15 below about a thousand seconds and near -1.45 above it.
-
-    '
+  expected_empirical_signature: 'Excess dispersion that survives a Poisson null carrying the same local
+    rate profile. That is a residual, not an attribution: separating self-excitation from a time-varying
+    rate needs the temporal structure of the counts, which dispersion discards.'
   alternative_explanations:
   - Regime switching in the exogenous rate. Independent Poisson days with per-day intensities produce
     apparent criticality with zero true self-excitation.
@@ -978,6 +976,10 @@ concepts:
   - A regime-switching Poisson process with true branching ratio zero calibrates to an estimate near one
     across fourteen years of E-mini data, and residual analysis does not reject it. A good fit is not
     evidence here.
+  - 'Dispersion does not rank the two candidate explanations correctly. Measured on synthetic streams:
+    a regime-switching Poisson process with zero self-excitation has Fano 6.76, and a genuinely self-exciting
+    stream has Fano 1.66. Any estimator reading n off the Fano factor will call the first more endogenous
+    than the second.'
   - One percent of inter-quote duration outliers moves the estimate from a true 0.7 to about 0.98 under
     a power-law kernel; heavier outliers need only 0.17 percent.
   - Fitting a short-memory kernel to long-memory data biases the estimate upward by more than 0.2 for

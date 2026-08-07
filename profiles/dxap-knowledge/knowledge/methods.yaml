@@ -1,307 +1,396 @@
-# Method objects: bindings from concepts to versioned implementations.
-#
-# The implementation, its inputs/outputs, its as-of contract and its unit tests
-# live in `scripts/methods.py`. This file records which concept a method is
-# evidence for, the parameters we default to, and the data the caller must have.
-#
-# `implementation_version` is pinned deliberately. If the implementation changes
-# version, validation fails until someone re-verifies the card against the new
-# behaviour — a silent numerical change is exactly the kind of drift that makes a
-# knowledge base untrustworthy.
-
 methods:
-  - method_id: order_flow_imbalance
-    implementation_version: "1.0.0"
-    concept_ids: [KC-MICRO-OFI]
-    default_params: {window: 50}
-    data_requirements: [l1_book]
-    status: implemented
-    synthetic_tests:
-      - "Bid queue growth at a constant best bid reads positive."
-      - "Ask queue depletion at a constant best ask reads positive."
-      - "A single snapshot yields zero rather than an error."
-    notes: "Normalize by displayed depth before comparing across instruments."
+- method_id: order_flow_imbalance
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-MICRO-OFI
+  default_params:
+    window: 50
+  data_requirements:
+  - l1_book
+  status: implemented
+  synthetic_tests:
+  - Bid queue growth at a constant best bid reads positive.
+  - Ask queue depletion at a constant best ask reads positive.
+  - A single snapshot yields zero rather than an error.
+  notes: Normalize by displayed depth before comparing across instruments.
+- method_id: kyle_lambda
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-INFO-KYLE
+  default_params: {}
+  data_requirements:
+  - signed_volume
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - Recovers a known slope on noiseless synthetic data.
+  - Refuses when signed volume has no variance.
+  notes: Always read r_squared alongside lambda; a fitted slope in a concave-impact regime is the classic
+    misuse.
+- method_id: avellaneda_stoikov_quotes
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-MM-INVENTORY
+  default_params:
+    gamma: 0.1
+    kappa: 1.5
+  data_requirements:
+  - l1_book
+  - position_state
+  - volatility_estimate
+  status: implemented
+  synthetic_tests:
+  - Flat inventory quotes symmetrically around mid.
+  - Long inventory leans the reservation price down, short leans it up.
+  - Half-spread is independent of inventory sign.
+  notes: Clamp to venue tick and quote limits before use. Funding carry is not in the model.
+- method_id: almgren_chriss_schedule
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-EXEC-AC
+  default_params:
+    intervals: 10
+  data_requirements:
+  - mid_price_series
+  - volatility_estimate
+  - position_state
+  status: implemented
+  synthetic_tests:
+  - Zero risk aversion reproduces the uniform (TWAP) trajectory.
+  - Higher risk aversion front-loads, lowering variance and raising expected cost.
+  - Refuses when the effective temporary impact is non-positive.
+  notes: The schedule has no stopping rule; pair it with KC-STOP-CONTINUATION when the thesis can decay
+    mid-execution.
+- method_id: kalman_local_level
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-FILTER-STATE
+  default_params:
+    observation_variance: 1.0
+    state_variance: 0.01
+  data_requirements:
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - Converges to the level on a constant series with vanishing innovations.
+  - Normalized innovation squared spikes at an injected level break.
+  notes: Filtered, never smoothed. Smoothing would leak future observations into a live decision.
+- method_id: cusum_changepoint
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-DETECT-CUSUM
+  default_params:
+    drift: 0.5
+    threshold: 5.0
+    burn_in: 10
+  data_requirements:
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - Silent on a stationary series.
+  - Alarms within a few observations of an injected shift, with the correct direction.
+  notes: Tune drift and threshold on a period disjoint from the one being evaluated, or the delay curve
+    is meaningless.
+- method_id: continuation_hazard
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-STOP-CONTINUATION
+  default_params:
+    bandwidth: 0.1
+    prior_strength: 4.0
+  data_requirements:
+  - position_state
+  - mfe_history
+  - episode_history
+  status: implemented
+  synthetic_tests:
+  - Deeper giveback lowers the continuation probability.
+  - A bucket with no comparable episodes falls back to the base rate.
+  notes: Returns support explicitly. A probability on three episodes is a prior, and the card says so.
+- method_id: lmsr_binary
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-PRED-LMSR
+  default_params: {}
+  data_requirements:
+  - market_probability
+  - orderbook_depth
+  status: implemented
+  synthetic_tests:
+  - Prices sum to one and start at 0.5 with zero inventory.
+  - Moving the price costs a positive amount bounded by the subsidy.
+  - Extreme inventory does not overflow the exponential.
+  notes: Only applies to scoring-rule venues. On a CLOB prediction market this misprices the cost of moving
+    the market.
+- method_id: hawkes_branching_ratio
+  implementation_version: 1.2.0
+  concept_ids:
+  - KC-HAWKES-CRITICALITY
+  default_params:
+    min_windows: 20
+    scales:
+    - 1
+    - 5
+    - 20
+    null_surrogates: 200
+  data_requirements:
+  - trade_prints
+  status: implemented
+  synthetic_tests:
+  - Recovers a branching ratio from counts constructed with a known Fano factor.
+  - Underdispersed counts are flagged rather than returned as a negative ratio.
+  - A series whose dispersion grows with aggregation raises the scale warning.
+  - A regime-switching Poisson stream with zero self-excitation reads n above 0.4 from dispersion alone,
+    the rate-varying null runs against it, and no code path returns a verdict claiming self-excitation.
+  notes: 'Version 1.2.0 adds a rate-varying Poisson null, which is sound in one direction only. Failing
+    to beat it means there is nothing left to attribute. Beating it means the dispersion is unexplained,
+    which is not the same as self-excited: measured on synthetic streams, a zero-excitation regime-switching
+    process has Fano 6.76 and a genuinely self-exciting one has Fano 1.66, so dispersion does not rank
+    them correctly. Read `verdict`, and treat `excess_dispersion_unexplained` as a residual. Separating
+    the two needs the temporal structure of the counts, which this estimator discards.'
+- method_id: time_irreversibility
+  implementation_version: 1.1.0
+  concept_ids:
+  - KC-IRREVERSIBILITY
+  default_params:
+    embedding: 3
+    surrogates: 200
+    seed: 1337
+  data_requirements:
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - A symmetric triangle wave is not significant against the surrogate null.
+  - A sawtooth is significant.
+  - Surrogate count of zero disables the test rather than silently returning a bare divergence.
+  notes: 'The surrogate population came from reading the source method; version 1.0.0 reported a raw divergence
+    with no null, which the published work treats as the essential ingredient.
 
-  - method_id: kyle_lambda
-    implementation_version: "1.0.0"
-    concept_ids: [KC-INFO-KYLE]
-    default_params: {}
-    data_requirements: [signed_volume, mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "Recovers a known slope on noiseless synthetic data."
-      - "Refuses when signed volume has no variance."
-    notes: "Always read r_squared alongside lambda; a fitted slope in a concave-impact regime is the classic misuse."
+    '
+- method_id: path_signature
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-SIGNATURE-PATH
+  default_params: {}
+  data_requirements:
+  - mid_price_series
+  - signed_volume
+  status: implemented
+  synthetic_tests:
+  - Exact Levy area for the unit triangle.
+  - Identical result after subdividing segments and repeating points.
+  - Zero area for a straight path.
+  notes: Normalize channels before comparing areas across instruments, or the area measures scale.
+- method_id: batch_priority_fill
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-BATCH-PRIORITY
+  default_params: {}
+  data_requirements:
+  - l2_book
+  - trade_prints
+  - sequence_metadata
+  status: implemented
+  synthetic_tests:
+  - A batch arriving aggressive-first, cancel-second, post-only-last executes in exactly the reverse order.
+  - A cancel that arrived after an aggressive order still executes before it.
+  - A batch of one category reproduces arrival order and reports no protection.
+  notes: 'Takes the batch as given. Reconstructing batch boundaries from the feed is the hard part and
+    lives upstream; a wrong reconstruction permutes categories and invalidates every number here.
 
-  - method_id: avellaneda_stoikov_quotes
-    implementation_version: "1.0.0"
-    concept_ids: [KC-MM-INVENTORY]
-    default_params: {gamma: 0.1, kappa: 1.5}
-    data_requirements: [l1_book, position_state, volatility_estimate]
-    status: implemented
-    synthetic_tests:
-      - "Flat inventory quotes symmetrically around mid."
-      - "Long inventory leans the reservation price down, short leans it up."
-      - "Half-spread is independent of inventory sign."
-    notes: "Clamp to venue tick and quote limits before use. Funding carry is not in the model."
+    '
+- method_id: depth_realization
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-PHANTOM-DEPTH
+  default_params:
+    side: buy
+  data_requirements:
+  - l2_book
+  - trade_prints
+  - sequence_metadata
+  status: implemented
+  synthetic_tests:
+  - A sweep that consumes everything displayed reads a realization of 1.0 and zero slippage.
+  - A top level half of which fails to execute reads 0.75 executable with exactly 0.05 of slippage.
+  - The deepest level reached is excluded, since it is partially consumed by design.
+  notes: 'Measures the shortfall, not its cause. Separating a margin failure from a cancel needs the account
+    state behind each resting order, which this pipeline does not capture.
 
-  - method_id: almgren_chriss_schedule
-    implementation_version: "1.0.0"
-    concept_ids: [KC-EXEC-AC]
-    default_params: {intervals: 10}
-    data_requirements: [mid_price_series, volatility_estimate, position_state]
-    status: implemented
-    synthetic_tests:
-      - "Zero risk aversion reproduces the uniform (TWAP) trajectory."
-      - "Higher risk aversion front-loads, lowering variance and raising expected cost."
-      - "Refuses when the effective temporary impact is non-positive."
-    notes: "The schedule has no stopping rule; pair it with KC-STOP-CONTINUATION when the thesis can decay mid-execution."
+    '
+- method_id: event_tree_constraints
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-EVENT-TREE-CONSTRAINTS
+  default_params:
+    require_exhaustive: true
+  data_requirements:
+  - event_tree
+  - market_probability
+  status: implemented
+  synthetic_tests:
+  - A negative-risk event becomes one enforced partition; an undeclared grouping is skipped with a reason.
+  - A single-market event is skipped rather than treated as a degenerate constraint.
+  - Output rows drop into prediction_market_consistency unchanged and recover a planted breach.
+  notes: '`require_exhaustive` defaults to true deliberately. Turning it off manufactures partitions from
+    groupings that were never exclusive, and no amount of price data reveals the error afterwards.
 
-  - method_id: kalman_local_level
-    implementation_version: "1.0.0"
-    concept_ids: [KC-FILTER-STATE]
-    default_params: {observation_variance: 1.0, state_variance: 0.01}
-    data_requirements: [mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "Converges to the level on a constant series with vanishing innovations."
-      - "Normalized innovation squared spikes at an injected level break."
-    notes: "Filtered, never smoothed. Smoothing would leak future observations into a live decision."
+    '
+- method_id: betting_eprocess
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-ANYTIME-ATTRIBUTION
+  default_params:
+    alpha: 0.05
+    lo: 0.0
+    hi: 1.0
+    grid: 201
+  data_requirements:
+  - decision_log
+  - matured_outcomes
+  status: implemented
+  synthetic_tests:
+  - Fixed bet of one against a null of one half gives exactly 1.5^wins x 0.5^losses.
+  - Mean capital over every equiprobable null path is exactly one, at every sequence length.
+  - An all-wins stream crosses the 5% threshold at the eighth observation and not before.
+  notes: 'Pair with `ledger.py analyze`, which is fixed-sample and clustered. This is what to read while
+    a batch is still accumulating; that is what to read once it has matured and frozen.
 
-  - method_id: cusum_changepoint
-    implementation_version: "1.0.0"
-    concept_ids: [KC-DETECT-CUSUM]
-    default_params: {drift: 0.5, threshold: 5.0, burn_in: 10}
-    data_requirements: [mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "Silent on a stationary series."
-      - "Alarms within a few observations of an injected shift, with the correct direction."
-    notes: "Tune drift and threshold on a period disjoint from the one being evaluated, or the delay curve is meaningless."
+    '
+- method_id: counterparty_markout
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-COUNTERPARTY-INFO
+  default_params:
+    prior_strength: 10.0
+    min_counterparties: 4
+  data_requirements:
+  - trade_prints
+  - counterparty_ids
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - Perfectly persistent rankings recover a rank correlation of exactly one.
+  - Perfectly inverted rankings recover minus one.
+  - A one-fill counterparty is pulled strictly between its own value and the pooled mean.
+  notes: 'Report `prior_strength` with the correlation. The shrinkage is what stops a two-fill address
+    topping the ranking, and it is a choice rather than an estimate.
 
-  - method_id: continuation_hazard
-    implementation_version: "1.0.0"
-    concept_ids: [KC-STOP-CONTINUATION]
-    default_params: {bandwidth: 0.1, prior_strength: 4.0}
-    data_requirements: [position_state, mfe_history, episode_history]
-    status: implemented
-    synthetic_tests:
-      - "Deeper giveback lowers the continuation probability."
-      - "A bucket with no comparable episodes falls back to the base rate."
-    notes: "Returns support explicitly. A probability on three episodes is a prior, and the card says so."
+    '
+- method_id: molchan_error_diagram
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-ALARM-LOSS
+  default_params:
+    cost_ratio: 1.0
+  data_requirements:
+  - mid_price_series
+  - matured_outcomes
+  status: implemented
+  synthetic_tests:
+  - A rule firing on exactly the event periods reads tau=0.2, nu=0, loss=0.2 and gain=5.
+  - A near-silent rule keeps the same gain of 5 and loses on loss, which is the whole point.
+  - A constant score scores loss exactly 1.0, the no-skill value, and reports no skill.
+  notes: 'Report the loss, then the gain. Reporting the gain alone selects a rule that almost never fires,
+    which is exactly the behaviour `conservative_abstain` shows in the stress harness: perfect on clean
+    trials, switched off the moment tools vanish.
 
-  - method_id: lmsr_binary
-    implementation_version: "1.0.0"
-    concept_ids: [KC-PRED-LMSR]
-    default_params: {}
-    data_requirements: [market_probability, orderbook_depth]
-    status: implemented
-    synthetic_tests:
-      - "Prices sum to one and start at 0.5 with zero inventory."
-      - "Moving the price costs a positive amount bounded by the subsidy."
-      - "Extreme inventory does not overflow the exponential."
-    notes: "Only applies to scoring-rule venues. On a CLOB prediction market this misprices the cost of moving the market."
+    '
+- method_id: cascade_forecast
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-CASCADE-HORIZON
+  default_params:
+    horizon_windows: 1
+    decay: 0.5
+  data_requirements:
+  - trade_prints
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - The total-descendants factor 1/(1-n) is recovered exactly.
+  - Amplification is exactly 2 at n=0.5 with full within-window decay.
+  - A supercritical branching ratio is refused rather than returning an infinite expectation.
+  notes: 'Pair with `hawkes_branching_ratio` and read its `scale_profile` first. The multiplier is 1/(1-n),
+    so an error in n near criticality is amplified without limit, and the source''s own finding is that
+    the naive forecast''s relative evolution is often good enough.
 
-  - method_id: hawkes_branching_ratio
-    implementation_version: "1.1.0"
-    concept_ids: [KC-HAWKES-CRITICALITY]
-    default_params: {min_windows: 20, scales: [1, 5, 20]}
-    data_requirements: [trade_prints]
-    status: implemented
-    synthetic_tests:
-      - "Recovers a branching ratio from counts constructed with a known Fano factor."
-      - "Underdispersed counts are flagged rather than returned as a negative ratio."
-      - "A series whose dispersion grows with aggregation raises the scale warning."
-    notes: >
-      Version 1.1.0 exists because the 1.0.0 card was written before the primary sources were read.
-      Always read `scale_profile` before quoting the headline number: the published failure is an
-      estimator that measured window-local reflexivity and reported it as a trend in the market.
+    '
+- method_id: doubly_robust_value
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-DOUBLY-ROBUST
+  default_params:
+    clip: 0.01
+  data_requirements:
+  - decision_log
+  - matured_outcomes
+  status: implemented
+  synthetic_tests:
+  - Under correct propensities both importance sampling and DR return the true value exactly.
+  - A perfect reward model makes the direct method exact and leaves DR exact.
+  - A reward model biased by a constant 10 leaves DR exactly unbiased while the direct method carries
+    the whole 10.
+  notes: 'Read `effective_sample_size` and `max_weight_share` before the point estimate. Doubly robust
+    is not doubly safe: if both models are bad it inherits both problems and says nothing about which
+    case you are in.
 
-  - method_id: time_irreversibility
-    implementation_version: "1.1.0"
-    concept_ids: [KC-IRREVERSIBILITY]
-    default_params: {embedding: 3, surrogates: 200, seed: 1337}
-    data_requirements: [mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "A symmetric triangle wave is not significant against the surrogate null."
-      - "A sawtooth is significant."
-      - "Surrogate count of zero disables the test rather than silently returning a bare divergence."
-    notes: >
-      The surrogate population came from reading the source method; version 1.0.0 reported a raw
-      divergence with no null, which the published work treats as the essential ingredient.
+    '
+- method_id: har_realized_volatility
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-VOLATILITY-CASCADE
+  default_params:
+    weekly: 5
+    monthly: 22
+    horizon: 1
+  data_requirements:
+  - mid_price_series
+  status: implemented
+  synthetic_tests:
+  - The daily loading dominates on a signal with genuine one-lag dependence.
+  - A constant series is refused as collinear rather than fitted.
+  - Horizon ordering is validated; weekly longer than monthly is refused.
+  notes: 'This is the control, not the model. Any volatility forecast that does not beat it has not earned
+    its complexity, and it is cheap enough that omitting it is a choice.
 
-  - method_id: path_signature
-    implementation_version: "1.0.0"
-    concept_ids: [KC-SIGNATURE-PATH]
-    default_params: {}
-    data_requirements: [mid_price_series, signed_volume]
-    status: implemented
-    synthetic_tests:
-      - "Exact Levy area for the unit triangle."
-      - "Identical result after subdividing segments and repeating points."
-      - "Zero area for a straight path."
-    notes: "Normalize channels before comparing areas across instruments, or the area measures scale."
+    '
+- method_id: engle_granger_cointegration
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-COINTEGRATION
+  default_params:
+    lags: 1
+  data_requirements:
+  - mid_price_series
+  - mark_price
+  status: implemented
+  synthetic_tests:
+  - Hedge ratio recovered exactly on a noiseless proportional pair.
+  - A planted bounded spread over a random walk reads cointegrated with a negative error-correction coefficient.
+  - Two independent random walks read not cointegrated, with residual variance an order of magnitude larger.
+  notes: 'The reported t-statistic does not have a standard distribution, because the residual is itself
+    estimated. It is compared against the conventional Engle-Granger threshold and must not be read as
+    an ADF or normal t.
 
-  # Workstream bindings. Each exists because a workstream problem had no servable
-  # concept and no way to compute evidence for one.
-  - method_id: batch_priority_fill
-    implementation_version: "1.0.0"
-    concept_ids: [KC-BATCH-PRIORITY]
-    default_params: {}
-    data_requirements: [l2_book, trade_prints, sequence_metadata]
-    status: implemented
-    synthetic_tests:
-      - "A batch arriving aggressive-first, cancel-second, post-only-last executes in exactly the reverse order."
-      - "A cancel that arrived after an aggressive order still executes before it."
-      - "A batch of one category reproduces arrival order and reports no protection."
-    notes: >
-      Takes the batch as given. Reconstructing batch boundaries from the feed is the hard part and
-      lives upstream; a wrong reconstruction permutes categories and invalidates every number here.
+    '
+- method_id: robust_location_scale
+  implementation_version: 1.0.0
+  concept_ids:
+  - KC-ROBUST-ESTIMATION
+  default_params:
+    tuning: 1.345
+    iterations: 50
+  data_requirements:
+  - mid_price_series
+  - trade_prints
+  status: implemented
+  synthetic_tests:
+  - Exact on symmetric data, where mean, median and M-estimate coincide.
+  - One arbitrary observation moves the mean by three orders of magnitude and leaves the M-estimate within
+    one unit.
+  - A degenerate median absolute deviation is refused rather than divided by.
+  notes: 'Report `downweighted_share` with the estimate. A high share means the model and the data disagree
+    about what the process is, which is information rather than noise to be removed.
 
-  - method_id: depth_realization
-    implementation_version: "1.0.0"
-    concept_ids: [KC-PHANTOM-DEPTH]
-    default_params: {side: buy}
-    data_requirements: [l2_book, trade_prints, sequence_metadata]
-    status: implemented
-    synthetic_tests:
-      - "A sweep that consumes everything displayed reads a realization of 1.0 and zero slippage."
-      - "A top level half of which fails to execute reads 0.75 executable with exactly 0.05 of slippage."
-      - "The deepest level reached is excluded, since it is partially consumed by design."
-    notes: >
-      Measures the shortfall, not its cause. Separating a margin failure from a cancel needs the
-      account state behind each resting order, which this pipeline does not capture.
-
-  - method_id: event_tree_constraints
-    implementation_version: "1.0.0"
-    concept_ids: [KC-EVENT-TREE-CONSTRAINTS]
-    default_params: {require_exhaustive: true}
-    data_requirements: [event_tree, market_probability]
-    status: implemented
-    synthetic_tests:
-      - "A negative-risk event becomes one enforced partition; an undeclared grouping is skipped with a reason."
-      - "A single-market event is skipped rather than treated as a degenerate constraint."
-      - "Output rows drop into prediction_market_consistency unchanged and recover a planted breach."
-    notes: >
-      `require_exhaustive` defaults to true deliberately. Turning it off manufactures partitions from
-      groupings that were never exclusive, and no amount of price data reveals the error afterwards.
-
-  - method_id: betting_eprocess
-    implementation_version: "1.0.0"
-    concept_ids: [KC-ANYTIME-ATTRIBUTION]
-    default_params: {alpha: 0.05, lo: 0.0, hi: 1.0, grid: 201}
-    data_requirements: [decision_log, matured_outcomes]
-    status: implemented
-    synthetic_tests:
-      - "Fixed bet of one against a null of one half gives exactly 1.5^wins x 0.5^losses."
-      - "Mean capital over every equiprobable null path is exactly one, at every sequence length."
-      - "An all-wins stream crosses the 5% threshold at the eighth observation and not before."
-    notes: >
-      Pair with `ledger.py analyze`, which is fixed-sample and clustered. This is what to read while
-      a batch is still accumulating; that is what to read once it has matured and frozen.
-
-  - method_id: counterparty_markout
-    implementation_version: "1.0.0"
-    concept_ids: [KC-COUNTERPARTY-INFO]
-    default_params: {prior_strength: 10.0, min_counterparties: 4}
-    data_requirements: [trade_prints, counterparty_ids, mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "Perfectly persistent rankings recover a rank correlation of exactly one."
-      - "Perfectly inverted rankings recover minus one."
-      - "A one-fill counterparty is pulled strictly between its own value and the pooled mean."
-    notes: >
-      Report `prior_strength` with the correlation. The shrinkage is what stops a two-fill address
-      topping the ranking, and it is a choice rather than an estimate.
-
-  # Bindings for the transfers. Both came out of reading the seismology material,
-  # and both correct something the corpus was already doing wrong.
-  - method_id: molchan_error_diagram
-    implementation_version: "1.0.0"
-    concept_ids: [KC-ALARM-LOSS]
-    default_params: {cost_ratio: 1.0}
-    data_requirements: [mid_price_series, matured_outcomes]
-    status: implemented
-    synthetic_tests:
-      - "A rule firing on exactly the event periods reads tau=0.2, nu=0, loss=0.2 and gain=5."
-      - "A near-silent rule keeps the same gain of 5 and loses on loss, which is the whole point."
-      - "A constant score scores loss exactly 1.0, the no-skill value, and reports no skill."
-    notes: >
-      Report the loss, then the gain. Reporting the gain alone selects a rule that almost
-      never fires, which is exactly the behaviour `conservative_abstain` shows in the stress
-      harness: perfect on clean trials, switched off the moment tools vanish.
-
-  - method_id: cascade_forecast
-    implementation_version: "1.0.0"
-    concept_ids: [KC-CASCADE-HORIZON]
-    default_params: {horizon_windows: 1, decay: 0.5}
-    data_requirements: [trade_prints, mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "The total-descendants factor 1/(1-n) is recovered exactly."
-      - "Amplification is exactly 2 at n=0.5 with full within-window decay."
-      - "A supercritical branching ratio is refused rather than returning an infinite expectation."
-    notes: >
-      Pair with `hawkes_branching_ratio` and read its `scale_profile` first. The multiplier is
-      1/(1-n), so an error in n near criticality is amplified without limit, and the source's
-      own finding is that the naive forecast's relative evolution is often good enough.
-
-  # Estimators for mathematics the corpus carried but never made executable.
-  - method_id: doubly_robust_value
-    implementation_version: "1.0.0"
-    concept_ids: [KC-DOUBLY-ROBUST]
-    default_params: {clip: 0.01}
-    data_requirements: [decision_log, matured_outcomes]
-    status: implemented
-    synthetic_tests:
-      - "Under correct propensities both importance sampling and DR return the true value exactly."
-      - "A perfect reward model makes the direct method exact and leaves DR exact."
-      - "A reward model biased by a constant 10 leaves DR exactly unbiased while the direct method carries the whole 10."
-    notes: >
-      Read `effective_sample_size` and `max_weight_share` before the point estimate. Doubly
-      robust is not doubly safe: if both models are bad it inherits both problems and says
-      nothing about which case you are in.
-
-  - method_id: har_realized_volatility
-    implementation_version: "1.0.0"
-    concept_ids: [KC-VOLATILITY-CASCADE]
-    default_params: {weekly: 5, monthly: 22, horizon: 1}
-    data_requirements: [mid_price_series]
-    status: implemented
-    synthetic_tests:
-      - "The daily loading dominates on a signal with genuine one-lag dependence."
-      - "A constant series is refused as collinear rather than fitted."
-      - "Horizon ordering is validated; weekly longer than monthly is refused."
-    notes: >
-      This is the control, not the model. Any volatility forecast that does not beat it has not
-      earned its complexity, and it is cheap enough that omitting it is a choice.
-
-  - method_id: engle_granger_cointegration
-    implementation_version: "1.0.0"
-    concept_ids: [KC-COINTEGRATION]
-    default_params: {lags: 1}
-    data_requirements: [mid_price_series, mark_price]
-    status: implemented
-    synthetic_tests:
-      - "Hedge ratio recovered exactly on a noiseless proportional pair."
-      - "A planted bounded spread over a random walk reads cointegrated with a negative error-correction coefficient."
-      - "Two independent random walks read not cointegrated, with residual variance an order of magnitude larger."
-    notes: >
-      The reported t-statistic does not have a standard distribution, because the residual is
-      itself estimated. It is compared against the conventional Engle-Granger threshold and must
-      not be read as an ADF or normal t.
-
-  - method_id: robust_location_scale
-    implementation_version: "1.0.0"
-    concept_ids: [KC-ROBUST-ESTIMATION]
-    default_params: {tuning: 1.345, iterations: 50}
-    data_requirements: [mid_price_series, trade_prints]
-    status: implemented
-    synthetic_tests:
-      - "Exact on symmetric data, where mean, median and M-estimate coincide."
-      - "One arbitrary observation moves the mean by three orders of magnitude and leaves the M-estimate within one unit."
-      - "A degenerate median absolute deviation is refused rather than divided by."
-    notes: >
-      Report `downweighted_share` with the estimate. A high share means the model and the data
-      disagree about what the process is, which is information rather than noise to be removed.
+    '
