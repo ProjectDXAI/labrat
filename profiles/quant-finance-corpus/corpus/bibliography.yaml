@@ -27395,3 +27395,708 @@ entries:
   tags: []
   notes: Importance splitting and adaptive multilevel splitting for rare-event estimation, with unbiasedness,
     a CLT, and how the importance function controls asymptotic variance.
+- id: trefethen-2005-spectra-pseudospectra
+  title: 'Spectra and Pseudospectra: The Behavior of Nonnormal Matrices and Operators'
+  authors:
+  - Lloyd N. Trefethen
+  - Mark Embree
+  year: 2005
+  bucket: dynamical_systems
+  form: monograph
+  venue: Princeton University Press
+  identifiers:
+    isbn: '9780691119465'
+    doi: 10.1515/9780691213101
+    url: https://press.princeton.edu/books/hardcover/9780691119465/spectra-and-pseudospectra
+  pages: 624
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://press.princeton.edu/books/hardcover/9780691119465/spectra-and-pseudospectra
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://press.princeton.edu/books/hardcover/9780691119465/spectra-and-pseudospectra
+    obtained_at: null
+    note: 'Manifest uncertain about: pages. No legitimate free full text found. Purchase or library.'
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The pseudospectrum as the governing object for non-normal matrices and operators, connecting
+    resolvent norm bounds to transient growth of e^{tA} and A^n via the Kreiss matrix theorem.
+- id: trefethen-1993-hydrodynamic-stability-without-eigenvalues
+  title: Hydrodynamic Stability Without Eigenvalues
+  authors:
+  - Lloyd N. Trefethen
+  - Anne E. Trefethen
+  - Satish C. Reddy
+  - Tobin A. Driscoll
+  year: 1993
+  bucket: dynamical_systems
+  form: paper
+  venue: Science 261(5121)
+  identifiers:
+    isbn: null
+    doi: 10.1126/science.261.5121.578
+    url: https://www.science.org/doi/10.1126/science.261.5121.578
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://people.maths.ox.ac.uk/trefethen/publication/PDF/1993_57.pdf
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/trefethen-1993-hydrodynamic-stability-without-eigenvalues.pdf
+    source_url: https://people.maths.ox.ac.uk/trefethen/publication/PDF/1993_57.pdf
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Eigenvalue-stable shear flows admit transient amplification of order 10^5 because the operator
+      is far from normal; pseudospectra rather than spectra predict the observed transition.
+    locator: the whole paper
+    kind: whole
+    pages: 8
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Eigenvalue-stable shear flows admit transient amplification of order 10^5 because the operator
+    is far from normal; pseudospectra rather than spectra predict the observed transition.
+- id: farrell-1996-generalized-stability-theory-i
+  title: 'Generalized Stability Theory. Part I: Autonomous Operators'
+  authors:
+  - Brian F. Farrell
+  - Petros J. Ioannou
+  year: 1996
+  bucket: dynamical_systems
+  form: paper
+  venue: Journal of the Atmospheric Sciences 53(14)
+  identifiers:
+    isbn: null
+    doi: 10.1175/1520-0469(1996)053<2025:GSTPIA>2.0.CO;2
+    url: https://journals.ametsoc.org/view/journals/atsc/53/14/1520-0469_1996_053_2025_gstpia_2_0_co_2.xml
+  pages: 16
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: http://users.uoa.gr/~pjioannou/papers/genstab1.pdf
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/farrell-1996-generalized-stability-theory-i.pdf
+    source_url: http://users.uoa.gr/~pjioannou/papers/genstab1.pdf
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'Linear stability for autonomous non-normal operators as a singular-value problem: propagator
+      SVD, optimal excitation, stochastic variance maintenance, for systems whose eigenmodes all decay.'
+    locator: the whole paper
+    kind: section
+    pages: 16
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Linear stability for autonomous non-normal operators as a singular-value problem: propagator
+    SVD, optimal excitation, stochastic variance maintenance, for systems whose eigenmodes all decay.'
+- id: schmid-2007-nonmodal-stability-theory
+  title: Nonmodal Stability Theory
+  authors:
+  - Peter J. Schmid
+  year: 2007
+  bucket: dynamical_systems
+  form: survey
+  venue: Annual Review of Fluid Mechanics 39
+  identifiers:
+    isbn: null
+    doi: 10.1146/annurev.fluid.38.050304.092139
+    url: https://www.annualreviews.org/doi/abs/10.1146/annurev.fluid.38.050304.092139
+  pages: 34
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.annualreviews.org/doi/abs/10.1146/annurev.fluid.38.050304.092139
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.annualreviews.org/doi/abs/10.1146/annurev.fluid.38.050304.092139
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The initial-value and operator-norm formulation of stability, unifying optimal transient growth,
+    resolvent and pseudospectral analysis, adjoint optimisation and stochastic forcing response.
+- id: kreiss-1962-stabilitaetsdefinition-differenzengleichungen
+  title: Über die Stabilitätsdefinition für Differenzengleichungen die partielle Differentialgleichungen
+    approximieren
+  authors:
+  - Heinz-Otto Kreiss
+  year: 1962
+  bucket: dynamical_systems
+  form: paper
+  venue: BIT Numerical Mathematics 2(3)
+  identifiers:
+    isbn: null
+    doi: 10.1007/BF01957330
+    url: https://link.springer.com/article/10.1007/BF01957330
+  pages: 29
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://link.springer.com/article/10.1007/BF01957330
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://link.springer.com/article/10.1007/BF01957330
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'Original source of the Kreiss matrix theorem: uniform power-boundedness is equivalent to a resolvent
+    bound, fixing the Kreiss constant as the bridge between resolvent growth and transient amplification.'
+- id: toh-1999-kreiss-matrix-theorem-general-domain
+  title: The Kreiss Matrix Theorem on a General Complex Domain
+  authors:
+  - Kim-Chuan Toh
+  - Lloyd N. Trefethen
+  year: 1999
+  bucket: dynamical_systems
+  form: paper
+  venue: SIAM J. Matrix Analysis and Applications 21(1)
+  identifiers:
+    isbn: null
+    doi: 10.1137/S0895479897324020
+    url: https://epubs.siam.org/doi/10.1137/S0895479897324020
+  pages: 21
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://people.maths.ox.ac.uk/trefethen/publication/PDF/1999_81.pdf
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/toh-1999-kreiss-matrix-theorem-general-domain.pdf
+    source_url: https://people.maths.ox.ac.uk/trefethen/publication/PDF/1999_81.pdf
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'The standard modern treatment of the Kreiss constant: generalises the theorem to an arbitrary
+      complex domain, sharpening the two-sided constants relating resolvent bounds, pseudospectra and
+      sup ||e^{tA}||.'
+    locator: the whole paper
+    kind: section
+    pages: 21
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The standard modern treatment of the Kreiss constant: generalises the theorem to an arbitrary
+    complex domain, sharpening the two-sided constants relating resolvent bounds, pseudospectra and sup
+    ||e^{tA}||.'
+- id: neubert-1997-alternatives-to-resilience
+  title: Alternatives to Resilience for Measuring the Responses of Ecological Systems to Perturbations
+  authors:
+  - Michael G. Neubert
+  - Hal Caswell
+  year: 1997
+  bucket: network_science
+  form: paper
+  venue: Ecology 78(3)
+  identifiers:
+    isbn: null
+    doi: 10.1890/0012-9658(1997)078[0653:ATRFMT]2.0.CO;2
+    url: https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658(1997)078%5B0653:ATRFMT%5D2.0.CO;2
+  pages: 13
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658(1997)078%5B0653:ATRFMT%5D2.0.CO;2
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658(1997)078%5B0653:ATRFMT%5D2.0.CO;2
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Introduces reactivity, the largest eigenvalue of the Hermitian part of A, plus maximum amplification
+    and its timing, as operator measures of transient growth in asymptotically stable networks.
+- id: asllani-2018-non-normal-networks
+  title: Structure and Dynamical Behavior of Non-normal Networks
+  authors:
+  - Malbor Asllani
+  - Renaud Lambiotte
+  - Timoteo Carletti
+  year: 2018
+  bucket: network_science
+  form: paper
+  venue: Science Advances 4(12)
+  identifiers:
+    isbn: null
+    doi: 10.1126/sciadv.aau9403
+    url: https://www.science.org/doi/10.1126/sciadv.aau9403
+  pages: 10
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1803.11542
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/asllani-2018-non-normal-networks.pdf
+    source_url: https://arxiv.org/pdf/1803.11542
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Strong non-normality is generic across real directed networks including economic and trade
+      networks, producing large transient amplification in linearly stable dynamics, linked to hierarchy
+      and low reciprocity.
+    locator: the whole paper
+    kind: whole
+    pages: 10
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Strong non-normality is generic across real directed networks including economic and trade networks,
+    producing large transient amplification in linearly stable dynamics, linked to hierarchy and low reciprocity.
+- id: sompolinsky-1988-chaos-random-neural-networks
+  title: Chaos in Random Neural Networks
+  authors:
+  - Haim Sompolinsky
+  - Andrea Crisanti
+  - Hans-Jürgen Sommers
+  year: 1988
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review Letters 61(3)
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevLett.61.259
+    url: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.61.259
+  pages: 4
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.61.259
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.61.259
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The self-consistent dynamical mean-field description of a fully asymmetric random recurrent network,
+    with the fixed-point-to-chaos transition at gain 1 and closed-form autocorrelation.
+- id: martin-1973-statistical-dynamics-classical-systems
+  title: Statistical Dynamics of Classical Systems
+  authors:
+  - Paul C. Martin
+  - Eric D. Siggia
+  - Harvey A. Rose
+  year: 1973
+  bucket: mathematical_foundations
+  form: paper
+  venue: Physical Review A 8(1)
+  identifiers:
+    isbn: null
+    doi: 10.1103/PhysRevA.8.423
+    url: https://journals.aps.org/pra/abstract/10.1103/PhysRevA.8.423
+  pages: 15
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://journals.aps.org/pra/abstract/10.1103/PhysRevA.8.423
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://journals.aps.org/pra/abstract/10.1103/PhysRevA.8.423
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The auxiliary response-field formalism turning a classical stochastic equation of motion into
+    a field theory with closed Dyson and vertex equations for correlation and response.
+- id: dedominicis-1976-renormalisation-dynamique-critique
+  title: Techniques de renormalisation de la théorie des champs et dynamique des phénomènes critiques
+  authors:
+  - Cirano De Dominicis
+  year: 1976
+  bucket: mathematical_foundations
+  form: paper
+  venue: Journal de Physique Colloques 37(C1)
+  identifiers:
+    isbn: null
+    doi: 10.1051/jphyscol:1976138
+    url: https://jphyscol.journaldephysique.org/articles/jphyscol/abs/1976/01/jphyscol197637C138/jphyscol197637C138.html
+  pages: 8
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://hal.science/jpa-00216466/file/ajp-jphyscol197637C138.pdf
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/dedominicis-1976-renormalisation-dynamique-critique.pdf
+    source_url: https://hal.science/jpa-00216466/file/ajp-jphyscol197637C138.pdf
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Recasts the response-field construction as a path-integral action for Langevin dynamics, making
+      field-theoretic renormalisation directly applicable to critical dynamics.
+    locator: the whole paper
+    kind: whole
+    pages: 8
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Recasts the response-field construction as a path-integral action for Langevin dynamics, making
+    field-theoretic renormalisation directly applicable to critical dynamics.
+- id: doi-1976-second-quantization-classical-many-particle
+  title: Second Quantization Representation for Classical Many-Particle System
+  authors:
+  - Masao Doi
+  year: 1976
+  bucket: mathematical_foundations
+  form: paper
+  venue: J. Physics A 9(9)
+  identifiers:
+    isbn: null
+    doi: 10.1088/0305-4470/9/9/008
+    url: https://iopscience.iop.org/article/10.1088/0305-4470/9/9/008
+  pages: 13
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://iopscience.iop.org/article/10.1088/0305-4470/9/9/008
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://iopscience.iop.org/article/10.1088/0305-4470/9/9/008
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Maps a classical reaction master equation onto a Fock-space evolution with bosonic operators,
+    so reaction and diffusion become normal-ordered operator monomials.
+- id: peliti-1985-path-integral-birth-death-lattice
+  title: Path Integral Approach to Birth-Death Processes on a Lattice
+  authors:
+  - Luca Peliti
+  year: 1985
+  bucket: mathematical_foundations
+  form: paper
+  venue: Journal de Physique 46(9)
+  identifiers:
+    isbn: null
+    doi: 10.1051/jphys:019850046090146900
+    url: https://jphys.journaldephysique.org/en/articles/jphys/abs/1985/09/jphys_1985__46_9_1469_0/jphys_1985__46_9_1469_0.html
+  pages: 16
+  density: high
+  priority: 5
+  rights:
+    status: open_license_other
+    confidence: inferred
+    evidence: https://hal.science/jpa-00210092/file/ajp-jphys_1985_46_9_1469_0.pdf
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/peliti-1985-path-integral-birth-death-lattice.pdf
+    source_url: https://hal.science/jpa-00210092/file/ajp-jphys_1985_46_9_1469_0.pdf
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: Converts Doi's operator representation into a coherent-state path integral with an explicit
+      action for lattice birth-death processes, completing the Doi-Peliti formalism.
+    locator: the whole paper
+    kind: section
+    pages: 16
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Converts Doi's operator representation into a coherent-state path integral with an explicit action
+    for lattice birth-death processes, completing the Doi-Peliti formalism.
+- id: helias-2020-statistical-field-theory-neural-networks
+  title: Statistical Field Theory for Neural Networks
+  authors:
+  - Moritz Helias
+  - David Dahmen
+  year: 2020
+  bucket: mathematical_foundations
+  form: lecture_notes
+  venue: Springer, Lecture Notes in Physics 970
+  identifiers:
+    isbn: '9783030464431'
+    doi: 10.1007/978-3-030-46444-8
+    url: https://link.springer.com/book/10.1007/978-3-030-46444-8
+  pages: 203
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1901.10416
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/helias-2020-statistical-field-theory-neural-networks.pdf
+    source_url: https://arxiv.org/pdf/1901.10416
+    obtained_at: '2026-08-07'
+    note: null
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: Pedagogical development of MSR/De Dominicis-Janssen path integrals, disorder averaging, effective
+    actions and loopwise expansions, culminating in dynamical mean-field theory for random recurrent networks.
+- id: kamenev-2023-field-theory-nonequilibrium-systems
+  title: Field Theory of Non-Equilibrium Systems
+  authors:
+  - Alex Kamenev
+  year: 2023
+  bucket: mathematical_foundations
+  form: textbook
+  venue: Cambridge University Press, 2nd edition
+  identifiers:
+    isbn: '9781108488259'
+    doi: 10.1017/9781108769266
+    url: https://www.cambridge.org/core/books/field-theory-of-nonequilibrium-systems/E86E9D0A1921BA06F964DA83428F7CCE
+  pages: 514
+  density: high
+  priority: 5
+  rights:
+    status: licensed_purchase_required
+    confidence: inferred
+    evidence: https://www.cambridge.org/core/books/field-theory-of-nonequilibrium-systems/E86E9D0A1921BA06F964DA83428F7CCE
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: purchasable
+    copy_path: null
+    source_url: https://www.cambridge.org/core/books/field-theory-of-nonequilibrium-systems/E86E9D0A1921BA06F964DA83428F7CCE
+    obtained_at: null
+    note: No legitimate free full text found. Purchase or library.
+  units: []
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: The closed-time-contour (Keldysh) functional integral, its classical/quantum basis, the MSR limit,
+    Doi-Peliti reaction models, and the causality structure of the 2x2 Green function matrix.
+- id: sieberer-2016-keldysh-field-theory-driven-open
+  title: Keldysh Field Theory for Driven Open Quantum Systems
+  authors:
+  - Lukas M. Sieberer
+  - Michael Buchhold
+  - Sebastian Diehl
+  year: 2016
+  bucket: mathematical_foundations
+  form: survey
+  venue: Reports on Progress in Physics 79(9)
+  identifiers:
+    isbn: null
+    doi: 10.1088/0034-4885/79/9/096001
+    url: https://iopscience.iop.org/article/10.1088/0034-4885/79/9/096001
+  pages: 73
+  density: high
+  priority: 5
+  rights:
+    status: author_hosted_free
+    confidence: inferred
+    evidence: https://arxiv.org/pdf/1512.00637
+    checked_at: '2026-08-07'
+    grant: null
+    notes: null
+  acquisition:
+    state: owned
+    copy_path: corpus/study/sieberer-2016-keldysh-field-theory-driven-open.pdf
+    source_url: https://arxiv.org/pdf/1512.00637
+    obtained_at: '2026-08-07'
+    note: null
+  units:
+  - unit_id: whole-paper
+    title: null
+    topic: 'The open-system Keldysh functional integral: action from a Lindblad generator, retarded/advanced/Keldysh
+      response-and-correlation structure, semiclassical limit, functional RG for driven-dissipative states.'
+    locator: the whole paper
+    kind: section
+    pages: 73
+    priority: 5
+    read_status: unread
+    concepts_expected: []
+    notes: null
+  refs: []
+  discovered:
+    round: 0
+    method: acquisition_manifest
+    source: research agent
+  status: candidate
+  tags: []
+  notes: 'The open-system Keldysh functional integral: action from a Lindblad generator, retarded/advanced/Keldysh
+    response-and-correlation structure, semiclassical limit, functional RG for driven-dissipative states.'
