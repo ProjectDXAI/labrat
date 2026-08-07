@@ -532,3 +532,40 @@ fraction of the tokens, the triggers are not earning their place and should chan
 the licences bind before the triggers do, the comparison says so rather than crediting
 the policy for a decision the rights made.
 
+## Admission: how far through compilation a source is
+
+```bash
+python scripts/knowledge.py admission --held-only
+```
+
+Seven checks, all reading fields the SERVABLE gate already requires, projected onto the
+source that produced them: an anchored card, that card's assumptions and failure modes, a
+falsifiable hypothesis, named observables, a bound method where it claims an
+implementation, a counterweight, and a mapping to a problem.
+
+**It measures our work on a source, not the source's worth.** A source nobody has compiled
+scores zero whether it is Brémaud or a blog post. A low number is a statement about the
+backlog. It was originally framed as whether a source had "earned its place", which was
+wrong, and the wording invited exactly the misreading it produced.
+
+Three things it deliberately does not do, two of them learned by getting them wrong.
+
+**It does not report dependent checks as failures.** Five checks read fields on a concept
+card, so a source with no card failed six checks at once and the totals read as six
+independent problems when there was one. Those are `not_applicable` now, and `stage`
+separates "nobody has compiled this" from "the card is one artifact short". On this corpus
+that changed the picture from *9 admitted, 123 rejected* to *10 compiled, 19 one artifact
+short, 103 not compiled* — the same facts, and a completely different thing to do about
+them.
+
+**It does not require a counterweight or a hypothesis for settled mathematics.** A theorem
+has no competing explanation and makes no ex ante prediction about a market; demanding
+either of Little's law tests the tagger rather than the source. A card tagged
+`established-maths` is exempt from both. Exempting a card from two checks is a large claim,
+which is why it has to be written on the card where it can be argued with.
+
+**It does not claim to be unbiased.** The `problem` check asks whether a source maps onto
+the existing `PB-*` taxonomy, so a source revealing a problem the taxonomy has not framed
+fails precisely for being novel. Nothing currently fails on it, so the bias is latent
+rather than active, but read a failure there as a question about the taxonomy rather than a
+verdict on the source.

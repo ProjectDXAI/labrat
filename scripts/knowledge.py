@@ -359,15 +359,29 @@ ADMISSION_CHECKS = [
 
 def admission(store: dict[str, Any], sources: dict[str, dict[str, Any]],
               held: set[str] | None = None) -> dict[str, Any]:
-    """Has a source earned its place, or is it still a bibliographic record?
+    """How far through compilation is each source, and what is the next missing artifact?
 
-    A corpus grows by acquisition and gets better by compilation, and only the first of
-    those is easy. Without a gate at the source level you end up with five hundred records
-    and the same forty cards. The checks are not new standards: every one reads a field
-    the SERVABLE gate already requires, projected onto the source that produced it.
+    This measures our work on a source, not the source's worth. A source nobody has
+    compiled yet scores zero whether it is Brémaud or a blog post, so a low score is a
+    statement about the backlog and never about the reading.
 
-    `method` is marked not-applicable rather than failed when no card from this source
-    claims an implementation -- a source can be conceptual and still earn admission.
+    Two things this deliberately does not do, both learned by getting them wrong.
+
+    It does not report dependent checks as failures. Five of the checks read fields on a
+    concept card, so a source with no card yet failed six checks at once and the totals
+    read as six independent problems when there was one: nobody has written a card. Those
+    are reported `not_applicable` now, and `stage` says which of the two situations a
+    source is in.
+
+    It does not require a counterweight for every claim. A theorem has no competing
+    explanation, and demanding one of Little's law or the Wiener-Hopf equation is a
+    category error rather than a standard. Cards marked as established mathematics are
+    exempt, and the exemption is recorded so it can be argued with.
+
+    The remaining bias is worth stating plainly and is not fixed here: the `problem` check
+    asks whether a source maps onto the existing PB-* taxonomy, so a source that reveals a
+    problem the taxonomy has not framed fails precisely for being novel. Read a failure
+    there as a question about the taxonomy, not a verdict on the source.
     """
     by_concept: dict[str, list[dict[str, Any]]] = {}
     for concept in store.get("concepts") or []:
@@ -387,10 +401,29 @@ def admission(store: dict[str, Any], sources: dict[str, dict[str, Any]],
         concepts = by_concept.get(source_id, [])
         results: dict[str, Any] = {}
         results["anchored_card"] = bool(concepts)
+        # Everything below reads a card. With no card the answer is "not yet asked", and
+        # reporting it as five separate failures triples the apparent size of the problem.
+        if not concepts:
+            rows.append({
+                "source_id": source_id,
+                "admitted": False,
+                "stage": "no_card_yet",
+                "cards": [],
+                "missing": ["a concept card anchored to it"],
+                "not_applicable": [label for key, label in ADMISSION_CHECKS if key != "anchored_card"],
+                "checks": {key: (True if key == "anchored_card" else None) for key, _ in ADMISSION_CHECKS},
+                "method_applicable": False,
+            })
+            continue
         results["assumptions"] = any(
             (c.get("assumptions") and c.get("known_failure_modes")) for c in concepts
         )
-        results["hypothesis"] = any(
+        # Same argument as counterweight. A theorem makes no ex ante prediction about a
+        # market, so demanding one of the Wiener-Hopf equation tests the tagger, not the
+        # source. `established-maths` exempts both, and exempting a card from two checks at
+        # once is a large claim, which is why it has to be written down on the card.
+        settled = all("established-maths" in (c.get("tags") or []) for c in concepts)
+        results["hypothesis"] = settled or any(
             any(h.get("ex_ante_prediction") and h.get("null_hypothesis")
                 for h in hypotheses.get(c["concept_id"], []))
             for c in concepts
@@ -402,28 +435,42 @@ def admission(store: dict[str, Any], sources: dict[str, dict[str, Any]],
         bound = any(methods.get(c["concept_id"]) for c in concepts)
         results["method"] = True if not claims_implementation and not bound else bound
         results["method_applicable"] = claims_implementation or bound
-        results["counterweight"] = any(
+        results["counterweight"] = settled or any(
             (c.get("contradicting_concept_ids") or c.get("alternative_explanations"))
             for c in concepts
         )
+        results["counterweight_exempt"] = settled
         results["problem"] = any(c.get("problem_ids") for c in concepts)
 
         missing = [label for key, label in ADMISSION_CHECKS if not results.get(key)]
         rows.append({
             "source_id": source_id,
             "admitted": not missing,
+            "stage": "compiled" if not missing else "card_incomplete",
             "cards": sorted(c["concept_id"] for c in concepts),
             "missing": missing,
+            "not_applicable": (["a contradiction or a competing explanation",
+                                "a falsifiable hypothesis on that card"]
+                               if results.get("counterweight_exempt") else []),
             "checks": {key: results.get(key) for key, _ in ADMISSION_CHECKS},
             "method_applicable": results["method_applicable"],
         })
 
     admitted = [r for r in rows if r["admitted"]]
+    no_card = [r for r in rows if r.get("stage") == "no_card_yet"]
+    partial = [r for r in rows if r.get("stage") == "card_incomplete"]
     return {
         "ok": True,
         "considered": len(rows),
         "admitted": len(admitted),
         "rejected": len(rows) - len(admitted),
+        # Split, because these are different situations with different fixes: one needs
+        # somebody to read and compile, the other needs one named artifact finishing.
+        "no_card_yet": len(no_card),
+        "card_incomplete": len(partial),
+        "next_artifact": sorted(
+            {m for r in partial for m in r["missing"]}
+        ),
         "admitted_ids": [r["source_id"] for r in admitted],
         "sources": rows,
     }
@@ -2231,13 +2278,23 @@ def cmd_admission(args: argparse.Namespace) -> int:
         print(json.dumps(result, indent=2))
         return 0
 
-    print(f"{result['admitted']} of {result['considered']} sources admitted, "
-          f"{result['rejected']} still bibliographic records.")
+    print(f"{result['considered']} held sources.")
+    print(f"  {result['admitted']:>4} compiled")
+    print(f"  {result['card_incomplete']:>4} have a card, missing one artifact")
+    print(f"  {result['no_card_yet']:>4} not compiled yet")
     print()
+    print("This measures compilation, not source quality. A source nobody has read scores")
+    print("zero whatever it is, so the third number is a backlog and not a verdict.")
+    print()
+    if result["next_artifact"]:
+        print("What the partly-compiled ones still need:")
+        for item in result["next_artifact"]:
+            print(f"  - {item}")
+        print()
     for row in result["sources"]:
         if row["admitted"] and not args.verbose:
             continue
-        mark = "PASS" if row["admitted"] else "----"
+        mark = {"compiled": "done", "card_incomplete": "part", "no_card_yet": "  --"}[row["stage"]]
         print(f"{mark}  {row['source_id']}")
         if row["cards"]:
             print(f"        cards: {', '.join(row['cards'])}")

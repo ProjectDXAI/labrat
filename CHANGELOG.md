@@ -122,6 +122,15 @@
 
 ### Fixed
 
+- The admission gate reported one problem six times. Five of its seven checks read fields
+  on a concept card, so a source with no card failed all six at once; those are
+  `not_applicable` now and `stage` separates "not compiled yet" from "one artifact short".
+  The corpus reading went from *9 admitted, 123 rejected* to *10 compiled, 19 one artifact
+  short, 103 not compiled*, which is the same facts and a different thing to do about them.
+- Cards tagged `established-maths` are exempt from the counterweight and hypothesis checks.
+  A theorem has no competing explanation and makes no ex ante market prediction, so
+  demanding either tested the tagger rather than the source.
+
 - `ingest_manifest.py` now enriches an existing entry on a near-duplicate instead of
   discarding the row. Seventy-four entries were marked freely available with no URL
   recorded, so nothing could fetch them, and a manifest that had found the URL was being
